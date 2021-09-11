@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] float rotationThrust = 1f;
+    [SerializeField] float rotationThrust = 200f;
     [SerializeField] float advanceThrust = 1f;
     private Rigidbody rb;
     
@@ -15,50 +15,46 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        processAdvancing();
-        processRotation();
+        ProcessAdvancing();
+        ProcessRotation();
     }
 
-    void processRotation()
+    void ProcessRotation()
     {
-        if (isPressed(KeyCode.D))
+        if (IsPressed(KeyCode.D))
         {
-            rotate(rotationThrust);
+            Rotate(rotationThrust);
         }
-        else if (isPressed(KeyCode.A))
+        else if (IsPressed(KeyCode.A))
         {
-            rotate(-rotationThrust);
-        }
-    }
-
-    void rotate(float rotationThisFrame)
-    {
-        rb.freezeRotation = true;  // freezing rotation so we can manually rotate
-        transform.Rotate(Vector3.right * rotationThisFrame * Time.deltaTime);
-        rb.freezeRotation = false;  // unfreezing rotation so the physics system can take over
-    }
-
-    void processAdvancing()
-    {
-        if (isPressed(KeyCode.W))
-        {
-            advance(advanceThrust);
-        }
-        else if (isPressed(KeyCode.S))
-        {
-            advance(-advanceThrust);
+            Rotate(-rotationThrust);
         }
     }
 
-    void advance(float advancindThisFrame)
+    void Rotate(float rotationThisFrame)
     {
-        //rb.freezePosition = true;  // freezing position so we can manually rotate
-        //transform.Rotate(Vector3.rigth * rotationThisFrame * Time.deltaTime);
-        //rb.freezePosition = false;  // unfreezing position so the physics system can take over
+        transform.Rotate(Vector3.up * rotationThisFrame * Time.deltaTime);
     }
 
-    bool isPressed(KeyCode key)
+    void ProcessAdvancing()
     {
-        return Input.GetKey(KeyCode.A);
+        if (IsPressed(KeyCode.W))
+        {
+            Advance(-advanceThrust);
+        }
+        else if (IsPressed(KeyCode.S))
+        {
+            Advance(advanceThrust);
+        }
+    }
+
+    void Advance(float advancingThisFrame)
+    {
+        transform.Translate(Vector3.forward * advancingThisFrame * Time.deltaTime);
+    }
+
+    bool IsPressed(KeyCode key)
+    {
+        return Input.GetKey(key);
     }
 }
