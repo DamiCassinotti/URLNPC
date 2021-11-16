@@ -40,11 +40,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (IsPressed(KeyCode.W))
         {
-            Advance(-advanceThrust);
+            Advance(advanceThrust);
         }
         else if (IsPressed(KeyCode.S))
         {
-            Advance(advanceThrust);
+            Advance(-advanceThrust);
         }
     }
 

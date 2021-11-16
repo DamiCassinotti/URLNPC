@@ -305,6 +305,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &477059084 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2418224769242456080, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+  m_PrefabInstance: {fileID: 4348771758874026475}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &477059091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477059084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30eb6835976f135a382a6654c9822202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  bulletDamage: 10
+--- !u!114 &477059092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477059084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30eb6835976f135a382a6654c9822202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  bulletDamage: 10
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,10 +561,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 667259666136439845, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
-      propertyPath: advanceThrust
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 4097184986343389542, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
       propertyPath: m_Name
       value: Player
@@ -539,18 +568,6 @@ PrefabInstance:
     - target: {fileID: 5787057898474597101, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
       propertyPath: m_RootOrder
       value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5787057898474597101, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5787057898474597101, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5787057898474597101, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5787057898474597101, guid: 0ef685071a9b2c9b79dc8508c2c3b4ca, type: 3}
       propertyPath: m_LocalPosition.x
