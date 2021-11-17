@@ -1,17 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyBehavior : MonoBehaviour
 {
+
+    [SerializeField] Transform target;
+    [SerializeField] float chaseRange = 10f;
+
+    NavMeshAgent navMeshAgent;
+    float distanceToTarget = Mathf.Infinity;
+
+    void Start()
+    {
+        navMeshAgent = GetComponent<NavMeshAgent>();
+    }
+
+    void Update()
+    {
+        distanceToTarget = Vector3.Distance(target.position, transform.position);
+        if (distanceToTarget <= chaseRange)
+        {
+            navMeshAgent.SetDestination(target.position);
+        }
+    }
+
+    void OnDrawGizmosSelected() {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+    }
+
     /*[SerializeField]  LayerMask whatIsGround, whatIsPlayer;
-    
+
     //States
     [SerializeField] float sightRange, attackRange;
     bool playerInSightRange, playerInAttackRange;
     void Start()
     {
-        
+
     }
 
     void Update()
@@ -24,7 +51,7 @@ public class EnemyBehavior : MonoBehaviour
         if (playerInSightRange && !playerInAttackRange) ChasePlayer();
         //if (playerInAttackRange && playerInSightRange) AttackPlayer();
     }
-    
+
     void Patroling()
     {
         if (!walkPointSet) SearchWalkPoint();
@@ -38,6 +65,5 @@ public class EnemyBehavior : MonoBehaviour
         if (distanceToWalkPoint.magnitude < 1f)
             walkPointSet = false;
     }*/
-    
-}
 
+}
