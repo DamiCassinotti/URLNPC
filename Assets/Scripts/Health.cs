@@ -35,14 +35,15 @@ public class Health : MonoBehaviour
     void ProcessDeath()
     {
         counter.UserWins();
-        //Destroy(gameObject);
-        //ChoseNewLevel();
+        Destroy(gameObject);
+        ChoseNewLevel();
     }
 
     void ChoseNewLevel()
     {
         StartCoroutine(WaitSomeSeconds());
-        SceneManager.LoadScene(0);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex);
     }
 
     IEnumerator WaitSomeSeconds()
