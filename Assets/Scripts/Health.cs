@@ -34,9 +34,26 @@ public class Health : MonoBehaviour
 
     void ProcessDeath()
     {
-        counter.UserWins();
-        Destroy(gameObject);
+        ProcessNpcDeath();
+        ProcessPlayerDeath();
         ChoseNewLevel();
+    }
+
+    void ProcessNpcDeath()
+    {
+        if (gameObject.tag == "NPC")
+        {
+            counter.UserWins();
+            Destroy(gameObject);
+        }
+    }
+
+    void ProcessPlayerDeath()
+    {
+        if (gameObject.tag == "Player")
+        {
+            counter.NpcWins();
+        }
     }
 
     void ChoseNewLevel()

@@ -7,7 +7,8 @@ public class EnemyBehavior : MonoBehaviour
 {
 
     [SerializeField] Transform target;
-    [SerializeField] float chaseRange = 10f;
+    [SerializeField] float chaseRange = 30f;
+    [SerializeField] float attackRange = 15f;
     [SerializeField] float walkPointRange = 10f;
 
     NavMeshAgent navMeshAgent;
@@ -21,12 +22,30 @@ public class EnemyBehavior : MonoBehaviour
     void Update()
     {
         distanceToTarget = Vector3.Distance(target.position, transform.position);
-        if (distanceToTarget <= chaseRange)
+        if (distanceToTarget <= attackRange)
         {
-            navMeshAgent.SetDestination(target.position);
+            Attack();
+        } else if (distanceToTarget <= chaseRange) {
+            Chase();
         } else {
-            navMeshAgent.SetDestination(GetNextDestination());
+            Patrol();
         }
+    }
+
+    void Attack()
+    {
+        EnemyWeapon weapon = gameObject.transform.GetComponent<EnemyWeapon>();
+        weapon.Shoot();
+    }
+
+    void Chase()
+    {
+        navMeshAgent.SetDestination(target.position);
+    }
+
+    void Patrol()
+    {
+        navMeshAgent.SetDestination(GetNextDestination());
     }
 
     Vector3 GetNextDestination()

@@ -2,24 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public abstract class Weapon : MonoBehaviour
 {
 
-    [SerializeField] Camera FPCamera;
     [SerializeField] float range = 100f;
     [SerializeField] float damage = 50f;
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] GameObject hitEffect;
 
-    void Update()
-    {
-        if (Input.GetButtonDown("Fire1"))
-        {
-            Shoot();
-        }
-    }
+    protected abstract Vector3 GetPosition();
+    protected abstract Vector3 GetForward();
 
-    void Shoot()
+    public void Shoot()
     {
         muzzleFlash.Play();
         ProcessRaycast();
@@ -28,7 +22,7 @@ public class Weapon : MonoBehaviour
     void ProcessRaycast()
     {
         RaycastHit hit;
-        if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, range))
+        if (Physics.Raycast(GetPosition(), GetForward(), out hit, range))
         {
             CreateHitImpact(hit);
             ProcessHitEnemy(hit);
