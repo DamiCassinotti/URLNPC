@@ -24,6 +24,7 @@ public class EnemyBehavior : MonoBehaviour
         distanceToTarget = Vector3.Distance(target.position, transform.position);
         if (distanceToTarget <= attackRange)
         {
+            Chase();
             Attack();
         } else if (distanceToTarget <= chaseRange) {
             Chase();
