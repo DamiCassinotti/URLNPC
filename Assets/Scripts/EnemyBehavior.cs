@@ -10,13 +10,17 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] float chaseRange = 30f;
     [SerializeField] float attackRange = 15f;
     [SerializeField] float walkPointRange = 10f;
+    [SerializeField] float attackCooldown = 1f;
 
+    EnemyWeapon weapon;
     NavMeshAgent navMeshAgent;
     float distanceToTarget = Mathf.Infinity;
+    bool canAttack = true;
 
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        weapon = gameObject.transform.GetComponent<EnemyWeapon>();
     }
 
     void Update()
@@ -35,8 +39,12 @@ public class EnemyBehavior : MonoBehaviour
 
     void Attack()
     {
-        EnemyWeapon weapon = gameObject.transform.GetComponent<EnemyWeapon>();
-        weapon.Shoot();
+        if (canAttack)
+        {
+            weapon.Shoot();
+            canAttack = false;
+            StartCoroutine(AttackCooldown());
+        }
     }
 
     void Chase()
@@ -59,6 +67,12 @@ public class EnemyBehavior : MonoBehaviour
     void OnDrawGizmosSelected() {
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
+    }
+
+    IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(attackCooldown);
+        this.canAttack = true;
     }
 
 }

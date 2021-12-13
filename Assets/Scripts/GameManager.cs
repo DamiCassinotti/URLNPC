@@ -7,6 +7,7 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] TMP_Text winnerText;
+    [SerializeField] Canvas finishedRoundCanvas;
     Counter counter;
     string playerTag = "Player";
     string npcTag = "NPC";
@@ -14,13 +15,20 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         counter = FindObjectOfType<Counter>();
+        finishedRoundCanvas.enabled = false;
+    }
+
+    public void LoadNewLevel()
+    {
+        Debug.Log("Reloading scene");
+        SceneManager.LoadScene(0);
+        Time.timeScale = 1;
     }
 
     public void ProcessDeath(string loser)
     {
         ProcessNpcDeath(loser);
         ProcessPlayerDeath(loser);
-        ChoseNewLevel();
     }
 
     void ProcessNpcDeath(string loser)
@@ -28,7 +36,7 @@ public class GameManager : MonoBehaviour
         if (loser == npcTag)
         {
             counter.UserWins();
-            Destroy(gameObject);
+            Destroy(GameObject.FindWithTag(npcTag));
             FinishRound(playerTag);
         }
     }
@@ -45,11 +53,9 @@ public class GameManager : MonoBehaviour
     void FinishRound(string winner)
     {
         winnerText.text = winner + " wins!";
-    }
-
-    void ChoseNewLevel()
-    {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        finishedRoundCanvas.enabled = true;
+        Time.timeScale = 0;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
