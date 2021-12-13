@@ -21,6 +21,7 @@ public class EnemyBehavior : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         weapon = gameObject.transform.GetComponent<EnemyWeapon>();
+        InitAtRandomPosition();
     }
 
     void Update()
@@ -73,6 +74,23 @@ public class EnemyBehavior : MonoBehaviour
     {
         yield return new WaitForSeconds(attackCooldown);
         this.canAttack = true;
+    }
+
+    void InitAtRandomPosition()
+    {
+        Vector3 newPosition = GetRandomPositionInMap();
+        while (!navMeshAgent.CalculatePath(newPosition, new NavMeshPath()))
+        {
+            newPosition = GetRandomPositionInMap();
+        }
+        gameObject.transform.position = newPosition;
+    }
+
+    Vector3 GetRandomPositionInMap()
+    {
+        float newX = Random.Range(-60, 60);
+        float newZ = Random.Range(-60, 60);
+        return new Vector3(newX, 0, newZ);
     }
 
 }

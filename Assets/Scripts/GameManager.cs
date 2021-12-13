@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] TMP_Text winnerText;
     [SerializeField] Canvas finishedRoundCanvas;
+
     Counter counter;
     FirstPersonController fpController;
     string playerTag = "Player";
@@ -61,4 +62,5 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
+
 }
