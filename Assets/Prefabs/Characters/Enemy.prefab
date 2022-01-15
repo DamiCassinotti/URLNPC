@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 210935812}
   - component: {fileID: 210935813}
   - component: {fileID: 210935806}
+  - component: {fileID: 2094766410}
+  - component: {fileID: 2094766401}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: NPC
@@ -132,10 +134,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4c52784fd4fee1a1a9b0f3b36a54edb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
   target: {fileID: 0}
-  chaseRange: 30
-  attackRange: 15
   walkPointRange: 10
+  attackCooldown: 0.2
+  sightRange: 20
 --- !u!195 &210935812
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -187,6 +193,51 @@ MonoBehaviour:
   damage: 50
   muzzleFlash: {fileID: 5640015575482252821}
   hitEffect: {fileID: 2409495363409633794, guid: 4801bea02e36af382abf110c987937e9, type: 3}
+--- !u!114 &2094766410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418224769242456080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5376e45f9f3d3b5b2b61d877656f56de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  chaseRange: 30
+  attackRange: 15
+--- !u!114 &2094766401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418224769242456080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bb6b867a41448888c1cd4f99643ad71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SensorName: RayPerceptionSensor
+  m_DetectableTags:
+  - Player
+  m_RaysPerDirection: 3
+  m_MaxRayDegrees: 70
+  m_SphereCastRadius: 4
+  m_RayLength: 20
+  m_RayLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  m_ObservationStacks: 1
+  rayHitColor: {r: 1, g: 0, b: 0, a: 1}
+  rayMissColor: {r: 1, g: 1, b: 1, a: 1}
+  m_StartVerticalOffset: 0
+  m_EndVerticalOffset: 0
 --- !u!1 &3846806824030858784
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] float health = 100f;
+    [SerializeField] public float health = 100f ;
     GameManager gameManager;
 
     void Start()

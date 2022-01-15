@@ -1,0 +1,97 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1641244776",
+        "python_version": "3.7.6 (default, Jan  8 2020, 19:59:22) \n[GCC 7.3.0]",
+        "command_line_arguments": "/home/damiancassinotti/anaconda3/bin/mlagents-learn config/URLNPC.yaml --run-id=URLNPC --force",
+        "mlagents_version": "0.19.0",
+        "mlagents_envs_version": "0.19.0",
+        "communication_protocol_version": "1.0.0",
+        "tensorflow_version": "2.7.0",
+        "numpy_version": "1.18.5",
+        "end_time_seconds": "1641244824"
+    },
+    "total": 48.21522335096961,
+    "count": 1,
+    "self": 0.003295249945949763,
+    "children": {
+        "run_training.setup": {
+            "total": 0.00645123200956732,
+            "count": 1,
+            "self": 0.00645123200956732
+        },
+        "TrainerController.start_learning": {
+            "total": 48.20547686901409,
+            "count": 1,
+            "self": 0.00041927199345082045,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 28.686737190000713,
+                    "count": 1,
+                    "self": 28.686737190000713
+                },
+                "TrainerController.advance": {
+                    "total": 19.322353349998593,
+                    "count": 1,
+                    "self": 1.443404471501708e-05,
+                    "children": {
+                        "env_step": {
+                            "total": 19.32233891595388,
+                            "count": 1,
+                            "self": 19.32233219698537,
+                            "children": {
+                                "SubprocessEnvManager._take_step": {
+                                    "total": 6.718968506902456e-06,
+                                    "count": 1,
+                                    "self": 6.718968506902456e-06
+                                }
+                            }
+                        }
+                    }
+                },
+                "trainer_threads": {
+                    "total": 1.8946011550724506e-05,
+                    "count": 1,
+                    "self": 1.8946011550724506e-05,
+                    "children": {
+                        "thread_root": {
+                            "total": 0.0,
+                            "count": 0,
+                            "is_parallel": true,
+                            "self": 0.0,
+                            "children": {
+                                "trainer_advance": {
+                                    "total": 19.315203746431507,
+                                    "count": 468,
+                                    "is_parallel": true,
+                                    "self": 0.02172072191024199,
+                                    "children": {
+                                        "process_trajectory": {
+                                            "total": 19.293483024521265,
+                                            "count": 468,
+                                            "is_parallel": true,
+                                            "self": 19.293483024521265
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "TrainerController._save_models": {
+                    "total": 0.19594811100978404,
+                    "count": 1,
+                    "self": 0.00034770602360367775,
+                    "children": {
+                        "RLTrainer._checkpoint": {
+                            "total": 0.19560040498618037,
+                            "count": 1,
+                            "self": 0.19560040498618037
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
