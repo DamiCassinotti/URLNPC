@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerWeapon : Weapon
 {
@@ -8,7 +9,8 @@ public class PlayerWeapon : Weapon
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        var mouse = Mouse.current;
+        if (mouse != null && mouse.leftButton.wasPressedThisFrame)
         {
             Shoot();
         }

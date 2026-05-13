@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 
 public class EnemyAgent : Agent
@@ -42,23 +43,24 @@ public class EnemyAgent : Agent
         sensor.AddObservation(health);
     }
 
-    public override void Heuristic(float[] actionsOut)
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
+        var discrete = actionsOut.DiscreteActions;
         if (!targetInSight)
         {
-            actionsOut[0] = 0;
+            discrete.Array[0] = 0;
         } else if (targetInSight && !canAttack)
         {
-            actionsOut[0] = 1;
+            discrete.Array[0] = 1;
         } else if (targetInSight && canAttack)
         {
-            actionsOut[0] = 2;
+            discrete.Array[0] = 2;
         }
     }
 
-    public override void OnActionReceived(float[] vectorAction)
+    public override void OnActionReceived(ActionBuffers actions)
     {
-        var action = Mathf.FloorToInt(vectorAction[0]);
+        var action = actions.DiscreteActions[0];
         switch (action)
         {
             case 0:
