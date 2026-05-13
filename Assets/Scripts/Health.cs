@@ -9,7 +9,7 @@ public class Health : MonoBehaviour
 
     void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindAnyObjectByType<GameManager>();
     }
 
     public void DecreaseHealth(float damage)

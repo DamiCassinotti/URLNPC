@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using UnityStandardAssets.Characters.FirstPerson;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] TMP_Text winnerText;
     [SerializeField] Canvas finishedRoundCanvas;
+    [SerializeField] Behaviour playerController;
 
     Counter counter;
-    FirstPersonController fpController;
     string playerTag = "Player";
     string npcTag = "NPC";
 
     void Start()
     {
-        counter = FindObjectOfType<Counter>();
-        fpController = GameObject.FindWithTag(playerTag).GetComponent<FirstPersonController>();
+        counter = FindAnyObjectByType<Counter>();
         finishedRoundCanvas.enabled = false;
     }
 
@@ -56,7 +54,7 @@ public class GameManager : MonoBehaviour
     void FinishRound(string winner)
     {
         winnerText.text = winner + " wins!";
-        fpController.enabled = false;
+        if (playerController != null) playerController.enabled = false;
         finishedRoundCanvas.enabled = true;
         Time.timeScale = 0;
         Cursor.lockState = CursorLockMode.None;
