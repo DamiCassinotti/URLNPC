@@ -1943,7 +1943,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2094766410, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
       propertyPath: MaxStep
-      value: 50000
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 2418224769242456080, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
       propertyPath: m_Name
@@ -1954,7 +1954,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3213368035559124543, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+      propertyPath: m_BehaviorName
+      value: URLNPC
+      objectReference: {fileID: 0}
+    - target: {fileID: 3213368035559124543, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3213368035559124543, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+      propertyPath: 'm_BrainParameters.VectorActionSize.Array.data[0]'
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3213368035559124543, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+      propertyPath: 'm_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]'
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5268262596678693787, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
@@ -2005,8 +2017,31 @@ PrefabInstance:
     - {fileID: 2094766401, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2418224769242456080, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1301256654}
   m_SourcePrefab: {fileID: 100100000, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+--- !u!1 &1301256653 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2418224769242456080, guid: b99905451b6dcc32c9799fb7850a7f69, type: 3}
+  m_PrefabInstance: {fileID: 1301256652}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1301256654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1301256653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  DecisionStep: 0
+  TakeActionsBetweenDecisions: 1
 --- !u!1 &1307602097
 GameObject:
   m_ObjectHideFlags: 0
