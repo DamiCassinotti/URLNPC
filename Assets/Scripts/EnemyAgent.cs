@@ -15,6 +15,11 @@ public class EnemyAgent : Agent
     [SerializeField] float diedPenalty = 1.0f;
     [SerializeField] float wastedShotPenalty = 0.05f;
 
+    [Header("Positioning shaping")]
+    [Tooltip("Per-step penalty while the enemy is closer to the player than tooCloseDistance. Discourages melee-rush.")]
+    [SerializeField] float tooClosePenaltyPerStep = 0.005f;
+    [SerializeField] float tooCloseDistance = 6f;
+
     EnemyBehavior behavior;
     Health selfHealth;
     Health targetHealth;
@@ -45,7 +50,11 @@ public class EnemyAgent : Agent
     void EnsureTargetSubscription()
     {
         if (behavior.target == null) return;
-        Health th = behavior.target.GetComponent<Health>();
+        // Walk both directions so this works regardless of whether Health is
+        // attached to the tagged root, a parent, or a child mesh GameObject.
+        Health th = behavior.target.GetComponent<Health>()
+                  ?? behavior.target.GetComponentInParent<Health>()
+                  ?? behavior.target.GetComponentInChildren<Health>();
         if (th == targetHealth) return;
         if (targetHealth != null)
         {
@@ -80,6 +89,11 @@ public class EnemyAgent : Agent
         if (episodeEnding) return;
 
         AddReward(aliveRewardPerStep);
+
+        if (tooClosePenaltyPerStep > 0f && behavior.DistanceToTarget() < tooCloseDistance)
+        {
+            AddReward(-tooClosePenaltyPerStep);
+        }
 
         int action = actions.DiscreteActions[0];
         switch (action)

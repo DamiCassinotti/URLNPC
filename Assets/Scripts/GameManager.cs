@@ -27,6 +27,15 @@ public class GameManager : MonoBehaviour
 
     public void ProcessDeath(string loser)
     {
+        // Counter increments either way — useful as a visual readout during
+        // training so you can see who's winning rounds without alt-tabbing
+        // to the trainer terminal.
+        if (counter != null)
+        {
+            if (loser == npcTag) counter.UserWins();
+            else if (loser == playerTag) counter.NpcWins();
+        }
+
         // While training (or running inference against a connected trainer),
         // the EnemyAgent handles episode resets itself — don't freeze the
         // scene or destroy the NPC, that would break training.
@@ -40,7 +49,6 @@ public class GameManager : MonoBehaviour
     {
         if (loser == npcTag)
         {
-            if (counter != null) counter.UserWins();
             GameObject npc = GameObject.FindWithTag(npcTag);
             if (npc != null) Destroy(npc);
             FinishRound(playerTag);
@@ -51,7 +59,6 @@ public class GameManager : MonoBehaviour
     {
         if (loser == playerTag)
         {
-            if (counter != null) counter.NpcWins();
             FinishRound(npcTag);
         }
     }

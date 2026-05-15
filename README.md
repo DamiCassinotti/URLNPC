@@ -20,9 +20,13 @@ To play against a trained model rather than the heuristic, drag the `.onnx` prod
 ### One-time setup
 
 ```bash
-python -m venv .venv
+# Python 3.10 is required (mlagents 1.1.0 is pinned to the 3.10 series).
+python3.10 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install --upgrade pip
+# --ignore-requires-python: mlagents 1.1.0 caps at 3.10.12, but newer 3.10.x
+# patch releases (e.g. Ubuntu 24.04 ships 3.10.20) are runtime-compatible.
+pip install --ignore-requires-python -r requirements.txt
 ```
 
 ### Required Enemy prefab setup (verify before first training run)

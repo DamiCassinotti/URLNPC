@@ -31,7 +31,7 @@ public abstract class Weapon : MonoBehaviour
 
     void ProcessHitEnemy(RaycastHit hit)
     {
-        Health target = hit.transform.GetComponent<Health>();
+        Health target = hit.transform.GetComponentInParent<Health>();
         if (target != null)
         {
             target.DecreaseHealth(damage);

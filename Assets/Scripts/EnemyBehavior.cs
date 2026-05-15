@@ -11,6 +11,8 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] float sightRange = 20f;
     [SerializeField] float sightFovDegrees = 120f;
     [SerializeField] LayerMask sightObstacleMask = ~0;
+    [Tooltip("Minimum distance between the enemy's random spawn and the player.")]
+    [SerializeField] float minSpawnDistanceFromPlayer = 25f;
 
     NavMeshAgent navMeshAgent;
     EnemyWeapon weapon;
@@ -82,10 +84,20 @@ public class EnemyBehavior : MonoBehaviour
     public void InitAtRandomPosition()
     {
         if (navMeshAgent == null) navMeshAgent = GetComponent<NavMeshAgent>();
+        Transform playerForSpawn = target;
+        if (playerForSpawn == null)
+        {
+            GameObject p = GameObject.FindWithTag("Player");
+            if (p != null) playerForSpawn = p.transform;
+        }
         Vector3 newPosition = GetRandomPositionInMap();
         int attempts = 0;
-        while (!navMeshAgent.CalculatePath(newPosition, new NavMeshPath()) && attempts < 32)
+        while (attempts < 32)
         {
+            bool farEnough = playerForSpawn == null
+                || Vector3.Distance(newPosition, playerForSpawn.position) >= minSpawnDistanceFromPlayer;
+            bool reachable = navMeshAgent.CalculatePath(newPosition, new NavMeshPath());
+            if (farEnough && reachable) break;
             newPosition = GetRandomPositionInMap();
             attempts++;
         }
