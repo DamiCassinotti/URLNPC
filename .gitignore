@@ -62,3 +62,17 @@ crashlytics-build.properties
 .idea/
 .idea/*
 .idea
+
+# Python virtualenv for ML-Agents training
+.venv/
+venv/
+
+# ML-Agents training outputs (per-run logs, checkpoints, .onnx). The committed
+# config is config/URLNPC.yaml; training runs are local artifacts.
+/results/
+/Assets/ML-Agents/Timers/
+
+# Unity crash dumps (emitted at the project root on segfault)
+mono_crash.mem.*
+mono_crash.*.json
+/UserSettings/

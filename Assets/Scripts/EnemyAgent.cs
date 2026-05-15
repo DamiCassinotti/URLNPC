@@ -1,85 +1,164 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 
+[RequireComponent(typeof(EnemyBehavior))]
+[RequireComponent(typeof(Health))]
 public class EnemyAgent : Agent
 {
+    [Header("Rewards")]
+    [SerializeField] float aliveRewardPerStep = 0.001f;
+    [SerializeField] float hitTargetReward = 0.5f;
+    [SerializeField] float gotHitPenalty = 0.5f;
+    [SerializeField] float killTargetReward = 1.0f;
+    [SerializeField] float diedPenalty = 1.0f;
+    [SerializeField] float wastedShotPenalty = 0.05f;
 
-    [Header("ENV PARAMS")]
+    [Header("Positioning shaping")]
+    [Tooltip("Per-step penalty while the enemy is closer to the player than tooCloseDistance. Discourages melee-rush.")]
+    [SerializeField] float tooClosePenaltyPerStep = 0.005f;
+    [SerializeField] float tooCloseDistance = 6f;
+
     EnemyBehavior behavior;
-    EnvironmentParameters defaultParameters;
+    Health selfHealth;
+    Health targetHealth;
 
-    [Header("Heuristic")]
-    [SerializeField] float chaseRange = 30f;
-    [SerializeField] float attackRange = 15f;
-    float distanceToTarget = Mathf.Infinity;
-
-    [Header("OBSERVATIONS")]
     bool canAttack = true;
     bool targetInSight = false;
-    float health;
+    float normalizedHealth = 1f;
+
+    bool episodeEnding;
 
     public override void Initialize()
     {
-        defaultParameters = Academy.Instance.EnvironmentParameters;
-        behavior = gameObject.transform.GetComponent<EnemyBehavior>();
+        behavior = GetComponent<EnemyBehavior>();
+        selfHealth = GetComponent<Health>();
+        selfHealth.OnDamaged += HandleSelfDamaged;
+        selfHealth.OnDied += HandleSelfDied;
     }
 
     void Update()
     {
-        this.targetInSight = behavior.IsTargetInSight();
-        this.health = behavior.ReadHealth();
-        this.canAttack = behavior.ReadCanAttack();
+        targetInSight = behavior.IsTargetInSight();
+        canAttack = behavior.ReadCanAttack();
+        float maxHp = selfHealth.maxHealth <= 0f ? 1f : selfHealth.maxHealth;
+        normalizedHealth = Mathf.Clamp01(selfHealth.health / maxHp);
+        EnsureTargetSubscription();
+    }
+
+    void EnsureTargetSubscription()
+    {
+        if (behavior.target == null) return;
+        // Walk both directions so this works regardless of whether Health is
+        // attached to the tagged root, a parent, or a child mesh GameObject.
+        Health th = behavior.target.GetComponent<Health>()
+                  ?? behavior.target.GetComponentInParent<Health>()
+                  ?? behavior.target.GetComponentInChildren<Health>();
+        if (th == targetHealth) return;
+        if (targetHealth != null)
+        {
+            targetHealth.OnDamaged -= HandleTargetDamaged;
+            targetHealth.OnDied -= HandleTargetDied;
+        }
+        targetHealth = th;
+        if (targetHealth != null)
+        {
+            targetHealth.OnDamaged += HandleTargetDamaged;
+            targetHealth.OnDied += HandleTargetDied;
+        }
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
         sensor.AddObservation(canAttack);
         sensor.AddObservation(targetInSight);
-        sensor.AddObservation(health);
+        sensor.AddObservation(normalizedHealth);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discrete = actionsOut.DiscreteActions;
-        if (!targetInSight)
-        {
-            discrete.Array[0] = 0;
-        } else if (targetInSight && !canAttack)
-        {
-            discrete.Array[0] = 1;
-        } else if (targetInSight && canAttack)
-        {
-            discrete.Array[0] = 2;
-        }
+        if (!targetInSight) discrete[0] = 0;
+        else if (!canAttack) discrete[0] = 1;
+        else discrete[0] = 2;
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        var action = actions.DiscreteActions[0];
+        if (episodeEnding) return;
+
+        AddReward(aliveRewardPerStep);
+
+        if (tooClosePenaltyPerStep > 0f && behavior.DistanceToTarget() < tooCloseDistance)
+        {
+            AddReward(-tooClosePenaltyPerStep);
+        }
+
+        int action = actions.DiscreteActions[0];
         switch (action)
         {
             case 0:
-            behavior.Patrol();
-            SetReward(-0.1f);
-            break;
+                behavior.Patrol();
+                break;
             case 1:
-            behavior.Chase();
-            SetReward(0.1f);
-            break;
+                behavior.Chase();
+                break;
             case 2:
-            behavior.Attack();
-            SetReward(0.5f);
-            break;
+                behavior.Attack();
+                if (behavior.DidShoot && !targetInSight)
+                {
+                    AddReward(-wastedShotPenalty);
+                }
+                break;
         }
     }
 
     public override void OnEpisodeBegin()
     {
-        base.OnEpisodeBegin();
+        episodeEnding = false;
+        if (selfHealth != null) selfHealth.ResetHealth();
+        if (targetHealth != null) targetHealth.ResetHealth();
+        if (behavior != null) behavior.ResetState();
+    }
+
+    void HandleSelfDamaged(float amount)
+    {
+        AddReward(-gotHitPenalty);
+    }
+
+    void HandleTargetDamaged(float amount)
+    {
+        AddReward(hitTargetReward);
+    }
+
+    void HandleSelfDied()
+    {
+        if (episodeEnding) return;
+        episodeEnding = true;
+        AddReward(-diedPenalty);
+        EndEpisode();
+    }
+
+    void HandleTargetDied()
+    {
+        if (episodeEnding) return;
+        episodeEnding = true;
+        AddReward(killTargetReward);
+        EndEpisode();
+    }
+
+    void OnDestroy()
+    {
+        if (selfHealth != null)
+        {
+            selfHealth.OnDamaged -= HandleSelfDamaged;
+            selfHealth.OnDied -= HandleSelfDied;
+        }
+        if (targetHealth != null)
+        {
+            targetHealth.OnDamaged -= HandleTargetDamaged;
+            targetHealth.OnDied -= HandleTargetDied;
+        }
     }
 }

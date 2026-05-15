@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build & Run
 
-- **Play the game:** Open the project in **Unity 6000.0 LTS**, load `Assets/Scenes/FPS/FPS.unity`, press Play.
+- **Play the game:** Open the project in **Unity 6000.0 LTS**, load `Assets/Scenes/FPS.unity`, press Play.
 - **ML training:** Create a Python 3.10 venv, install `requirements.txt`, then from the repo root:
   ```bash
   python -m venv .venv && source .venv/bin/activate
@@ -32,8 +32,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Game state** is managed by `GameManager.cs`, which tracks win/loss conditions, controls the end-of-round UI, and calls `CounterData` (static class) to persist scores across scene reloads. `GameManager` holds a generic `[SerializeField] Behaviour playerController` reference that is disabled at end-of-round — wire whichever player controller component you're using (currently StarterAssets `FirstPersonController`) to that slot in the Inspector.
 
 **Enemy AI** is split across two scripts:
-- `EnemyAgent.cs` — the ML-Agents `Agent` subclass. Collects observations (`canAttack`, `targetInSight`, `health`), receives discrete actions (0=Patrol, 1=Chase, 2=Attack) via the `ActionBuffers` API, and assigns rewards.
-- `EnemyBehavior.cs` — executes the actual behavior: NavMesh patrolling within a 20-unit random range, chasing the player, and triggering weapon fire with a 0.5s cooldown.
+- `EnemyAgent.cs` — the ML-Agents `Agent` subclass (the **only** `Agent` on the Enemy GameObject). Collects observations (`canAttack`, `targetInSight`, `normalizedHealth`), receives discrete actions (0=Patrol, 1=Chase, 2=Attack) via `ActionBuffers`, and assigns rewards. Subscribes to `Health.OnDamaged` / `OnDied` on both itself and the player target to emit hit/kill/death rewards. Calls `EndEpisode()` on either death and resets state in `OnEpisodeBegin()`.
+- `EnemyBehavior.cs` — plain `MonoBehaviour`. Executes the actual behavior: NavMesh patrolling within a random range, chasing the player, triggering weapon fire with cooldown, and providing observation primitives (`IsTargetInSight`, `ReadCanAttack`, etc.) plus `ResetState()` for episode resets.
+
+`Health.cs` exposes `OnDamaged(float)` and `OnDied` events that `EnemyAgent` listens to for reward shaping. `GameManager.ProcessDeath` early-exits when `Academy.Instance.IsCommunicatorOn` so it doesn't freeze the scene during training.
 
 **Weapons** use a raycast-based hit system defined in abstract class `Weapon.cs`, with `PlayerWeapon.cs` (new Input System: `Mouse.current.leftButton.wasPressedThisFrame`) and `EnemyWeapon.cs` (called by `EnemyBehavior`) as concrete implementations. Hits call `Health.DecreaseHealth()` on the target.
 
@@ -54,6 +56,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The pre-trained `.nn` model in `results/URLNPC/` was produced under the old ML-Agents 1.0.8 stack and is not guaranteed to load under Release 22 / Inference Engine — retrain from scratch with `mlagents-learn` and reference the new `.onnx` output from the `EnemyAgent`'s **Behavior Parameters → Model** field.
 
+## Required Enemy prefab components
+
+The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` for ML-Agents to drive it at all. The prefab in `Assets/Prefabs/Characters/Enemy.prefab` is missing both at time of writing — see the "Required Enemy prefab setup" section in `README.md` for the exact Inspector configuration (Behavior Name `URLNPC`, vector obs size 3, one discrete branch of size 3, decision period 5).
+
+## Reward shape (in `EnemyAgent.cs`, all serialized for Inspector tweaking)
+
+- `aliveRewardPerStep` `+0.001`
+- `hitTargetReward` `+0.5`
+- `gotHitPenalty` `-0.5`
+- `killTargetReward` `+1.0` (ends episode)
+- `diedPenalty` `-1.0` (ends episode)
+- `wastedShotPenalty` `-0.05` (attack action while target not in sight)
+
 ## Known follow-ups
 
-- **Enemy movement / training validation** — at time of upgrade, the enemy doesn't move in play mode. Needs investigation: confirm the `EnemyAgent` Behavior Parameters use *Inference Only* with a valid model, or run training and verify the policy learns. The unused `chaseRange`/`attackRange`/`distanceToTarget` fields in `EnemyAgent.cs` suggest a heuristic was started but not wired up.
+- **NavMesh bake** — confirm a NavMesh exists for the FPS scene; the enemy uses `NavMeshAgent` for patrol/chase and won't move without one.
+- **Player position reset on episode begin** — `EnemyAgent.OnEpisodeBegin` resets the *enemy's* position and both healths but leaves the player where they are. For self-play / scripted-player training, add a player reset hook.

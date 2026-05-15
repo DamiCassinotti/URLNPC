@@ -1,5 +1,8 @@
-# Python 3.10.12
-# Install with: pip install -r requirements.txt
+# Python 3.10.x (1.1.0 packaging caps at 3.10.12; newer 3.10 patches work fine)
+# Install with:
+#   pip install --ignore-requires-python -r requirements.txt
+# mlagents 1.1.0 is the newest PyPI release and pairs with Unity
+# com.unity.ml-agents 3.0.0 (Release 22). Do not bump.
 mlagents==1.1.0
 torch==2.2.1
 protobuf==3.20.3
