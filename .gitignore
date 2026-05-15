@@ -71,3 +71,7 @@ venv/
 # config is config/URLNPC.yaml; training runs are local artifacts.
 /results/
 /Assets/ML-Agents/Timers/
+
+# Unity crash dumps (emitted at the project root on segfault)
+mono_crash.mem.*
+mono_crash.*.json
