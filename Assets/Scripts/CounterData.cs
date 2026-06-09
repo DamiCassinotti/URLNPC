@@ -2,44 +2,42 @@ using UnityEngine;
 
 public static class CounterData
 {
-    static int userPoints { get; set; }
-    static int npcPoints { get; set; }
-
-    static CounterData()
-    {
-        userPoints = 0;
-        npcPoints = 0;
-    }
-
-    // Reset the counter at the start of every Play session in the Editor.
-    // RuntimeInitializeLoadType.BeforeSceneLoad fires once per Play entry,
-    // before the first scene loads — so the counter resets between training
-    // runs (or between Editor Play sessions in general), but in-game scene
-    // reloads (e.g. "Play Again" after a match) don't zero it.
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void ResetOnPlay()
-    {
-        userPoints = 0;
-        npcPoints = 0;
-    }
+    // PlayerPrefs keys — backs the score with Unity's on-disk store so the
+    // tally survives quitting the game (Editor Play sessions and standalone
+    // builds alike). This lets you stop and resume a training run later
+    // without losing the win/loss count.
+    const string UserPointsKey = "URLNPC.userPoints";
+    const string NpcPointsKey = "URLNPC.npcPoints";
 
     public static int readUserPoints()
     {
-        return userPoints;
+        return PlayerPrefs.GetInt(UserPointsKey, 0);
     }
 
     public static int readNpcPoints()
     {
-        return npcPoints;
+        return PlayerPrefs.GetInt(NpcPointsKey, 0);
     }
 
     public static void UserWins()
     {
-        userPoints += 1;
+        PlayerPrefs.SetInt(UserPointsKey, readUserPoints() + 1);
+        PlayerPrefs.Save();
     }
 
     public static void NpcWins()
     {
-        npcPoints += 1;
+        PlayerPrefs.SetInt(NpcPointsKey, readNpcPoints() + 1);
+        PlayerPrefs.Save();
+    }
+
+    // Manual reset — wire this to a UI button or call it from a menu when you
+    // want to start a fresh tally. Nothing zeroes the score automatically
+    // anymore, so the count persists until you clear it here.
+    public static void ResetScores()
+    {
+        PlayerPrefs.DeleteKey(UserPointsKey);
+        PlayerPrefs.DeleteKey(NpcPointsKey);
+        PlayerPrefs.Save();
     }
 }

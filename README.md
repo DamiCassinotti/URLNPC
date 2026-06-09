@@ -85,7 +85,22 @@ mlagents-learn config/URLNPC.yaml --run-id=URLNPC --force
 
 To speed training, in the Editor: **Edit → Project Settings → Time → Time Scale** can be increased, or run multiple parallel envs by duplicating the Enemy/Player setup into separate Training Areas (recommended for longer runs).
 
-Trained models land at `results/URLNPC/URLNPC.onnx`. Resume an interrupted run with `--resume` instead of `--force`.
+Trained models land at `results/URLNPC/URLNPC.onnx`.
+
+### Stopping and resuming training
+
+You can quit the game and pick training back up later **on the same semi-trained model** — the network is checkpointed entirely on the Python side (`results/URLNPC/`, see `checkpoint_interval` in `config/URLNPC.yaml`), not stored in the Unity project.
+
+1. Stop whenever: exit Play mode in the Editor and/or `Ctrl+C` the trainer.
+2. To continue, run with **`--resume`** instead of `--force`, then press **Play** again:
+
+   ```bash
+   mlagents-learn config/URLNPC.yaml --run-id=URLNPC --resume
+   ```
+
+   `--resume` reloads the network weights, optimizer state, and step count from the last checkpoint. (To instead *fork* a finished model into a brand-new run, use `--initialize-from=URLNPC` with a different `--run-id`.)
+
+The on-screen win/loss tally also survives quitting: `CounterData` persists the score to `PlayerPrefs`, so it carries across Editor Play sessions and standalone builds. Use the **Reset Score** button on the end-of-round canvas (or call `CounterData.ResetScores()`) to clear it.
 
 ### Reward shape
 

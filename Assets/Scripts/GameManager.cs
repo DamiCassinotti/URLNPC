@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 using Unity.MLAgents;
 
@@ -17,6 +18,50 @@ public class GameManager : MonoBehaviour
     {
         counter = FindAnyObjectByType<Counter>();
         if (finishedRoundCanvas != null) finishedRoundCanvas.enabled = false;
+        CreateResetScoreButton();
+    }
+
+    // Clears the persisted win/loss tally. Public so it can also be wired to
+    // an OnClick in the Inspector if you ever rebuild the canvas by hand.
+    public void ResetScore()
+    {
+        CounterData.ResetScores();
+    }
+
+    // The FPS scene is force-binary serialized, so we can't author button
+    // wiring in the scene file — build the "Reset Score" button in code and
+    // parent it to the end-of-round canvas. As a child of that canvas it
+    // shows/hides automatically with the canvas's enabled state.
+    void CreateResetScoreButton()
+    {
+        if (finishedRoundCanvas == null) return;
+
+        var btnObj = new GameObject("ResetScoreButton", typeof(RectTransform), typeof(Image), typeof(Button));
+        btnObj.transform.SetParent(finishedRoundCanvas.transform, false);
+
+        var rt = btnObj.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0.5f, 0f);
+        rt.anchorMax = new Vector2(0.5f, 0f);
+        rt.pivot = new Vector2(0.5f, 0f);
+        rt.anchoredPosition = new Vector2(0f, 40f);
+        rt.sizeDelta = new Vector2(240f, 60f);
+
+        btnObj.GetComponent<Image>().color = new Color(0.15f, 0.15f, 0.15f, 0.9f);
+        btnObj.GetComponent<Button>().onClick.AddListener(ResetScore);
+
+        var labelObj = new GameObject("Label", typeof(RectTransform));
+        labelObj.transform.SetParent(btnObj.transform, false);
+        var lrt = labelObj.GetComponent<RectTransform>();
+        lrt.anchorMin = Vector2.zero;
+        lrt.anchorMax = Vector2.one;
+        lrt.offsetMin = Vector2.zero;
+        lrt.offsetMax = Vector2.zero;
+
+        var label = labelObj.AddComponent<TextMeshProUGUI>();
+        label.text = "Reset Score";
+        label.alignment = TextAlignmentOptions.Center;
+        label.fontSize = 28;
+        label.color = Color.white;
     }
 
     public void LoadNewLevel()
