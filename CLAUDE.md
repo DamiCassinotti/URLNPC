@@ -41,6 +41,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Health & death:** `Health.cs` tracks HP for both Player and NPC. On death it calls `GameManager.ProcessDeath()`, which reads the entity's tag (`"Player"` or `"NPC"`) to determine the winner.
 
+**Arenas:** `ArenaManager.cs` procedurally builds the level at runtime. Because the scene is force-binary serialized, level geometry is generated in code rather than authored in the scene. On `Awake` (it runs at `[DefaultExecutionOrder(-10000)]` so the NavMesh exists before the enemy spawns) it destroys any static `Arena` root, picks 1 of 5 layouts (random, or `forcedArenaIndex`), builds floor/walls/cover from primitive cubes with contrasting URP/Lit materials, and bakes a fresh NavMesh via a runtime `NavMeshSurface` (`Unity.AI.Navigation`). It exposes `ArenaManager.Current` so `EnemyBehavior.GetRandomPositionInMap` samples spawn points from the active arena's NavMesh instead of hard-coded ±60 bounds, and repositions the player to the arena's spawn point on `Start`. A `[RuntimeInitializeOnLoadMethod]` auto-creates an instance on first load if none is in the scene, but for per-round re-rolls the component should be placed in the scene (it is recreated each `LoadScene`). See "Arenas" in `README.md`.
+
 **UI:** `Counter.cs` reads from static `CounterData` each frame to display win counts. TextMesh Pro is used for all UI text.
 
 ### Tags
@@ -71,5 +73,5 @@ The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` f
 
 ## Known follow-ups
 
-- **NavMesh bake** — confirm a NavMesh exists for the FPS scene; the enemy uses `NavMeshAgent` for patrol/chase and won't move without one.
-- **Player position reset on episode begin** — `EnemyAgent.OnEpisodeBegin` resets the *enemy's* position and both healths but leaves the player where they are. For self-play / scripted-player training, add a player reset hook.
+- **NavMesh bake** — now handled at runtime: `ArenaManager` bakes a `NavMeshSurface` over the generated arena on `Awake`, so no hand-baked NavMesh is required. (A hand-baked NavMesh in the scene is removed at startup.)
+- **Player position reset on episode begin** — `EnemyAgent.OnEpisodeBegin` resets the *enemy's* position and both healths but leaves the player where they are. `ArenaManager` only repositions the player once, on `Start`. For self-play / scripted-player training, add a player reset hook.
