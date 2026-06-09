@@ -15,6 +15,30 @@ First-person combat arena where an AI enemy NPC is trained with Unity ML-Agents 
 
 To play against a trained model rather than the heuristic, drag the `.onnx` produced by training into the **Behavior Parameters → Model** field on the Enemy prefab and set **Behavior Type = Inference Only**.
 
+## Arenas
+
+The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at that arena's spawn point.
+
+The five arenas vary in size and cover:
+
+| # | Name | Size (X×Z) | Theme |
+|---|------|-----------|-------|
+| 0 | Courtyard   | 40×40 | Central building with a doorway, corner crate stacks, low flanking walls |
+| 1 | The Pit     | 28×28 | Tight; two raised corner platforms reached by stairs, central pillars |
+| 2 | Twin Towers | 60×60 | Two tall tower buildings, long mid-field sightline barriers |
+| 3 | Maze        | 44×44 | Flat maze of offset wall segments and pillars |
+| 4 | Ramparts    | 56×36 | Rectangular; raised side walkways via stairs, central divider with gaps |
+
+### Wiring it into the scene (recommended, one step)
+
+`ArenaManager` auto-bootstraps itself on the **first** scene load, so arenas work with no setup. But the game restarts rounds via `SceneManager.LoadScene`, and the auto-bootstrap only fires at initial startup. To get a fresh random arena **every round**, add the component to the scene so it is recreated on each reload:
+
+1. In `Assets/Scenes/FPS.unity`, create an empty GameObject named `ArenaManager`.
+2. **Add Component → Arena Manager**.
+3. (Optional) Set **Forced Arena Index** to `0`–`4` to always build a specific arena (leave `-1` for random); toggle **Reposition Player On Start**; tune wall height/thickness.
+
+No NavMesh needs to be baked by hand — `ArenaManager` bakes one at runtime via `NavMeshSurface` (`com.unity.ai.navigation`). The static arena baked into the scene is removed automatically at startup, so you can leave it in place.
+
 ## Training the agent
 
 ### One-time setup

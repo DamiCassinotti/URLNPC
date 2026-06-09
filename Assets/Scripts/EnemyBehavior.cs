@@ -90,12 +90,20 @@ public class EnemyBehavior : MonoBehaviour
             GameObject p = GameObject.FindWithTag("Player");
             if (p != null) playerForSpawn = p.transform;
         }
+        // Tight arenas can't satisfy a large min separation — cap it to what
+        // the current arena can actually fit so we don't burn every attempt.
+        float effectiveMinDistance = minSpawnDistanceFromPlayer;
+        if (ArenaManager.Current != null)
+        {
+            effectiveMinDistance = Mathf.Min(minSpawnDistanceFromPlayer, ArenaManager.Current.SpawnSeparationCap);
+        }
+
         Vector3 newPosition = GetRandomPositionInMap();
         int attempts = 0;
         while (attempts < 32)
         {
             bool farEnough = playerForSpawn == null
-                || Vector3.Distance(newPosition, playerForSpawn.position) >= minSpawnDistanceFromPlayer;
+                || Vector3.Distance(newPosition, playerForSpawn.position) >= effectiveMinDistance;
             bool reachable = navMeshAgent.CalculatePath(newPosition, new NavMeshPath());
             if (farEnough && reachable) break;
             newPosition = GetRandomPositionInMap();
@@ -106,6 +114,10 @@ public class EnemyBehavior : MonoBehaviour
 
     Vector3 GetRandomPositionInMap()
     {
+        // Prefer a point sampled from the procedurally generated arena's NavMesh
+        // so spawns stay inside whatever arena was selected this round.
+        if (ArenaManager.Current != null) return ArenaManager.Current.RandomGroundPoint();
+
         float newX = Random.Range(-60f, 60f);
         float newZ = Random.Range(-60f, 60f);
         return new Vector3(newX, 0f, newZ);
