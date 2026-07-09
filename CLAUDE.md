@@ -51,7 +51,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### ML-Agents Configuration (`config/URLNPC.yaml`)
 - Trainer: PPO
-- `max_steps`: 500,000
+- `max_steps`: 1,000,000
 - `batch_size`: 1024
 - `learning_rate`: 0.0003
 - `time_horizon`: 64
