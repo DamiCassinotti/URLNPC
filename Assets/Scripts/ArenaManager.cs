@@ -84,24 +84,42 @@ public class ArenaManager : MonoBehaviour
 
     // ---------------------------------------------------------------- bounds
 
+    /// <summary>The floor surface sits at y = 0; anything sampled noticeably
+    /// above it is a platform/rampart/stair/crate top rather than the main
+    /// floor. Spawns are kept at or below this height so actors land on the
+    /// open floor where they are visible, not perched on top of cover.</summary>
+    const float GroundLevelMaxY = 0.6f;
+
     /// <summary>
-    /// A random point that sits on the baked NavMesh, comfortably inside the
-    /// arena walls. Returns <see cref="Vector3.zero"/> if nothing is found
-    /// (should not happen once a NavMesh is baked).
+    /// A random point on the main floor of the baked NavMesh, comfortably
+    /// inside the arena walls. Avoids the tops of raised cover so the enemy
+    /// never spawns out of sight on a platform. Always returns a valid on-mesh
+    /// point once a NavMesh is baked (never the off-mesh origin).
     /// </summary>
     public Vector3 RandomGroundPoint()
     {
         float marginX = Mathf.Max(2f, HalfExtentX - 2f);
         float marginZ = Mathf.Max(2f, HalfExtentZ - 2f);
-        for (int i = 0; i < 48; i++)
+        Vector3 elevatedFallback = Vector3.zero;
+        bool haveElevatedFallback = false;
+        for (int i = 0; i < 64; i++)
         {
             float x = Random.Range(-marginX, marginX);
             float z = Random.Range(-marginZ, marginZ);
-            if (NavMesh.SamplePosition(new Vector3(x, 1f, z), out NavMeshHit hit, 6f, NavMesh.AllAreas))
+            // Small search radius so a floor query snaps to the floor directly
+            // below it instead of jumping up onto a nearby raised platform.
+            if (NavMesh.SamplePosition(new Vector3(x, 0.5f, z), out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
-                return hit.position;
+                if (hit.position.y <= GroundLevelMaxY) return hit.position;
+                if (!haveElevatedFallback) { elevatedFallback = hit.position; haveElevatedFallback = true; }
             }
         }
+        // No floor-level point found — better to use an elevated spot than to
+        // hand back an off-mesh origin that a Warp would silently reject.
+        if (haveElevatedFallback) return elevatedFallback;
+        if (NavMesh.SamplePosition(new Vector3(PlayerSpawn.x, 0.5f, PlayerSpawn.z), out NavMeshHit spawnHit, 12f, NavMesh.AllAreas))
+            return spawnHit.position;
+        Debug.LogWarning("[ArenaManager] RandomGroundPoint found no NavMesh — is the arena baked?");
         return Vector3.zero;
     }
 
