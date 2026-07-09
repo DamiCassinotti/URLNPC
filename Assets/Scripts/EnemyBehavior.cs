@@ -70,8 +70,8 @@ public class EnemyBehavior : MonoBehaviour
 
     Vector3 GetNextDestination()
     {
-        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        float randomX = Random.Range(-walkPointRange, walkPointRange);
+        float randomZ = RunRng.Range(RunRng.Stream.Wander, -walkPointRange, walkPointRange);
+        float randomX = RunRng.Range(RunRng.Stream.Wander, -walkPointRange, walkPointRange);
         return new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
     }
 
@@ -118,8 +118,8 @@ public class EnemyBehavior : MonoBehaviour
         // so spawns stay inside whatever arena was selected this round.
         if (ArenaManager.Current != null) return ArenaManager.Current.RandomGroundPoint();
 
-        float newX = Random.Range(-60f, 60f);
-        float newZ = Random.Range(-60f, 60f);
+        float newX = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
+        float newZ = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
         return new Vector3(newX, 0f, newZ);
     }
 

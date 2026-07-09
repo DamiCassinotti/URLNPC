@@ -102,6 +102,15 @@ You can quit the game and pick training back up later **on the same semi-trained
 
 The on-screen win/loss tally also survives quitting: `CounterData` persists the score to `PlayerPrefs`, so it carries across Editor Play sessions and standalone builds. Use the **Reset Score** button on the end-of-round canvas (or call `CounterData.ResetScores()`) to clear it.
 
+### Reproducible evaluation runs
+
+Arena selection, spawn sampling and wander waypoints are driven by a single seedable RNG (`RunRng`). To make two runs comparable, fix the seed either way:
+
+- **Inspector:** set **Run Seed** on the `ArenaManager` component (0 = random each run).
+- **Command line (standalone build / batch mode):** pass `-runSeed <int>` — this overrides the Inspector value.
+
+Unseeded runs draw a random seed and still log it (look for the `[RunRng] Run seed: …` line in the Console/Player log), so any run can be replayed after the fact. The seed is also recorded per episode as the `Run/Seed` stat in TensorBoard. Note the seed governs arena/spawn/waypoint *sequences*, not frame-exact gameplay (physics, input timing and aim spread still vary).
+
 ### Reward shape
 
 Defined in `EnemyAgent.cs` (tunable in Inspector):

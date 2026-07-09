@@ -26,6 +26,8 @@ public class ArenaManager : MonoBehaviour
     [SerializeField] string existingArenaRootName = "Arena";
     [Tooltip("Force a specific arena (0..4). Leave at -1 to pick randomly at startup.")]
     [SerializeField] int forcedArenaIndex = -1;
+    [Tooltip("Run seed for reproducible evaluation: drives arena selection, spawn sampling and wander waypoints (see RunRng). 0 = random seed each run. Overridden by '-runSeed <int>' on the command line.")]
+    [SerializeField] int runSeed = 0;
     [Tooltip("Teleport the player to the arena's spawn point on start. Keeps the player inside whatever arena was generated.")]
     [SerializeField] bool repositionPlayerOnStart = true;
 
@@ -65,6 +67,10 @@ public class ArenaManager : MonoBehaviour
     void Awake()
     {
         Current = this;
+        // Seed the run before any randomness is consumed. No-op on scene
+        // reloads within the same run, so the deterministic sequences keep
+        // advancing round to round instead of restarting.
+        RunRng.EnsureInitialized(runSeed);
         RemoveExistingArena();
         // Clear any NavMesh data baked into the scene so only our fresh bake is live.
         NavMesh.RemoveAllNavMeshData();
@@ -95,8 +101,8 @@ public class ArenaManager : MonoBehaviour
         float marginZ = Mathf.Max(2f, HalfExtentZ - 2f);
         for (int i = 0; i < 48; i++)
         {
-            float x = Random.Range(-marginX, marginX);
-            float z = Random.Range(-marginZ, marginZ);
+            float x = RunRng.Range(RunRng.Stream.Spawn, -marginX, marginX);
+            float z = RunRng.Range(RunRng.Stream.Spawn, -marginZ, marginZ);
             if (NavMesh.SamplePosition(new Vector3(x, 1f, z), out NavMeshHit hit, 6f, NavMesh.AllAreas))
             {
                 return hit.position;
@@ -125,12 +131,28 @@ public class ArenaManager : MonoBehaviour
 
     void RepositionPlayer()
     {
+        MovePlayerTo(PlayerSpawn);
+    }
+
+    /// <summary>
+    /// Teleport the player to a random walkable point. Used by
+    /// <see cref="EnemyAgent"/> on episode begin during training so player
+    /// spawns are distributed across the arena instead of clustering wherever
+    /// the last episode ended.
+    /// </summary>
+    public void RepositionPlayerAtRandomPoint()
+    {
+        MovePlayerTo(RandomGroundPoint());
+    }
+
+    void MovePlayerTo(Vector3 point)
+    {
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null) return;
         // Snap to the nearest walkable spot so the player never spawns inside a
         // wall/divider, whatever arena was generated.
-        Vector3 target = PlayerSpawn;
-        if (NavMesh.SamplePosition(new Vector3(PlayerSpawn.x, 1f, PlayerSpawn.z), out NavMeshHit hit, 10f, NavMesh.AllAreas))
+        Vector3 target = point;
+        if (NavMesh.SamplePosition(new Vector3(point.x, 1f, point.z), out NavMeshHit hit, 10f, NavMesh.AllAreas))
         {
             target = hit.position + Vector3.up * 1.1f;
         }
@@ -157,7 +179,7 @@ public class ArenaManager : MonoBehaviour
     {
         int idx = (forcedArenaIndex >= 0 && forcedArenaIndex < ArenaCount)
             ? forcedArenaIndex
-            : Random.Range(0, ArenaCount);
+            : RunRng.Range(RunRng.Stream.Arena, 0, ArenaCount);
         ActiveArenaIndex = idx;
         arenaRoot = new GameObject("Arena (Generated)");
 

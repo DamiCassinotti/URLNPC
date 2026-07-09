@@ -20,6 +20,10 @@ public class EnemyAgent : Agent
     [SerializeField] float tooClosePenaltyPerStep = 0.005f;
     [SerializeField] float tooCloseDistance = 6f;
 
+    [Header("Episode reset")]
+    [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play is unaffected: without a trainer attached the scene reload places the player instead.")]
+    [SerializeField] bool repositionPlayerOnEpisodeBegin = true;
+
     EnemyBehavior behavior;
     Health selfHealth;
     Health targetHealth;
@@ -119,7 +123,31 @@ public class EnemyAgent : Agent
         episodeEnding = false;
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
+        // Reposition the player BEFORE the enemy respawns so the enemy's
+        // min-spawn-separation check (EnemyBehavior.InitAtRandomPosition)
+        // measures against the player's fresh position, not last episode's.
+        if (ShouldRepositionPlayer())
+        {
+            ArenaManager.Current.RepositionPlayerAtRandomPoint();
+        }
         if (behavior != null) behavior.ResetState();
+        // Make every episode attributable to its run seed in TensorBoard.
+        // (The authoritative full-precision record is RunRng's startup log.)
+        if (Academy.IsInitialized)
+        {
+            Academy.Instance.StatsRecorder.Add("Run/Seed", RunRng.Seed);
+        }
+    }
+
+    // Only during automated training: in human play the round restarts via a
+    // scene reload and ArenaManager.Start places the player, so teleporting
+    // them here would just yank a live player around mid-round.
+    bool ShouldRepositionPlayer()
+    {
+        return repositionPlayerOnEpisodeBegin
+            && ArenaManager.Current != null
+            && Academy.IsInitialized
+            && Academy.Instance.IsCommunicatorOn;
     }
 
     void HandleSelfDamaged(float amount)
