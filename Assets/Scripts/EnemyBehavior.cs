@@ -123,7 +123,17 @@ public class EnemyBehavior : MonoBehaviour
             newPosition = GetRandomPositionInMap();
             attempts++;
         }
-        navMeshAgent.Warp(newPosition);
+
+        // Final guard: snap to the nearest NavMesh point so Warp can never fail
+        // and silently strand the enemy at its (off-arena) authored position.
+        if (NavMesh.SamplePosition(newPosition, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        {
+            newPosition = hit.position;
+        }
+        if (!navMeshAgent.Warp(newPosition))
+        {
+            Debug.LogWarning($"[EnemyBehavior] Warp to {newPosition} failed — enemy may be off the NavMesh.");
+        }
     }
 
     // Attach the agent to the NavMesh at (or near) the given point. Warp is
