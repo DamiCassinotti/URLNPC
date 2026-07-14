@@ -28,7 +28,7 @@ public class ArenaManager : MonoBehaviour
     [Tooltip("Force a specific arena (0..4). Leave at -1 to pick randomly at startup.")]
     [SerializeField] int forcedArenaIndex = -1;
     [Tooltip("Run seed for reproducible evaluation: drives arena selection, spawn sampling and wander waypoints (see RunRng). 0 = random seed each run. Overridden by '-runSeed <int>' on the command line.")]
-    [SerializeField] int runSeed = 25910267;
+    [SerializeField] int runSeed = 0;
     [Tooltip("Teleport the player to a random NavMesh point on start (seeded — see RunRng), so rounds don't always open from the same spot. Also keeps the player inside whatever arena was generated.")]
     [SerializeField] bool repositionPlayerOnStart = true;
 
@@ -91,38 +91,10 @@ public class ArenaManager : MonoBehaviour
         // advancing round to round instead of restarting.
         RunRng.EnsureInitialized(runSeed);
         RemoveExistingArena();
-
-        // Active NavMeshAgents must sit out the data swap: AddNavMeshData
-        // immediately re-creates every active agent, and one still standing
-        // at its authored scene position — outside a small arena like The
-        // Pit — fails with "Failed to create agent because it is not close
-        // enough to the NavMesh" and is left in a broken state that survives
-        // later Warp calls (the "missing enemy" bug).
-        var suspendedAgents = new List<NavMeshAgent>();
-        foreach (NavMeshAgent agent in FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None))
-        {
-            if (!agent.enabled) continue;
-            agent.enabled = false;
-            suspendedAgents.Add(agent);
-        }
-
         // Clear any NavMesh data baked into the scene so only our fresh bake is live.
         NavMesh.RemoveAllNavMeshData();
         BuildRandomArena();
         BakeNavMesh();
-
-        foreach (NavMeshAgent agent in suspendedAgents)
-        {
-            if (agent == null) continue;
-            // Snap onto the new mesh BEFORE re-enabling so the native agent
-            // is created cleanly. Proper spawn placement still belongs to the
-            // owner (EnemyBehavior warps to its own random point in Start).
-            if (NavMesh.SamplePosition(agent.transform.position, out NavMeshHit hit, 100f, NavMesh.AllAreas))
-            {
-                agent.transform.position = hit.position;
-            }
-            agent.enabled = true;
-        }
     }
 
     void Start()
