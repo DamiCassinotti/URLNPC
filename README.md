@@ -17,7 +17,7 @@ To play against a trained model rather than the heuristic, drag the `.onnx` prod
 
 ## Arenas
 
-The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at that arena's spawn point.
+The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at a random point on it — so both the arena and your starting position re-roll every round.
 
 The five arenas vary in size and cover:
 

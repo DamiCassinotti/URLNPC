@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using Unity.AI.Navigation;
 
 /// <summary>
@@ -28,7 +29,7 @@ public class ArenaManager : MonoBehaviour
     [SerializeField] int forcedArenaIndex = -1;
     [Tooltip("Run seed for reproducible evaluation: drives arena selection, spawn sampling and wander waypoints (see RunRng). 0 = random seed each run. Overridden by '-runSeed <int>' on the command line.")]
     [SerializeField] int runSeed = 0;
-    [Tooltip("Teleport the player to the arena's spawn point on start. Keeps the player inside whatever arena was generated.")]
+    [Tooltip("Teleport the player to a random NavMesh point on start (seeded — see RunRng), so rounds don't always open from the same spot. Also keeps the player inside whatever arena was generated.")]
     [SerializeField] bool repositionPlayerOnStart = true;
 
     [Header("Perimeter walls")]
@@ -51,13 +52,31 @@ public class ArenaManager : MonoBehaviour
 
     public const int ArenaCount = 5;
 
-    // Fallback for the very first scene load: if no ArenaManager was placed in
-    // the scene, spawn one so arenas still generate out of the box. NOTE this
-    // only fires at initial startup — for the arena to re-roll every round
-    // (the game restarts via SceneManager.LoadScene), add an ArenaManager
-    // component to a GameObject in the scene so it is recreated on each reload.
+    // Fallback bootstrap: if no ArenaManager was placed in the scene, spawn
+    // one so arenas still generate out of the box. AfterSceneLoad only fires
+    // for the FIRST scene of a session, but the manager and its generated
+    // arena die with every SceneManager.LoadScene — without the sceneLoaded
+    // hook, rounds 2+ had no manager at all: no re-roll, and the old static
+    // "Arena" root baked into the scene was never removed, so every round
+    // after the first showed the same hand-authored arena.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void AutoBootstrap()
+    {
+        // -= before += so a second play session (domain reload disabled)
+        // doesn't stack subscriptions.
+        SceneManager.sceneLoaded -= EnsureExistsOnSceneLoad;
+        SceneManager.sceneLoaded += EnsureExistsOnSceneLoad;
+        EnsureExists();
+    }
+
+    static void EnsureExistsOnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        // Fires after the scene's Awakes but before Starts, so the arena and
+        // its NavMesh exist before EnemyBehavior.Start spawns the enemy.
+        EnsureExists();
+    }
+
+    static void EnsureExists()
     {
         if (Current != null) return;
         if (FindAnyObjectByType<ArenaManager>() != null) return;
@@ -80,7 +99,11 @@ public class ArenaManager : MonoBehaviour
 
     void Start()
     {
-        if (repositionPlayerOnStart) RepositionPlayer();
+        // Random, not the fixed south-wall spawn: every round should open
+        // from a fresh position in every mode, human play included. Runs at
+        // execution order -10000, i.e. before EnemyBehavior.Start, so the
+        // enemy's min-spawn-separation check measures against this position.
+        if (repositionPlayerOnStart) RepositionPlayerAtRandomPoint();
     }
 
     void OnDestroy()
@@ -129,16 +152,12 @@ public class ArenaManager : MonoBehaviour
         }
     }
 
-    void RepositionPlayer()
-    {
-        MovePlayerTo(PlayerSpawn);
-    }
-
     /// <summary>
-    /// Teleport the player to a random walkable point. Used by
-    /// <see cref="EnemyAgent"/> on episode begin during training so player
-    /// spawns are distributed across the arena instead of clustering wherever
-    /// the last episode ended.
+    /// Teleport the player to a random walkable point. Called from
+    /// <see cref="Start"/> every round (all modes) and by
+    /// <see cref="EnemyAgent"/> on episode begin during training, so player
+    /// spawns are distributed across the arena instead of clustering at a
+    /// fixed spot or wherever the last episode ended.
     /// </summary>
     public void RepositionPlayerAtRandomPoint()
     {

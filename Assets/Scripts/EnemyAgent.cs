@@ -21,7 +21,7 @@ public class EnemyAgent : Agent
     [SerializeField] float tooCloseDistance = 6f;
 
     [Header("Episode reset")]
-    [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play is unaffected: without a trainer attached the scene reload places the player instead.")]
+    [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play gets its random spawn from ArenaManager.Start on each round's scene reload instead — repositioning here would also fire on mid-round MaxStep resets and yank a live player across the arena.")]
     [SerializeField] bool repositionPlayerOnEpisodeBegin = true;
 
     EnemyBehavior behavior;
