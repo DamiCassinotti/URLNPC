@@ -99,6 +99,20 @@ public class EnemyBehavior : MonoBehaviour
         }
 
         Vector3 newPosition = GetRandomPositionInMap();
+
+        // On reload rounds the arena (and its NavMesh) is rebuilt AFTER this
+        // agent's OnEnable, so the agent may not be standing on the fresh
+        // mesh yet — and CalculatePath errors on a detached agent. Warp
+        // attaches it; only then is the reachability probe legal.
+        if (!EnsureOnNavMesh(newPosition))
+        {
+            // No usable NavMesh at all: place the transform directly so the
+            // enemy still exists somewhere sane, and let the next reset retry.
+            Debug.LogWarning($"[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at {newPosition}.", this);
+            transform.position = newPosition;
+            return;
+        }
+
         int attempts = 0;
         while (attempts < 32)
         {
@@ -110,6 +124,21 @@ public class EnemyBehavior : MonoBehaviour
             attempts++;
         }
         navMeshAgent.Warp(newPosition);
+    }
+
+    // Attach the agent to the NavMesh at (or near) the given point. Warp is
+    // the normal path; if the native agent is stuck in a failed-creation
+    // state (e.g. it was active while the arena's NavMesh data was swapped),
+    // Warp can no-op — toggling the component forces a clean re-creation.
+    bool EnsureOnNavMesh(Vector3 point)
+    {
+        if (navMeshAgent.isOnNavMesh) return true;
+        if (navMeshAgent.Warp(point) && navMeshAgent.isOnNavMesh) return true;
+
+        navMeshAgent.enabled = false;
+        transform.position = point;
+        navMeshAgent.enabled = true;
+        return navMeshAgent.isOnNavMesh;
     }
 
     Vector3 GetRandomPositionInMap()
