@@ -70,8 +70,8 @@ public class EnemyBehavior : MonoBehaviour
 
     Vector3 GetNextDestination()
     {
-        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        float randomX = Random.Range(-walkPointRange, walkPointRange);
+        float randomZ = RunRng.Range(RunRng.Stream.Wander, -walkPointRange, walkPointRange);
+        float randomX = RunRng.Range(RunRng.Stream.Wander, -walkPointRange, walkPointRange);
         return new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
     }
 
@@ -99,6 +99,20 @@ public class EnemyBehavior : MonoBehaviour
         }
 
         Vector3 newPosition = GetRandomPositionInMap();
+
+        // On reload rounds the arena (and its NavMesh) is rebuilt AFTER this
+        // agent's OnEnable, so the agent may not be standing on the fresh
+        // mesh yet — and CalculatePath errors on a detached agent. Warp
+        // attaches it; only then is the reachability probe legal.
+        if (!EnsureOnNavMesh(newPosition))
+        {
+            // No usable NavMesh at all: place the transform directly so the
+            // enemy still exists somewhere sane, and let the next reset retry.
+            Debug.LogWarning($"[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at {newPosition}.", this);
+            transform.position = newPosition;
+            return;
+        }
+
         int attempts = 0;
         while (attempts < 32)
         {
@@ -122,14 +136,29 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
+    // Attach the agent to the NavMesh at (or near) the given point. Warp is
+    // the normal path; if the native agent is stuck in a failed-creation
+    // state (e.g. it was active while the arena's NavMesh data was swapped),
+    // Warp can no-op — toggling the component forces a clean re-creation.
+    bool EnsureOnNavMesh(Vector3 point)
+    {
+        if (navMeshAgent.isOnNavMesh) return true;
+        if (navMeshAgent.Warp(point) && navMeshAgent.isOnNavMesh) return true;
+
+        navMeshAgent.enabled = false;
+        transform.position = point;
+        navMeshAgent.enabled = true;
+        return navMeshAgent.isOnNavMesh;
+    }
+
     Vector3 GetRandomPositionInMap()
     {
         // Prefer a point sampled from the procedurally generated arena's NavMesh
         // so spawns stay inside whatever arena was selected this round.
         if (ArenaManager.Current != null) return ArenaManager.Current.RandomGroundPoint();
 
-        float newX = Random.Range(-60f, 60f);
-        float newZ = Random.Range(-60f, 60f);
+        float newX = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
+        float newZ = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
         return new Vector3(newX, 0f, newZ);
     }
 

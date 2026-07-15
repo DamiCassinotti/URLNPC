@@ -17,7 +17,7 @@ To play against a trained model rather than the heuristic, drag the `.onnx` prod
 
 ## Arenas
 
-The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at that arena's spawn point.
+The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at a random point on it — so both the arena and your starting position re-roll every round.
 
 The five arenas vary in size and cover:
 
@@ -101,6 +101,15 @@ You can quit the game and pick training back up later **on the same semi-trained
    `--resume` reloads the network weights, optimizer state, and step count from the last checkpoint. (To instead *fork* a finished model into a brand-new run, use `--initialize-from=URLNPC` with a different `--run-id`.)
 
 The on-screen win/loss tally also survives quitting: `CounterData` persists the score to `PlayerPrefs`, so it carries across Editor Play sessions and standalone builds. Use the **Reset Score** button on the end-of-round canvas (or call `CounterData.ResetScores()`) to clear it.
+
+### Reproducible evaluation runs
+
+Arena selection, spawn sampling and wander waypoints are driven by a single seedable RNG (`RunRng`). To make two runs comparable, fix the seed either way:
+
+- **Inspector:** set **Run Seed** on the `ArenaManager` component (0 = random each run).
+- **Command line (standalone build / batch mode):** pass `-runSeed <int>` — this overrides the Inspector value.
+
+Unseeded runs draw a random seed and still log it (look for the `[RunRng] Run seed: …` line in the Console/Player log), so any run can be replayed after the fact. The seed is also recorded per episode as the `Run/Seed` stat in TensorBoard. Note the seed governs arena/spawn/waypoint *sequences*, not frame-exact gameplay (physics, input timing and aim spread still vary).
 
 ### Reward shape
 
