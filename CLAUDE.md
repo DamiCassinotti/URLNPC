@@ -61,7 +61,7 @@ The pre-trained `.nn` model in `results/URLNPC/` was produced under the old ML-A
 
 ## Required Enemy prefab components
 
-The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` for ML-Agents to drive it at all. The prefab in `Assets/Prefabs/Characters/Enemy.prefab` is missing both at time of writing — see the "Required Enemy prefab setup" section in `README.md` for the exact Inspector configuration (Behavior Name `URLNPC`, vector obs size 3, one discrete branch of size 3, decision period 5).
+The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` for ML-Agents to drive it at all — without a `DecisionRequester` no decisions are requested, `OnActionReceived` never fires, and the enemy stands still in every mode (heuristic, inference, and training). Both are present on `Assets/Prefabs/Characters/Enemy.prefab` (Behavior Name `URLNPC`, vector obs size 3, one discrete branch of size 3, decision period 5, Behavior Type Default, no model assigned). The prefab is text-serialized YAML (only the scene is force-binary), so it can be edited directly.
 
 ## Reward shape (in `EnemyAgent.cs`, all serialized for Inspector tweaking)
 

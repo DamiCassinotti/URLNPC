@@ -165,7 +165,10 @@ public class EnemyBehavior : MonoBehaviour
         if (angle > sightFovDegrees * 0.5f) return false;
         if (Physics.Raycast(origin, toTarget.normalized, out RaycastHit hit, distance, sightObstacleMask, QueryTriggerInteraction.Ignore))
         {
-            return hit.transform.CompareTag("Player");
+            // Accept any collider in the target's hierarchy: the tagged root
+            // (CharacterController) and untagged child colliders like the
+            // "Capsule" visual mesh are both "seeing the player".
+            return hit.transform.IsChildOf(target) || hit.transform.CompareTag("Player");
         }
         return true;
     }
