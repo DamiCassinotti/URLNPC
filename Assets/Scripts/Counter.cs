@@ -9,7 +9,9 @@ public class Counter : MonoBehaviour
 
     void Update()
     {
-        counter.text = "User: " + CounterData.readUserPoints() + "\nNPC: " + CounterData.readNpcPoints();
+        counter.text = "User: " + CounterData.readUserPoints()
+            + "\nNPC: " + CounterData.readNpcPoints()
+            + "\nDraws: " + CounterData.readDraws();
     }
 
     public void UserWins()
@@ -20,6 +22,11 @@ public class Counter : MonoBehaviour
     public void NpcWins()
     {
         CounterData.NpcWins();
+    }
+
+    public void Draw()
+    {
+        CounterData.Draw();
     }
 
 }

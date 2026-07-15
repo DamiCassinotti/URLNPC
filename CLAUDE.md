@@ -31,6 +31,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Game state** is managed by `GameManager.cs`, which tracks win/loss conditions, controls the end-of-round UI, and calls `CounterData` (static class) to persist scores across scene reloads. `GameManager` holds a generic `[SerializeField] Behaviour playerController` reference that is disabled at end-of-round — wire whichever player controller component you're using (currently StarterAssets `FirstPersonController`) to that slot in the Inspector.
 
+**Round clock:** `GameManager` also runs a configurable round timer (`roundDurationSeconds`, default 120 s game time — it scales with the trainer's `time_scale`; ≤ 0 disables it). Timeout is a **draw**: no winner is forced, every `EnemyAgent` gets `OnRoundTimeout()` (small negative terminal reward `timeoutPenalty`, default `-0.2`, then `EndEpisode()`), and `CounterData.Draw()` records the outcome. In human play the round ends with a "Draw!" banner; during training the scene keeps running and the clock is rearmed — `EnemyAgent.OnEpisodeBegin` calls `GameManager.ResetRoundClock()` so every episode gets a full budget without a scene reload. Remaining time is queryable via `GameManager.RemainingRoundTime` (the "tiempo restante" input for the future GameStateSnapshot/LLM context) and shown on a runtime-created HUD text (the scene is binary, so the label is built in code like the Reset Score button).
+
 **Enemy AI** is split across two scripts:
 - `EnemyAgent.cs` — the ML-Agents `Agent` subclass (the **only** `Agent` on the Enemy GameObject). Collects observations (`canAttack`, `targetInSight`, `normalizedHealth`), receives discrete actions (0=Patrol, 1=Chase, 2=Attack) via `ActionBuffers`, and assigns rewards. Subscribes to `Health.OnDamaged` / `OnDied` on both itself and the player target to emit hit/kill/death rewards. Calls `EndEpisode()` on either death and resets state in `OnEpisodeBegin()`.
 - `EnemyBehavior.cs` — plain `MonoBehaviour`. Executes the actual behavior: NavMesh patrolling within a random range, chasing the player, triggering weapon fire with cooldown, and providing observation primitives (`IsTargetInSight`, `ReadCanAttack`, etc.) plus `ResetState()` for episode resets.
@@ -70,6 +72,7 @@ The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` f
 - `killTargetReward` `+1.0` (ends episode)
 - `diedPenalty` `-1.0` (ends episode)
 - `wastedShotPenalty` `-0.05` (attack action while target not in sight)
+- `timeoutPenalty` `-0.2` (round clock ran out — draw, ends episode)
 
 ## Known follow-ups
 

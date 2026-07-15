@@ -14,6 +14,8 @@ public class EnemyAgent : Agent
     [SerializeField] float killTargetReward = 1.0f;
     [SerializeField] float diedPenalty = 1.0f;
     [SerializeField] float wastedShotPenalty = 0.05f;
+    [Tooltip("Small negative terminal reward when the round clock runs out (draw). Discourages stalling without forcing a winner.")]
+    [SerializeField] float timeoutPenalty = 0.2f;
 
     [Header("Positioning shaping")]
     [Tooltip("Per-step penalty while the enemy is closer to the player than tooCloseDistance. Discourages melee-rush.")]
@@ -23,6 +25,7 @@ public class EnemyAgent : Agent
     EnemyBehavior behavior;
     Health selfHealth;
     Health targetHealth;
+    GameManager gameManager;
 
     bool canAttack = true;
     bool targetInSight = false;
@@ -120,6 +123,23 @@ public class EnemyAgent : Agent
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
         if (behavior != null) behavior.ResetState();
+        // Every episode gets a full round clock — during training episodes
+        // reset without a scene reload, so the clock must be rearmed here.
+        if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
+        if (gameManager != null) gameManager.ResetRoundClock();
+    }
+
+    /// <summary>
+    /// Called by <see cref="GameManager"/> when the round clock runs out.
+    /// Timeout is a draw: both sides take a small penalty (stalling should
+    /// not pay off) and the episode ends without a winner.
+    /// </summary>
+    public void OnRoundTimeout()
+    {
+        if (episodeEnding) return;
+        episodeEnding = true;
+        AddReward(-timeoutPenalty);
+        EndEpisode();
     }
 
     void HandleSelfDamaged(float amount)
