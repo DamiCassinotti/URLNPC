@@ -70,6 +70,14 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
+    /// <summary>
+    /// Round outcome hook (issue #12): fired with the winner's tag every
+    /// time a round is decided. Static so listeners (TelemetryLogger)
+    /// survive the scene reload that follows. Fired BEFORE the training
+    /// early-return below, so training rounds are reported too.
+    /// </summary>
+    public static event System.Action<string> RoundEnded;
+
     public void ProcessDeath(string loser)
     {
         // Counter increments either way — useful as a visual readout during
@@ -80,6 +88,8 @@ public class GameManager : MonoBehaviour
             if (loser == npcTag) counter.UserWins();
             else if (loser == playerTag) counter.NpcWins();
         }
+
+        RoundEnded?.Invoke(loser == npcTag ? playerTag : npcTag);
 
         // While training (or running inference against a connected trainer),
         // the EnemyAgent handles episode resets itself — don't freeze the
