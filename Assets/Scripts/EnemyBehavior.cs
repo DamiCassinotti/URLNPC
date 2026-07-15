@@ -19,11 +19,20 @@ public class EnemyBehavior : MonoBehaviour
     Health enemyHealth;
     bool canAttack = true;
 
+    /// <summary>
+    /// The only source of target info for the NPC brain (sensory contract,
+    /// issue #9). Auto-added at runtime because the Enemy prefab is binary
+    /// serialized and can't gain new components via a text edit.
+    /// </summary>
+    public PerceptionMemory Perception { get; private set; }
+
     void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         weapon = GetComponent<EnemyWeapon>();
         enemyHealth = GetComponent<Health>();
+        Perception = GetComponent<PerceptionMemory>();
+        if (Perception == null) Perception = gameObject.AddComponent<PerceptionMemory>();
     }
 
     void Start()
@@ -41,9 +50,15 @@ public class EnemyBehavior : MonoBehaviour
     public void Attack()
     {
         DidShoot = false;
-        if (canAttack && target != null)
+        Perception.Refresh();
+        // Aim at the last-seen position, never the live one — while the
+        // target is visible they are the same thing; behind cover the shot
+        // goes where the NPC *believes* the player is (and eats the
+        // wastedShotPenalty if it's wrong).
+        if (canAttack && Perception.HasEverSeen)
         {
-            transform.LookAt(new Vector3(target.position.x, transform.position.y, target.position.z));
+            Vector3 aim = Perception.LastSeenPosition;
+            transform.LookAt(new Vector3(aim.x, transform.position.y, aim.z));
             weapon.Shoot();
             DidShoot = true;
             canAttack = false;
@@ -53,9 +68,15 @@ public class EnemyBehavior : MonoBehaviour
 
     public void Chase()
     {
-        if (target != null && navMeshAgent.isOnNavMesh)
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+        // Navigate to where the target was last seen, not where they truly
+        // are — with the player behind a wall the enemy heads to the corner
+        // it lost sight at instead of wallhack-tracking. Never seen anyone?
+        // Then there is nothing to chase.
+        if (Perception.HasEverSeen)
         {
-            navMeshAgent.SetDestination(target.position);
+            navMeshAgent.SetDestination(Perception.LastSeenPosition);
         }
     }
 
@@ -70,8 +91,8 @@ public class EnemyBehavior : MonoBehaviour
 
     Vector3 GetNextDestination()
     {
-        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        float randomX = Random.Range(-walkPointRange, walkPointRange);
+        float randomZ = RunRng.Range(RunRng.Stream.Wander, -walkPointRange, walkPointRange);
+        float randomX = RunRng.Range(RunRng.Stream.Wander, -walkPointRange, walkPointRange);
         return new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
     }
 
@@ -99,6 +120,20 @@ public class EnemyBehavior : MonoBehaviour
         }
 
         Vector3 newPosition = GetRandomPositionInMap();
+
+        // On reload rounds the arena (and its NavMesh) is rebuilt AFTER this
+        // agent's OnEnable, so the agent may not be standing on the fresh
+        // mesh yet — and CalculatePath errors on a detached agent. Warp
+        // attaches it; only then is the reachability probe legal.
+        if (!EnsureOnNavMesh(newPosition))
+        {
+            // No usable NavMesh at all: place the transform directly so the
+            // enemy still exists somewhere sane, and let the next reset retry.
+            Debug.LogWarning($"[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at {newPosition}.", this);
+            transform.position = newPosition;
+            return;
+        }
+
         int attempts = 0;
         while (attempts < 32)
         {
@@ -109,7 +144,32 @@ public class EnemyBehavior : MonoBehaviour
             newPosition = GetRandomPositionInMap();
             attempts++;
         }
-        navMeshAgent.Warp(newPosition);
+
+        // Final guard: snap to the nearest NavMesh point so Warp can never fail
+        // and silently strand the enemy at its (off-arena) authored position.
+        if (NavMesh.SamplePosition(newPosition, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        {
+            newPosition = hit.position;
+        }
+        if (!navMeshAgent.Warp(newPosition))
+        {
+            Debug.LogWarning($"[EnemyBehavior] Warp to {newPosition} failed — enemy may be off the NavMesh.");
+        }
+    }
+
+    // Attach the agent to the NavMesh at (or near) the given point. Warp is
+    // the normal path; if the native agent is stuck in a failed-creation
+    // state (e.g. it was active while the arena's NavMesh data was swapped),
+    // Warp can no-op — toggling the component forces a clean re-creation.
+    bool EnsureOnNavMesh(Vector3 point)
+    {
+        if (navMeshAgent.isOnNavMesh) return true;
+        if (navMeshAgent.Warp(point) && navMeshAgent.isOnNavMesh) return true;
+
+        navMeshAgent.enabled = false;
+        transform.position = point;
+        navMeshAgent.enabled = true;
+        return navMeshAgent.isOnNavMesh;
     }
 
     Vector3 GetRandomPositionInMap()
@@ -118,8 +178,8 @@ public class EnemyBehavior : MonoBehaviour
         // so spawns stay inside whatever arena was selected this round.
         if (ArenaManager.Current != null) return ArenaManager.Current.RandomGroundPoint();
 
-        float newX = Random.Range(-60f, 60f);
-        float newZ = Random.Range(-60f, 60f);
+        float newX = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
+        float newZ = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
         return new Vector3(newX, 0f, newZ);
     }
 
@@ -128,6 +188,7 @@ public class EnemyBehavior : MonoBehaviour
         StopAllCoroutines();
         canAttack = true;
         DidShoot = false;
+        if (Perception != null) Perception.Forget();
         if (navMeshAgent != null && navMeshAgent.isOnNavMesh) navMeshAgent.ResetPath();
         InitAtRandomPosition();
     }
@@ -143,11 +204,18 @@ public class EnemyBehavior : MonoBehaviour
         if (angle > sightFovDegrees * 0.5f) return false;
         if (Physics.Raycast(origin, toTarget.normalized, out RaycastHit hit, distance, sightObstacleMask, QueryTriggerInteraction.Ignore))
         {
-            return hit.transform.CompareTag("Player");
+            // Accept any collider in the target's hierarchy: the tagged root
+            // (CharacterController) and untagged child colliders like the
+            // "Capsule" visual mesh are both "seeing the player".
+            return hit.transform.IsChildOf(target) || hit.transform.CompareTag("Player");
         }
         return true;
     }
 
+    // True distance to the live target position. ENVIRONMENT-SIDE ONLY: used
+    // by EnemyAgent for reward computation (tooClose penalty), which is
+    // allowed to read true state. Never feed this to observations or actions
+    // — the brain goes through PerceptionMemory.
     public float DistanceToTarget()
     {
         if (target == null) return Mathf.Infinity;

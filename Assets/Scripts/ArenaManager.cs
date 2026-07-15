@@ -27,7 +27,9 @@ public class ArenaManager : MonoBehaviour
     [SerializeField] string existingArenaRootName = "Arena";
     [Tooltip("Force a specific arena (0..4). Leave at -1 to pick randomly at startup.")]
     [SerializeField] int forcedArenaIndex = -1;
-    [Tooltip("Teleport the player to the arena's spawn point on start. Keeps the player inside whatever arena was generated.")]
+    [Tooltip("Run seed for reproducible evaluation: drives arena selection, spawn sampling and wander waypoints (see RunRng). 0 = random seed each run. Overridden by '-runSeed <int>' on the command line.")]
+    [SerializeField] int runSeed = 0;
+    [Tooltip("Teleport the player to a random NavMesh point on start (seeded — see RunRng), so rounds don't always open from the same spot. Also keeps the player inside whatever arena was generated.")]
     [SerializeField] bool repositionPlayerOnStart = true;
 
     [Header("Perimeter walls")]
@@ -50,22 +52,31 @@ public class ArenaManager : MonoBehaviour
 
     public const int ArenaCount = 5;
 
-    // Bootstrap for scenes with no ArenaManager placed in them (the FPS scene
-    // is binary serialized, so adding the component by hand isn't practical).
-    // Rounds end via SceneManager.LoadScene, so hook sceneLoaded to re-create
-    // the manager on EVERY load — each round re-rolls a fresh arena, not just
-    // the first. sceneLoaded fires after the scene objects' Awake but before
-    // their Start, and AddComponent runs ArenaManager.Awake synchronously, so
-    // the arena + NavMesh exist before EnemyBehavior.Start spawns the enemy —
-    // the same timing this method already had on the first load.
+    // Fallback bootstrap: if no ArenaManager was placed in the scene, spawn
+    // one so arenas still generate out of the box. AfterSceneLoad only fires
+    // for the FIRST scene of a session, but the manager and its generated
+    // arena die with every SceneManager.LoadScene — without the sceneLoaded
+    // hook, rounds 2+ had no manager at all: no re-roll, and the old static
+    // "Arena" root baked into the scene was never removed, so every round
+    // after the first showed the same hand-authored arena.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void AutoBootstrap()
     {
-        SceneManager.sceneLoaded += (_, _) => EnsureInstance();
-        EnsureInstance();
+        // -= before += so a second play session (domain reload disabled)
+        // doesn't stack subscriptions.
+        SceneManager.sceneLoaded -= EnsureExistsOnSceneLoad;
+        SceneManager.sceneLoaded += EnsureExistsOnSceneLoad;
+        EnsureExists();
     }
 
-    static void EnsureInstance()
+    static void EnsureExistsOnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        // Fires after the scene's Awakes but before Starts, so the arena and
+        // its NavMesh exist before EnemyBehavior.Start spawns the enemy.
+        EnsureExists();
+    }
+
+    static void EnsureExists()
     {
         if (Current != null) return;
         if (FindAnyObjectByType<ArenaManager>() != null) return;
@@ -75,6 +86,10 @@ public class ArenaManager : MonoBehaviour
     void Awake()
     {
         Current = this;
+        // Seed the run before any randomness is consumed. No-op on scene
+        // reloads within the same run, so the deterministic sequences keep
+        // advancing round to round instead of restarting.
+        RunRng.EnsureInitialized(runSeed);
         RemoveExistingArena();
         // Clear any NavMesh data baked into the scene so only our fresh bake is live.
         NavMesh.RemoveAllNavMeshData();
@@ -84,7 +99,11 @@ public class ArenaManager : MonoBehaviour
 
     void Start()
     {
-        if (repositionPlayerOnStart) RepositionPlayer();
+        // Random, not the fixed south-wall spawn: every round should open
+        // from a fresh position in every mode, human play included. Runs at
+        // execution order -10000, i.e. before EnemyBehavior.Start, so the
+        // enemy's min-spawn-separation check measures against this position.
+        if (repositionPlayerOnStart) RepositionPlayerAtRandomPoint();
     }
 
     void OnDestroy()
@@ -94,24 +113,42 @@ public class ArenaManager : MonoBehaviour
 
     // ---------------------------------------------------------------- bounds
 
+    /// <summary>The floor surface sits at y = 0; anything sampled noticeably
+    /// above it is a platform/rampart/stair/crate top rather than the main
+    /// floor. Spawns are kept at or below this height so actors land on the
+    /// open floor where they are visible, not perched on top of cover.</summary>
+    const float GroundLevelMaxY = 0.6f;
+
     /// <summary>
-    /// A random point that sits on the baked NavMesh, comfortably inside the
-    /// arena walls. Returns <see cref="Vector3.zero"/> if nothing is found
-    /// (should not happen once a NavMesh is baked).
+    /// A random point on the main floor of the baked NavMesh, comfortably
+    /// inside the arena walls. Avoids the tops of raised cover so the enemy
+    /// never spawns out of sight on a platform. Always returns a valid on-mesh
+    /// point once a NavMesh is baked (never the off-mesh origin).
     /// </summary>
     public Vector3 RandomGroundPoint()
     {
         float marginX = Mathf.Max(2f, HalfExtentX - 2f);
         float marginZ = Mathf.Max(2f, HalfExtentZ - 2f);
-        for (int i = 0; i < 48; i++)
+        Vector3 elevatedFallback = Vector3.zero;
+        bool haveElevatedFallback = false;
+        for (int i = 0; i < 64; i++)
         {
-            float x = Random.Range(-marginX, marginX);
-            float z = Random.Range(-marginZ, marginZ);
-            if (NavMesh.SamplePosition(new Vector3(x, 1f, z), out NavMeshHit hit, 6f, NavMesh.AllAreas))
+            float x = RunRng.Range(RunRng.Stream.Spawn, -marginX, marginX);
+            float z = RunRng.Range(RunRng.Stream.Spawn, -marginZ, marginZ);
+            // Small search radius so a floor query snaps to the floor directly
+            // below it instead of jumping up onto a nearby raised platform.
+            if (NavMesh.SamplePosition(new Vector3(x, 0.5f, z), out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
-                return hit.position;
+                if (hit.position.y <= GroundLevelMaxY) return hit.position;
+                if (!haveElevatedFallback) { elevatedFallback = hit.position; haveElevatedFallback = true; }
             }
         }
+        // No floor-level point found — better to use an elevated spot than to
+        // hand back an off-mesh origin that a Warp would silently reject.
+        if (haveElevatedFallback) return elevatedFallback;
+        if (NavMesh.SamplePosition(new Vector3(PlayerSpawn.x, 0.5f, PlayerSpawn.z), out NavMeshHit spawnHit, 12f, NavMesh.AllAreas))
+            return spawnHit.position;
+        Debug.LogWarning("[ArenaManager] RandomGroundPoint found no NavMesh — is the arena baked?");
         return Vector3.zero;
     }
 
@@ -133,14 +170,26 @@ public class ArenaManager : MonoBehaviour
         }
     }
 
-    void RepositionPlayer()
+    /// <summary>
+    /// Teleport the player to a random walkable point. Called from
+    /// <see cref="Start"/> every round (all modes) and by
+    /// <see cref="EnemyAgent"/> on episode begin during training, so player
+    /// spawns are distributed across the arena instead of clustering at a
+    /// fixed spot or wherever the last episode ended.
+    /// </summary>
+    public void RepositionPlayerAtRandomPoint()
+    {
+        MovePlayerTo(RandomGroundPoint());
+    }
+
+    void MovePlayerTo(Vector3 point)
     {
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null) return;
         // Snap to the nearest walkable spot so the player never spawns inside a
         // wall/divider, whatever arena was generated.
-        Vector3 target = PlayerSpawn;
-        if (NavMesh.SamplePosition(new Vector3(PlayerSpawn.x, 1f, PlayerSpawn.z), out NavMeshHit hit, 10f, NavMesh.AllAreas))
+        Vector3 target = point;
+        if (NavMesh.SamplePosition(new Vector3(point.x, 1f, point.z), out NavMeshHit hit, 10f, NavMesh.AllAreas))
         {
             target = hit.position + Vector3.up * 1.1f;
         }
@@ -167,7 +216,7 @@ public class ArenaManager : MonoBehaviour
     {
         int idx = (forcedArenaIndex >= 0 && forcedArenaIndex < ArenaCount)
             ? forcedArenaIndex
-            : Random.Range(0, ArenaCount);
+            : RunRng.Range(RunRng.Stream.Arena, 0, ArenaCount);
         ActiveArenaIndex = idx;
         arenaRoot = new GameObject("Arena (Generated)");
 

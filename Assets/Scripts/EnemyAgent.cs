@@ -22,6 +22,10 @@ public class EnemyAgent : Agent
     [SerializeField] float tooClosePenaltyPerStep = 0.005f;
     [SerializeField] float tooCloseDistance = 6f;
 
+    [Header("Episode reset")]
+    [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play gets its random spawn from ArenaManager.Start on each round's scene reload instead — repositioning here would also fire on mid-round MaxStep resets and yank a live player across the arena.")]
+    [SerializeField] bool repositionPlayerOnEpisodeBegin = true;
+
     EnemyBehavior behavior;
     Health selfHealth;
     Health targetHealth;
@@ -55,7 +59,9 @@ public class EnemyAgent : Agent
 
     void Update()
     {
-        targetInSight = behavior.IsTargetInSight();
+        // Sensory contract (issue #9): target info reaches the policy only
+        // through PerceptionMemory, never straight off the target transform.
+        targetInSight = behavior.Perception != null && behavior.Perception.CurrentlyVisible;
         canAttack = behavior.ReadCanAttack();
         float maxHp = selfHealth.maxHealth <= 0f ? 1f : selfHealth.maxHealth;
         normalizedHealth = Mathf.Clamp01(selfHealth.health / maxHp);
@@ -105,6 +111,8 @@ public class EnemyAgent : Agent
 
         AddReward(aliveRewardPerStep);
 
+        // True-state read is fine here: reward computation is environment
+        // code, not a policy input (sensory contract, issue #9).
         if (tooClosePenaltyPerStep > 0f && behavior.DistanceToTarget() < tooCloseDistance)
         {
             AddReward(-tooClosePenaltyPerStep);
@@ -134,11 +142,24 @@ public class EnemyAgent : Agent
         episodeEnding = false;
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
+        // Reposition the player BEFORE the enemy respawns so the enemy's
+        // min-spawn-separation check (EnemyBehavior.InitAtRandomPosition)
+        // measures against the player's fresh position, not last episode's.
+        if (ShouldRepositionPlayer())
+        {
+            ArenaManager.Current.RepositionPlayerAtRandomPoint();
+        }
         if (behavior != null) behavior.ResetState();
         // Every episode gets a full round clock — during training episodes
         // reset without a scene reload, so the clock must be rearmed here.
         if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
         if (gameManager != null) gameManager.ResetRoundClock();
+        // Make every episode attributable to its run seed in TensorBoard.
+        // (The authoritative full-precision record is RunRng's startup log.)
+        if (Academy.IsInitialized)
+        {
+            Academy.Instance.StatsRecorder.Add("Run/Seed", RunRng.Seed);
+        }
     }
 
     /// <summary>
@@ -152,6 +173,17 @@ public class EnemyAgent : Agent
         episodeEnding = true;
         AddReward(-timeoutPenalty);
         EndEpisode();
+    }
+
+    // Only during automated training: in human play the round restarts via a
+    // scene reload and ArenaManager.Start places the player, so teleporting
+    // them here would just yank a live player around mid-round.
+    bool ShouldRepositionPlayer()
+    {
+        return repositionPlayerOnEpisodeBegin
+            && ArenaManager.Current != null
+            && Academy.IsInitialized
+            && Academy.Instance.IsCommunicatorOn;
     }
 
     void HandleSelfDamaged(float amount)
