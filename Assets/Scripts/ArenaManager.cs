@@ -35,6 +35,11 @@ public class ArenaManager : MonoBehaviour
 
     GameObject arenaRoot;
     readonly Dictionary<Color, Material> matCache = new Dictionary<Color, Material>();
+    // Every LOS-blocking box this arena was built from (crates, houses,
+    // pillars, maze walls, platforms… — everything except the floor and the
+    // perimeter walls). The builder knows where cover is, so the NPC can ask
+    // instead of raycast-searching the world.
+    readonly List<Collider> coverColliders = new List<Collider>();
 
     /// <summary>Half the floor size along X (distance from center to the inner wall face).</summary>
     public float HalfExtentX { get; private set; }
@@ -107,6 +112,74 @@ public class ArenaManager : MonoBehaviour
 
     /// <summary>How far apart two actors can realistically be in this arena.</summary>
     public float SpawnSeparationCap => Mathf.Min(HalfExtentX, HalfExtentZ) * 1.4f;
+
+    // ----------------------------------------------------------------- cover
+
+    const float EyeHeight = 1f;          // matches EnemyBehavior's sight-ray origin
+    const float CoverStandOff = 1.2f;    // how far behind the cover face to stand
+
+    /// <summary>
+    /// Nearest NavMesh-valid point adjacent to a cover object such that line
+    /// of sight from <paramref name="breakLosFrom"/> (the threat) to the
+    /// point is blocked, and the point is reachable from
+    /// <paramref name="from"/>. Backs the MoveToCover action primitive
+    /// (issue #14). Returns false when no such point exists in the current
+    /// layout — the caller should fall back to another action (e.g. Retreat).
+    /// </summary>
+    public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, out Vector3 coverPoint)
+    {
+        coverPoint = default;
+        // Snap the query origin onto the NavMesh so reachability tests make sense.
+        if (NavMesh.SamplePosition(from + Vector3.up, out NavMeshHit fromHit, 4f, NavMesh.AllAreas))
+        {
+            from = fromHit.position;
+        }
+
+        Vector3 threatEye = breakLosFrom + Vector3.up * EyeHeight;
+        NavMeshPath path = new NavMeshPath();
+        float bestDist = float.PositiveInfinity;
+        bool found = false;
+
+        foreach (Collider cover in coverColliders)
+        {
+            if (cover == null) continue;
+            Bounds bounds = cover.bounds;
+            Vector3 center = new Vector3(bounds.center.x, 0f, bounds.center.z);
+
+            // Candidate: the spot on the far side of the cover from the
+            // threat, one stand-off past the object's horizontal footprint.
+            Vector3 away = center - new Vector3(breakLosFrom.x, 0f, breakLosFrom.z);
+            if (away.sqrMagnitude < 1e-4f) continue; // threat is on top of it
+            away.Normalize();
+            float footprint = new Vector2(bounds.extents.x, bounds.extents.z).magnitude;
+            Vector3 candidate = center + away * (footprint + CoverStandOff);
+
+            // Cheap rejections first: must beat the current best, then sit on
+            // the NavMesh.
+            if (Vector3.Distance(from, candidate) >= bestDist) continue;
+            if (!NavMesh.SamplePosition(candidate + Vector3.up, out NavMeshHit navHit, 3f, NavMesh.AllAreas)) continue;
+            candidate = navHit.position;
+            float dist = Vector3.Distance(from, candidate);
+            if (dist >= bestDist) continue;
+
+            // The point only counts as cover if something (normally this very
+            // object) interrupts the threat's eye-line to it. Low geometry
+            // like stair steps fails here on its own.
+            Vector3 candidateEye = candidate + Vector3.up * EyeHeight;
+            Vector3 toCandidate = candidateEye - threatEye;
+            if (!Physics.Raycast(threatEye, toCandidate.normalized, toCandidate.magnitude - 0.1f,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)) continue;
+
+            // And the NPC must be able to actually walk there.
+            if (!NavMesh.CalculatePath(from, candidate, NavMesh.AllAreas, path)) continue;
+            if (path.status != NavMeshPathStatus.PathComplete) continue;
+
+            bestDist = dist;
+            coverPoint = candidate;
+            found = true;
+        }
+        return found;
+    }
 
     // ------------------------------------------------------------- lifecycle
 
@@ -383,6 +456,15 @@ public class ArenaManager : MonoBehaviour
         go.transform.localScale = size;
         Renderer r = go.GetComponent<Renderer>();
         if (r != null) r.sharedMaterial = mat;
+
+        // Everything except the floor and the perimeter is a cover candidate
+        // for NearestCoverPoint. (Perimeter walls can't have a far side that
+        // is still inside the arena; low objects like stairs self-reject via
+        // the eye-height LOS check.)
+        if (name != "Floor" && !name.StartsWith("Wall_"))
+        {
+            coverColliders.Add(go.GetComponent<Collider>());
+        }
         return go;
     }
 
