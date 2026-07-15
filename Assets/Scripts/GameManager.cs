@@ -21,8 +21,9 @@ public class GameManager : MonoBehaviour
     /// the "tiempo restante de la ronda" input for the future
     /// GameStateSnapshot / LLM context.
     /// </summary>
-    public float RemainingRoundTime { get; private set; }
+    public float RemainingRoundTime => roundClock.Remaining;
 
+    readonly RoundClock roundClock = new RoundClock();
     Counter counter;
     bool roundOver;
     string playerTag = "Player";
@@ -39,10 +40,10 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (roundOver || roundDurationSeconds <= 0f) return;
-        RemainingRoundTime = Mathf.Max(0f, RemainingRoundTime - Time.deltaTime);
+        if (roundOver || !roundClock.Enabled) return;
+        bool expired = roundClock.Tick(Time.deltaTime);
         UpdateTimerText();
-        if (RemainingRoundTime <= 0f) ProcessTimeout();
+        if (expired) ProcessTimeout();
     }
 
     /// <summary>
@@ -53,7 +54,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void ResetRoundClock()
     {
-        RemainingRoundTime = roundDurationSeconds;
+        roundClock.Duration = roundDurationSeconds;
+        roundClock.Reset();
     }
 
     // Clears the persisted win/loss tally. Public so it can also be wired to

@@ -11,27 +11,32 @@ using UnityEngine;
 /// component. Environment code — spawning, reward computation, the sight
 /// check itself — may still read true state; only the NPC *brain* is
 /// restricted.
+///
+/// This component is the engine adapter: the remember/freeze rules live in
+/// <see cref="PerceptionState"/>, which gets fed the sight-check result and
+/// the current time.
 /// </summary>
 public class PerceptionMemory : MonoBehaviour
 {
+    readonly PerceptionState state = new PerceptionState();
+
     /// <summary>True while the target passes the line-of-sight check this frame.</summary>
-    public bool CurrentlyVisible { get; private set; }
+    public bool CurrentlyVisible => state.CurrentlyVisible;
 
     /// <summary>
     /// Where the target was last seen. Only meaningful when
     /// <see cref="HasEverSeen"/> is true. While visible this tracks the live
     /// position; the moment sight breaks it freezes.
     /// </summary>
-    public Vector3 LastSeenPosition { get; private set; }
+    public Vector3 LastSeenPosition => state.LastSeenPosition;
 
     /// <summary>Seconds since the target was last visible. Infinity if never seen.</summary>
-    public float TimeSinceSeen => HasEverSeen ? Time.time - lastSeenTime : Mathf.Infinity;
+    public float TimeSinceSeen => state.TimeSinceSeen(Time.time);
 
     /// <summary>False until the first successful sighting (and after <see cref="Forget"/>).</summary>
-    public bool HasEverSeen { get; private set; }
+    public bool HasEverSeen => state.HasEverSeen;
 
     EnemyBehavior behavior;
-    float lastSeenTime;
 
     void Awake()
     {
@@ -51,22 +56,16 @@ public class PerceptionMemory : MonoBehaviour
     /// </summary>
     public void Refresh()
     {
-        CurrentlyVisible = behavior != null && behavior.IsTargetInSight();
-        if (CurrentlyVisible && behavior.target != null)
-        {
-            // The one place live player position legitimately enters NPC
-            // state: the sensor reading while the target is visible.
-            LastSeenPosition = behavior.target.position;
-            lastSeenTime = Time.time;
-            HasEverSeen = true;
-        }
+        bool visible = behavior != null && behavior.IsTargetInSight();
+        // The one place live player position legitimately enters NPC state:
+        // the sensor reading while the target is visible. (IsTargetInSight is
+        // false for a null target, so the position read is safe.)
+        state.Observe(visible, visible ? behavior.target.position : Vector3.zero, Time.time);
     }
 
     /// <summary>Wipe the memory (episode resets — last episode's sighting must not leak).</summary>
     public void Forget()
     {
-        CurrentlyVisible = false;
-        HasEverSeen = false;
-        LastSeenPosition = Vector3.zero;
+        state.Forget();
     }
 }
