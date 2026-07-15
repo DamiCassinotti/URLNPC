@@ -19,11 +19,20 @@ public class EnemyBehavior : MonoBehaviour
     Health enemyHealth;
     bool canAttack = true;
 
+    /// <summary>
+    /// The only source of target info for the NPC brain (sensory contract,
+    /// issue #9). Auto-added at runtime because the Enemy prefab is binary
+    /// serialized and can't gain new components via a text edit.
+    /// </summary>
+    public PerceptionMemory Perception { get; private set; }
+
     void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         weapon = GetComponent<EnemyWeapon>();
         enemyHealth = GetComponent<Health>();
+        Perception = GetComponent<PerceptionMemory>();
+        if (Perception == null) Perception = gameObject.AddComponent<PerceptionMemory>();
     }
 
     void Start()
@@ -41,9 +50,15 @@ public class EnemyBehavior : MonoBehaviour
     public void Attack()
     {
         DidShoot = false;
-        if (canAttack && target != null)
+        Perception.Refresh();
+        // Aim at the last-seen position, never the live one — while the
+        // target is visible they are the same thing; behind cover the shot
+        // goes where the NPC *believes* the player is (and eats the
+        // wastedShotPenalty if it's wrong).
+        if (canAttack && Perception.HasEverSeen)
         {
-            transform.LookAt(new Vector3(target.position.x, transform.position.y, target.position.z));
+            Vector3 aim = Perception.LastSeenPosition;
+            transform.LookAt(new Vector3(aim.x, transform.position.y, aim.z));
             weapon.Shoot();
             DidShoot = true;
             canAttack = false;
@@ -53,9 +68,15 @@ public class EnemyBehavior : MonoBehaviour
 
     public void Chase()
     {
-        if (target != null && navMeshAgent.isOnNavMesh)
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+        // Navigate to where the target was last seen, not where they truly
+        // are — with the player behind a wall the enemy heads to the corner
+        // it lost sight at instead of wallhack-tracking. Never seen anyone?
+        // Then there is nothing to chase.
+        if (Perception.HasEverSeen)
         {
-            navMeshAgent.SetDestination(target.position);
+            navMeshAgent.SetDestination(Perception.LastSeenPosition);
         }
     }
 
@@ -167,6 +188,7 @@ public class EnemyBehavior : MonoBehaviour
         StopAllCoroutines();
         canAttack = true;
         DidShoot = false;
+        if (Perception != null) Perception.Forget();
         if (navMeshAgent != null && navMeshAgent.isOnNavMesh) navMeshAgent.ResetPath();
         InitAtRandomPosition();
     }
@@ -182,11 +204,18 @@ public class EnemyBehavior : MonoBehaviour
         if (angle > sightFovDegrees * 0.5f) return false;
         if (Physics.Raycast(origin, toTarget.normalized, out RaycastHit hit, distance, sightObstacleMask, QueryTriggerInteraction.Ignore))
         {
-            return hit.transform.CompareTag("Player");
+            // Accept any collider in the target's hierarchy: the tagged root
+            // (CharacterController) and untagged child colliders like the
+            // "Capsule" visual mesh are both "seeing the player".
+            return hit.transform.IsChildOf(target) || hit.transform.CompareTag("Player");
         }
         return true;
     }
 
+    // True distance to the live target position. ENVIRONMENT-SIDE ONLY: used
+    // by EnemyAgent for reward computation (tooClose penalty), which is
+    // allowed to read true state. Never feed this to observations or actions
+    // — the brain goes through PerceptionMemory.
     public float DistanceToTarget()
     {
         if (target == null) return Mathf.Infinity;

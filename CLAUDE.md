@@ -31,9 +31,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Game state** is managed by `GameManager.cs`, which tracks win/loss conditions, controls the end-of-round UI, and calls `CounterData` (static class) to persist scores across scene reloads. `GameManager` holds a generic `[SerializeField] Behaviour playerController` reference that is disabled at end-of-round — wire whichever player controller component you're using (currently StarterAssets `FirstPersonController`) to that slot in the Inspector.
 
-**Enemy AI** is split across two scripts:
+**Enemy AI** is split across three scripts:
 - `EnemyAgent.cs` — the ML-Agents `Agent` subclass (the **only** `Agent` on the Enemy GameObject). Collects observations (`canAttack`, `targetInSight`, `normalizedHealth`), receives discrete actions (0=Patrol, 1=Chase, 2=Attack) via `ActionBuffers`, and assigns rewards. Subscribes to `Health.OnDamaged` / `OnDied` on both itself and the player target to emit hit/kill/death rewards. Calls `EndEpisode()` on either death and resets state in `OnEpisodeBegin()`.
-- `EnemyBehavior.cs` — plain `MonoBehaviour`. Executes the actual behavior: NavMesh patrolling within a random range, chasing the player, triggering weapon fire with cooldown, and providing observation primitives (`IsTargetInSight`, `ReadCanAttack`, etc.) plus `ResetState()` for episode resets.
+- `EnemyBehavior.cs` — plain `MonoBehaviour`. Executes the actual behavior: NavMesh patrolling within a random range, chasing toward the last-seen player position, triggering weapon fire with cooldown, and providing observation primitives (`IsTargetInSight`, `ReadCanAttack`, etc.) plus `ResetState()` for episode resets.
+- `PerceptionMemory.cs` — enforces the **sensory contract**: the NPC never knows the player's HP and knows their position only while visible (`CurrentlyVisible`, `LastSeenPosition`, `TimeSinceSeen`, updated from `IsTargetInSight()`). It is the *only* source of target info for the NPC brain — `Chase()` navigates to and `Attack()` aims at `LastSeenPosition`, and the `targetInSight` observation reads `CurrentlyVisible`. Environment code (spawn separation, reward computation like `DistanceToTarget()`, and the sight check itself) may still read true state; only policy inputs/actions are restricted. Auto-added at runtime by `EnemyBehavior.Awake` (binary prefab), memory wiped by `ResetState()` on episode begin.
 
 `Health.cs` exposes `OnDamaged(float)` and `OnDied` events that `EnemyAgent` listens to for reward shaping. `GameManager.ProcessDeath` early-exits when `Academy.Instance.IsCommunicatorOn` so it doesn't freeze the scene during training.
 
@@ -62,7 +63,7 @@ The pre-trained `.nn` model in `results/URLNPC/` was produced under the old ML-A
 
 ## Required Enemy prefab components
 
-The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` for ML-Agents to drive it at all. The prefab in `Assets/Prefabs/Characters/Enemy.prefab` is missing both at time of writing — see the "Required Enemy prefab setup" section in `README.md` for the exact Inspector configuration (Behavior Name `URLNPC`, vector obs size 3, one discrete branch of size 3, decision period 5).
+The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` for ML-Agents to drive it at all — without a `DecisionRequester` no decisions are requested, `OnActionReceived` never fires, and the enemy stands still in every mode (heuristic, inference, and training). Both are present on `Assets/Prefabs/Characters/Enemy.prefab` (Behavior Name `URLNPC`, vector obs size 3, one discrete branch of size 3, decision period 5, Behavior Type Default, no model assigned). The prefab is text-serialized YAML (only the scene is force-binary), so it can be edited directly.
 
 ## Reward shape (in `EnemyAgent.cs`, all serialized for Inspector tweaking)
 

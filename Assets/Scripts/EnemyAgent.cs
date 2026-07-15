@@ -44,7 +44,9 @@ public class EnemyAgent : Agent
 
     void Update()
     {
-        targetInSight = behavior.IsTargetInSight();
+        // Sensory contract (issue #9): target info reaches the policy only
+        // through PerceptionMemory, never straight off the target transform.
+        targetInSight = behavior.Perception != null && behavior.Perception.CurrentlyVisible;
         canAttack = behavior.ReadCanAttack();
         float maxHp = selfHealth.maxHealth <= 0f ? 1f : selfHealth.maxHealth;
         normalizedHealth = Mathf.Clamp01(selfHealth.health / maxHp);
@@ -94,6 +96,8 @@ public class EnemyAgent : Agent
 
         AddReward(aliveRewardPerStep);
 
+        // True-state read is fine here: reward computation is environment
+        // code, not a policy input (sensory contract, issue #9).
         if (tooClosePenaltyPerStep > 0f && behavior.DistanceToTarget() < tooCloseDistance)
         {
             AddReward(-tooClosePenaltyPerStep);
