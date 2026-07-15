@@ -5,7 +5,7 @@ using TMPro;
 
 public class Counter : MonoBehaviour
 {
-    [SerializeField] TMP_Text counter;
+    [SerializeField] internal TMP_Text counter;
 
     void Update()
     {

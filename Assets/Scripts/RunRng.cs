@@ -44,9 +44,10 @@ public static class RunRng
     // Statics survive Enter Play Mode with domain reload disabled — reset per
     // play session so a stale seed never leaks into the next run. (Fires once
     // per session, not per SceneManager.LoadScene, so the streams still
-    // persist across round reloads within a run.)
+    // persist across round reloads within a run.) Internal: tests reset the
+    // streams between cases for the same isolation reason.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void ResetForNewRun()
+    internal static void ResetForNewRun()
     {
         Initialized = false;
         streams = null;
