@@ -126,6 +126,23 @@ Defined in `EnemyAgent.cs` (tunable in Inspector):
 | Died | `-1.0` (ends episode) |
 | Shot while target out of sight | `-0.05` |
 
+## Testing
+
+The project carries a Unity Test Framework suite covering the load-bearing behaviors: seeded reproducibility (`RunRng`, arena/spawn replays), the round clock and draw path, win/loss/draw counters, health/death events, episode resets, and the NPC's sensory contract (`PerceptionMemory`).
+
+- **In the editor:** *Window ▸ General ▸ Test Runner*, then run the `URLNPC.Tests.EditMode` / `URLNPC.Tests.PlayMode` assemblies.
+- **Headless (CLI):** close the editor (Unity is single-instance per project) and run:
+
+  ```bash
+  scripts/run-tests.sh            # EditMode only (fast)
+  scripts/run-tests.sh playmode   # PlayMode integration tests
+  scripts/run-tests.sh all        # both
+  ```
+
+  Results (NUnit XML + log) are written to `results/tests/`. The script auto-detects the editor version pinned in `ProjectSettings/ProjectVersion.txt` under `~/Unity/Hub/Editor/`; override with `UNITY_BIN=/path/to/Unity`.
+
+Test scaffolding restores real state on teardown: your persisted score tally (PlayerPrefs) is snapshotted and put back, and `Time.timeScale`/NavMesh/RNG state are reset per test.
+
 ## Tech stack
 
 - Unity 6 LTS, ML-Agents Release 22 (`com.unity.ml-agents` 3.0.0 — embedded under `Packages/` and locally patched for the renamed Inference Engine package).

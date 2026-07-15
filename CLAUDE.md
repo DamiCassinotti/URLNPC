@@ -77,6 +77,16 @@ The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` f
 - `wastedShotPenalty` `-0.05` (attack action while target not in sight)
 - `timeoutPenalty` `-0.2` (round clock ran out — draw, ends episode)
 
+## Tests
+
+Unity Test Framework suite in `Assets/Tests/` (EditMode = pure logic, PlayMode = integration with real geometry/NavMesh/Academy). Run headless with `scripts/run-tests.sh [editmode|playmode|all]` (editor must be closed — single instance per project; results in `results/tests/`), or in-editor via the Test Runner window. **Never pass `-runSeed` to the test process** — it outranks the inspector seeds the reproducibility tests set on purpose (the tests `Assert.Ignore` where that would invalidate them).
+
+Structure that must be preserved:
+- `Assets/Scripts/URLNPC.asmdef` — the game scripts' assembly. Test asmdefs can't reference the default `Assembly-CSharp`, so game code must stay in this assembly (StarterAssets etc. remain in `Assembly-CSharp`, which auto-references it). New script dependencies on other packages need their asmdef name added to its `references`.
+- `Assets/Scripts/AssemblyInfo.cs` — `InternalsVisibleTo` for the two test assemblies. Test seams are `internal`: `RunRng.ResetForNewRun()` (stream isolation between tests), `ArenaManager.suppressAutoBootstrap` (keeps the sceneLoaded hook from spawning arenas into test scenes), and a few serialized config fields (`roundDurationSeconds`, `runSeed`, `forcedArenaIndex`, `repositionPlayerOnStart`, `Counter.counter`).
+- `PlayModeTestBase` (in `Assets/Tests/PlayMode/`) — every PlayMode fixture derives from it; it sweeps auto-spawned arenas, snapshots/restores the real PlayerPrefs tally, and resets `Time.timeScale`/NavMesh/RunRng per test.
+- `CounterDataTests`/`PlayModeTestBase` duplicate the private PlayerPrefs key strings from `CounterData.cs` — renaming those keys must update both.
+
 ## Known follow-ups
 
 - **NavMesh bake** — now handled at runtime: `ArenaManager` bakes a `NavMeshSurface` over the generated arena on `Awake`, so no hand-baked NavMesh is required. (A hand-baked NavMesh in the scene is removed at startup.)

@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Round clock")]
     [Tooltip("Round length in seconds (game time, so it scales with the trainer's time_scale). Timeout ends the round as a DRAW. Set to 0 or negative to disable the clock.")]
-    [SerializeField] float roundDurationSeconds = 120f;
+    [SerializeField] internal float roundDurationSeconds = 120f;
     [Tooltip("Optional HUD text for the clock. Left empty (the scene is binary serialized), one is created at runtime on the HUD canvas.")]
     [SerializeField] TMP_Text timerText;
 

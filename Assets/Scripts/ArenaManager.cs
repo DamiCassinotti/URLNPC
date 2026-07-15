@@ -26,11 +26,11 @@ public class ArenaManager : MonoBehaviour
     [Tooltip("Name of any pre-existing arena root in the scene to remove before generating. Leave as 'Arena' to clear the static scene arena.")]
     [SerializeField] string existingArenaRootName = "Arena";
     [Tooltip("Force a specific arena (0..4). Leave at -1 to pick randomly at startup.")]
-    [SerializeField] int forcedArenaIndex = -1;
+    [SerializeField] internal int forcedArenaIndex = -1;
     [Tooltip("Run seed for reproducible evaluation: drives arena selection, spawn sampling and wander waypoints (see RunRng). 0 = random seed each run. Overridden by '-runSeed <int>' on the command line.")]
-    [SerializeField] int runSeed = 0;
+    [SerializeField] internal int runSeed = 0;
     [Tooltip("Teleport the player to a random NavMesh point on start (seeded — see RunRng), so rounds don't always open from the same spot. Also keeps the player inside whatever arena was generated.")]
-    [SerializeField] bool repositionPlayerOnStart = true;
+    [SerializeField] internal bool repositionPlayerOnStart = true;
 
     [Header("Perimeter walls")]
     [SerializeField] float wallHeight = 5f;
@@ -76,8 +76,13 @@ public class ArenaManager : MonoBehaviour
         EnsureExists();
     }
 
+    // Test seam: PlayMode tests build their own minimal scenes and must not
+    // have an arena auto-spawned into them by the sceneLoaded hook.
+    internal static bool suppressAutoBootstrap;
+
     static void EnsureExists()
     {
+        if (suppressAutoBootstrap) return;
         if (Current != null) return;
         if (FindAnyObjectByType<ArenaManager>() != null) return;
         new GameObject("ArenaManager (auto)").AddComponent<ArenaManager>();
