@@ -29,13 +29,15 @@ The five arenas vary in size and cover:
 | 3 | Maze        | 44×44 | Flat maze of offset wall segments and pillars |
 | 4 | Ramparts    | 56×36 | Rectangular; raised side walkways via stairs, central divider with gaps |
 
-### Wiring it into the scene (recommended, one step)
+### Scene wiring (optional)
 
-`ArenaManager` auto-bootstraps itself on the **first** scene load, so arenas work with no setup. But the game restarts rounds via `SceneManager.LoadScene`, and the auto-bootstrap only fires at initial startup. To get a fresh random arena **every round**, add the component to the scene so it is recreated on each reload:
+`ArenaManager` auto-bootstraps itself on **every** scene load (it hooks `SceneManager.sceneLoaded`), so arenas work — and re-roll each round — with no scene setup. The game restarts rounds via `SceneManager.LoadScene` after a win or a draw, and each reload builds a fresh random arena.
+
+Placing the component in the scene by hand is only needed if you want non-default Inspector settings:
 
 1. In `Assets/Scenes/FPS.unity`, create an empty GameObject named `ArenaManager`.
 2. **Add Component → Arena Manager**.
-3. (Optional) Set **Forced Arena Index** to `0`–`4` to always build a specific arena (leave `-1` for random); toggle **Reposition Player On Start**; tune wall height/thickness.
+3. Set **Forced Arena Index** to `0`–`4` to always build a specific arena (leave `-1` for random); toggle **Reposition Player On Start**; tune wall height/thickness.
 
 No NavMesh needs to be baked by hand — `ArenaManager` bakes one at runtime via `NavMeshSurface` (`com.unity.ai.navigation`). The static arena baked into the scene is removed automatically at startup, so you can leave it in place.
 

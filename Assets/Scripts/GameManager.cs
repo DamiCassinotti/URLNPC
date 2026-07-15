@@ -150,21 +150,26 @@ public class GameManager : MonoBehaviour
     {
         if (counter != null) counter.Draw();
 
-        // Every agent (the enemy — and the player too, once it is
-        // agent-driven) takes the timeout penalty and ends its episode.
-        foreach (EnemyAgent agent in FindObjectsByType<EnemyAgent>(FindObjectsSortMode.None))
-        {
-            agent.OnRoundTimeout();
-        }
-
-        // While training, the agents reset themselves (OnEpisodeBegin) —
-        // just rearm the clock and keep the scene running.
+        // While training, every agent (the enemy — and the player too, once
+        // it is agent-driven) takes the timeout penalty and ends its episode,
+        // resetting in place (OnEpisodeBegin) — rearm the clock and keep the
+        // scene running, no scene reload.
         if (Academy.IsInitialized && Academy.Instance.IsCommunicatorOn)
         {
+            foreach (EnemyAgent agent in FindObjectsByType<EnemyAgent>(FindObjectsSortMode.None))
+            {
+                agent.OnRoundTimeout();
+            }
             ResetRoundClock();
             return;
         }
 
+        // Human play: a draw ends the round exactly like a win — freeze the
+        // scene on the final standoff and show the banner. The end-of-round
+        // button reloads the scene, which builds a whole new round (fresh
+        // arena, fresh spawns). No agent reset here: the reload recreates
+        // everything, and skipping it keeps the enemy from visibly
+        // teleporting behind the draw screen.
         FinishRound("Draw!");
     }
 

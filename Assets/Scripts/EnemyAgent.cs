@@ -35,6 +35,18 @@ public class EnemyAgent : Agent
 
     public override void Initialize()
     {
+        // The GameManager round clock is the single owner of time-based
+        // episode termination (timeout penalty + draw). A nonzero
+        // Agent.MaxStep would silently reset the episode before the clock
+        // fires — the binary FPS scene carries a stale MaxStep of 5000
+        // (~100 s, shorter than the 120 s round), which made timeouts
+        // restart the round in place without ever counting a draw.
+        if (MaxStep != 0)
+        {
+            Debug.LogWarning($"[EnemyAgent] Overriding serialized MaxStep {MaxStep} -> 0; the round clock owns episode timeout.");
+            MaxStep = 0;
+        }
+
         behavior = GetComponent<EnemyBehavior>();
         selfHealth = GetComponent<Health>();
         selfHealth.OnDamaged += HandleSelfDamaged;

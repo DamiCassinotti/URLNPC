@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using Unity.AI.Navigation;
 
 /// <summary>
@@ -49,13 +50,22 @@ public class ArenaManager : MonoBehaviour
 
     public const int ArenaCount = 5;
 
-    // Fallback for the very first scene load: if no ArenaManager was placed in
-    // the scene, spawn one so arenas still generate out of the box. NOTE this
-    // only fires at initial startup — for the arena to re-roll every round
-    // (the game restarts via SceneManager.LoadScene), add an ArenaManager
-    // component to a GameObject in the scene so it is recreated on each reload.
+    // Bootstrap for scenes with no ArenaManager placed in them (the FPS scene
+    // is binary serialized, so adding the component by hand isn't practical).
+    // Rounds end via SceneManager.LoadScene, so hook sceneLoaded to re-create
+    // the manager on EVERY load — each round re-rolls a fresh arena, not just
+    // the first. sceneLoaded fires after the scene objects' Awake but before
+    // their Start, and AddComponent runs ArenaManager.Awake synchronously, so
+    // the arena + NavMesh exist before EnemyBehavior.Start spawns the enemy —
+    // the same timing this method already had on the first load.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void AutoBootstrap()
+    {
+        SceneManager.sceneLoaded += (_, _) => EnsureInstance();
+        EnsureInstance();
+    }
+
+    static void EnsureInstance()
     {
         if (Current != null) return;
         if (FindAnyObjectByType<ArenaManager>() != null) return;
