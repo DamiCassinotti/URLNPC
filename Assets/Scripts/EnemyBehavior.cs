@@ -6,6 +6,8 @@ public class EnemyBehavior : MonoBehaviour
 {
     [Header("PARAMS")]
     [SerializeField] public Transform target;
+    [Tooltip("Tag of the opponent this combatant hunts. \"Player\" on the enemy NPC; CombatantRig sets it to \"NPC\" when this script drives the agent-side player body.")]
+    [SerializeField] public string targetTag = "Player";
     [SerializeField] float walkPointRange = 10f;
     [SerializeField] float attackCooldown = 0.5f;
     [SerializeField] float sightRange = 20f;
@@ -31,8 +33,8 @@ public class EnemyBehavior : MonoBehaviour
         InitAtRandomPosition();
         if (target == null)
         {
-            GameObject player = GameObject.FindWithTag("Player");
-            if (player != null) target = player.transform;
+            GameObject opponent = GameObject.FindWithTag(targetTag);
+            if (opponent != null) target = opponent.transform;
         }
     }
 
@@ -87,7 +89,7 @@ public class EnemyBehavior : MonoBehaviour
         Transform playerForSpawn = target;
         if (playerForSpawn == null)
         {
-            GameObject p = GameObject.FindWithTag("Player");
+            GameObject p = GameObject.FindWithTag(targetTag);
             if (p != null) playerForSpawn = p.transform;
         }
         // Tight arenas can't satisfy a large min separation — cap it to what
@@ -143,7 +145,7 @@ public class EnemyBehavior : MonoBehaviour
         if (angle > sightFovDegrees * 0.5f) return false;
         if (Physics.Raycast(origin, toTarget.normalized, out RaycastHit hit, distance, sightObstacleMask, QueryTriggerInteraction.Ignore))
         {
-            return hit.transform.CompareTag("Player");
+            return hit.transform.CompareTag(targetTag);
         }
         return true;
     }
