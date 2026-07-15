@@ -30,6 +30,7 @@ public class EnemyAgent : Agent
     Health selfHealth;
     Health targetHealth;
     GameManager gameManager;
+    RewardComputer stepRewards;
 
     bool canAttack = true;
     bool targetInSight = false;
@@ -55,6 +56,17 @@ public class EnemyAgent : Agent
         selfHealth = GetComponent<Health>();
         selfHealth.OnDamaged += HandleSelfDamaged;
         selfHealth.OnDied += HandleSelfDied;
+
+        // Snapshot of the serialized tunables, taken once per play session —
+        // tweak them between runs, not mid-play. (The event rewards below
+        // still read their fields live.)
+        stepRewards = new RewardComputer
+        {
+            aliveRewardPerStep = aliveRewardPerStep,
+            wastedShotPenalty = wastedShotPenalty,
+            tooClosePenaltyPerStep = tooClosePenaltyPerStep,
+            tooCloseDistance = tooCloseDistance,
+        };
     }
 
     void Update()
@@ -109,14 +121,9 @@ public class EnemyAgent : Agent
     {
         if (episodeEnding) return;
 
-        AddReward(aliveRewardPerStep);
-
         // True-state read is fine here: reward computation is environment
         // code, not a policy input (sensory contract, issue #9).
-        if (tooClosePenaltyPerStep > 0f && behavior.DistanceToTarget() < tooCloseDistance)
-        {
-            AddReward(-tooClosePenaltyPerStep);
-        }
+        float distanceToTarget = behavior.DistanceToTarget();
 
         int action = actions.DiscreteActions[0];
         switch (action)
@@ -129,12 +136,10 @@ public class EnemyAgent : Agent
                 break;
             case 2:
                 behavior.Attack();
-                if (behavior.DidShoot && !targetInSight)
-                {
-                    AddReward(-wastedShotPenalty);
-                }
                 break;
         }
+
+        AddReward(stepRewards.StepReward(action, behavior.DidShoot, targetInSight, distanceToTarget));
     }
 
     public override void OnEpisodeBegin()
