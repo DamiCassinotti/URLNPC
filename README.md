@@ -143,6 +143,8 @@ The project carries a Unity Test Framework suite covering the load-bearing behav
 
 Test scaffolding restores real state on teardown: your persisted score tally (PlayerPrefs) is snapshotted and put back, and `Time.timeScale`/NavMesh/RNG state are reset per test.
 
+**CI:** `.github/workflows/tests.yml` runs both suites on every PR and on pushes to `main`, via [GameCI](https://game.ci/) (`unity-test-runner` in the `unityci/editor` Docker image matching `ProjectVersion.txt`). It needs three repository secrets — `UNITY_LICENSE` (contents of a manually activated `.ulf`), `UNITY_EMAIL` and `UNITY_PASSWORD`. Results are published as check runs and uploaded as artifacts.
+
 ## Tech stack
 
 - Unity 6 LTS, ML-Agents Release 22 (`com.unity.ml-agents` 3.0.0 — embedded under `Packages/` and locally patched for the renamed Inference Engine package).
