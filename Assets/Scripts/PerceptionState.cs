@@ -22,9 +22,9 @@ public class PerceptionState
     public void Observe(bool targetVisible, Vector3 targetPosition, float now)
     {
         CurrentlyVisible = targetVisible;
+        LastSeenPosition = targetPosition;
         if (targetVisible)
         {
-            LastSeenPosition = targetPosition;
             lastSeenTime = now;
             HasEverSeen = true;
         }
