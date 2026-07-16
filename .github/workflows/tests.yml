@@ -1,9 +1,10 @@
 name: Tests
 
+# No paths filter on pull_request: these checks are REQUIRED on main, and a
+# filtered-out workflow never reports, which would leave doc-only PRs stuck
+# on "Expected" checks forever. Pushes to main keep the filter (not required).
 on:
   pull_request:
-    paths-ignore:
-      - '**.md'
   push:
     branches: [main]
     paths-ignore:
