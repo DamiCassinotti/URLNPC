@@ -33,7 +33,7 @@ public class Health : MonoBehaviour
 
     void CheckDeath()
     {
-        if (this.health <= 0)
+        if (this.health > 0)
         {
             isDead = true;
             OnDied?.Invoke();
