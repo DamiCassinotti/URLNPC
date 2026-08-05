@@ -1,0 +1,161 @@
+using System.Collections;
+using NUnit.Framework;
+using Unity.MLAgents;
+using Unity.MLAgents.Policies;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.TestTools;
+using DriverKind = CombatantRig.DriverKind;
+
+/// <summary>
+/// CombatantRig composing the agent driver onto the player body (issue #10).
+/// The scene is force-binary serialized, so this stack cannot be authored and
+/// reviewed in the editor — it only ever exists as the product of
+/// EnableAgentDriver, which makes it worth asserting piece by piece.
+///
+/// The fixture has no NavMesh: the NavMeshAgent the rig adds, and
+/// EnemyBehavior.Start's respawn, both complain about that. Those logs are
+/// expected here — the rig's composition is what is under test, not
+/// navigation.
+/// </summary>
+public class CombatantRigTests : PlayModeTestBase
+{
+    GameObject body;
+
+    [TearDown]
+    public void ClearDriverOverride()
+    {
+        CombatantRig.DriverOverride = null;
+        LogAssert.ignoreFailingMessages = false;
+    }
+
+    /// <summary>
+    /// A player body with the pieces the rig expects to already be there:
+    /// the "Player" tag, Health, a CharacterController and the human weapon.
+    /// Built inactive so the driver override is in place before Awake resolves.
+    /// </summary>
+    IEnumerator BuildBody(DriverKind driver)
+    {
+        // The rig reads the real command line first, so an editor launched with
+        // -playerDriver would outrank the override these tests rely on.
+        foreach (string arg in System.Environment.GetCommandLineArgs())
+        {
+            if (arg == DriverSelector.CommandLineArg)
+            {
+                Assert.Ignore("Editor was launched with -playerDriver; driver-override tests do not apply.");
+            }
+        }
+
+        LogAssert.ignoreFailingMessages = true; // no NavMesh in this fixture
+
+        body = Track(new GameObject("TestPlayerBody"));
+        body.SetActive(false);
+        body.tag = "Player";
+        body.AddComponent<CharacterController>();
+        body.AddComponent<Health>();
+        body.AddComponent<PlayerWeapon>();
+
+        CombatantRig.DriverOverride = driver;
+        body.AddComponent<CombatantRig>();
+        body.SetActive(true); // Awake resolves the driver and composes
+
+        yield return null; // let Start run on whatever the rig added
+    }
+
+    [UnityTest]
+    public IEnumerator AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout()
+    {
+        yield return BuildBody(DriverKind.Agent);
+
+        // Regression guard. The round clock is the single owner of time-based
+        // episode termination (see EnemyAgent.Initialize and CLAUDE.md); the
+        // rig used to set MaxStep to 5000 here, reinstating on the player side
+        // exactly the stale value the enemy side had just been fixed for.
+        // EnemyAgentTests covers this for the Enemy prefab, which never saw
+        // the runtime-composed player.
+        var agent = body.GetComponent<PlayerAgent>();
+        Assert.That(agent, Is.Not.Null, "the agent driver must install a PlayerAgent");
+        Assert.That(agent.MaxStep, Is.Zero,
+            "a nonzero MaxStep would end the player's episode before the round clock fires");
+    }
+
+    [UnityTest]
+    public IEnumerator AgentDriver_SilencesEveryHumanInputPath()
+    {
+        yield return BuildBody(DriverKind.Agent);
+
+        var cc = body.GetComponent<CharacterController>();
+        Assert.That(cc.enabled, Is.False, "CharacterController fights NavMeshAgent for the transform");
+        Assert.That(body.GetComponent<PlayerWeapon>().enabled, Is.False,
+            "mouse fire must not survive alongside the agent's weapon");
+    }
+
+    [UnityTest]
+    public IEnumerator AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc()
+    {
+        yield return BuildBody(DriverKind.Agent);
+
+        Assert.That(body.GetComponent<NavMeshAgent>(), Is.Not.Null, "agent locomotion is NavMesh-driven");
+        Assert.That(body.GetComponent<EnemyWeapon>(), Is.Not.Null, "the agent fires through EnemyWeapon");
+
+        var behavior = body.GetComponent<EnemyBehavior>();
+        Assert.That(behavior, Is.Not.Null);
+        Assert.That(behavior.targetTag, Is.EqualTo("NPC"),
+            "the agent-driven player hunts the enemy, not itself");
+
+        // EnemyBehavior.Awake auto-adds the sensory contract; the agent-driven
+        // player must be bound by it exactly like the enemy is.
+        Assert.That(behavior.Perception, Is.Not.Null, "PerceptionMemory must be present on the player side too");
+    }
+
+    [UnityTest]
+    public IEnumerator AgentDriver_MatchesTheEnemyPolicyContract()
+    {
+        yield return BuildBody(DriverKind.Agent);
+
+        var bp = body.GetComponent<BehaviorParameters>();
+        Assert.That(bp, Is.Not.Null, "ML-Agents cannot drive the body without BehaviorParameters");
+        Assert.That(bp.BehaviorName, Is.EqualTo("URLNPC"),
+            "sharing the enemy's behavior name is what makes this self-play against one policy");
+        Assert.That(bp.TeamId, Is.Not.EqualTo(0),
+            "the player side needs a team id distinct from the enemy's 0 for adversarial self-play");
+
+        // Same observation/action shape as the Enemy prefab, or the shared
+        // policy cannot be applied to both sides.
+        Assert.That(bp.BrainParameters.VectorObservationSize, Is.EqualTo(3),
+            "canAttack, targetInSight, normalizedHealth");
+        Assert.That(bp.BrainParameters.NumStackedVectorObservations, Is.EqualTo(1));
+        Assert.That(bp.BrainParameters.ActionSpec.NumDiscreteActions, Is.EqualTo(1),
+            "one discrete branch: Patrol / Chase / Attack");
+        Assert.That(bp.BrainParameters.ActionSpec.BranchSizes[0], Is.EqualTo(3));
+
+        var requester = body.GetComponent<DecisionRequester>();
+        Assert.That(requester, Is.Not.Null,
+            "without a DecisionRequester no decisions are requested and the body stands still");
+        Assert.That(requester.DecisionPeriod, Is.EqualTo(5), "same cadence as the Enemy prefab");
+    }
+
+    [UnityTest]
+    public IEnumerator HumanDriver_LeavesTheBodyExactlyAsAuthored()
+    {
+        yield return BuildBody(DriverKind.Human);
+
+        Assert.That(body.GetComponent<CharacterController>().enabled, Is.True);
+        Assert.That(body.GetComponent<PlayerWeapon>().enabled, Is.True);
+
+        // Nothing from the agent stack may be composed in human mode.
+        Assert.That(body.GetComponent<PlayerAgent>(), Is.Null);
+        Assert.That(body.GetComponent<BehaviorParameters>(), Is.Null);
+        Assert.That(body.GetComponent<DecisionRequester>(), Is.Null);
+        Assert.That(body.GetComponent<NavMeshAgent>(), Is.Null);
+        Assert.That(body.GetComponent<EnemyBehavior>(), Is.Null);
+        Assert.That(body.GetComponent<EnemyWeapon>(), Is.Null);
+    }
+
+    [UnityTest]
+    public IEnumerator ResolvedDriver_IsReportedOnTheRig()
+    {
+        yield return BuildBody(DriverKind.Agent);
+        Assert.That(body.GetComponent<CombatantRig>().ActiveDriver, Is.EqualTo(DriverKind.Agent));
+    }
+}

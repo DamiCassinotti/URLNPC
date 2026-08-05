@@ -17,7 +17,7 @@ To play against a trained model rather than the heuristic, drag the `.onnx` prod
 
 ## Arenas
 
-The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at that arena's spawn point.
+The arena is generated procedurally at startup by `Assets/Scripts/ArenaManager.cs`. On every scene load it removes the static scene arena (the `Arena` root), picks **one of 5 layouts at random**, builds it from primitive geometry with contrasting URP materials, bakes a fresh NavMesh, and drops the player at a random point on it — so both the arena and your starting position re-roll every round.
 
 The five arenas vary in size and cover:
 
@@ -29,13 +29,15 @@ The five arenas vary in size and cover:
 | 3 | Maze        | 44×44 | Flat maze of offset wall segments and pillars |
 | 4 | Ramparts    | 56×36 | Rectangular; raised side walkways via stairs, central divider with gaps |
 
-### Wiring it into the scene (recommended, one step)
+### Scene wiring (optional)
 
-`ArenaManager` auto-bootstraps itself on the **first** scene load, so arenas work with no setup. But the game restarts rounds via `SceneManager.LoadScene`, and the auto-bootstrap only fires at initial startup. To get a fresh random arena **every round**, add the component to the scene so it is recreated on each reload:
+`ArenaManager` auto-bootstraps itself on **every** scene load (it hooks `SceneManager.sceneLoaded`), so arenas work — and re-roll each round — with no scene setup. The game restarts rounds via `SceneManager.LoadScene` after a win or a draw, and each reload builds a fresh random arena.
+
+Placing the component in the scene by hand is only needed if you want non-default Inspector settings:
 
 1. In `Assets/Scenes/FPS.unity`, create an empty GameObject named `ArenaManager`.
 2. **Add Component → Arena Manager**.
-3. (Optional) Set **Forced Arena Index** to `0`–`4` to always build a specific arena (leave `-1` for random); toggle **Reposition Player On Start**; tune wall height/thickness.
+3. Set **Forced Arena Index** to `0`–`4` to always build a specific arena (leave `-1` for random); toggle **Reposition Player On Start**; tune wall height/thickness.
 
 No NavMesh needs to be baked by hand — `ArenaManager` bakes one at runtime via `NavMeshSurface` (`com.unity.ai.navigation`). The static arena baked into the scene is removed automatically at startup, so you can leave it in place.
 
@@ -102,6 +104,15 @@ You can quit the game and pick training back up later **on the same semi-trained
 
 The on-screen win/loss tally also survives quitting: `CounterData` persists the score to `PlayerPrefs`, so it carries across Editor Play sessions and standalone builds. Use the **Reset Score** button on the end-of-round canvas (or call `CounterData.ResetScores()`) to clear it.
 
+### Reproducible evaluation runs
+
+Arena selection, spawn sampling and wander waypoints are driven by a single seedable RNG (`RunRng`). To make two runs comparable, fix the seed either way:
+
+- **Inspector:** set **Run Seed** on the `ArenaManager` component (0 = random each run).
+- **Command line (standalone build / batch mode):** pass `-runSeed <int>` — this overrides the Inspector value.
+
+Unseeded runs draw a random seed and still log it (look for the `[RunRng] Run seed: …` line in the Console/Player log), so any run can be replayed after the fact. The seed is also recorded per episode as the `Run/Seed` stat in TensorBoard. Note the seed governs arena/spawn/waypoint *sequences*, not frame-exact gameplay (physics, input timing and aim spread still vary).
+
 ### Reward shape
 
 Defined in `EnemyAgent.cs` (tunable in Inspector):
@@ -114,6 +125,25 @@ Defined in `EnemyAgent.cs` (tunable in Inspector):
 | Killed player | `+1.0` (ends episode) |
 | Died | `-1.0` (ends episode) |
 | Shot while target out of sight | `-0.05` |
+
+## Testing
+
+The project carries a Unity Test Framework suite covering the load-bearing behaviors: seeded reproducibility (`RunRng`, arena/spawn replays), the round clock and draw path, win/loss/draw counters, health/death events, episode resets, and the NPC's sensory contract (`PerceptionMemory`).
+
+- **In the editor:** *Window ▸ General ▸ Test Runner*, then run the `URLNPC.Tests.EditMode` / `URLNPC.Tests.PlayMode` assemblies.
+- **Headless (CLI):** close the editor (Unity is single-instance per project) and run:
+
+  ```bash
+  scripts/run-tests.sh            # EditMode only (fast)
+  scripts/run-tests.sh playmode   # PlayMode integration tests
+  scripts/run-tests.sh all        # both
+  ```
+
+  Results (NUnit XML + log) are written to `results/tests/`. The script auto-detects the editor version pinned in `ProjectSettings/ProjectVersion.txt` under `~/Unity/Hub/Editor/`; override with `UNITY_BIN=/path/to/Unity`.
+
+Test scaffolding restores real state on teardown: your persisted score tally (PlayerPrefs) is snapshotted and put back, and `Time.timeScale`/NavMesh/RNG state are reset per test.
+
+**CI:** `.github/workflows/tests.yml` runs both suites on every PR and on pushes to `main`, via [GameCI](https://game.ci/) (`unity-test-runner` in the `unityci/editor` Docker image matching `ProjectVersion.txt`). It needs three repository secrets — `UNITY_LICENSE` (contents of a manually activated `.ulf`), `UNITY_EMAIL` and `UNITY_PASSWORD`. Results are published as check runs and uploaded as artifacts.
 
 ## Tech stack
 
