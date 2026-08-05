@@ -103,6 +103,48 @@ public abstract class PlayModeTestBase
     }
 
     /// <summary>
+    /// A combatant stand-in: a cube with a collider (weapons raycast) and a
+    /// Health at the given starting HP.
+    /// </summary>
+    protected Health CreateCombatant(string tag, Vector3 position, float startingHealth)
+    {
+        GameObject go = Track(GameObject.CreatePrimitive(PrimitiveType.Cube));
+        go.name = $"Test{tag}";
+        go.tag = tag;
+        go.transform.position = position;
+        // Physics.autoSyncTransforms is off: without this the collider stays
+        // at the origin until the next FixedUpdate, so a weapon firing in the
+        // same frame starts its ray inside the box and reports a miss.
+        Physics.SyncTransforms();
+        Health health = go.AddComponent<Health>();
+        health.maxHealth = 100f;
+        health.health = startingHealth;
+        return health;
+    }
+
+    /// <summary>
+    /// A firing weapon aimed along +Z. Weapon reports the shooter by root
+    /// tag, so the owner tag goes on the weapon's own GameObject.
+    /// </summary>
+    protected Weapon CreateWeapon(string ownerTag, Vector3 position)
+    {
+        GameObject go = Track(new GameObject($"Test{ownerTag}Weapon"));
+        go.tag = ownerTag;
+        go.transform.position = position;
+        go.transform.forward = Vector3.forward;
+        var weapon = go.AddComponent<TestWeapon>();
+        weapon.muzzle = go.transform;
+        return weapon;
+    }
+
+    class TestWeapon : Weapon
+    {
+        public Transform muzzle;
+        protected override Vector3 GetPosition() => muzzle.position;
+        protected override Vector3 GetForward() => muzzle.forward;
+    }
+
+    /// <summary>
     /// Remove any ArenaManager (auto-bootstrapped before the first SetUp
     /// could suppress it, or left over from a test) plus its generated
     /// geometry and NavMesh.

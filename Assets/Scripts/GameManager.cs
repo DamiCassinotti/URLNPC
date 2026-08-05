@@ -107,6 +107,14 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
+    // Round outcome hook (issue #12): the winner's tag, or DrawResult on a
+    // timeout. Static so listeners (TelemetryLogger) survive the scene reload
+    // that follows; fired before the training early-returns below, so
+    // training rounds are reported too.
+    public static event System.Action<string> RoundEnded;
+
+    public const string DrawResult = "Draw";
+
     public void ProcessDeath(string loser)
     {
         // Counter increments either way — useful as a visual readout during
@@ -117,6 +125,8 @@ public class GameManager : MonoBehaviour
             if (loser == npcTag) counter.UserWins();
             else if (loser == playerTag) counter.NpcWins();
         }
+
+        RoundEnded?.Invoke(loser == npcTag ? playerTag : npcTag);
 
         // While training (or running inference against a connected trainer),
         // the EnemyAgent handles episode resets itself — don't freeze the
@@ -151,6 +161,8 @@ public class GameManager : MonoBehaviour
     void ProcessTimeout()
     {
         if (counter != null) counter.Draw();
+
+        RoundEnded?.Invoke(DrawResult);
 
         // While training, every agent (the enemy — and the player too, once
         // it is agent-driven) takes the timeout penalty and ends its episode,
