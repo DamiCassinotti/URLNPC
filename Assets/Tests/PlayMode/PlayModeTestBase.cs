@@ -112,6 +112,10 @@ public abstract class PlayModeTestBase
         go.name = $"Test{tag}";
         go.tag = tag;
         go.transform.position = position;
+        // Physics.autoSyncTransforms is off: without this the collider stays
+        // at the origin until the next FixedUpdate, so a weapon firing in the
+        // same frame starts its ray inside the box and reports a miss.
+        Physics.SyncTransforms();
         Health health = go.AddComponent<Health>();
         health.maxHealth = 100f;
         health.health = startingHealth;
