@@ -107,13 +107,13 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    /// <summary>
-    /// Round outcome hook (issue #12): fired with the winner's tag every
-    /// time a round is decided. Static so listeners (TelemetryLogger)
-    /// survive the scene reload that follows. Fired BEFORE the training
-    /// early-return below, so training rounds are reported too.
-    /// </summary>
+    // Round outcome hook (issue #12): the winner's tag, or DrawResult on a
+    // timeout. Static so listeners (TelemetryLogger) survive the scene reload
+    // that follows; fired before the training early-returns below, so
+    // training rounds are reported too.
     public static event System.Action<string> RoundEnded;
+
+    public const string DrawResult = "Draw";
 
     public void ProcessDeath(string loser)
     {
@@ -161,6 +161,8 @@ public class GameManager : MonoBehaviour
     void ProcessTimeout()
     {
         if (counter != null) counter.Draw();
+
+        RoundEnded?.Invoke(DrawResult);
 
         // While training, every agent (the enemy — and the player too, once
         // it is agent-driven) takes the timeout penalty and ends its episode,
