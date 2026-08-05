@@ -1,0 +1,71 @@
+name: Tests
+
+# No paths filter on pull_request: these checks are REQUIRED on main, and a
+# filtered-out workflow never reports, which would leave doc-only PRs stuck
+# on "Expected" checks forever. Pushes to main keep the filter (not required).
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+# A newer push to the same PR/branch supersedes the running tests.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write # unity-test-runner publishes results as a check run
+
+jobs:
+  unity-tests:
+    name: ${{ matrix.assembly }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - testMode: editmode
+            assembly: URLNPC.Tests.EditMode
+          - testMode: playmode
+            assembly: URLNPC.Tests.PlayMode
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The imported-asset cache. Without it every run pays the full project
+      # import (~10+ min); with it only changed assets re-import.
+      - name: Restore Library cache
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      # -assemblyNames keeps the embedded ML-Agents package tests out of the
+      # run, same as scripts/run-tests.sh. Never pass -runSeed here: it
+      # outranks the inspector seeds the reproducibility tests set on purpose.
+      - name: Run ${{ matrix.assembly }}
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: ${{ matrix.testMode }}
+          customParameters: -assemblyNames ${{ matrix.assembly }}
+          checkName: ${{ matrix.assembly }} results
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          artifactsPath: results/tests/${{ matrix.testMode }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.testMode }}
+          path: results/tests/${{ matrix.testMode }}

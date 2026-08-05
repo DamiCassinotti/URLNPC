@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
+      issues: write
       id-token: write
 
     steps:
@@ -38,7 +38,27 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
+          prompt: '/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
+
+      # The code-review plugin posts findings as inline comments but always
+      # exits 0, so on its own the required check can never block a merge.
+      # Turn findings on the current revision into a red check. Caveat: the
+      # plugin skips PRs it has already commented on, so a later push goes
+      # green without re-review — the Unity test checks remain the hard gate.
+      - name: Fail when the review posted findings
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          findings=$(gh api "repos/$REPO/pulls/$PR/comments" --paginate \
+            --jq '[.[] | select((.user.login | startswith("claude")) and .commit_id == env.HEAD_SHA)] | length')
+          echo "claude inline findings on $HEAD_SHA: $findings"
+          if [ "$findings" -gt 0 ]; then
+            echo "::error::claude-review flagged $findings issue(s) on this revision — see the inline PR comments."
+            exit 1
+          fi
 

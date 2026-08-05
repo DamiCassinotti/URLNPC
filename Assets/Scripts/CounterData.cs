@@ -8,6 +8,7 @@ public static class CounterData
     // without losing the win/loss count.
     const string UserPointsKey = "URLNPC.userPoints";
     const string NpcPointsKey = "URLNPC.npcPoints";
+    const string DrawsKey = "URLNPC.draws";
 
     public static int readUserPoints()
     {
@@ -31,6 +32,18 @@ public static class CounterData
         PlayerPrefs.Save();
     }
 
+    public static int readDraws()
+    {
+        return PlayerPrefs.GetInt(DrawsKey, 0);
+    }
+
+    // Round clock ran out with both combatants alive — nobody scores.
+    public static void Draw()
+    {
+        PlayerPrefs.SetInt(DrawsKey, readDraws() + 1);
+        PlayerPrefs.Save();
+    }
+
     // Manual reset — wire this to a UI button or call it from a menu when you
     // want to start a fresh tally. Nothing zeroes the score automatically
     // anymore, so the count persists until you clear it here.
@@ -38,6 +51,7 @@ public static class CounterData
     {
         PlayerPrefs.DeleteKey(UserPointsKey);
         PlayerPrefs.DeleteKey(NpcPointsKey);
+        PlayerPrefs.DeleteKey(DrawsKey);
         PlayerPrefs.Save();
     }
 }

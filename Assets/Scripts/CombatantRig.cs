@@ -1,4 +1,3 @@
-using StarterAssets;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -43,8 +42,6 @@ public class CombatantRig : MonoBehaviour
     [SerializeField] string agentBehaviorName = "URLNPC";
     [Tooltip("ML-Agents team id for the player side. The enemy defaults to 0; a distinct id lets the trainer treat the matchup as adversarial self-play.")]
     [SerializeField] int agentTeamId = 1;
-    [Tooltip("Same cap the Enemy prefab uses on its Agent component.")]
-    [SerializeField] int agentMaxStep = 5000;
     [SerializeField] float agentMoveSpeed = 4f;
 
     /// <summary>Code-level driver selection (e.g. from a future menu or GameManager). Set before the scene loads; survives scene reloads.</summary>
@@ -93,8 +90,11 @@ public class CombatantRig : MonoBehaviour
     void EnableAgentDriver()
     {
         // --- 1. Silence every input-driven component on the body. ----------
-        Disable<FirstPersonController>();
-        Disable<StarterAssetsInputs>();
+        // StarterAssets lives in Assembly-CSharp, which auto-references this
+        // assembly (URLNPC) — so URLNPC can't reference it back and the two
+        // controller types can't be named at compile time. Match by type name.
+        DisableByTypeName("FirstPersonController");
+        DisableByTypeName("StarterAssetsInputs");
         Disable<PlayerInput>();
         Disable<PlayerWeapon>();
         // CharacterController fights NavMeshAgent for the transform.
@@ -136,8 +136,10 @@ public class CombatantRig : MonoBehaviour
         bp.BrainParameters.NumStackedVectorObservations = 1;
         bp.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(3); // Patrol / Chase / Attack
 
-        PlayerAgent agent = gameObject.AddComponent<PlayerAgent>();
-        agent.MaxStep = agentMaxStep;
+        // MaxStep is deliberately left at 0: EnemyAgent.Initialize forces it
+        // there so the GameManager round clock is the single owner of
+        // time-based episode termination on both sides of the fight.
+        gameObject.AddComponent<PlayerAgent>();
         DecisionRequester requester = gameObject.AddComponent<DecisionRequester>();
         requester.DecisionPeriod = 5; // same as the Enemy prefab
     }
@@ -147,5 +149,14 @@ public class CombatantRig : MonoBehaviour
     {
         T component = GetComponentInChildren<T>(true);
         if (component != null) component.enabled = false;
+    }
+
+    // Same, for types this assembly can't reference (see EnableAgentDriver).
+    void DisableByTypeName(string typeName)
+    {
+        foreach (MonoBehaviour component in GetComponentsInChildren<MonoBehaviour>(true))
+        {
+            if (component != null && component.GetType().Name == typeName) component.enabled = false;
+        }
     }
 }

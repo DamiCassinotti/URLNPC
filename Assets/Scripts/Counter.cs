@@ -5,11 +5,13 @@ using TMPro;
 
 public class Counter : MonoBehaviour
 {
-    [SerializeField] TMP_Text counter;
+    [SerializeField] internal TMP_Text counter;
 
     void Update()
     {
-        counter.text = "User: " + CounterData.readUserPoints() + "\nNPC: " + CounterData.readNpcPoints();
+        counter.text = "User: " + CounterData.readUserPoints()
+            + "\nNPC: " + CounterData.readNpcPoints()
+            + "\nDraws: " + CounterData.readDraws();
     }
 
     public void UserWins()
@@ -20,6 +22,11 @@ public class Counter : MonoBehaviour
     public void NpcWins()
     {
         CounterData.NpcWins();
+    }
+
+    public void Draw()
+    {
+        CounterData.Draw();
     }
 
 }
