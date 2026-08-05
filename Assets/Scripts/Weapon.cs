@@ -19,6 +19,10 @@ public abstract class Weapon : MonoBehaviour
     protected abstract Vector3 GetPosition();
     protected abstract Vector3 GetForward();
 
+    // Telemetry hook (issue #12): weapon, the Health hit (null on a miss),
+    // damage. Fired once per shot.
+    public static event System.Action<Weapon, Health, float> ShotFired;
+
     public void Shoot()
     {
         if (muzzleFlash != null) muzzleFlash.Play();
@@ -30,13 +34,20 @@ public abstract class Weapon : MonoBehaviour
         Vector3 origin = GetPosition();
         Vector3 direction = GetForward();
         Vector3 endPoint = origin + direction * range;
+        Health victim = null;
 
         if (Physics.Raycast(origin, direction, out RaycastHit hit, range))
         {
             endPoint = hit.point;
             CreateHitImpact(hit);
-            ProcessHitEnemy(hit);
+            victim = hit.transform.GetComponentInParent<Health>();
         }
+
+        // Before the damage: a lethal hit cascades synchronously into
+        // RoundEnded, so a shot reported afterwards lands outside the episode
+        // it decided.
+        ShotFired?.Invoke(this, victim, victim != null ? damage : 0f);
+        if (victim != null) victim.DecreaseHealth(damage);
 
         SpawnTracer(GetTracerStart(origin), endPoint);
     }
@@ -73,15 +84,6 @@ public abstract class Weapon : MonoBehaviour
         if (shader == null) shader = Shader.Find("Sprites/Default");
         s_tracerMaterial = new Material(shader);
         return s_tracerMaterial;
-    }
-
-    void ProcessHitEnemy(RaycastHit hit)
-    {
-        Health target = hit.transform.GetComponentInParent<Health>();
-        if (target != null)
-        {
-            target.DecreaseHealth(damage);
-        }
     }
 
     void CreateHitImpact(RaycastHit hit)
