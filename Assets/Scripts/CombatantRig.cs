@@ -50,7 +50,17 @@ public class CombatantRig : MonoBehaviour
     /// <summary>The driver that actually won the selection this run.</summary>
     public DriverKind ActiveDriver { get; private set; }
 
-    const string CommandLineArg = "-playerDriver";
+    /// <summary>
+    /// The human-driver components the agent path silences, named as strings
+    /// because they cannot be referenced at compile time (see
+    /// <see cref="EnableAgentDriver"/>). Exposed so the test suite can assert
+    /// against the names actually used here rather than a second copy of them.
+    /// </summary>
+    internal static readonly string[] HumanDriverTypeNames =
+    {
+        "FirstPersonController",
+        "StarterAssetsInputs",
+    };
 
     // The scene is binary, so the rig can't be added to the player in the
     // editor by editing text — attach it at runtime if it isn't there.
@@ -75,16 +85,7 @@ public class CombatantRig : MonoBehaviour
 
     DriverKind ResolveDriver()
     {
-        string[] args = System.Environment.GetCommandLineArgs();
-        for (int i = 0; i < args.Length - 1; i++)
-        {
-            if (args[i] != CommandLineArg) continue;
-            string value = args[i + 1].ToLowerInvariant();
-            if (value == "agent") return DriverKind.Agent;
-            if (value == "human") return DriverKind.Human;
-        }
-        if (DriverOverride.HasValue) return DriverOverride.Value;
-        return driver;
+        return DriverSelector.Resolve(System.Environment.GetCommandLineArgs(), DriverOverride, driver);
     }
 
     void EnableAgentDriver()
@@ -93,8 +94,7 @@ public class CombatantRig : MonoBehaviour
         // StarterAssets lives in Assembly-CSharp, which auto-references this
         // assembly (URLNPC) — so URLNPC can't reference it back and the two
         // controller types can't be named at compile time. Match by type name.
-        DisableByTypeName("FirstPersonController");
-        DisableByTypeName("StarterAssetsInputs");
+        foreach (string typeName in HumanDriverTypeNames) DisableByTypeName(typeName);
         Disable<PlayerInput>();
         Disable<PlayerWeapon>();
         // CharacterController fights NavMeshAgent for the transform.
