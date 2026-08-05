@@ -6,6 +6,8 @@ public class EnemyBehavior : MonoBehaviour
 {
     [Header("PARAMS")]
     [SerializeField] public Transform target;
+    [Tooltip("Tag of the opponent this combatant hunts. \"Player\" on the enemy NPC; CombatantRig sets it to \"NPC\" when this script drives the agent-side player body.")]
+    [SerializeField] public string targetTag = "Player";
     [SerializeField] float walkPointRange = 10f;
     [SerializeField] float attackCooldown = 0.5f;
     [SerializeField] float sightRange = 20f;
@@ -40,8 +42,8 @@ public class EnemyBehavior : MonoBehaviour
         InitAtRandomPosition();
         if (target == null)
         {
-            GameObject player = GameObject.FindWithTag("Player");
-            if (player != null) target = player.transform;
+            GameObject opponent = GameObject.FindWithTag(targetTag);
+            if (opponent != null) target = opponent.transform;
         }
     }
 
@@ -108,7 +110,7 @@ public class EnemyBehavior : MonoBehaviour
         Transform playerForSpawn = target;
         if (playerForSpawn == null)
         {
-            GameObject p = GameObject.FindWithTag("Player");
+            GameObject p = GameObject.FindWithTag(targetTag);
             if (p != null) playerForSpawn = p.transform;
         }
         // Tight arenas can't satisfy a large min separation — cap it to what
@@ -206,8 +208,8 @@ public class EnemyBehavior : MonoBehaviour
         {
             // Accept any collider in the target's hierarchy: the tagged root
             // (CharacterController) and untagged child colliders like the
-            // "Capsule" visual mesh are both "seeing the player".
-            return hit.transform.IsChildOf(target) || hit.transform.CompareTag("Player");
+            // "Capsule" visual mesh are both "seeing the target".
+            return hit.transform.IsChildOf(target) || hit.transform.CompareTag(targetTag);
         }
         return true;
     }
