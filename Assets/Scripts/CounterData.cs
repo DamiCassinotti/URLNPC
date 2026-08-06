@@ -2,10 +2,8 @@ using UnityEngine;
 
 public static class CounterData
 {
-    // PlayerPrefs keys — backs the score with Unity's on-disk store so the
-    // tally survives quitting the game (Editor Play sessions and standalone
-    // builds alike). This lets you stop and resume a training run later
-    // without losing the win/loss count.
+    // PlayerPrefs is on-disk, so the tally survives quitting the game — a
+    // training run can be stopped and resumed without losing the count.
     const string UserPointsKey = "URLNPC.userPoints";
     const string NpcPointsKey = "URLNPC.npcPoints";
     const string DrawsKey = "URLNPC.draws";
@@ -37,16 +35,13 @@ public static class CounterData
         return PlayerPrefs.GetInt(DrawsKey, 0);
     }
 
-    // Round clock ran out with both combatants alive — nobody scores.
     public static void Draw()
     {
         PlayerPrefs.SetInt(DrawsKey, readDraws() + 1);
         PlayerPrefs.Save();
     }
 
-    // Manual reset — wire this to a UI button or call it from a menu when you
-    // want to start a fresh tally. Nothing zeroes the score automatically
-    // anymore, so the count persists until you clear it here.
+    // The only thing that ever zeroes the tally; nothing clears it automatically.
     public static void ResetScores()
     {
         PlayerPrefs.DeleteKey(UserPointsKey);

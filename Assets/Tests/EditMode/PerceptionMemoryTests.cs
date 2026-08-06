@@ -1,13 +1,12 @@
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>
-/// Never-seen invariants of the sensory contract: a fresh (or wiped) memory
-/// must report nothing about the player. The full sighting/freezing behavior
-/// needs real geometry and runs in PlayMode (PerceptionContractTests).
-/// (EditMode: Awake never runs, so the EnemyBehavior lookup stays null and
-/// Refresh must degrade to "not visible" rather than throw.)
-/// </summary>
+// Never-seen invariants of the sensory contract: a fresh or wiped memory must
+// report nothing about the player. The sighting/freezing behavior needs real
+// geometry and lives in PerceptionContractTests.
+//
+// EditMode, so Awake never runs: the EnemyBehavior lookup stays null and
+// Refresh must degrade to "not visible" rather than throw.
 public class PerceptionMemoryTests
 {
     GameObject go;

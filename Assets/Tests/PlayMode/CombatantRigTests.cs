@@ -7,17 +7,13 @@ using UnityEngine.AI;
 using UnityEngine.TestTools;
 using DriverKind = CombatantRig.DriverKind;
 
-/// <summary>
-/// CombatantRig composing the agent driver onto the player body (issue #10).
-/// The scene is force-binary serialized, so this stack cannot be authored and
-/// reviewed in the editor — it only ever exists as the product of
-/// EnableAgentDriver, which makes it worth asserting piece by piece.
-///
-/// The fixture has no NavMesh: the NavMeshAgent the rig adds, and
-/// EnemyBehavior.Start's respawn, both complain about that. Those logs are
-/// expected here — the rig's composition is what is under test, not
-/// navigation.
-/// </summary>
+// CombatantRig composing the agent driver onto the player body (issue #10). The
+// scene is force-binary serialized, so this stack can never be reviewed in the
+// editor — it only exists as the product of EnableAgentDriver, which is why it
+// is worth asserting piece by piece.
+//
+// No NavMesh in this fixture, so the NavMeshAgent the rig adds and
+// EnemyBehavior.Start's respawn both complain. Those logs are expected.
 public class CombatantRigTests : PlayModeTestBase
 {
     GameObject body;
@@ -29,11 +25,8 @@ public class CombatantRigTests : PlayModeTestBase
         LogAssert.ignoreFailingMessages = false;
     }
 
-    /// <summary>
-    /// A player body with the pieces the rig expects to already be there:
-    /// the "Player" tag, Health, a CharacterController and the human weapon.
-    /// Built inactive so the driver override is in place before Awake resolves.
-    /// </summary>
+    // A player body carrying what the rig expects to already be there. Built
+    // inactive so the driver override is in place before Awake resolves.
     IEnumerator BuildBody(DriverKind driver)
     {
         // The rig reads the real command line first, so an editor launched with
@@ -67,12 +60,10 @@ public class CombatantRigTests : PlayModeTestBase
     {
         yield return BuildBody(DriverKind.Agent);
 
-        // Regression guard. The round clock is the single owner of time-based
-        // episode termination (see EnemyAgent.Initialize and CLAUDE.md); the
-        // rig used to set MaxStep to 5000 here, reinstating on the player side
-        // exactly the stale value the enemy side had just been fixed for.
-        // EnemyAgentTests covers this for the Enemy prefab, which never saw
-        // the runtime-composed player.
+        // Regression guard: the rig used to set MaxStep to 5000 here,
+        // reinstating on the player side the stale value the enemy had just
+        // been fixed for. EnemyAgentTests only covers the Enemy prefab, which
+        // never sees the runtime-composed player.
         var agent = body.GetComponent<PlayerAgent>();
         Assert.That(agent, Is.Not.Null, "the agent driver must install a PlayerAgent");
         Assert.That(agent.MaxStep, Is.Zero,

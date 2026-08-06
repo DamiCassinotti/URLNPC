@@ -1,26 +1,19 @@
 using UnityEngine;
 
-/// <summary>
-/// Process-wide, seedable RNG for everything that affects evaluation
-/// reproducibility: arena selection, spawn-point sampling and patrol/wander
-/// waypoints. Two runs launched with the same seed produce the same arena
-/// sequence and the same spawn positions, which makes evaluation runs
-/// replayable (issue #13).
-///
-/// Seed priority: <c>-runSeed &lt;int&gt;</c> on the command line, then the
-/// non-zero <c>runSeed</c> Inspector field on <see cref="ArenaManager"/>,
-/// then a time-derived random seed. Whatever wins is logged at startup so
-/// even an unseeded run can be replayed after the fact.
-///
-/// Each random domain gets its own sub-stream so a variable number of draws
-/// in one domain (e.g. wander waypoints, which depend on what the policy
-/// does) cannot shift the sequences of the others (arena choice, spawns).
-///
-/// Deliberately NOT routed through here: gameplay noise that is consumed a
-/// non-deterministic number of times per frame, like <c>EnemyWeapon</c> aim
-/// spread — feeding it from these streams would desynchronise the
-/// reproducible domains between runs.
-/// </summary>
+// Process-wide, seedable RNG for everything that affects reproducibility: two
+// runs launched with the same seed build the same arenas and spawn actors in
+// the same places (issue #13).
+//
+// Seed priority: -runSeed <int> on the command line, then a non-zero runSeed on
+// ArenaManager, then a time-derived seed. Whatever wins is logged at startup,
+// so even an unseeded run can be replayed after the fact.
+//
+// Each domain gets its own sub-stream so a variable number of draws in one
+// (wander waypoints depend on what the policy does) can't shift the others.
+//
+// Deliberately NOT routed through here: noise consumed a non-deterministic
+// number of times per frame, like EnemyWeapon aim spread — it would
+// desynchronise the reproducible streams between runs.
 public static class RunRng
 {
     public enum Stream
@@ -34,9 +27,8 @@ public static class RunRng
     const int StreamCount = 3;
 
     public static bool Initialized { get; private set; }
-    /// <summary>The effective run seed. Valid once <see cref="Initialized"/>.</summary>
     public static int Seed { get; private set; }
-    /// <summary>Where the seed came from: "command line", "inspector" or "random".</summary>
+    // "command line", "inspector" or "random".
     public static string SeedSource { get; private set; } = "uninitialized";
 
     static System.Random[] streams;
@@ -54,11 +46,9 @@ public static class RunRng
         SeedSource = "uninitialized";
     }
 
-    /// <summary>
-    /// Seed the run once. Later calls are no-ops, so the streams keep
-    /// advancing across scene reloads instead of restarting every round.
-    /// <paramref name="inspectorSeed"/> 0 means "not configured".
-    /// </summary>
+    // Later calls are no-ops, so the streams keep advancing across scene
+    // reloads instead of restarting every round. inspectorSeed 0 means "not
+    // configured".
     public static void EnsureInitialized(int inspectorSeed)
     {
         if (Initialized) return;
@@ -90,13 +80,13 @@ public static class RunRng
                   $"Replay with '{CommandLineArg} {Seed}' or ArenaManager.runSeed = {Seed}.");
     }
 
-    /// <summary>Random int in [minInclusive, maxExclusive), like UnityEngine.Random.Range.</summary>
+    // [minInclusive, maxExclusive), like UnityEngine.Random.Range.
     public static int Range(Stream stream, int minInclusive, int maxExclusive)
     {
         return Get(stream).Next(minInclusive, maxExclusive);
     }
 
-    /// <summary>Random float in [minInclusive, maxInclusive], like UnityEngine.Random.Range.</summary>
+    // [minInclusive, maxInclusive], like UnityEngine.Random.Range.
     public static float Range(Stream stream, float minInclusive, float maxInclusive)
     {
         return minInclusive + (float)Get(stream).NextDouble() * (maxInclusive - minInclusive);

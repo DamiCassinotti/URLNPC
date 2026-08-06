@@ -15,9 +15,9 @@ public class EnemyWeapon : Weapon
     {
         Vector3 forward = gameObject.transform.forward;
         if (aimSpreadDegrees <= 0f) return forward;
-        // Random cone around the aim vector. Box-Muller-ish: pick a random
-        // axis perpendicular to forward, rotate by a random angle in
-        // [-aimSpreadDegrees, +aimSpreadDegrees].
+        // Deliberately UnityEngine.Random, not RunRng: this is drawn a
+        // policy-dependent number of times, which would desync the
+        // reproducible streams between runs.
         Vector3 perp = Vector3.Cross(forward, Random.onUnitSphere).normalized;
         if (perp.sqrMagnitude < 1e-4f) perp = Vector3.up;
         float angle = Random.Range(-aimSpreadDegrees, aimSpreadDegrees);

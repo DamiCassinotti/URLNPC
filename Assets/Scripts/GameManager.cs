@@ -16,11 +16,7 @@ public class GameManager : MonoBehaviour
     [Tooltip("Optional HUD text for the clock. Left empty (the scene is binary serialized), one is created at runtime on the HUD canvas.")]
     [SerializeField] TMP_Text timerText;
 
-    /// <summary>
-    /// Seconds left on the round clock. Queryable from anywhere — this is
-    /// the "tiempo restante de la ronda" input for the future
-    /// GameStateSnapshot / LLM context.
-    /// </summary>
+    // Public because the future GameStateSnapshot / LLM context needs it.
     public float RemainingRoundTime => roundClock.Remaining;
 
     readonly RoundClock roundClock = new RoundClock();
@@ -46,29 +42,25 @@ public class GameManager : MonoBehaviour
         if (expired) ProcessTimeout();
     }
 
-    /// <summary>
-    /// Rearm the clock. Called on round start and by EnemyAgent.OnEpisodeBegin,
-    /// so during training every episode gets a full time budget without a
-    /// scene reload. Idempotent — multiple agents resetting in the same
-    /// frame is fine.
-    /// </summary>
+    // Also called by EnemyAgent.OnEpisodeBegin, so training episodes get a full
+    // time budget without a scene reload. Idempotent: several agents resetting
+    // in the same frame is fine.
     public void ResetRoundClock()
     {
         roundClock.Duration = roundDurationSeconds;
         roundClock.Reset();
     }
 
-    // Clears the persisted win/loss tally. Public so it can also be wired to
-    // an OnClick in the Inspector if you ever rebuild the canvas by hand.
+    // Public so it can also be wired to an OnClick in the Inspector, if the
+    // canvas is ever rebuilt by hand.
     public void ResetScore()
     {
         CounterData.ResetScores();
     }
 
-    // The FPS scene is force-binary serialized, so we can't author button
-    // wiring in the scene file — build the "Reset Score" button in code and
-    // parent it to the end-of-round canvas. As a child of that canvas it
-    // shows/hides automatically with the canvas's enabled state.
+    // The FPS scene is force-binary serialized, so button wiring can't be
+    // authored there. Parented to the end-of-round canvas, which makes it
+    // show and hide with that canvas's enabled state.
     void CreateResetScoreButton()
     {
         if (finishedRoundCanvas == null) return;
@@ -155,19 +147,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // The clock ran out: the round is a DRAW — no winner is forced. Agents
-    // get a small negative terminal reward instead, so stalling/hiding is
-    // discouraged by incentive rather than by handing someone the win.
+    // The clock ran out: a draw, no winner forced. Agents take a small negative
+    // terminal reward instead, so stalling is discouraged by incentive rather
+    // than by handing someone the win.
     void ProcessTimeout()
     {
         if (counter != null) counter.Draw();
 
         RoundEnded?.Invoke(DrawResult);
 
-        // While training, every agent (the enemy — and the player too, once
-        // it is agent-driven) takes the timeout penalty and ends its episode,
-        // resetting in place (OnEpisodeBegin) — rearm the clock and keep the
-        // scene running, no scene reload.
+        // Training: every agent takes the penalty and resets in place, so the
+        // clock is rearmed and the scene keeps running — no reload.
         if (Academy.IsInitialized && Academy.Instance.IsCommunicatorOn)
         {
             foreach (EnemyAgent agent in FindObjectsByType<EnemyAgent>(FindObjectsSortMode.None))
@@ -178,12 +168,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Human play: a draw ends the round exactly like a win — freeze the
-        // scene on the final standoff and show the banner. The end-of-round
-        // button reloads the scene, which builds a whole new round (fresh
-        // arena, fresh spawns). No agent reset here: the reload recreates
-        // everything, and skipping it keeps the enemy from visibly
-        // teleporting behind the draw screen.
+        // Human play: a draw ends the round exactly like a win, and the
+        // end-of-round button reloads into a fresh one. No agent reset here —
+        // the reload recreates everything, and skipping it keeps the enemy
+        // from visibly teleporting behind the draw screen.
         FinishRound("Draw!");
     }
 
@@ -200,9 +188,8 @@ public class GameManager : MonoBehaviour
 
     // ------------------------------------------------------------ timer UI
 
-    // Same reasoning as CreateResetScoreButton: the scene is force-binary
-    // serialized, so the clock's HUD text is built in code — top-center of
-    // the same canvas the win counter lives on.
+    // Built in code for the same reason as the reset button; hung on the same
+    // canvas as the win counter, not the end-of-round one.
     void CreateTimerText()
     {
         if (timerText != null || roundDurationSeconds <= 0f) return;

@@ -3,11 +3,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// Hitscan weapons must have no distance cap (issue #18): line of sight is the
-/// only thing that decides whether a shot lands. Exercised through a test
-/// subclass so aim is exact — EnemyWeapon's spread would miss at these ranges.
-/// </summary>
+// Hitscan weapons have no distance cap (issue #18): line of sight is the only
+// thing deciding whether a shot lands. Exercised through a test subclass so aim
+// is exact — EnemyWeapon's spread would miss at these ranges.
 public class WeaponRangeTests : PlayModeTestBase
 {
     class TestWeapon : Weapon

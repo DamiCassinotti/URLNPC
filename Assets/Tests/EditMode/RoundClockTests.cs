@@ -1,10 +1,7 @@
 using NUnit.Framework;
 
-/// <summary>
-/// The round countdown as pure state: clamping, expiry semantics, re-arming,
-/// and the "duration <= 0 disables the clock" contract that GameManager and
-/// the training loop rely on.
-/// </summary>
+// The round countdown as pure state: clamping, expiry semantics, re-arming, and
+// the "duration <= 0 disables the clock" contract GameManager relies on.
 public class RoundClockTests
 {
     [Test]

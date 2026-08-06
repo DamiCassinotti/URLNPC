@@ -21,16 +21,13 @@ public class EnemyBehavior : MonoBehaviour
     Health enemyHealth;
     bool canAttack = true;
 
-    /// <summary>
-    /// The only source of target info for the NPC brain (sensory contract,
-    /// issue #9). Auto-added at runtime because the Enemy prefab is binary
-    /// serialized and can't gain new components via a text edit.
-    /// </summary>
+    // The only source of target info for the NPC brain (sensory contract,
+    // issue #9). Auto-added in Awake because the Enemy prefab is binary
+    // serialized and can't gain new components via a text edit.
     public PerceptionMemory Perception { get; private set; }
 
-    /// <summary>What this combatant's sight ray can be blocked by. Cover
-    /// queries must run against the same mask (see
-    /// <see cref="ArenaManager.NearestCoverPoint"/>).</summary>
+    // What this combatant's sight ray can be blocked by. Cover queries must run
+    // against the same mask (ArenaManager.NearestCoverPoint).
     public LayerMask SightObstacleMask => sightObstacleMask;
 
     void Awake()
@@ -58,10 +55,9 @@ public class EnemyBehavior : MonoBehaviour
     {
         DidShoot = false;
         Perception.Refresh();
-        // Aim at the last-seen position, never the live one — while the
-        // target is visible they are the same thing; behind cover the shot
-        // goes where the NPC *believes* the player is (and eats the
-        // wastedShotPenalty if it's wrong).
+        // Aim at the last-seen position, never the live one. While the target
+        // is visible they are the same; behind cover the shot goes where the
+        // NPC believes the player is, and eats the wastedShotPenalty if wrong.
         if (canAttack && Perception.HasEverSeen)
         {
             Vector3 aim = Perception.LastSeenPosition;
@@ -77,10 +73,8 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (!navMeshAgent.isOnNavMesh) return;
         Perception.Refresh();
-        // Navigate to where the target was last seen, not where they truly
-        // are — with the player behind a wall the enemy heads to the corner
-        // it lost sight at instead of wallhack-tracking. Never seen anyone?
-        // Then there is nothing to chase.
+        // Last-seen, not true position: with the player behind a wall the enemy
+        // heads for the corner it lost sight at instead of wallhack-tracking.
         if (Perception.HasEverSeen)
         {
             navMeshAgent.SetDestination(Perception.LastSeenPosition);
@@ -181,8 +175,8 @@ public class EnemyBehavior : MonoBehaviour
 
     Vector3 GetRandomPositionInMap()
     {
-        // Prefer a point sampled from the procedurally generated arena's NavMesh
-        // so spawns stay inside whatever arena was selected this round.
+        // Sample the generated arena's NavMesh so spawns stay inside whatever
+        // layout was selected this round; the bounds below are a bare fallback.
         if (ArenaManager.Current != null) return ArenaManager.Current.RandomGroundPoint();
 
         float newX = RunRng.Range(RunRng.Stream.Spawn, -60f, 60f);
@@ -219,10 +213,8 @@ public class EnemyBehavior : MonoBehaviour
         return true;
     }
 
-    // True distance to the live target position. ENVIRONMENT-SIDE ONLY: used
-    // by EnemyAgent for reward computation (tooClose penalty), which is
-    // allowed to read true state. Never feed this to observations or actions
-    // — the brain goes through PerceptionMemory.
+    // ENVIRONMENT-SIDE ONLY. Reward computation may read true state; never feed
+    // this to observations or actions — the brain goes through PerceptionMemory.
     public float DistanceToTarget()
     {
         if (target == null) return Mathf.Infinity;

@@ -1,13 +1,10 @@
 using NUnit.Framework;
 using DriverKind = CombatantRig.DriverKind;
 
-/// <summary>
-/// The player-driver priority chain (issue #10): command line beats a
-/// code-level override, which beats the Inspector default. Also the leniency
-/// the command line scan needs — the editor and player are launched with many
-/// unrelated arguments, so a malformed occurrence of the flag must be skipped
-/// rather than crash or hijack the selection.
-/// </summary>
+// The player-driver priority chain (issue #10), plus the leniency the command
+// line scan needs: the editor and player are launched with many unrelated
+// arguments, so a malformed occurrence of the flag must be skipped rather than
+// crash or hijack the selection.
 public class DriverSelectorTests
 {
     static readonly string[] NoArgs = new string[0];

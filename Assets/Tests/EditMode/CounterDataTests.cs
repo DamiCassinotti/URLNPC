@@ -1,11 +1,8 @@
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>
-/// CounterData persists the win/loss/draw tally in PlayerPrefs. The fixture
-/// snapshots the real on-disk values and restores them afterwards, so running
-/// the suite never clobbers an actual score.
-/// </summary>
+// The tally lives in PlayerPrefs, so the fixture snapshots the real on-disk
+// values and restores them — running the suite must not clobber a real score.
 public class CounterDataTests
 {
     // Must match the private keys in CounterData.cs.

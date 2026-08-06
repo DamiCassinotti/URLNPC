@@ -4,19 +4,13 @@ using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using Unity.AI.Navigation;
 
-/// <summary>
-/// Procedurally builds one of several FPS arenas at runtime and bakes a fresh
-/// NavMesh over it. On <see cref="Awake"/> it removes any static arena baked
-/// into the scene (the "Arena" root) so generated geometry is the only thing
-/// present, picks a random layout, builds it from primitive cubes with
-/// contrasting URP materials, and bakes the NavMesh so the enemy NavMeshAgent
-/// has somewhere to walk.
-///
-/// Runs very early (<see cref="DefaultExecutionOrder"/> -10000) so the NavMesh
-/// exists before <see cref="EnemyBehavior"/> / <see cref="EnemyAgent"/> try to
-/// spawn the enemy on it. <see cref="EnemyBehavior"/> queries
-/// <see cref="Current"/> for valid spawn points instead of hard-coded bounds.
-/// </summary>
+// Builds one of several FPS arenas from primitive cubes at runtime and bakes a
+// fresh NavMesh over it — the scene is force-binary serialized, so level
+// geometry can't be authored and reviewed as text. Any static "Arena" root the
+// scene still carries is removed first.
+//
+// The execution order below runs this before EnemyBehavior/EnemyAgent, so the
+// NavMesh exists by the time they try to spawn the enemy on it.
 [DefaultExecutionOrder(-10000)]
 public class ArenaManager : MonoBehaviour
 {
@@ -42,26 +36,20 @@ public class ArenaManager : MonoBehaviour
     // have to raycast-search the world.
     readonly List<Collider> coverColliders = new List<Collider>();
 
-    /// <summary>Half the floor size along X (distance from center to the inner wall face).</summary>
+    // Half the floor size, i.e. center to the inner wall face.
     public float HalfExtentX { get; private set; }
-    /// <summary>Half the floor size along Z.</summary>
     public float HalfExtentZ { get; private set; }
-    /// <summary>Where the player should be placed for the current arena.</summary>
     public Vector3 PlayerSpawn { get; private set; }
-    /// <summary>Index of the arena that was built this session.</summary>
     public int ActiveArenaIndex { get; private set; }
-    /// <summary>Human-readable name of the active arena.</summary>
     public string ActiveArenaName { get; private set; }
 
     public const int ArenaCount = 5;
 
     // Fallback bootstrap: if no ArenaManager was placed in the scene, spawn
     // one so arenas still generate out of the box. AfterSceneLoad only fires
-    // for the FIRST scene of a session, but the manager and its generated
-    // arena die with every SceneManager.LoadScene — without the sceneLoaded
-    // hook, rounds 2+ had no manager at all: no re-roll, and the old static
-    // "Arena" root baked into the scene was never removed, so every round
-    // after the first showed the same hand-authored arena.
+    // for the FIRST scene of a session, but the manager dies with every
+    // SceneManager.LoadScene — hence the sceneLoaded hook, without which
+    // rounds 2+ get no manager, no re-roll and the stale static "Arena" root.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void AutoBootstrap()
     {
@@ -121,18 +109,14 @@ public class ArenaManager : MonoBehaviour
 
     // ---------------------------------------------------------------- bounds
 
-    /// <summary>The floor surface sits at y = 0; anything sampled noticeably
-    /// above it is a platform/rampart/stair/crate top rather than the main
-    /// floor. Spawns are kept at or below this height so actors land on the
-    /// open floor where they are visible, not perched on top of cover.</summary>
+    // The floor sits at y = 0, so anything sampled noticeably above it is a
+    // platform/rampart/stair/crate top. Spawns stay at or below this height:
+    // actors belong on the open floor, not perched out of sight on cover.
     const float GroundLevelMaxY = 0.6f;
 
-    /// <summary>
-    /// A random point on the main floor of the baked NavMesh, comfortably
-    /// inside the arena walls. Avoids the tops of raised cover so the enemy
-    /// never spawns out of sight on a platform. Always returns a valid on-mesh
-    /// point once a NavMesh is baked (never the off-mesh origin).
-    /// </summary>
+    // A random floor-level point on the baked NavMesh, comfortably inside the
+    // walls. Once a NavMesh is baked this always returns an on-mesh point,
+    // never the off-mesh origin.
     public Vector3 RandomGroundPoint()
     {
         float marginX = Mathf.Max(2f, HalfExtentX - 2f);
@@ -160,7 +144,7 @@ public class ArenaManager : MonoBehaviour
         return Vector3.zero;
     }
 
-    /// <summary>How far apart two actors can realistically be in this arena.</summary>
+    // How far apart two actors can realistically be in this arena.
     public float SpawnSeparationCap => Mathf.Min(HalfExtentX, HalfExtentZ) * 1.4f;
 
     // ----------------------------------------------------------------- cover
@@ -168,11 +152,10 @@ public class ArenaManager : MonoBehaviour
     const float EyeHeight = 1f;          // matches EnemyBehavior's sight-ray origin
     const float CoverStandOff = 1.2f;    // how far behind the cover face to stand
 
-    /// <summary>Nearest walkable point hidden from <paramref name="breakLosFrom"/>
-    /// and reachable from <paramref name="from"/>. False when this layout offers
-    /// none — the caller must fall back to another action. Pass the threat's own
-    /// sight mask (<see cref="EnemyBehavior.SightObstacleMask"/>), or a point
-    /// can come back "hidden" behind geometry the threat sees straight through.</summary>
+    // Nearest walkable point hidden from breakLosFrom and reachable from `from`.
+    // False when this layout offers none — the caller must fall back to another
+    // action. The mask must be the threat's own (EnemyBehavior.SightObstacleMask),
+    // or a point comes back "hidden" behind geometry the threat sees through.
     public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, LayerMask sightObstacleMask, out Vector3 coverPoint)
     {
         coverPoint = default;
@@ -240,13 +223,9 @@ public class ArenaManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Teleport the player to a random walkable point. Called from
-    /// <see cref="Start"/> every round (all modes) and by
-    /// <see cref="EnemyAgent"/> on episode begin during training, so player
-    /// spawns are distributed across the arena instead of clustering at a
-    /// fixed spot or wherever the last episode ended.
-    /// </summary>
+    // Called from Start every round (all modes) and by EnemyAgent on episode
+    // begin during training, so spawns spread across the arena instead of
+    // clustering at a fixed spot or wherever the last episode ended.
     public void RepositionPlayerAtRandomPoint()
     {
         MovePlayerTo(RandomGroundPoint());
@@ -340,10 +319,8 @@ public class ArenaManager : MonoBehaviour
         Material crate = MakeMat(new Color(0.88f, 0.80f, 0.30f)); // yellow
         BuildFloorAndWalls(20f, 20f, floor, wall);
 
-        // Central house with a door facing south (toward the player spawn).
         House(new Vector3(0f, 0f, 2f), 11f, 9f, 4f, 3f, cover);
 
-        // Corner crate stacks for cover.
         foreach (Vector3 c in new[]
         {
             new Vector3(-12f, 0f, 10f), new Vector3(12f, 0f, 10f),
@@ -354,7 +331,6 @@ public class ArenaManager : MonoBehaviour
             Box("Crate", c + new Vector3(1.6f, 1f, 0.4f), new Vector3(1.6f, 2f, 1.6f), crate);
         }
 
-        // Two low flanking walls.
         Box("LowWall", new Vector3(-7f, 0.75f, -8f), new Vector3(6f, 1.5f, 0.8f), cover);
         Box("LowWall", new Vector3(7f, 0.75f, -8f), new Vector3(6f, 1.5f, 0.8f), cover);
     }
@@ -369,7 +345,6 @@ public class ArenaManager : MonoBehaviour
         Material crate = MakeMat(new Color(0.90f, 0.85f, 0.80f)); // bone
         BuildFloorAndWalls(14f, 14f, floor, wall);
 
-        // Raised platforms in NE and SW corners, with stairs leading up.
         Platform(new Vector3(9f, 0f, 9f), 7f, 7f, 2.5f, cover);
         Stairs(new Vector3(9f, 0f, 4.5f), Vector3.forward, 10, 0.25f, 0.55f, 4f, cover);
 
@@ -393,15 +368,13 @@ public class ArenaManager : MonoBehaviour
         Material barrier = MakeMat(new Color(0.60f, 0.60f, 0.65f)); // steel
         BuildFloorAndWalls(30f, 30f, floor, wall);
 
-        // Two towers (tall houses) with doorways facing the center.
         House(new Vector3(-15f, 0f, 8f), 13f, 13f, 8f, 4f, tower);
         House(new Vector3(15f, 0f, -8f), 13f, 13f, 8f, 4f, tower);
 
-        // Long mid-field sightline blockers.
+        // Long mid-field sightline blockers, or this arena is one big open shot.
         Box("Barrier", new Vector3(0f, 1.5f, 14f), new Vector3(16f, 3f, 1f), barrier);
         Box("Barrier", new Vector3(0f, 1.5f, -14f), new Vector3(16f, 3f, 1f), barrier);
 
-        // Crate clusters around the towers for short cover.
         Box("Crate", new Vector3(-6f, 1f, -6f), new Vector3(2.5f, 2f, 2.5f), crate);
         Box("Crate", new Vector3(6f, 1f, 6f), new Vector3(2.5f, 2f, 2.5f), crate);
         Box("Crate", new Vector3(20f, 1f, 18f), new Vector3(2.5f, 2f, 2.5f), crate);
@@ -429,7 +402,6 @@ public class ArenaManager : MonoBehaviour
         Box("Maze", new Vector3(-4f, h / 2, -10f), new Vector3(16f, h, t), maze);
         Box("Maze", new Vector3(13f, h / 2, -6f), new Vector3(12f, h, t), maze);
 
-        // Decorative pillars at junctions, also useful cover.
         foreach (Vector3 p in new[]
         {
             new Vector3(-2f, 0f, 10f), new Vector3(8f, 0f, 4f),
@@ -450,10 +422,8 @@ public class ArenaManager : MonoBehaviour
         Material crate = MakeMat(new Color(0.88f, 0.78f, 0.55f)); // tan
         BuildFloorAndWalls(28f, 18f, floor, wall);
 
-        // Raised walkways (ramparts) along the east and west edges.
         Platform(new Vector3(-25f, 0f, 0f), 5f, 30f, 2.5f, rampart);
         Platform(new Vector3(25f, 0f, 0f), 5f, 30f, 2.5f, rampart);
-        // Stairs up to each rampart from mid-field.
         Stairs(new Vector3(-21f, 0f, 0f), Vector3.left, 9, 0.28f, 0.55f, 5f, rampart);
         Stairs(new Vector3(21f, 0f, 0f), Vector3.right, 9, 0.28f, 0.55f, 5f, rampart);
 
@@ -461,7 +431,6 @@ public class ArenaManager : MonoBehaviour
         Box("Divider", new Vector3(0f, 1.75f, 9f), new Vector3(1f, 3.5f, 14f), wall);
         Box("Divider", new Vector3(0f, 1.75f, -9f), new Vector3(1f, 3.5f, 14f), wall);
 
-        // Crates for ground-level cover.
         Box("Crate", new Vector3(-10f, 1f, 6f), new Vector3(2.5f, 2f, 2.5f), crate);
         Box("Crate", new Vector3(10f, 1f, -6f), new Vector3(2.5f, 2f, 2.5f), crate);
         Box("Crate", new Vector3(8f, 1f, 8f), new Vector3(2.5f, 2f, 2.5f), crate);
