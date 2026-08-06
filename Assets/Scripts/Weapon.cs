@@ -3,7 +3,6 @@ using UnityEngine;
 public abstract class Weapon : MonoBehaviour
 {
 
-    [SerializeField] float range = 100f;
     [SerializeField] float damage = 50f;
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] GameObject hitEffect;
@@ -13,6 +12,8 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField] float tracerWidth = 0.04f;
     [SerializeField] float tracerDuration = 0.06f;
     [SerializeField] Transform muzzleOrigin;
+    [Tooltip("How far the tracer is drawn when the shot hits nothing. Visual only — it does not limit the hit test.")]
+    [SerializeField] float tracerMissDistance = 100f;
 
     static Material s_tracerMaterial;
 
@@ -33,10 +34,11 @@ public abstract class Weapon : MonoBehaviour
     {
         Vector3 origin = GetPosition();
         Vector3 direction = GetForward();
-        Vector3 endPoint = origin + direction * range;
+        Vector3 endPoint = origin + direction.normalized * tracerMissDistance;
         Health victim = null;
 
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, range))
+        // Hitscan: no distance cap. The tracer length above is cosmetic.
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, Mathf.Infinity))
         {
             endPoint = hit.point;
             CreateHitImpact(hit);
