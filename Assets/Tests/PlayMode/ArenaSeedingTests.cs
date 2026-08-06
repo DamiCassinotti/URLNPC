@@ -104,6 +104,63 @@ public class ArenaSeedingTests : PlayModeTestBase
         }
     }
 
+    // Far outside every arena, so "was the player actually moved?" is unambiguous.
+    static readonly Vector3 OffArena = new Vector3(500f, 0f, 500f);
+
+    GameObject CreatePlayerBody(bool agentDriven)
+    {
+        GameObject player = Track(GameObject.CreatePrimitive(PrimitiveType.Capsule));
+        player.name = "TestPlayer";
+        player.tag = "Player";
+        player.transform.position = OffArena;
+        if (agentDriven) player.AddComponent<NavMeshAgent>();
+        else player.AddComponent<CharacterController>();
+        Physics.SyncTransforms();
+        return player;
+    }
+
+    [UnityTest]
+    public IEnumerator RepositioningAnAgentDrivenPlayer_Sticks()
+    {
+        ArenaManager manager = CreateManager(4242, forcedIndex: 0);
+        GameObject player = CreatePlayerBody(agentDriven: true);
+        var nav = player.GetComponent<NavMeshAgent>();
+
+        manager.RepositionPlayerAtRandomPoint();
+        Vector3 placed = player.transform.position;
+        Assert.That(nav.isOnNavMesh, Is.True, $"player agent left off the NavMesh at {placed}");
+        Assert.That(Vector3.Distance(placed, OffArena), Is.GreaterThan(1f), "player was not moved at all");
+
+        // The regression: a raw transform write leaves the NavMeshAgent's
+        // internal position behind, and the next agent update snaps the body
+        // back to where it was.
+        yield return null;
+        yield return null;
+        // Horizontal only: the agent legitimately lifts the body by its
+        // baseOffset on its first update.
+        Vector2 before = new Vector2(placed.x, placed.z);
+        Vector2 after = new Vector2(player.transform.position.x, player.transform.position.z);
+        Assert.That(Vector2.Distance(before, after), Is.LessThan(0.5f),
+            $"agent-driven player drifted back from {placed} to {player.transform.position}");
+    }
+
+    [UnityTest]
+    public IEnumerator RepositioningAHumanPlayer_StillLandsOnTheArena()
+    {
+        ArenaManager manager = CreateManager(4242, forcedIndex: 0);
+        GameObject player = CreatePlayerBody(agentDriven: false);
+
+        manager.RepositionPlayerAtRandomPoint();
+        yield return null;
+
+        Vector3 placed = player.transform.position;
+        Assert.That(Vector3.Distance(placed, OffArena), Is.GreaterThan(1f), "player was not moved at all");
+        Assert.That(NavMesh.SamplePosition(placed, out NavMeshHit _, 2f, NavMesh.AllAreas), Is.True,
+            $"player was placed off the NavMesh at {placed}");
+        Assert.That(player.GetComponent<CharacterController>().enabled, Is.True,
+            "the CharacterController must be re-enabled after the move");
+    }
+
     [UnityTest]
     public IEnumerator EnemySpawn_LandsOnNavMesh_AwayFromThePlayer()
     {

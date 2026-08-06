@@ -256,17 +256,43 @@ public class ArenaManager : MonoBehaviour
         if (player == null) return;
         // Snap to the nearest walkable spot so the player never spawns inside a
         // wall/divider, whatever arena was generated.
-        Vector3 target = point;
-        if (NavMesh.SamplePosition(new Vector3(point.x, 1f, point.z), out NavMeshHit hit, 10f, NavMesh.AllAreas))
+        Vector3 ground = point;
+        bool onNavMesh = NavMesh.SamplePosition(new Vector3(point.x, 1f, point.z), out NavMeshHit hit, 10f, NavMesh.AllAreas);
+        if (onNavMesh) ground = hit.position;
+
+        // An agent-driven player (CombatantRig) is steered by a NavMeshAgent,
+        // which owns the transform from its own internal position — a raw
+        // positional write gets overridden and the body snaps back.
+        NavMeshAgent nav = player.GetComponent<NavMeshAgent>();
+        if (nav != null && nav.enabled && onNavMesh)
         {
-            target = hit.position + Vector3.up * 1.1f;
+            WarpPlayerAgent(nav, ground);
+            return;
         }
 
+        Vector3 target = onNavMesh ? ground + Vector3.up * 1.1f : point;
         CharacterController cc = player.GetComponent<CharacterController>();
         bool wasEnabled = cc != null && cc.enabled;
         if (cc != null) cc.enabled = false; // CharacterController fights direct position writes.
         player.transform.position = target;
         if (cc != null) cc.enabled = wasEnabled;
+    }
+
+    // Same pattern as EnemyBehavior.EnsureOnNavMesh: Warp is the normal path,
+    // but it no-ops when the native agent lost its mesh (arena rebuilt under
+    // it), and toggling the component forces a clean re-creation.
+    static void WarpPlayerAgent(NavMeshAgent nav, Vector3 target)
+    {
+        if (nav.isOnNavMesh) nav.ResetPath(); // drop last round's destination
+        if (nav.Warp(target) && nav.isOnNavMesh) return;
+
+        nav.enabled = false;
+        nav.transform.position = target;
+        nav.enabled = true;
+        if (!nav.isOnNavMesh)
+        {
+            Debug.LogWarning($"[ArenaManager] Could not place the player agent on the NavMesh at {target}.", nav);
+        }
     }
 
     void BakeNavMesh()
