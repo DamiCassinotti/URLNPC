@@ -28,6 +28,11 @@ public class EnemyBehavior : MonoBehaviour
     /// </summary>
     public PerceptionMemory Perception { get; private set; }
 
+    /// <summary>What this combatant's sight ray can be blocked by. Cover
+    /// queries must run against the same mask (see
+    /// <see cref="ArenaManager.NearestCoverPoint"/>).</summary>
+    public LayerMask SightObstacleMask => sightObstacleMask;
+
     void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
