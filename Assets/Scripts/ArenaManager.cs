@@ -170,8 +170,10 @@ public class ArenaManager : MonoBehaviour
 
     /// <summary>Nearest walkable point hidden from <paramref name="breakLosFrom"/>
     /// and reachable from <paramref name="from"/>. False when this layout offers
-    /// none — the caller must fall back to another action.</summary>
-    public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, out Vector3 coverPoint)
+    /// none — the caller must fall back to another action. Pass the threat's own
+    /// sight mask (<see cref="EnemyBehavior.SightObstacleMask"/>), or a point
+    /// can come back "hidden" behind geometry the threat sees straight through.</summary>
+    public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, LayerMask sightObstacleMask, out Vector3 coverPoint)
     {
         coverPoint = default;
         // Snap the origin on-mesh, otherwise the path checks below all fail.
@@ -211,7 +213,7 @@ public class ArenaManager : MonoBehaviour
             Vector3 candidateEye = candidate + Vector3.up * EyeHeight;
             Vector3 toCandidate = candidateEye - threatEye;
             if (!Physics.Raycast(threatEye, toCandidate.normalized, toCandidate.magnitude - 0.1f,
-                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)) continue;
+                    sightObstacleMask, QueryTriggerInteraction.Ignore)) continue;
 
             if (!NavMesh.CalculatePath(from, candidate, NavMesh.AllAreas, path)) continue;
             if (path.status != NavMeshPathStatus.PathComplete) continue;

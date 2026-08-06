@@ -12,6 +12,8 @@ public class ArenaCoverTests : PlayModeTestBase
 {
     // Must match ArenaManager's cover constants.
     const float EyeHeight = 1f;
+    // Stands in for the threat's own sight mask (EnemyBehavior defaults to ~0).
+    const int SightMask = ~0;
 
     ArenaManager CreateManager(int arenaIndex, int seed = 20260714)
     {
@@ -41,7 +43,7 @@ public class ArenaCoverTests : PlayModeTestBase
         Vector3 eye = threat + Vector3.up * EyeHeight;
         Vector3 toPoint = (point + Vector3.up * EyeHeight) - eye;
         return Physics.Raycast(eye, toPoint.normalized, toPoint.magnitude - 0.1f,
-            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            SightMask, QueryTriggerInteraction.Ignore);
     }
 
     static bool Reachable(Vector3 from, Vector3 to)
@@ -63,7 +65,7 @@ public class ArenaCoverTests : PlayModeTestBase
             Vector3 threat = manager.RandomGroundPoint();
             if (Vector3.Distance(from, threat) < 4f) continue;
 
-            if (!manager.NearestCoverPoint(from, threat, out Vector3 cover)) continue;
+            if (!manager.NearestCoverPoint(from, threat, SightMask, out Vector3 cover)) continue;
             found++;
 
             string where = $"{manager.ActiveArenaName}: cover {cover} for from {from}, threat {threat}";
@@ -84,8 +86,8 @@ public class ArenaCoverTests : PlayModeTestBase
         Vector3 west = new Vector3(-14f, 0f, -12f);
         Vector3 east = new Vector3(14f, 0f, -12f);
 
-        Assert.That(manager.NearestCoverPoint(west, threat, out Vector3 westCover), Is.True);
-        Assert.That(manager.NearestCoverPoint(east, threat, out Vector3 eastCover), Is.True);
+        Assert.That(manager.NearestCoverPoint(west, threat, SightMask, out Vector3 westCover), Is.True);
+        Assert.That(manager.NearestCoverPoint(east, threat, SightMask, out Vector3 eastCover), Is.True);
 
         // Same threat means both queries saw the same candidates, so each
         // origin must have kept the one nearer to it — as long as the other
@@ -101,13 +103,13 @@ public class ArenaCoverTests : PlayModeTestBase
         ArenaManager manager = CreateManager(0);
         Vector3 from = new Vector3(-14f, 0f, -14f);
         Vector3 threat = Vector3.zero;
-        Assert.That(manager.NearestCoverPoint(from, threat, out Vector3 _), Is.True,
+        Assert.That(manager.NearestCoverPoint(from, threat, SightMask, out Vector3 _), Is.True,
             "sanity: the intact courtyard has cover");
 
         StripCoverGeometry();
         Physics.SyncTransforms();
 
-        Assert.That(manager.NearestCoverPoint(from, threat, out Vector3 _), Is.False,
+        Assert.That(manager.NearestCoverPoint(from, threat, SightMask, out Vector3 _), Is.False,
             "with every cover box gone the caller must be told to fall back");
     }
 
@@ -117,10 +119,29 @@ public class ArenaCoverTests : PlayModeTestBase
         ArenaManager manager = CreateManager(0);
         Vector3 crate = new Vector3(-12f, 0f, 10f); // dead centre of a corner crate stack
 
-        Assert.That(manager.NearestCoverPoint(new Vector3(0f, 0f, -14f), crate, out Vector3 cover), Is.True,
+        Assert.That(manager.NearestCoverPoint(new Vector3(0f, 0f, -14f), crate, SightMask, out Vector3 cover), Is.True,
             "the rest of the courtyard still offers cover");
         Assert.That(float.IsNaN(cover.x) || float.IsNaN(cover.z), Is.False, "degenerate direction leaked a NaN");
         Assert.That(LosBlocked(crate, cover), Is.True);
+    }
+
+    [Test]
+    public void GeometryOutsideTheSightMask_IsNotCover()
+    {
+        ArenaManager manager = CreateManager(0);
+        Vector3 from = new Vector3(-14f, 0f, -14f);
+        Vector3 threat = Vector3.zero;
+        Assert.That(manager.NearestCoverPoint(from, threat, SightMask, out Vector3 _), Is.True,
+            "sanity: the intact courtyard has cover");
+
+        const int ghostLayer = 2; // "Ignore Raycast" — a built-in layer, always defined
+        MoveCoverToLayer(ghostLayer);
+        Physics.SyncTransforms();
+
+        Assert.That(manager.NearestCoverPoint(from, threat, ~(1 << ghostLayer), out Vector3 seen), Is.False,
+            $"{seen} counts as cover behind geometry this threat's sight ray goes straight through");
+        Assert.That(manager.NearestCoverPoint(from, threat, SightMask, out Vector3 _), Is.True,
+            "the same boxes are cover again for a threat whose mask includes their layer");
     }
 
     [Test]
@@ -145,7 +166,7 @@ public class ArenaCoverTests : PlayModeTestBase
         Assert.That(NavMesh.SamplePosition(center + new Vector3(0f, 1f, -3.5f), out NavMeshHit _, 1.5f, NavMesh.AllAreas),
             Is.True, "sanity: there is walkable floor on the far side of the step");
 
-        Assert.That(manager.NearestCoverPoint(from, threat, out Vector3 cover), Is.False,
+        Assert.That(manager.NearestCoverPoint(from, threat, SightMask, out Vector3 cover), Is.False,
             $"a {bounds.size.y:0.00} m step is not cover, but {cover} was offered");
     }
 
@@ -164,7 +185,7 @@ public class ArenaCoverTests : PlayModeTestBase
         int coveredWhileIntact = 0;
         for (int i = 0; i < origins.Length; i++)
         {
-            if (manager.NearestCoverPoint(origins[i], threats[i], out Vector3 _)) coveredWhileIntact++;
+            if (manager.NearestCoverPoint(origins[i], threats[i], SightMask, out Vector3 _)) coveredWhileIntact++;
         }
         Assert.That(coveredWhileIntact, Is.GreaterThan(0), "sanity: the intact pit covers some of these pairs");
 
@@ -173,8 +194,20 @@ public class ArenaCoverTests : PlayModeTestBase
 
         for (int i = 0; i < origins.Length; i++)
         {
-            Assert.That(manager.NearestCoverPoint(origins[i], threats[i], out Vector3 cover), Is.False,
+            Assert.That(manager.NearestCoverPoint(origins[i], threats[i], SightMask, out Vector3 cover), Is.False,
                 $"pair #{i} (from {origins[i]}, threat {threats[i]}) was offered {cover} behind a stair step");
+        }
+    }
+
+    // Everything the arena builder registered as cover, moved to another layer.
+    static void MoveCoverToLayer(int layer)
+    {
+        GameObject root = GameObject.Find("Arena (Generated)");
+        Assert.That(root, Is.Not.Null, "no generated arena to relayer");
+        foreach (Transform child in root.transform)
+        {
+            if (child.name == "Floor" || child.name.StartsWith("Wall_")) continue;
+            child.gameObject.layer = layer;
         }
     }
 
