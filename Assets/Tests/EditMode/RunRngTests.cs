@@ -1,11 +1,8 @@
 using NUnit.Framework;
 
-/// <summary>
-/// Guards the reproducibility contract (CLAUDE.md "Reproducibility"): a run
-/// seed fully determines every evaluation-relevant random sequence, and each
-/// domain draws from its own sub-stream so activity in one domain can never
-/// shift the others.
-/// </summary>
+// The reproducibility contract (CLAUDE.md "Reproducibility"): a run seed fully
+// determines every random sequence that matters, and each domain draws from its
+// own sub-stream so activity in one can never shift the others.
 public class RunRngTests
 {
     [SetUp]

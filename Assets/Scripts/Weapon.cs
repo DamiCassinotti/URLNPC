@@ -21,7 +21,7 @@ public abstract class Weapon : MonoBehaviour
     protected abstract Vector3 GetForward();
 
     // Telemetry hook (issue #12): weapon, the Health hit (null on a miss),
-    // damage. Fired once per shot.
+    // damage.
     public static event System.Action<Weapon, Health, float> ShotFired;
 
     public void Shoot()

@@ -3,11 +3,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// Contract for ArenaManager.NearestCoverPoint (issue #14): whatever it hands
-/// back sits on the NavMesh, has the threat's eye-line to it blocked and is
-/// walkable from the query origin — or it correctly reports no cover at all.
-/// </summary>
+// Contract for ArenaManager.NearestCoverPoint (issue #14): whatever it hands
+// back sits on the NavMesh, has the threat's eye-line to it blocked and is
+// walkable from the query origin — or it correctly reports no cover at all.
 public class ArenaCoverTests : PlayModeTestBase
 {
     // Must match ArenaManager's cover constants.

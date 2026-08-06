@@ -5,14 +5,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // Match telemetry (issue #12): one JSON line per event under
-// persistentDataPath/Telemetry/, so every evaluation phase of the thesis
-// (training debug, headless eval, LLM A/B, human study) reads one format.
-// Events: session_start, shot, damage, death, episode_summary, session_end.
-//
-// Pure file IO + event subscriptions, so it works unchanged in -batchmode.
-// Auto-bootstraps at startup (the scene is binary serialized) and survives
-// scene reloads via DontDestroyOnLoad. Episode bookkeeping and line
-// formatting live in EpisodeLog / JsonLine; this is the Unity adapter.
+// persistentDataPath/Telemetry/, parseable without a Unity build. File IO
+// only, so it works in -batchmode. Auto-bootstraps at startup (the scene is
+// binary serialized) and survives scene reloads via DontDestroyOnLoad.
 public class TelemetryLogger : MonoBehaviour
 {
     public static TelemetryLogger Instance { get; private set; }
@@ -103,8 +98,8 @@ public class TelemetryLogger : MonoBehaviour
         catch (IOException) { } // already broken, nothing left to salvage
     }
 
-    // Append one event line. Public so future systems (NPC mode changes, LLM
-    // decisions) emit through the same bus; build fields with JsonLine.Field.
+    // Public so future systems (NPC mode changes, LLM decisions) emit through
+    // the same bus; build fields with JsonLine.Field.
     public void LogEvent(string type, params string[] jsonFields)
     {
         if (writer == null) return;

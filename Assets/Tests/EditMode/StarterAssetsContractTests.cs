@@ -4,23 +4,14 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>
-/// A canary for the one string-typed coupling in the codebase.
-///
-/// <see cref="CombatantRig"/> silences the human driver by disabling the
-/// StarterAssets first-person controller and its input component. It cannot
-/// name those types at compile time: StarterAssets has no asmdef, so it lands
-/// in Assembly-CSharp, which auto-references the URLNPC assembly — the
-/// reference cannot go back the other way (and this test assembly references
-/// URLNPC, not Assembly-CSharp, so it can't name them either). The rig
-/// therefore matches on <c>Type.Name</c>.
-///
-/// The failure mode that buys: upgrade or rename StarterAssets — or mistype
-/// the name in the rig — and the lookup quietly finds nothing, leaving human
-/// input live to fight the NavMeshAgent in agent mode. No exception, no log,
-/// just a player body pulled two ways. These asserts turn that into a red
-/// test, on both sides of the coupling.
-/// </summary>
+// A canary for the one string-typed coupling in the codebase. CombatantRig
+// silences the human driver by name because StarterAssets has no asmdef and
+// lands in Assembly-CSharp, which auto-references URLNPC — the reference can't
+// go the other way, and this test assembly can't name those types either.
+//
+// The failure mode that buys: upgrade or rename StarterAssets, or mistype the
+// name in the rig, and the lookup quietly finds nothing — no exception, no log,
+// just human input left live to fight the NavMeshAgent in agent mode.
 public class StarterAssetsContractTests
 {
     // Read from the rig itself, not a second copy: the point is to check the

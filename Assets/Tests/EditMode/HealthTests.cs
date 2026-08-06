@@ -1,14 +1,12 @@
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>
-/// Health drives the whole reward/win-loss chain (EnemyAgent subscribes to
-/// OnDamaged/OnDied, GameManager decides the round from deaths), so its event
-/// semantics are load-bearing: exact damage payloads, death fires exactly
-/// once, and ResetHealth re-arms it for the next episode.
-/// (EditMode: Start() never runs, so the GameManager lookup stays null and
-/// CheckDeath's null guard keeps death processing local to the component.)
-/// </summary>
+// Health drives the whole reward/win-loss chain — EnemyAgent subscribes to
+// OnDamaged/OnDied and GameManager decides the round from deaths — so its event
+// semantics are load-bearing.
+//
+// EditMode, so Start() never runs: the GameManager lookup stays null and
+// CheckDeath's null guard keeps death processing local to the component.
 public class HealthTests
 {
     GameObject go;

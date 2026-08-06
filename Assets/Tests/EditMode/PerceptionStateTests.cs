@@ -1,12 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>
-/// The remember/freeze state machine behind the sensory contract, as pure
-/// state with injected time: track while visible, freeze the moment sight
-/// breaks, wipe on Forget. (PerceptionContractTests covers the same rules
-/// end-to-end with real raycasts.)
-/// </summary>
+// The remember/freeze state machine behind the sensory contract, as pure state
+// with injected time. PerceptionContractTests covers the same rules end to end
+// with real raycasts.
 public class PerceptionStateTests
 {
     [Test]

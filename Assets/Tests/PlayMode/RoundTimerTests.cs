@@ -3,11 +3,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// The round clock in GameManager: countdown, re-arming, the draw-on-timeout
-/// path (human play — no communicator in tests), and the "clock disabled"
-/// configuration. Uses sub-second rounds so the suite stays fast.
-/// </summary>
+// The round clock in GameManager: countdown, re-arming, the draw-on-timeout
+// path (human play — no communicator in tests), and the disabled-clock
+// configuration. Sub-second rounds keep the suite fast.
 public class RoundTimerTests : PlayModeTestBase
 {
     [UnityTest]

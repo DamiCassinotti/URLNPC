@@ -1,8 +1,6 @@
 using System.Runtime.CompilerServices;
 
-// The test assemblies drive internal seams (RunRng.ResetForNewRun,
-// ArenaManager.suppressAutoBootstrap, TelemetryLogger.SwapWriter/RescanHealths,
-// serialized config fields) that the game's public API deliberately does not
-// expose.
+// The test assemblies drive internal seams — reset hooks, bootstrap
+// suppression, serialized config — that the public API deliberately withholds.
 [assembly: InternalsVisibleTo("URLNPC.Tests.EditMode")]
 [assembly: InternalsVisibleTo("URLNPC.Tests.PlayMode")]

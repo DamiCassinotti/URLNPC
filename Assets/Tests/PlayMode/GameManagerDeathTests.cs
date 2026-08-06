@@ -3,11 +3,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// Win/loss accounting: GameManager.ProcessDeath maps the loser's tag to the
-/// opposite side's score and ends the round (human-play path — the tests run
-/// with no trainer connected, exactly like a player pressing Play).
-/// </summary>
+// Win/loss accounting: ProcessDeath maps the loser's tag to the opposite side's
+// score and ends the round. No trainer is connected here, so this is the
+// human-play path, exactly like pressing Play.
 public class GameManagerDeathTests : PlayModeTestBase
 {
     [UnityTest]

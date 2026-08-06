@@ -1,12 +1,9 @@
 using UnityEngine;
 
-/// <summary>
-/// The remember/freeze state machine behind <see cref="PerceptionMemory"/>,
-/// engine-free so it is unit-testable without geometry or Time: while the
-/// target is visible the last-seen position tracks it; the moment visibility
-/// ends the position freezes; <see cref="Forget"/> wipes everything for
-/// episode resets. Time is injected as a plain "now" value.
-/// </summary>
+// The remember/freeze state machine behind PerceptionMemory, engine-free so it
+// is testable without geometry or Time: the last-seen position tracks the
+// target while visible and freezes the moment visibility ends. Time is injected
+// as a plain "now" value.
 public class PerceptionState
 {
     public bool CurrentlyVisible { get; private set; }
@@ -15,10 +12,9 @@ public class PerceptionState
 
     float lastSeenTime;
 
-    /// <summary>Seconds between <paramref name="now"/> and the last sighting. Infinity if never seen.</summary>
+    // Infinity if never seen.
     public float TimeSinceSeen(float now) => HasEverSeen ? now - lastSeenTime : Mathf.Infinity;
 
-    /// <summary>Record one sight-check result.</summary>
     public void Observe(bool targetVisible, Vector3 targetPosition, float now)
     {
         CurrentlyVisible = targetVisible;
@@ -30,7 +26,7 @@ public class PerceptionState
         }
     }
 
-    /// <summary>Wipe the memory (episode resets — last episode's sighting must not leak).</summary>
+    // Episode resets: last episode's sighting must not leak into the next.
     public void Forget()
     {
         CurrentlyVisible = false;

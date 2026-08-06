@@ -1,10 +1,7 @@
 using NUnit.Framework;
 
-/// <summary>
-/// The full per-step reward table (CLAUDE.md "Reward shape"), enumerated as
-/// pure math: alive bonus, too-close shaping penalty, wasted-shot penalty,
-/// and how they combine. Actions: 0=Patrol, 1=Chase, 2=Attack.
-/// </summary>
+// The full per-step reward table (CLAUDE.md "Reward shape") enumerated as pure
+// math, including how the penalties combine. Actions: 0=Patrol, 1=Chase, 2=Attack.
 public class RewardComputerTests
 {
     const float Tolerance = 1e-6f;

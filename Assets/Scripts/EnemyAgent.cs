@@ -40,12 +40,11 @@ public class EnemyAgent : Agent
 
     public override void Initialize()
     {
-        // The GameManager round clock is the single owner of time-based
-        // episode termination (timeout penalty + draw). A nonzero
-        // Agent.MaxStep would silently reset the episode before the clock
-        // fires — the binary FPS scene carries a stale MaxStep of 5000
-        // (~100 s, shorter than the 120 s round), which made timeouts
-        // restart the round in place without ever counting a draw.
+        // The round clock is the single owner of time-based episode
+        // termination. A nonzero MaxStep silently resets the episode before the
+        // clock fires — the binary FPS scene carries a stale 5000 (~100 s,
+        // shorter than the round), which made timeouts restart the round in
+        // place and never count a draw.
         if (MaxStep != 0)
         {
             Debug.LogWarning($"[EnemyAgent] Overriding serialized MaxStep {MaxStep} -> 0; the round clock owns episode timeout.");
@@ -57,9 +56,8 @@ public class EnemyAgent : Agent
         selfHealth.OnDamaged += HandleSelfDamaged;
         selfHealth.OnDied += HandleSelfDied;
 
-        // Snapshot of the serialized tunables, taken once per play session —
-        // tweak them between runs, not mid-play. (The event rewards below
-        // still read their fields live.)
+        // Snapshot taken once per play session, so these tunables only take
+        // effect between runs. (The event rewards below still read live.)
         stepRewards = new RewardComputer
         {
             aliveRewardPerStep = aliveRewardPerStep,
@@ -72,7 +70,7 @@ public class EnemyAgent : Agent
     void Update()
     {
         // Sensory contract (issue #9): target info reaches the policy only
-        // through PerceptionMemory, never straight off the target transform.
+        // through PerceptionMemory, never off the target transform.
         targetInSight = behavior.Perception != null && behavior.Perception.CurrentlyVisible;
         canAttack = behavior.ReadCanAttack();
         float maxHp = selfHealth.maxHealth <= 0f ? 1f : selfHealth.maxHealth;
@@ -121,7 +119,7 @@ public class EnemyAgent : Agent
     {
         if (episodeEnding) return;
 
-        // True-state read is fine here: reward computation is environment
+        // A true-state read is fine here: reward computation is environment
         // code, not a policy input (sensory contract, issue #9).
         float distanceToTarget = behavior.DistanceToTarget();
 
@@ -155,23 +153,20 @@ public class EnemyAgent : Agent
             ArenaManager.Current.RepositionPlayerAtRandomPoint();
         }
         if (behavior != null) behavior.ResetState();
-        // Every episode gets a full round clock — during training episodes
-        // reset without a scene reload, so the clock must be rearmed here.
+        // Training episodes reset without a scene reload, so the clock has to
+        // be rearmed here to give each one a full budget.
         if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
         if (gameManager != null) gameManager.ResetRoundClock();
-        // Make every episode attributable to its run seed in TensorBoard.
-        // (The authoritative full-precision record is RunRng's startup log.)
+        // Makes every episode attributable to its run seed in TensorBoard.
         if (Academy.IsInitialized)
         {
             Academy.Instance.StatsRecorder.Add("Run/Seed", RunRng.Seed);
         }
     }
 
-    /// <summary>
-    /// Called by <see cref="GameManager"/> when the round clock runs out.
-    /// Timeout is a draw: both sides take a small penalty (stalling should
-    /// not pay off) and the episode ends without a winner.
-    /// </summary>
+    // Called by GameManager when the round clock runs out. A timeout is a draw:
+    // both sides take a small penalty so stalling doesn't pay off, and the
+    // episode ends without a winner.
     public void OnRoundTimeout()
     {
         if (episodeEnding) return;

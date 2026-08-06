@@ -4,17 +4,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// Shared scaffolding for PlayMode integration tests. Guarantees per test:
-/// - No auto-spawned arena: ArenaManager's bootstrap fires on every scene
-///   load (including the test runner's init scene), so the seam suppresses it
-///   and any manager/arena that already snuck in is swept.
-/// - The real score tally survives: PlayerPrefs values are snapshotted in
-///   SetUp and restored in TearDown.
-/// - Engine state is restored: Time.timeScale (GameManager.FinishRound sets
-///   it to 0), cursor state, NavMesh data, and RunRng's static streams.
-/// Spawned objects registered via Track() are destroyed on teardown.
-/// </summary>
+// Shared scaffolding for PlayMode integration tests. Guarantees per test:
+// - No auto-spawned arena. ArenaManager's bootstrap fires on every scene load,
+//   including the test runner's own init scene, so the seam suppresses it and
+//   anything that already snuck in is swept.
+// - The real score tally survives: PlayerPrefs are snapshotted and restored.
+// - Engine state is restored: Time.timeScale (FinishRound zeroes it), cursor,
+//   NavMesh data and RunRng's static streams.
 public abstract class PlayModeTestBase
 {
     // Must match the private keys in CounterData.cs.
@@ -64,18 +60,15 @@ public abstract class PlayModeTestBase
         ArenaManager.suppressAutoBootstrap = false;
     }
 
-    /// <summary>Register a spawned object for teardown destruction.</summary>
+    // Register a spawned object for teardown destruction.
     protected GameObject Track(GameObject go)
     {
         tracked.Add(go);
         return go;
     }
 
-    /// <summary>
-    /// A minimal HUD: Canvas + TMP label wired into a Counter, enough for
-    /// GameManager.Start to find a Counter and hang its runtime timer text on
-    /// the same canvas.
-    /// </summary>
+    // Enough for GameManager.Start to find a Counter and hang its runtime timer
+    // text on the same canvas.
     protected Counter CreateCounterHud()
     {
         GameObject canvasGo = Track(new GameObject("TestHud", typeof(Canvas)));
@@ -87,11 +80,8 @@ public abstract class PlayModeTestBase
         return counter;
     }
 
-    /// <summary>
-    /// GameManager on a bare GameObject. Created inactive so the round
-    /// duration is in place before Start arms the clock; the caller must
-    /// yield a frame for Start to run.
-    /// </summary>
+    // Created inactive so the round duration is in place before Start arms the
+    // clock; the caller must yield a frame for Start to run.
     protected GameManager CreateGameManager(float roundDuration)
     {
         GameObject go = Track(new GameObject("TestGameManager"));
@@ -102,10 +92,7 @@ public abstract class PlayModeTestBase
         return gm;
     }
 
-    /// <summary>
-    /// A combatant stand-in: a cube with a collider (weapons raycast) and a
-    /// Health at the given starting HP.
-    /// </summary>
+    // A combatant stand-in: a cube with a collider (weapons raycast) and Health.
     protected Health CreateCombatant(string tag, Vector3 position, float startingHealth)
     {
         GameObject go = Track(GameObject.CreatePrimitive(PrimitiveType.Cube));
@@ -122,10 +109,8 @@ public abstract class PlayModeTestBase
         return health;
     }
 
-    /// <summary>
-    /// A firing weapon aimed along +Z. Weapon reports the shooter by root
-    /// tag, so the owner tag goes on the weapon's own GameObject.
-    /// </summary>
+    // Aimed along +Z. Weapon reports the shooter by root tag, so the owner tag
+    // goes on the weapon's own GameObject.
     protected Weapon CreateWeapon(string ownerTag, Vector3 position)
     {
         GameObject go = Track(new GameObject($"Test{ownerTag}Weapon"));
@@ -144,11 +129,8 @@ public abstract class PlayModeTestBase
         protected override Vector3 GetForward() => muzzle.forward;
     }
 
-    /// <summary>
-    /// Remove any ArenaManager (auto-bootstrapped before the first SetUp
-    /// could suppress it, or left over from a test) plus its generated
-    /// geometry and NavMesh.
-    /// </summary>
+    // Removes any ArenaManager — auto-bootstrapped before the first SetUp could
+    // suppress it, or left over from a test — plus its geometry and NavMesh.
     protected static void SweepArenas()
     {
         foreach (ArenaManager manager in Object.FindObjectsByType<ArenaManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))

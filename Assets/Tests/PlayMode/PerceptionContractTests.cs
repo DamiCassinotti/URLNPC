@@ -4,15 +4,13 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// The sensory contract (issue #9) against real geometry: the NPC knows the
-/// player's position only while line of sight holds; the moment sight breaks
-/// the memory freezes at the last-seen point, and episode resets wipe it.
-///
-/// The enemy is assembled with its NavMeshAgent and EnemyBehavior disabled —
-/// there is no NavMesh in this fixture and the sight check needs neither
-/// Start() spawning nor navigation, only transforms and raycasts.
-/// </summary>
+// The sensory contract (issue #9) against real geometry: the NPC knows the
+// player's position only while line of sight holds, the memory freezes at the
+// last-seen point the moment sight breaks, and episode resets wipe it.
+//
+// The enemy is assembled with its NavMeshAgent and EnemyBehavior disabled —
+// there is no NavMesh here, and the sight check needs only transforms and
+// raycasts.
 public class PerceptionContractTests : PlayModeTestBase
 {
     GameObject player;

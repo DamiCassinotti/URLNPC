@@ -4,12 +4,9 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// End-to-end reproducibility (issue #13): a run seed fully determines which
-/// arena is built and where actors spawn, spawn points land on the freshly
-/// baked NavMesh at floor level, and the enemy's spawn keeps its distance
-/// from the player.
-/// </summary>
+// End-to-end reproducibility (issue #13): a run seed fully determines which
+// arena is built and where actors spawn, spawn points land on the freshly baked
+// NavMesh at floor level, and the enemy keeps its distance from the player.
 public class ArenaSeedingTests : PlayModeTestBase
 {
     ArenaManager CreateManager(int seed, int forcedIndex = -1)

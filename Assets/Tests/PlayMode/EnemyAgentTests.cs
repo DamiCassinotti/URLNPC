@@ -6,14 +6,10 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// The reward/episode plumbing of EnemyAgent against a live Academy (no
-/// trainer connected — same as pressing Play): health events map to the
-/// documented reward shape, and both terminal paths (timeout, target death)
-/// end the episode and reset state. Also a wiring smoke test for the actual
-/// Enemy prefab, whose BehaviorParameters/DecisionRequester are required for
-/// ML-Agents to drive it at all (see CLAUDE.md).
-/// </summary>
+// The reward/episode plumbing of EnemyAgent against a live Academy with no
+// trainer connected, same as pressing Play. Also a wiring smoke test for the
+// real Enemy prefab, whose BehaviorParameters/DecisionRequester are what let
+// ML-Agents drive it at all (see CLAUDE.md).
 public class EnemyAgentTests : PlayModeTestBase
 {
     GameObject player;
