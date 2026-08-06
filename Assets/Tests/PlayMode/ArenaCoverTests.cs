@@ -123,9 +123,86 @@ public class ArenaCoverTests : PlayModeTestBase
         Assert.That(LosBlocked(crate, cover), Is.True);
     }
 
+    [Test]
+    public void ALowStairStep_IsNotCover()
+    {
+        ArenaManager manager = CreateManager(1); // The Pit — the only layout with stairs
+
+        // Leave a single 0.25 m step standing: it is registered as a cover
+        // candidate, but nobody hides behind a 25 cm step, so the eye-height
+        // LOS check has to be what rejects it.
+        Transform step = StripCoverGeometryExceptOneStep();
+        Physics.SyncTransforms();
+        Bounds bounds = step.GetComponent<Collider>().bounds;
+        Assert.That(bounds.size.y, Is.LessThan(EyeHeight),
+            "sanity: the surviving step must be shorter than eye height");
+
+        // The stairs run along +Z: uphill is behind the step, the open pit
+        // floor in front of it.
+        Vector3 center = new Vector3(bounds.center.x, 0f, bounds.center.z);
+        Vector3 threat = center + new Vector3(0f, 0f, 6f);
+        Vector3 from = center + new Vector3(0f, 0f, -8f);
+        Assert.That(NavMesh.SamplePosition(center + new Vector3(0f, 1f, -3.5f), out NavMeshHit _, 1.5f, NavMesh.AllAreas),
+            Is.True, "sanity: there is walkable floor on the far side of the step");
+
+        Assert.That(manager.NearestCoverPoint(from, threat, out Vector3 cover), Is.False,
+            $"a {bounds.size.y:0.00} m step is not cover, but {cover} was offered");
+    }
+
+    [Test]
+    public void ALowStairStep_IsNotCover_FromAnywhereInTheArena()
+    {
+        ArenaManager manager = CreateManager(1);
+        Vector3[] origins = new Vector3[24];
+        Vector3[] threats = new Vector3[origins.Length];
+        for (int i = 0; i < origins.Length; i++)
+        {
+            origins[i] = manager.RandomGroundPoint();
+            threats[i] = manager.RandomGroundPoint();
+        }
+
+        int coveredWhileIntact = 0;
+        for (int i = 0; i < origins.Length; i++)
+        {
+            if (manager.NearestCoverPoint(origins[i], threats[i], out Vector3 _)) coveredWhileIntact++;
+        }
+        Assert.That(coveredWhileIntact, Is.GreaterThan(0), "sanity: the intact pit covers some of these pairs");
+
+        StripCoverGeometryExceptOneStep();
+        Physics.SyncTransforms();
+
+        for (int i = 0; i < origins.Length; i++)
+        {
+            Assert.That(manager.NearestCoverPoint(origins[i], threats[i], out Vector3 cover), Is.False,
+                $"pair #{i} (from {origins[i]}, threat {threats[i]}) was offered {cover} behind a stair step");
+        }
+    }
+
     // Everything the arena builder registered as cover, removed — leaving the
     // floor and perimeter behind.
     static void StripCoverGeometry()
+    {
+        StripCoverGeometry(null);
+    }
+
+    // Same, but keeps the lowest step of the +Z staircase (see BuildThePit).
+    // Returns the survivor.
+    static Transform StripCoverGeometryExceptOneStep()
+    {
+        GameObject root = GameObject.Find("Arena (Generated)");
+        Assert.That(root, Is.Not.Null, "no generated arena to strip");
+        Transform step = null;
+        foreach (Transform child in root.transform)
+        {
+            // Both staircases have a Step_0; take the one facing +Z.
+            if (child.name == "Step_0" && child.position.z > 0f) step = child;
+        }
+        Assert.That(step, Is.Not.Null, "the pit should have a +Z staircase to keep a step from");
+        StripCoverGeometry(step);
+        return step;
+    }
+
+    static void StripCoverGeometry(Transform keep)
     {
         GameObject root = GameObject.Find("Arena (Generated)");
         Assert.That(root, Is.Not.Null, "no generated arena to strip");
@@ -133,7 +210,7 @@ public class ArenaCoverTests : PlayModeTestBase
         var doomed = new List<GameObject>();
         foreach (Transform child in root.transform)
         {
-            if (child.name == "Floor" || child.name.StartsWith("Wall_")) continue;
+            if (child == keep || child.name == "Floor" || child.name.StartsWith("Wall_")) continue;
             doomed.Add(child.gameObject);
         }
         foreach (GameObject go in doomed) Object.DestroyImmediate(go);
