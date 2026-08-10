@@ -14,7 +14,11 @@ public class ModeChannel : MonoBehaviour
 
     // Seconds since the current mode interval started. Re-commanding the same
     // mode mid-episode does not restart it; an episode reset does.
-    public float TimeInMode => Time.time - modeSetTime;
+    //
+    // Kept entirely on the fixed clock, which is what the policy is read on: a
+    // frame-clock stamp read back from FixedUpdate (where Time.time IS
+    // Time.fixedTime) reports a negative age until the frame clock catches up.
+    public float TimeInMode => Time.fixedTime - modeSetTime;
 
     // (previous, current), raised once per mode interval — so a listener that
     // segments the timeline from this event alone can never disagree with
@@ -27,7 +31,7 @@ public class ModeChannel : MonoBehaviour
     void Awake()
     {
         CurrentMode = initialMode;
-        modeSetTime = Time.time;
+        modeSetTime = Time.fixedTime;
     }
 
     public void SetMode(NpcMode mode)
@@ -48,7 +52,7 @@ public class ModeChannel : MonoBehaviour
     {
         NpcMode previous = CurrentMode;
         CurrentMode = mode;
-        modeSetTime = Time.time;
+        modeSetTime = Time.fixedTime;
         ModeChanged?.Invoke(previous, mode);
     }
 }
