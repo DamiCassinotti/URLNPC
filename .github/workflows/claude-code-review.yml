@@ -3,33 +3,42 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+
+# A newer push supersedes the running review — they cost real money.
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
+  # The job id is a required status check on main. Renaming it leaves every PR
+  # stuck on an "Expected" check that never reports.
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: read
       pull-requests: write
-      issues: write
+      issues: read
+      checks: write # the advisory "PR Review Gate" check run
       id-token: write
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
+
+      # Branch convention is type/<issue>-slug, so match a number that is
+      # followed by a dash and preceded by a slash or start — not the first
+      # digits anywhere, which would grab version numbers out of a branch
+      # like feat/v2-fix. No match is fine; the review still runs.
+      - name: Extract issue number from branch
+        id: issue
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          NUM=$(printf '%s' "$BRANCH" | grep -oE '(^|/)[0-9]+-' | grep -oE '[0-9]+' | head -1)
+          echo "number=$NUM" >> "$GITHUB_OUTPUT"
+          echo "Branch: $BRANCH -> issue: ${NUM:-none}"
 
       - name: Run Claude Code Review
         id: claude-review
@@ -38,27 +47,94 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+          # The plugin's own frontmatter allows only a handful of `gh pr`/`gh
+          # issue` subcommands — no Read/Grep/Glob. Its CLAUDE.md-compliance
+          # agents are handed file *paths* to read, so without these the run
+          # burns dozens of permission denials and reports "no issues found".
+          claude_args: |
+            --model opus
+            --allowedTools "Read,Grep,Glob,Bash(gh:*)"
+          prompt: |
+            # Step 1 — Check issue linkage (warn only, never stop)
+            The convention here is that a PR names its issue in the branch
+            (`type/<issue>-slug`, extracted: "${{ steps.issue.outputs.number }}") and in the
+            PR body via "Fixes #N" / "Closes #N" / "Resolves #N".
 
-      # The code-review plugin posts findings as inline comments but always
-      # exits 0, so on its own the required check can never block a merge.
-      # Turn findings on the current revision into a red check. Caveat: the
-      # plugin skips PRs it has already commented on, so a later push goes
-      # green without re-review — the Unity test checks remain the hard gate.
-      - name: Fail when the review posted findings
+            Run `gh pr view ${{ github.event.pull_request.number }} --json body,title` and check
+            both. If either is missing or they disagree, note it and carry on — say so in the
+            summary comment you post at the end. Do NOT skip the review over a linkage problem.
+
+            # Step 2 — Fetch the issue
+            If you have a number, run `gh issue view <number> --json title,body` for the
+            requirements and acceptance criteria. If you have no number, review the diff on
+            its own merits and skip Step 5.
+
+            # Step 3 — Read the review rules
+            Read `.github/review-rules.md` and apply it with the same priority as the plugin's
+            own instructions. Pass its contents to every review subagent you launch — subagents
+            do not inherit this prompt.
+
+            # Step 4 — Review
+            /code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+
+            Two overrides to the plugin's Step 1 bail-out conditions:
+            - Review this revision even if Claude has already commented on this PR. A new push
+              is new code; a stale approving comment is not a review of it.
+            - "Trivial and obviously correct" is a high bar. If the diff touches C# under
+              `Assets/`, review it.
+            Do still skip closed and draft PRs.
+
+            # Step 5 — Check the diff against the issue
+            Beyond the plugin's normal checks, post a finding (inline where a line is
+            responsible, top-level otherwise) for:
+            - A requirement or acceptance criterion in the issue the diff does not address
+            - Implemented behavior that contradicts what the issue described
+            Hold these to the same evidence bar as the rest: quote the criterion you mean.
+
+      # Deterministic and advisory. The plugin always exits 0, so this turns
+      # its output into a visible signal without gating the merge — flip the
+      # neutral conclusion to failure once the reviewer has earned the trust.
+      - name: Report review outcome
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ACTION_CONCLUSION: ${{ steps.claude-review.outputs.conclusion }}
         run: |
-          findings=$(gh api "repos/$REPO/pulls/$PR/comments" --paginate \
-            --jq '[.[] | select((.user.login | startswith("claude")) and .commit_id == env.HEAD_SHA)] | length')
-          echo "claude inline findings on $HEAD_SHA: $findings"
-          if [ "$findings" -gt 0 ]; then
-            echo "::error::claude-review flagged $findings issue(s) on this revision — see the inline PR comments."
-            exit 1
+          set -uo pipefail
+
+          inline=$(gh api "repos/$REPO/pulls/$PR/comments" --paginate \
+            --jq '[.[] | select(.user.login == "claude[bot]" and .commit_id == env.HEAD_SHA)] | length' || echo 0)
+          # Top-level comments carry no commit_id, so they can only be counted
+          # per PR, not per revision.
+          toplevel=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+            --jq '[.[] | select(.user.login == "claude[bot]")] | length' || echo 0)
+
+          if [ "$ACTION_CONCLUSION" != "success" ]; then
+            state=neutral
+            title="Review did not complete"
+            summary="The reviewer exited with '$ACTION_CONCLUSION'. Findings below, if any, may be partial."
+          elif [ "$inline" -gt 0 ]; then
+            state=neutral
+            title="$inline finding(s) on this revision"
+            summary="Claude posted $inline inline comment(s) on $HEAD_SHA. Advisory only — this check does not block."
+          elif [ "$toplevel" -eq 0 ]; then
+            state=neutral
+            title="Reviewer posted nothing"
+            summary="No inline or summary comment from claude[bot]. The review likely bailed out early rather than finding the diff clean."
+          else
+            state=success
+            title="No findings on this revision"
+            summary="Claude reviewed $HEAD_SHA and posted no inline findings."
           fi
 
+          echo "### $title" >> "$GITHUB_STEP_SUMMARY"
+          echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+
+          # --input avoids gh's nested-field syntax for output[title]/[summary].
+          jq -n --arg sha "$HEAD_SHA" --arg c "$state" --arg t "$title" --arg s "$summary" \
+            '{name:"PR Review Gate", head_sha:$sha, status:"completed", conclusion:$c,
+              output:{title:$t, summary:$s}}' \
+            | gh api "repos/$REPO/check-runs" --input - --silent
