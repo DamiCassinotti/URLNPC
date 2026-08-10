@@ -125,6 +125,25 @@ public class ModeDirectorTests
         Assert.That(channel.CurrentMode, Is.Not.EqualTo(NpcMode.Patrol));
     }
 
+    // Nothing to draw is still an episode boundary: the channel has to start a
+    // fresh interval, or the new episode reads the old one's dwell.
+    [Test]
+    public void ResetState_StartsANewIntervalEvenWithNothingToDraw()
+    {
+        RunRng.EnsureInitialized(42);
+        LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex("ModeDirector"));
+        ModeDirector director = NewDirector(NpcModeMask.None);
+        ModeChannel channel = director.GetComponent<ModeChannel>();
+        channel.SetMode(NpcMode.HoldCover);
+        var intervals = new List<(NpcMode, NpcMode)>();
+        channel.ModeChanged += (previous, current) => intervals.Add((previous, current));
+
+        director.ResetState(1f);
+
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.HoldCover));
+        Assert.That(intervals, Is.EqualTo(new[] { (NpcMode.HoldCover, NpcMode.HoldCover) }));
+    }
+
     [Test]
     public void SameSeed_ReplaysTheSameModeTimeline()
     {

@@ -8,6 +8,10 @@ using Unity.MLAgents;
 // the editor or a headless build happens to hit.
 //
 // The engine adapter half; the sampling rules are in ModeSchedule.
+// Ahead of Agent (-50), DecisionRequester (-10) and the Academy's own stepper
+// (default order): same-order FixedUpdates run in an undefined order, so
+// without this the mode could land after the step it is meant to condition.
+[DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(ModeChannel))]
 public class ModeDirector : MonoBehaviour
 {
@@ -88,6 +92,10 @@ public class ModeDirector : MonoBehaviour
         RebuildPoolIfMaskChanged();
         schedule.MinDwellSeconds = minDwellSeconds;
         if (schedule.TryAdvance(now, pickIndex)) Commit(schedule.Current, restart);
+        // An empty pool has nothing to draw, but a reset still owes the channel
+        // an interval boundary — otherwise the new episode inherits the old
+        // one's dwell with no ModeChanged to mark it.
+        else if (restart) channel.ResetState(channel.CurrentMode);
     }
 
     // A reset forces the write through: the drawn mode can equal the one the
