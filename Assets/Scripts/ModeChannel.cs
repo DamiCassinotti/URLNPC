@@ -30,9 +30,22 @@ public class ModeChannel : MonoBehaviour
     public void SetMode(NpcMode mode)
     {
         if (mode == CurrentMode) return;
+        Write(mode);
+    }
+
+    // Episode resets: force the mode and restart TimeInMode even when the drawn
+    // mode matches the one the last episode ended on, which SetMode would treat
+    // as a no-op and leave reporting the previous episode's dwell.
+    public void ResetState(NpcMode mode)
+    {
+        Write(mode);
+    }
+
+    void Write(NpcMode mode)
+    {
         NpcMode previous = CurrentMode;
         CurrentMode = mode;
         modeSetTime = Time.time;
-        ModeChanged?.Invoke(previous, mode);
+        if (previous != mode) ModeChanged?.Invoke(previous, mode);
     }
 }

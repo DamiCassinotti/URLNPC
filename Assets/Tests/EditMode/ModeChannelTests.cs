@@ -13,9 +13,12 @@ public class ModeChannelTests
     ModeChannel channel;
     readonly List<(NpcMode previous, NpcMode current)> changes = new List<(NpcMode, NpcMode)>();
 
+    // NUnit reuses one fixture instance for the whole class, so the capture
+    // list has to be cleared alongside the channel it belongs to.
     [SetUp]
     public void SetUp()
     {
+        changes.Clear();
         go = new GameObject("ModeChannelTest");
         channel = go.AddComponent<ModeChannel>();
         channel.ModeChanged += (previous, current) => changes.Add((previous, current));
@@ -68,6 +71,21 @@ public class ModeChannelTests
             (NpcMode.Hunt, NpcMode.Retreat),
             (NpcMode.Retreat, NpcMode.Patrol),
         }));
+    }
+
+    [Test]
+    public void ResetState_ForcesTheModeAndAnnouncesRealChangesOnly()
+    {
+        channel.ResetState(NpcMode.Retreat);
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat));
+        Assert.That(changes, Is.EqualTo(new[] { (NpcMode.Hunt, NpcMode.Retreat) }));
+
+        // The mode the last episode ended on can be drawn again: no event, but
+        // the write still goes through so TimeInMode restarts.
+        changes.Clear();
+        channel.ResetState(NpcMode.Retreat);
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat));
+        Assert.That(changes, Is.Empty);
     }
 
     [Test]

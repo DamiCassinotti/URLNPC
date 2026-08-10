@@ -1,8 +1,10 @@
 using UnityEngine;
 
 // Writes the commanded mode during training, standing in for the LLM selector
-// that takes the channel over at inference. Draws from RunRng on its own stream
-// so a seeded run replays the same mode timeline.
+// that takes the channel over at inference. Draws from RunRng on its own stream,
+// on the fixed step the agent's decisions run on — so a seeded run replays the
+// same mode timeline instead of quantising the switches to whatever frame rate
+// the editor or a headless build happens to hit.
 //
 // The engine adapter half; the sampling rules are in ModeSchedule.
 [RequireComponent(typeof(ModeChannel))]
@@ -34,14 +36,33 @@ public class ModeDirector : MonoBehaviour
         channel = GetComponent<ModeChannel>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        Tick(Time.time);
+        Tick(Time.fixedTime);
     }
 
     // Internal seam: EditMode tests drive the schedule without play mode, the
     // same way GameManager feeds RoundClock its delta.
     internal void Tick(float now)
+    {
+        Write(now, restart: false);
+    }
+
+    // Episode resets: draw a fresh mode straight away rather than arming the
+    // next tick. The agent collects its first observation on the Academy step,
+    // which would otherwise read the mode the previous episode ended on.
+    public void ResetState()
+    {
+        ResetState(Time.fixedTime);
+    }
+
+    internal void ResetState(float now)
+    {
+        schedule.Reset();
+        Write(now, restart: true);
+    }
+
+    void Write(float now, bool restart)
     {
         // Awake does not run in EditMode.
         if (channel == null) channel = GetComponent<ModeChannel>();
@@ -49,19 +70,22 @@ public class ModeDirector : MonoBehaviour
 
         if (useForcedMode)
         {
-            channel.SetMode(forcedMode);
+            Commit(forcedMode, restart);
             return;
         }
 
         RebuildPoolIfMaskChanged();
         schedule.MinDwellSeconds = minDwellSeconds;
-        if (schedule.TryAdvance(now, pickIndex)) channel.SetMode(schedule.Current);
+        if (schedule.TryAdvance(now, pickIndex)) Commit(schedule.Current, restart);
     }
 
-    // Episode resets: the next tick draws a fresh mode with a full dwell.
-    public void ResetState()
+    // A reset forces the write through: the drawn mode can equal the one the
+    // channel already holds, and SetMode would drop it as a no-op, leaving
+    // TimeInMode counting the previous episode's dwell.
+    void Commit(NpcMode mode, bool restart)
     {
-        schedule.Reset();
+        if (restart) channel.ResetState(mode);
+        else channel.SetMode(mode);
     }
 
     void RebuildPoolIfMaskChanged()

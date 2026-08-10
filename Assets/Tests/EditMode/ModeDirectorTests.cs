@@ -108,6 +108,23 @@ public class ModeDirectorTests
         Assert.That(RunTimeline(director, 20), Is.All.EqualTo(NpcMode.HoldCover));
     }
 
+    // The fresh episode must be commanded a mode before the agent's first
+    // observation, not on the director's next tick.
+    [Test]
+    public void ResetState_CommandsAFreshModeImmediately()
+    {
+        RunRng.EnsureInitialized(42);
+        ModeDirector director = NewDirector(HuntOrRetreat, dwell: 30f);
+        ModeChannel channel = director.GetComponent<ModeChannel>();
+        director.Tick(0f);
+        channel.SetMode(NpcMode.Patrol); // not in the pool, so it can only be left over
+
+        director.ResetState(1f);
+
+        // Without the immediate draw the dwell would hold Patrol until t=30.
+        Assert.That(channel.CurrentMode, Is.Not.EqualTo(NpcMode.Patrol));
+    }
+
     [Test]
     public void SameSeed_ReplaysTheSameModeTimeline()
     {
