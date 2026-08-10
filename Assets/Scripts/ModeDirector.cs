@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.MLAgents;
 
 // Writes the commanded mode during training, standing in for the LLM selector
 // that takes the channel over at inference. Draws from RunRng on its own stream,
@@ -16,8 +17,11 @@ public class ModeDirector : MonoBehaviour
     [Tooltip("Seconds a drawn mode is held before the next draw. Kept near the LLM selector's 3-5 s decision period so the policy trains on the switch rate it will see at inference.")]
     [SerializeField] internal float minDwellSeconds = 5f;
 
+    [Tooltip("Only write the channel while the trainer is attached, so the director can't fight the LLM selector for it at inference. Untick to drive an inference run from the scripted schedule instead — the random-mode evaluation baseline, or manual inspection with a forced mode.")]
+    [SerializeField] internal bool trainingOnly = true;
+
     [Header("Manual inspection")]
-    [Tooltip("Hold one mode for the whole run instead of sampling.")]
+    [Tooltip("Hold one mode for the whole run instead of sampling. Needs trainingOnly unticked outside training.")]
     [SerializeField] internal bool useForcedMode;
     [SerializeField] internal NpcMode forcedMode = NpcMode.Hunt;
 
@@ -38,8 +42,14 @@ public class ModeDirector : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!IsWriter) return;
         Tick(Time.fixedTime);
     }
+
+    // The channel takes one writer at a time: this director during training,
+    // the LLM selector at inference. Nothing arbitrates between them, so the
+    // scripted side stands down unless it was told to run either way.
+    internal bool IsWriter => !trainingOnly || (Academy.IsInitialized && Academy.Instance.IsCommunicatorOn);
 
     // Internal seam: EditMode tests drive the schedule without play mode, the
     // same way GameManager feeds RoundClock its delta.
@@ -53,6 +63,7 @@ public class ModeDirector : MonoBehaviour
     // which would otherwise read the mode the previous episode ended on.
     public void ResetState()
     {
+        if (!IsWriter) return;
         ResetState(Time.fixedTime);
     }
 

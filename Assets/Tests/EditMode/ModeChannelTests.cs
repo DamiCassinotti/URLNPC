@@ -73,19 +73,19 @@ public class ModeChannelTests
         }));
     }
 
+    // A reset starts a new interval whatever it draws, and TimeInMode restarts
+    // with it — so it has to be announced, or a listener segmenting the
+    // timeline from the events would date the new interval to the old episode.
     [Test]
-    public void ResetState_ForcesTheModeAndAnnouncesRealChangesOnly()
+    public void ResetState_AnnouncesTheNewIntervalEvenWhenTheModeIsUnchanged()
     {
         channel.ResetState(NpcMode.Retreat);
-        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat));
         Assert.That(changes, Is.EqualTo(new[] { (NpcMode.Hunt, NpcMode.Retreat) }));
 
-        // The mode the last episode ended on can be drawn again: no event, but
-        // the write still goes through so TimeInMode restarts.
         changes.Clear();
         channel.ResetState(NpcMode.Retreat);
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat));
-        Assert.That(changes, Is.Empty);
+        Assert.That(changes, Is.EqualTo(new[] { (NpcMode.Retreat, NpcMode.Retreat) }));
     }
 
     [Test]

@@ -12,11 +12,14 @@ public class ModeChannel : MonoBehaviour
 
     public NpcMode CurrentMode { get; private set; }
 
-    // Seconds since the mode last actually changed. Re-commanding the same mode
-    // does not restart it.
+    // Seconds since the current mode interval started. Re-commanding the same
+    // mode mid-episode does not restart it; an episode reset does.
     public float TimeInMode => Time.time - modeSetTime;
 
-    // (previous, current). Only fires on a real change.
+    // (previous, current), raised once per mode interval — so a listener that
+    // segments the timeline from this event alone can never disagree with
+    // TimeInMode. An episode reset that redraws the mode already held is a new
+    // interval and reports previous == current.
     public event System.Action<NpcMode, NpcMode> ModeChanged;
 
     float modeSetTime;
@@ -46,6 +49,6 @@ public class ModeChannel : MonoBehaviour
         NpcMode previous = CurrentMode;
         CurrentMode = mode;
         modeSetTime = Time.time;
-        if (previous != mode) ModeChanged?.Invoke(previous, mode);
+        ModeChanged?.Invoke(previous, mode);
     }
 }
