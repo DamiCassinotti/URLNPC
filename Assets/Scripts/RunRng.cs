@@ -21,10 +21,11 @@ public static class RunRng
         Arena = 0,  // which arena layout is built each round
         Spawn = 1,  // NavMesh spawn-point sampling (player + enemy)
         Wander = 2, // patrol/wander waypoints
+        Mode = 3,   // commanded-mode sampling (ModeDirector)
     }
 
     const string CommandLineArg = "-runSeed";
-    const int StreamCount = 3;
+    const int StreamCount = 4;
 
     public static bool Initialized { get; private set; }
     public static int Seed { get; private set; }
