@@ -10,7 +10,7 @@ public class RewardComputer
     public float tooClosePenaltyPerStep = 0.005f;
     public float tooCloseDistance = 6f;
 
-    // action is 0=Patrol, 1=Chase, 2=Attack. distanceToTarget is a true-state
+    // action is 0=Wander, 1=Advance, 2=Attack. distanceToTarget is a true-state
     // read, which reward computation is allowed (sensory contract, issue #9).
     public float StepReward(int action, bool didShoot, bool targetInSight, float distanceToTarget)
     {

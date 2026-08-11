@@ -64,7 +64,7 @@ The `Assets/Prefabs/Characters/Enemy.prefab` GameObject must have these componen
    - **Vector Observation → Space Size:** `3` (canAttack, targetInSight, normalizedHealth)
    - **Vector Observation → Stacked Vectors:** `1`
    - **Actions → Continuous Actions:** `0`
-   - **Actions → Discrete Branches:** `1`, **Branch 0 Size:** `3` (Patrol, Chase, Attack)
+   - **Actions → Discrete Branches:** `1`, **Branch 0 Size:** `3` (Wander, Advance, Attack)
    - **Behavior Type:** `Default` while training, `Inference Only` to play vs a trained `.onnx`, `Heuristic Only` to test the scripted fallback
    - **Model:** the trained `.onnx` once you have one (leave empty for first training)
 2. **Decision Requester** (`Unity.MLAgents.DecisionRequester`)

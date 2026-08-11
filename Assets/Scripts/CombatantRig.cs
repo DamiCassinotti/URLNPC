@@ -111,7 +111,7 @@ public class CombatantRig : MonoBehaviour
         bp.TeamId = agentTeamId;
         bp.BrainParameters.VectorObservationSize = 3;   // canAttack, targetInSight, normalizedHealth
         bp.BrainParameters.NumStackedVectorObservations = 1;
-        bp.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(3); // Patrol / Chase / Attack
+        bp.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(3); // Wander / Advance / Attack
 
         // MaxStep is deliberately left at 0: EnemyAgent.Initialize forces it
         // there so the GameManager round clock is the single owner of

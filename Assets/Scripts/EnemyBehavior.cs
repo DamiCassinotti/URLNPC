@@ -9,6 +9,10 @@ public class EnemyBehavior : MonoBehaviour
     [Tooltip("Tag of the opponent this combatant hunts. \"Player\" on the enemy NPC; CombatantRig sets it to \"NPC\" when this script drives the agent-side player body.")]
     [SerializeField] public string targetTag = "Player";
     [SerializeField] float walkPointRange = 10f;
+    [Tooltip("How far ahead of itself Retreat and the strafes place their NavMesh destination each decision step. (Advance walks the whole way to the last-seen position.)")]
+    [SerializeField] float moveStepDistance = 6f;
+    [Tooltip("Seconds between cover searches. NearestCoverPoint raycasts and path-checks every cover box in the arena, so MoveToCover walks to the point it already picked in between.")]
+    [SerializeField] float coverQueryInterval = 0.25f;
     [SerializeField] float attackCooldown = 0.5f;
     [SerializeField] float sightRange = 20f;
     [SerializeField] float sightFovDegrees = 120f;
@@ -20,6 +24,16 @@ public class EnemyBehavior : MonoBehaviour
     EnemyWeapon weapon;
     Health enemyHealth;
     bool canAttack = true;
+
+    Vector3 coverPoint;
+    bool hasCoverPoint;
+    float nextCoverQueryTime;
+
+    // Final snap for a destination sitting just off the mesh; the long
+    // overshoots are trimmed by SetStepDestination before they get here.
+    const float DestinationSampleRadius = 2f;
+    // Below this a trimmed step isn't worth issuing — see SetStepDestination.
+    const float MinStepDistance = 0.5f;
 
     // The only source of target info for the NPC brain (sensory contract,
     // issue #9). Auto-added in Awake because the Enemy prefab is binary
@@ -69,25 +83,178 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    public void Chase()
+    // The movement branch's only entry point: one primitive per decision step.
+    public void Move(MovementAction action)
     {
         if (!navMeshAgent.isOnNavMesh) return;
         Perception.Refresh();
-        // Last-seen, not true position: with the player behind a wall the enemy
-        // heads for the corner it lost sight at instead of wallhack-tracking.
-        if (Perception.HasEverSeen)
+        switch (action)
         {
-            navMeshAgent.SetDestination(Perception.LastSeenPosition);
+            case MovementAction.Hold: Hold(); break;
+            case MovementAction.Advance: Advance(); break;
+            case MovementAction.Retreat: Retreat(); break;
+            case MovementAction.StrafeLeft: Strafe(-1f); break;
+            case MovementAction.StrafeRight: Strafe(1f); break;
+            case MovementAction.MoveToCover: MoveToCover(); break;
+            case MovementAction.Wander: Wander(); break;
         }
     }
 
-    public void Patrol()
+    // Stand still, watching where the target was last seen — the NPC keeps its
+    // bearing instead of drifting off the one it had when it stopped.
+    void Hold()
     {
-        if (!navMeshAgent.isOnNavMesh) return;
+        navMeshAgent.ResetPath();
+        navMeshAgent.velocity = Vector3.zero;
+        FaceBearing(PerceivedBearing());
+    }
+
+    // Close on the perceived position. Last-seen, not true position: with the
+    // player behind a wall the enemy heads for the corner it lost sight at
+    // instead of wallhack-tracking.
+    void Advance()
+    {
+        if (WanderIfBlind()) return;
+        navMeshAgent.updateRotation = true;
+        // The whole way to the remembered spot, so the solver routes around
+        // whatever is in between. A straight-line step instead would pick
+        // waypoints on the far side of a building and work the doorway.
+        SetDestinationOnNavMesh(Perception.LastSeenPosition);
+    }
+
+    void Retreat()
+    {
+        if (WanderIfBlind()) return;
+        navMeshAgent.updateRotation = true; // turn and run; watching is Hold's job
+        SetStepDestination(-PerceivedBearing());
+    }
+
+    // Sidestep while keeping the perceived position in front: a strafe that let
+    // the NavMeshAgent turn the body would swing the target out of the sight
+    // cone, which is the opposite of what circling cover is for.
+    void Strafe(float sign)
+    {
+        if (WanderIfBlind()) return;
+        Vector3 bearing = PerceivedBearing();
+        SetStepDestination(Vector3.Cross(Vector3.up, bearing) * sign);
+        FaceBearing(bearing);
+    }
+
+    // The bearing-relative primitives have no bearing before the first sighting.
+    // Running off own facing wedges the NPC nose-first into the first wall it
+    // reaches — pinned facing, so it never turns away, stops moving against the
+    // wall and so never sees anything to break out with. Cover ground to find
+    // the target instead. (Hold has no such trap: standing still is well defined
+    // with no target, so it keeps the own-facing fallback.)
+    bool WanderIfBlind()
+    {
+        if (Perception.HasEverSeen) return false;
+        Wander();
+        return true;
+    }
+
+    // Break the perceived threat's line of sight. The arena knows where its own
+    // cover is; when this layout offers none, opening distance is the fallback.
+    void MoveToCover()
+    {
+        // Nothing to hide from: no query to rate-limit, so leave the timer be —
+        // arming it here would skip the query for a full interval after the
+        // first sighting and fall back to Retreat in the open with cover about.
+        if (ArenaManager.Current == null || !Perception.HasEverSeen)
+        {
+            hasCoverPoint = false;
+        }
+        else if (Time.time >= nextCoverQueryTime)
+        {
+            // The query wants the mask of whatever blocks the *threat's* view;
+            // a human player has no sight model to read, so the NPC's own
+            // stands in. The same thing while both keep the default.
+            nextCoverQueryTime = Time.time + coverQueryInterval;
+            hasCoverPoint = ArenaManager.Current.NearestCoverPoint(
+                transform.position, Perception.LastSeenPosition, sightObstacleMask, out coverPoint);
+        }
+
+        if (!hasCoverPoint)
+        {
+            Retreat();
+            return;
+        }
+        navMeshAgent.updateRotation = true;
+        SetDestinationOnNavMesh(coverPoint);
+    }
+
+    void Wander()
+    {
+        navMeshAgent.updateRotation = true;
         if (navMeshAgent.remainingDistance < 0.5f || !navMeshAgent.hasPath)
         {
-            navMeshAgent.SetDestination(GetNextDestination());
+            SetDestinationOnNavMesh(GetNextDestination());
         }
+    }
+
+    // Where the NPC believes the target is, as a flat unit vector. Only Hold
+    // reads this before the first sighting (it faces its own way and stands
+    // still); the moving primitives Wander instead of running off own facing.
+    Vector3 PerceivedBearing()
+    {
+        if (Perception.HasEverSeen)
+        {
+            Vector3 toTarget = Perception.LastSeenPosition - transform.position;
+            toTarget.y = 0f;
+            if (toTarget.sqrMagnitude > 1e-4f) return toTarget.normalized;
+        }
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        return forward.sqrMagnitude > 1e-4f ? forward.normalized : Vector3.forward;
+    }
+
+    void FaceBearing(Vector3 bearing)
+    {
+        // The agent would rewrite the rotation from its own velocity next tick.
+        navMeshAgent.updateRotation = false;
+        transform.rotation = Quaternion.LookRotation(bearing, Vector3.up);
+    }
+
+    // A step aims at open ground rather than a known goal, so one that crosses
+    // a wall is trimmed back to the last point on the mesh along it. Untrimmed
+    // it maps to whatever mesh sits nearest the overshoot, which can be on the
+    // far side of the wall — turning a sidestep into a walk around the block.
+    void SetStepDestination(Vector3 direction)
+    {
+        // Snap the origin on-mesh first: the Enemy prefab lifts the body a metre
+        // by its NavMeshAgent base offset, so transform.position sits above the
+        // surface and NavMesh.Raycast off it maps unpredictably. Same guard as
+        // ArenaManager.NearestCoverPoint and SetDestinationOnNavMesh.
+        Vector3 origin = transform.position;
+        if (NavMesh.SamplePosition(origin, out NavMeshHit onMesh, DestinationSampleRadius, NavMesh.AllAreas))
+        {
+            origin = onMesh.position;
+        }
+        Vector3 point = origin + direction * moveStepDistance;
+        if (NavMesh.Raycast(origin, point, out NavMeshHit edge, NavMesh.AllAreas))
+        {
+            // Already on the boundary: the trimmed step is the agent's own
+            // position, and issuing that as a destination pins it there.
+            // Nowhere to go this way, so stop — carrying on would run out the
+            // destination an earlier primitive set, and a cornered Retreat
+            // would walk the last Advance straight at what it is backing from.
+            if (edge.distance < MinStepDistance)
+            {
+                navMeshAgent.ResetPath();
+                return;
+            }
+            point = edge.position;
+        }
+        SetDestinationOnNavMesh(point);
+    }
+
+    void SetDestinationOnNavMesh(Vector3 point)
+    {
+        if (NavMesh.SamplePosition(point, out NavMeshHit hit, DestinationSampleRadius, NavMesh.AllAreas))
+        {
+            point = hit.position;
+        }
+        navMeshAgent.SetDestination(point);
     }
 
     Vector3 GetNextDestination()
@@ -189,8 +356,16 @@ public class EnemyBehavior : MonoBehaviour
         StopAllCoroutines();
         canAttack = true;
         DidShoot = false;
+        hasCoverPoint = false;
+        nextCoverQueryTime = 0f;
         if (Perception != null) Perception.Forget();
-        if (navMeshAgent != null && navMeshAgent.isOnNavMesh) navMeshAgent.ResetPath();
+        if (navMeshAgent != null)
+        {
+            // Hold/the strafes park it on manual rotation; the next episode
+            // starts on the agent's own steering again.
+            navMeshAgent.updateRotation = true;
+            if (navMeshAgent.isOnNavMesh) navMeshAgent.ResetPath();
+        }
         InitAtRandomPosition();
     }
 
