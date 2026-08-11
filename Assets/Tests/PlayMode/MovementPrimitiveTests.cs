@@ -326,6 +326,37 @@ public class MovementPrimitiveTests : PlayModeTestBase
     }
 
     [UnityTest]
+    public IEnumerator MoveToCover_QueriesTheFrameItFirstSeesTheThreat()
+    {
+        arena = CreateArena(0);
+        Assert.That(FindCoverScenario(arena, out Vector3 from, out Vector3 threat), Is.True,
+            "the Courtyard should offer a visible-threat/cover-nearby pair");
+
+        // Start blind, facing away from the threat, and command MoveToCover:
+        // the query short-circuits on "nothing seen". The rate limiter must not
+        // then swallow the query on the very next step once the threat appears.
+        yield return PlaceCombatants(from, threat, facing: from + (from - threat));
+        Assert.That(behavior.Perception.HasEverSeen, Is.False, "sanity: the threat starts unseen");
+
+        behavior.Move(MovementAction.MoveToCover); // arms nothing; there is no query to rate-limit
+        yield return new WaitForFixedUpdate();
+
+        FaceTowards(threat); // now the threat is in the cone
+        behavior.Perception.Refresh();
+        Assert.That(behavior.Perception.CurrentlyVisible, Is.True, "sanity: the threat is now visible");
+
+        behavior.Move(MovementAction.MoveToCover);
+        yield return new WaitForFixedUpdate();
+
+        // Retreat's fallback destination is a step into the open; a real cover
+        // point has the threat's LOS to it broken. That tells them apart, and
+        // it is only reachable if the query ran this frame rather than sitting
+        // out the interval a no-sighting MoveToCover would otherwise have armed.
+        Assert.That(LosBlocked(threat, nav.destination), Is.True,
+            "the cover query must run the frame the threat is first seen, not fall back to Retreat");
+    }
+
+    [UnityTest]
     public IEnumerator MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover()
     {
         yield return BuildScene();

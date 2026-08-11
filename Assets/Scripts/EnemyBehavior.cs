@@ -9,7 +9,7 @@ public class EnemyBehavior : MonoBehaviour
     [Tooltip("Tag of the opponent this combatant hunts. \"Player\" on the enemy NPC; CombatantRig sets it to \"NPC\" when this script drives the agent-side player body.")]
     [SerializeField] public string targetTag = "Player";
     [SerializeField] float walkPointRange = 10f;
-    [Tooltip("How far ahead of itself Advance/Retreat/the strafes place their NavMesh destination each decision step.")]
+    [Tooltip("How far ahead of itself Retreat and the strafes place their NavMesh destination each decision step. (Advance walks the whole way to the last-seen position.)")]
     [SerializeField] float moveStepDistance = 6f;
     [Tooltip("Seconds between cover searches. NearestCoverPoint raycasts and path-checks every cover box in the arena, so MoveToCover walks to the point it already picked in between.")]
     [SerializeField] float coverQueryInterval = 0.25f;
@@ -156,16 +156,21 @@ public class EnemyBehavior : MonoBehaviour
     // cover is; when this layout offers none, opening distance is the fallback.
     void MoveToCover()
     {
-        if (Time.time >= nextCoverQueryTime)
+        // Nothing to hide from: no query to rate-limit, so leave the timer be —
+        // arming it here would skip the query for a full interval after the
+        // first sighting and fall back to Retreat in the open with cover about.
+        if (ArenaManager.Current == null || !Perception.HasEverSeen)
+        {
+            hasCoverPoint = false;
+        }
+        else if (Time.time >= nextCoverQueryTime)
         {
             // The query wants the mask of whatever blocks the *threat's* view;
             // a human player has no sight model to read, so the NPC's own
             // stands in. The same thing while both keep the default.
             nextCoverQueryTime = Time.time + coverQueryInterval;
-            hasCoverPoint = ArenaManager.Current != null
-                && Perception.HasEverSeen
-                && ArenaManager.Current.NearestCoverPoint(
-                    transform.position, Perception.LastSeenPosition, sightObstacleMask, out coverPoint);
+            hasCoverPoint = ArenaManager.Current.NearestCoverPoint(
+                transform.position, Perception.LastSeenPosition, sightObstacleMask, out coverPoint);
         }
 
         if (!hasCoverPoint)
