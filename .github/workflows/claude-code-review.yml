@@ -53,7 +53,7 @@ jobs:
           # without Task it collapses to a single serial pass; it also needs
           # git for the full SHAs its code links require.
           claude_args: |
-            --model opus
+            --model sonnet
             --allowedTools "Task,Read,Grep,Glob,Bash(gh:*),Bash(git:*)"
           prompt: |
             # Step 1 — Check issue linkage (warn only, never stop)
