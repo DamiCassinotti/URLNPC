@@ -47,13 +47,14 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          # The plugin's own frontmatter allows only a handful of `gh pr`/`gh
-          # issue` subcommands — no Read/Grep/Glob. Its CLAUDE.md-compliance
-          # agents are handed file *paths* to read, so without these the run
-          # burns dozens of permission denials and reports "no issues found".
+          # This list REPLACES the defaults, it does not add to them — whatever
+          # is missing here is denied. The plugin is built on subagent fan-out
+          # (triage, four parallel reviewers, one validator per finding), so
+          # without Task it collapses to a single serial pass; it also needs
+          # git for the full SHAs its code links require.
           claude_args: |
             --model opus
-            --allowedTools "Read,Grep,Glob,Bash(gh:*)"
+            --allowedTools "Task,Read,Grep,Glob,Bash(gh:*),Bash(git:*)"
           prompt: |
             # Step 1 — Check issue linkage (warn only, never stop)
             The convention here is that a PR names its issue in the branch
@@ -102,8 +103,16 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           ACTION_CONCLUSION: ${{ steps.claude-review.outputs.conclusion }}
+          EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
         run: |
           set -uo pipefail
+
+          # A denial means a tool the reviewer wanted is missing from
+          # --allowedTools, which silently guts the review rather than failing
+          # it. Twice now that has looked like "the reviewer found nothing".
+          denials=$(jq -r '[.. | objects | select(has("permission_denials_count"))
+            | .permission_denials_count] | last // 0' "$EXECUTION_FILE" 2>/dev/null || echo 0)
+          [ -n "$denials" ] || denials=0
 
           inline=$(gh api "repos/$REPO/pulls/$PR/comments" --paginate \
             --jq '[.[] | select(.user.login == "claude[bot]" and .commit_id == env.HEAD_SHA)] | length' || echo 0)
@@ -128,6 +137,11 @@ jobs:
             state=success
             title="No findings on this revision"
             summary="Claude reviewed $HEAD_SHA and posted no inline findings."
+          fi
+
+          if [ "$denials" -gt 0 ]; then
+            summary="$summary"$'\n\n'":warning: $denials permission denial(s) — a tool the reviewer needed is missing from \`--allowedTools\`, so this review ran degraded."
+            echo "::warning::$denials permission denial(s) during review — check --allowedTools in this workflow."
           fi
 
           echo "### $title" >> "$GITHUB_STEP_SUMMARY"
