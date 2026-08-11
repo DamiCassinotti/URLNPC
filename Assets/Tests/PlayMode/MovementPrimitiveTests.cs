@@ -42,7 +42,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
         return manager;
     }
 
-    IEnumerator PlaceCombatants(Vector3 enemyAt, Vector3 playerAt)
+    IEnumerator PlaceCombatants(Vector3 enemyAt, Vector3 playerAt, Vector3? facing = null)
     {
         // No collider on the player: with nothing in the way the sight ray
         // reports visible exactly as it would for a capsule, and the test's own
@@ -60,7 +60,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
         enemyGo.SetActive(true);  // Awake auto-adds PerceptionMemory
 
         Assert.That(nav.Warp(SnapToNavMesh(enemyAt)), Is.True, $"the enemy must start on the NavMesh at {enemyAt}");
-        FaceTowards(playerAt);
+        FaceTowards(facing ?? playerAt);
         Physics.SyncTransforms();
         yield return new WaitForFixedUpdate();
 
@@ -166,6 +166,44 @@ public class MovementPrimitiveTests : PlayModeTestBase
 
         Assert.That(FlatDistance(EnemyPos, PlayerStart), Is.GreaterThan(before + 1f),
             "Retreat must open the gap to the target");
+    }
+
+    [UnityTest]
+    public IEnumerator Retreat_KeepsOpeningDistance_WithNothingSeen()
+    {
+        arena = CreateArena(0);
+        // Nothing seen, so the bearing is own facing: if the agent is allowed
+        // to turn into the retreat, the next step points back where it came
+        // from and it ping-pongs on the spot instead of getting away.
+        yield return PlaceCombatants(new Vector3(16f, 0f, -14f), new Vector3(0f, 0f, 18f),
+            facing: new Vector3(20f, 0f, -14f));
+        Assert.That(behavior.Perception.HasEverSeen, Is.False, "sanity: nothing seen");
+
+        Vector3 previous = EnemyPos;
+        for (int leg = 0; leg < 3; leg++)
+        {
+            yield return Drive(MovementAction.Retreat, 1f);
+            Assert.That(EnemyPos.x, Is.LessThan(previous.x - 0.5f),
+                $"leg {leg}: the retreat reversed instead of carrying on west");
+            previous = EnemyPos;
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator Retreat_AgainstTheArenaEdge_StillBacksAway()
+    {
+        arena = CreateArena(0);
+        // Backed up against the south wall with the target to the north, so a
+        // full retreat step lands several metres past the floor edge.
+        yield return PlaceCombatants(new Vector3(0f, 0f, -18f), new Vector3(0f, 0f, -9f));
+        Assert.That(behavior.Perception.HasEverSeen, Is.True, "sanity: the target is visible");
+
+        yield return Drive(MovementAction.Advance, 0.4f); // give it a path north to abandon
+        Vector3 turnedAt = EnemyPos;
+        yield return Drive(MovementAction.Retreat, 1f);
+
+        Assert.That(EnemyPos.z, Is.LessThan(turnedAt.z - 0.5f),
+            "a step that overshoots the arena edge must still turn the agent around");
     }
 
     [UnityTest]

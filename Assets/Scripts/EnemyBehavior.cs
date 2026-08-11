@@ -29,8 +29,8 @@ public class EnemyBehavior : MonoBehaviour
     bool hasCoverPoint;
     float nextCoverQueryTime;
 
-    // A destination computed from a step can land inside a wall or past the
-    // floor edge; it is snapped back onto the mesh within this radius.
+    // Final snap for a destination sitting just off the mesh; the long
+    // overshoots are trimmed by SetStepDestination before they get here.
     const float DestinationSampleRadius = 2f;
 
     // The only source of target info for the NPC brain (sensory contract,
@@ -84,6 +84,8 @@ public class EnemyBehavior : MonoBehaviour
     // The movement branch's only entry point: one primitive per decision step.
     public void Move(MovementAction action)
     {
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
         switch (action)
         {
             case MovementAction.Hold: Hold(); break;
@@ -100,8 +102,6 @@ public class EnemyBehavior : MonoBehaviour
     // bearing instead of drifting off the one it had when it stopped.
     void Hold()
     {
-        if (!navMeshAgent.isOnNavMesh) return;
-        Perception.Refresh();
         navMeshAgent.ResetPath();
         navMeshAgent.velocity = Vector3.zero;
         FaceBearing(PerceivedBearing());
@@ -112,27 +112,27 @@ public class EnemyBehavior : MonoBehaviour
     // instead of wallhack-tracking.
     void Advance()
     {
-        if (!navMeshAgent.isOnNavMesh) return;
-        Perception.Refresh();
         navMeshAgent.updateRotation = true;
-        Vector3 bearing = PerceivedBearing();
-        float step = moveStepDistance;
         if (Perception.HasEverSeen)
         {
-            // Don't walk past the target when it is nearer than a full step.
-            Vector3 toTarget = Perception.LastSeenPosition - transform.position;
-            toTarget.y = 0f;
-            step = Mathf.Min(step, toTarget.magnitude);
+            // The whole way to the remembered spot, so the solver routes around
+            // whatever is in between. A straight-line step instead would pick
+            // waypoints on the far side of a building and work the doorway.
+            SetDestinationOnNavMesh(Perception.LastSeenPosition);
+            return;
         }
-        SetDestinationOnNavMesh(transform.position + bearing * step);
+        SetStepDestination(PerceivedBearing());
     }
 
     void Retreat()
     {
-        if (!navMeshAgent.isOnNavMesh) return;
-        Perception.Refresh();
-        navMeshAgent.updateRotation = true;
-        SetDestinationOnNavMesh(transform.position - PerceivedBearing() * moveStepDistance);
+        Vector3 bearing = PerceivedBearing();
+        // With nothing seen the bearing is own facing, so letting the agent
+        // turn into the retreat flips the direction on the next decision step
+        // and it ping-pongs on the spot. Keep the facing, back away from it.
+        if (Perception.HasEverSeen) navMeshAgent.updateRotation = true;
+        else FaceBearing(bearing);
+        SetStepDestination(-bearing);
     }
 
     // Sidestep while keeping the perceived position in front: a strafe that let
@@ -140,11 +140,8 @@ public class EnemyBehavior : MonoBehaviour
     // cone, which is the opposite of what circling cover is for.
     void Strafe(float sign)
     {
-        if (!navMeshAgent.isOnNavMesh) return;
-        Perception.Refresh();
         Vector3 bearing = PerceivedBearing();
-        Vector3 right = Vector3.Cross(Vector3.up, bearing);
-        SetDestinationOnNavMesh(transform.position + right * (sign * moveStepDistance));
+        SetStepDestination(Vector3.Cross(Vector3.up, bearing) * sign);
         FaceBearing(bearing);
     }
 
@@ -152,9 +149,6 @@ public class EnemyBehavior : MonoBehaviour
     // cover is; when this layout offers none, opening distance is the fallback.
     void MoveToCover()
     {
-        if (!navMeshAgent.isOnNavMesh) return;
-        Perception.Refresh();
-
         if (Time.time >= nextCoverQueryTime)
         {
             nextCoverQueryTime = Time.time + coverQueryInterval;
@@ -175,7 +169,6 @@ public class EnemyBehavior : MonoBehaviour
 
     void Wander()
     {
-        if (!navMeshAgent.isOnNavMesh) return;
         navMeshAgent.updateRotation = true;
         if (navMeshAgent.remainingDistance < 0.5f || !navMeshAgent.hasPath)
         {
@@ -205,6 +198,20 @@ public class EnemyBehavior : MonoBehaviour
         // The agent would rewrite the rotation from its own velocity next tick.
         navMeshAgent.updateRotation = false;
         transform.rotation = Quaternion.LookRotation(bearing, Vector3.up);
+    }
+
+    // A step aims at open ground rather than a known goal, so one that crosses
+    // a wall is trimmed back to the last point on the mesh along it. Untrimmed
+    // it maps to whatever mesh sits nearest the overshoot, which can be on the
+    // far side of the wall — turning a sidestep into a walk around the block.
+    void SetStepDestination(Vector3 direction)
+    {
+        Vector3 point = transform.position + direction * moveStepDistance;
+        if (NavMesh.Raycast(transform.position, point, out NavMeshHit edge, NavMesh.AllAreas))
+        {
+            point = edge.position;
+        }
+        SetDestinationOnNavMesh(point);
     }
 
     void SetDestinationOnNavMesh(Vector3 point)
