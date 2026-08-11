@@ -50,12 +50,14 @@ public class RunRngTests
         int[] arena1 = DrawInts(RunRng.Stream.Arena, 20);
         int[] spawn1 = DrawInts(RunRng.Stream.Spawn, 20);
         float[] wander1 = DrawFloats(RunRng.Stream.Wander, 20);
+        int[] mode1 = DrawInts(RunRng.Stream.Mode, 20);
 
         RunRng.ResetForNewRun();
         RunRng.EnsureInitialized(42);
         Assert.That(DrawInts(RunRng.Stream.Arena, 20), Is.EqualTo(arena1));
         Assert.That(DrawInts(RunRng.Stream.Spawn, 20), Is.EqualTo(spawn1));
         Assert.That(DrawFloats(RunRng.Stream.Wander, 20), Is.EqualTo(wander1));
+        Assert.That(DrawInts(RunRng.Stream.Mode, 20), Is.EqualTo(mode1));
     }
 
     [Test]

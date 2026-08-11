@@ -106,7 +106,7 @@ The on-screen win/loss tally also survives quitting: `CounterData` persists the 
 
 ### Reproducible evaluation runs
 
-Arena selection, spawn sampling and wander waypoints are driven by a single seedable RNG (`RunRng`). To make two runs comparable, fix the seed either way:
+Arena selection, spawn sampling, wander waypoints and commanded-mode sampling are driven by a single seedable RNG (`RunRng`). To make two runs comparable, fix the seed either way:
 
 - **Inspector:** set **Run Seed** on the `ArenaManager` component (0 = random each run).
 - **Command line (standalone build / batch mode):** pass `-runSeed <int>` — this overrides the Inspector value.
