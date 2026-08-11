@@ -123,14 +123,16 @@ public class EnemyAgent : Agent
         // code, not a policy input (sensory contract, issue #9).
         float distanceToTarget = behavior.DistanceToTarget();
 
+        // Still the old three-action branch; the movement branch that reaches
+        // the rest of MovementAction lands with the interface freeze (#43).
         int action = actions.DiscreteActions[0];
         switch (action)
         {
             case 0:
-                behavior.Patrol();
+                behavior.Move(MovementAction.Wander);
                 break;
             case 1:
-                behavior.Chase();
+                behavior.Move(MovementAction.Advance);
                 break;
             case 2:
                 behavior.Attack();

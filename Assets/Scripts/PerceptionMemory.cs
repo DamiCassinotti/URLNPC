@@ -36,7 +36,7 @@ public class PerceptionMemory : MonoBehaviour
         Refresh();
     }
 
-    // Also called explicitly from EnemyBehavior.Chase/Attack so ML-Agents
+    // Also called explicitly from EnemyBehavior.Move/Attack so ML-Agents
     // decision steps, which fire from FixedUpdate, never act on a frame-stale
     // snapshot.
     public void Refresh()

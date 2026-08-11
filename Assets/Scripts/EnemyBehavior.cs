@@ -9,6 +9,10 @@ public class EnemyBehavior : MonoBehaviour
     [Tooltip("Tag of the opponent this combatant hunts. \"Player\" on the enemy NPC; CombatantRig sets it to \"NPC\" when this script drives the agent-side player body.")]
     [SerializeField] public string targetTag = "Player";
     [SerializeField] float walkPointRange = 10f;
+    [Tooltip("How far ahead of itself Advance/Retreat/the strafes place their NavMesh destination each decision step.")]
+    [SerializeField] float moveStepDistance = 6f;
+    [Tooltip("Seconds between cover searches. NearestCoverPoint raycasts and path-checks every cover box in the arena, so MoveToCover walks to the point it already picked in between.")]
+    [SerializeField] float coverQueryInterval = 0.25f;
     [SerializeField] float attackCooldown = 0.5f;
     [SerializeField] float sightRange = 20f;
     [SerializeField] float sightFovDegrees = 120f;
@@ -20,6 +24,14 @@ public class EnemyBehavior : MonoBehaviour
     EnemyWeapon weapon;
     Health enemyHealth;
     bool canAttack = true;
+
+    Vector3 coverPoint;
+    bool hasCoverPoint;
+    float nextCoverQueryTime;
+
+    // A destination computed from a step can land inside a wall or past the
+    // floor edge; it is snapped back onto the mesh within this radius.
+    const float DestinationSampleRadius = 2f;
 
     // The only source of target info for the NPC brain (sensory contract,
     // issue #9). Auto-added in Awake because the Enemy prefab is binary
@@ -69,25 +81,139 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    public void Chase()
+    // The movement branch's only entry point: one primitive per decision step.
+    public void Move(MovementAction action)
     {
-        if (!navMeshAgent.isOnNavMesh) return;
-        Perception.Refresh();
-        // Last-seen, not true position: with the player behind a wall the enemy
-        // heads for the corner it lost sight at instead of wallhack-tracking.
-        if (Perception.HasEverSeen)
+        switch (action)
         {
-            navMeshAgent.SetDestination(Perception.LastSeenPosition);
+            case MovementAction.Hold: Hold(); break;
+            case MovementAction.Advance: Advance(); break;
+            case MovementAction.Retreat: Retreat(); break;
+            case MovementAction.StrafeLeft: Strafe(-1f); break;
+            case MovementAction.StrafeRight: Strafe(1f); break;
+            case MovementAction.MoveToCover: MoveToCover(); break;
+            case MovementAction.Wander: Wander(); break;
         }
     }
 
-    public void Patrol()
+    // Stand still, watching where the target was last seen — the NPC keeps its
+    // bearing instead of drifting off the one it had when it stopped.
+    void Hold()
     {
         if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+        navMeshAgent.ResetPath();
+        navMeshAgent.velocity = Vector3.zero;
+        FaceBearing(PerceivedBearing());
+    }
+
+    // Close on the perceived position. Last-seen, not true position: with the
+    // player behind a wall the enemy heads for the corner it lost sight at
+    // instead of wallhack-tracking.
+    void Advance()
+    {
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+        navMeshAgent.updateRotation = true;
+        Vector3 bearing = PerceivedBearing();
+        float step = moveStepDistance;
+        if (Perception.HasEverSeen)
+        {
+            // Don't walk past the target when it is nearer than a full step.
+            Vector3 toTarget = Perception.LastSeenPosition - transform.position;
+            toTarget.y = 0f;
+            step = Mathf.Min(step, toTarget.magnitude);
+        }
+        SetDestinationOnNavMesh(transform.position + bearing * step);
+    }
+
+    void Retreat()
+    {
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+        navMeshAgent.updateRotation = true;
+        SetDestinationOnNavMesh(transform.position - PerceivedBearing() * moveStepDistance);
+    }
+
+    // Sidestep while keeping the perceived position in front: a strafe that let
+    // the NavMeshAgent turn the body would swing the target out of the sight
+    // cone, which is the opposite of what circling cover is for.
+    void Strafe(float sign)
+    {
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+        Vector3 bearing = PerceivedBearing();
+        Vector3 right = Vector3.Cross(Vector3.up, bearing);
+        SetDestinationOnNavMesh(transform.position + right * (sign * moveStepDistance));
+        FaceBearing(bearing);
+    }
+
+    // Break the perceived threat's line of sight. The arena knows where its own
+    // cover is; when this layout offers none, opening distance is the fallback.
+    void MoveToCover()
+    {
+        if (!navMeshAgent.isOnNavMesh) return;
+        Perception.Refresh();
+
+        if (Time.time >= nextCoverQueryTime)
+        {
+            nextCoverQueryTime = Time.time + coverQueryInterval;
+            hasCoverPoint = ArenaManager.Current != null
+                && Perception.HasEverSeen
+                && ArenaManager.Current.NearestCoverPoint(
+                    transform.position, Perception.LastSeenPosition, sightObstacleMask, out coverPoint);
+        }
+
+        if (!hasCoverPoint)
+        {
+            Retreat();
+            return;
+        }
+        navMeshAgent.updateRotation = true;
+        SetDestinationOnNavMesh(coverPoint);
+    }
+
+    void Wander()
+    {
+        if (!navMeshAgent.isOnNavMesh) return;
+        navMeshAgent.updateRotation = true;
         if (navMeshAgent.remainingDistance < 0.5f || !navMeshAgent.hasPath)
         {
-            navMeshAgent.SetDestination(GetNextDestination());
+            SetDestinationOnNavMesh(GetNextDestination());
         }
+    }
+
+    // Where the NPC believes the target is, as a flat unit vector. Before the
+    // first sighting there is no bearing to work from, so the primitives run
+    // off own facing rather than standing still — otherwise most of the branch
+    // is a no-op at episode start and the policy gets no signal on it.
+    Vector3 PerceivedBearing()
+    {
+        if (Perception.HasEverSeen)
+        {
+            Vector3 toTarget = Perception.LastSeenPosition - transform.position;
+            toTarget.y = 0f;
+            if (toTarget.sqrMagnitude > 1e-4f) return toTarget.normalized;
+        }
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        return forward.sqrMagnitude > 1e-4f ? forward.normalized : Vector3.forward;
+    }
+
+    void FaceBearing(Vector3 bearing)
+    {
+        // The agent would rewrite the rotation from its own velocity next tick.
+        navMeshAgent.updateRotation = false;
+        transform.rotation = Quaternion.LookRotation(bearing, Vector3.up);
+    }
+
+    void SetDestinationOnNavMesh(Vector3 point)
+    {
+        if (NavMesh.SamplePosition(point, out NavMeshHit hit, DestinationSampleRadius, NavMesh.AllAreas))
+        {
+            point = hit.position;
+        }
+        navMeshAgent.SetDestination(point);
     }
 
     Vector3 GetNextDestination()
@@ -189,8 +315,16 @@ public class EnemyBehavior : MonoBehaviour
         StopAllCoroutines();
         canAttack = true;
         DidShoot = false;
+        hasCoverPoint = false;
+        nextCoverQueryTime = 0f;
         if (Perception != null) Perception.Forget();
-        if (navMeshAgent != null && navMeshAgent.isOnNavMesh) navMeshAgent.ResetPath();
+        if (navMeshAgent != null)
+        {
+            // Hold/the strafes park it on manual rotation; the next episode
+            // starts on the agent's own steering again.
+            navMeshAgent.updateRotation = true;
+            if (navMeshAgent.isOnNavMesh) navMeshAgent.ResetPath();
+        }
         InitAtRandomPosition();
     }
 

@@ -117,7 +117,7 @@ public class CombatantRigTests : PlayModeTestBase
             "canAttack, targetInSight, normalizedHealth");
         Assert.That(bp.BrainParameters.NumStackedVectorObservations, Is.EqualTo(1));
         Assert.That(bp.BrainParameters.ActionSpec.NumDiscreteActions, Is.EqualTo(1),
-            "one discrete branch: Patrol / Chase / Attack");
+            "one discrete branch: Wander / Advance / Attack");
         Assert.That(bp.BrainParameters.ActionSpec.BranchSizes[0], Is.EqualTo(3));
 
         var requester = body.GetComponent<DecisionRequester>();
