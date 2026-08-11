@@ -114,17 +114,8 @@ public class EnemyBehavior : MonoBehaviour
     // instead of wallhack-tracking.
     void Advance()
     {
+        if (WanderIfBlind()) return;
         navMeshAgent.updateRotation = true;
-        if (!Perception.HasEverSeen)
-        {
-            // Nothing to close on: spawns are further apart than sight range,
-            // so this is every episode's opening. Stepping along own facing
-            // would bury the NPC nose-first in the first wall it meets, where
-            // it stops moving, therefore stops turning, therefore never sees
-            // anything to break out with — cover ground instead.
-            Wander();
-            return;
-        }
         // The whole way to the remembered spot, so the solver routes around
         // whatever is in between. A straight-line step instead would pick
         // waypoints on the far side of a building and work the doorway.
@@ -133,13 +124,9 @@ public class EnemyBehavior : MonoBehaviour
 
     void Retreat()
     {
-        Vector3 bearing = PerceivedBearing();
-        // With nothing seen the bearing is own facing, so letting the agent
-        // turn into the retreat flips the direction on the next decision step
-        // and it ping-pongs on the spot. Keep the facing, back away from it.
-        if (Perception.HasEverSeen) navMeshAgent.updateRotation = true;
-        else FaceBearing(bearing);
-        SetStepDestination(-bearing);
+        if (WanderIfBlind()) return;
+        navMeshAgent.updateRotation = true; // turn and run; watching is Hold's job
+        SetStepDestination(-PerceivedBearing());
     }
 
     // Sidestep while keeping the perceived position in front: a strafe that let
@@ -147,9 +134,23 @@ public class EnemyBehavior : MonoBehaviour
     // cone, which is the opposite of what circling cover is for.
     void Strafe(float sign)
     {
+        if (WanderIfBlind()) return;
         Vector3 bearing = PerceivedBearing();
         SetStepDestination(Vector3.Cross(Vector3.up, bearing) * sign);
         FaceBearing(bearing);
+    }
+
+    // The bearing-relative primitives have no bearing before the first sighting.
+    // Running off own facing wedges the NPC nose-first into the first wall it
+    // reaches — pinned facing, so it never turns away, stops moving against the
+    // wall and so never sees anything to break out with. Cover ground to find
+    // the target instead. (Hold has no such trap: standing still is well defined
+    // with no target, so it keeps the own-facing fallback.)
+    bool WanderIfBlind()
+    {
+        if (Perception.HasEverSeen) return false;
+        Wander();
+        return true;
     }
 
     // Break the perceived threat's line of sight. The arena knows where its own
@@ -191,11 +192,9 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    // Where the NPC believes the target is, as a flat unit vector. Before the
-    // first sighting there is no bearing to work from, so Hold, Retreat and the
-    // strafes run off own facing rather than standing still — otherwise half
-    // the branch is a no-op at episode start and the policy gets no signal on
-    // it. (Advance is the exception: it wanders instead.)
+    // Where the NPC believes the target is, as a flat unit vector. Only Hold
+    // reads this before the first sighting (it faces its own way and stands
+    // still); the moving primitives Wander instead of running off own facing.
     Vector3 PerceivedBearing()
     {
         if (Perception.HasEverSeen)
@@ -222,8 +221,17 @@ public class EnemyBehavior : MonoBehaviour
     // far side of the wall — turning a sidestep into a walk around the block.
     void SetStepDestination(Vector3 direction)
     {
-        Vector3 point = transform.position + direction * moveStepDistance;
-        if (NavMesh.Raycast(transform.position, point, out NavMeshHit edge, NavMesh.AllAreas))
+        // Snap the origin on-mesh first: the Enemy prefab lifts the body a metre
+        // by its NavMeshAgent base offset, so transform.position sits above the
+        // surface and NavMesh.Raycast off it maps unpredictably. Same guard as
+        // ArenaManager.NearestCoverPoint and SetDestinationOnNavMesh.
+        Vector3 origin = transform.position;
+        if (NavMesh.SamplePosition(origin, out NavMeshHit onMesh, DestinationSampleRadius, NavMesh.AllAreas))
+        {
+            origin = onMesh.position;
+        }
+        Vector3 point = origin + direction * moveStepDistance;
+        if (NavMesh.Raycast(origin, point, out NavMeshHit edge, NavMesh.AllAreas))
         {
             // Already on the boundary: the trimmed step is the agent's own
             // position, and issuing that as a destination pins it there.

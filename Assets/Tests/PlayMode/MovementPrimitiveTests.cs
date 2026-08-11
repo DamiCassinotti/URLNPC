@@ -42,7 +42,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
         return manager;
     }
 
-    IEnumerator PlaceCombatants(Vector3 enemyAt, Vector3 playerAt, Vector3? facing = null)
+    IEnumerator PlaceCombatants(Vector3 enemyAt, Vector3 playerAt, Vector3? facing = null, float baseOffset = 0f)
     {
         // No collider on the player: with nothing in the way the sight ray
         // reports visible exactly as it would for a capsule, and the test's own
@@ -54,6 +54,9 @@ public class MovementPrimitiveTests : PlayModeTestBase
         enemyGo = Track(new GameObject("TestEnemy"));
         enemyGo.SetActive(false);
         nav = enemyGo.AddComponent<NavMeshAgent>();
+        // The shipped Enemy prefab lifts the body a metre off the mesh; pass 1
+        // to reproduce that when a query's origin snapping is under test.
+        nav.baseOffset = baseOffset;
         behavior = enemyGo.AddComponent<EnemyBehavior>();
         behavior.enabled = false; // skip Start's random respawn: the test picks the spot
         behavior.target = player.transform;
@@ -168,42 +171,47 @@ public class MovementPrimitiveTests : PlayModeTestBase
             "Retreat must open the gap to the target");
     }
 
+    // Every bearing-relative primitive with nothing seen — the state every
+    // episode opens in, spawns being further apart than sight range. There is
+    // no bearing to move along, and running off own facing would bury the NPC
+    // nose-first in the first wall it meets, where it stops moving, stops
+    // turning and never sees anything to break out with. They must Wander.
     [UnityTest]
-    public IEnumerator Advance_WithNothingSeen_DoesNotWedgeIntoAWall()
+    public IEnumerator BlindMovingPrimitive_WandersInsteadOfWedging(
+        [Values(MovementAction.Advance, MovementAction.Retreat,
+                MovementAction.StrafeLeft, MovementAction.StrafeRight)] MovementAction action)
     {
         arena = CreateArena(0);
-        // Nose to the south wall with nothing seen — the state every episode
-        // opens in, since spawns are further apart than sight range. Walking
-        // on own facing here ends against the wall, and an NPC that stops
-        // moving stops turning and can never see anything to break out with.
+        // Nose to the south wall, so running off own facing has a wall in the
+        // way whichever direction the primitive steps relative to it.
         yield return PlaceCombatants(new Vector3(0f, 0f, -18.5f), new Vector3(0f, 0f, 18f),
             facing: new Vector3(0f, 0f, -25f));
         Assert.That(behavior.Perception.HasEverSeen, Is.False, "sanity: nothing seen");
 
-        yield return Drive(MovementAction.Advance, 2.5f);
+        yield return Drive(action, 2.5f);
 
-        Assert.That(travelled, Is.GreaterThan(3f), "Advance with no target must keep covering ground");
+        Assert.That(travelled, Is.GreaterThan(3f), $"{action} with no target must cover ground to find one");
     }
 
+    // The shipped Enemy prefab carries NavMeshAgent baseOffset 1, so its
+    // transform sits a metre above the mesh — the config SetStepDestination
+    // snaps its raycast origin for. This pins that the stepping primitives trim
+    // correctly against a wall in that configuration (the test rig otherwise
+    // runs at baseOffset 0, on the mesh).
     [UnityTest]
-    public IEnumerator Retreat_KeepsOpeningDistance_WithNothingSeen()
+    public IEnumerator SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh()
     {
         arena = CreateArena(0);
-        // Nothing seen, so the bearing is own facing: if the agent is allowed
-        // to turn into the retreat, the next step points back where it came
-        // from and it ping-pongs on the spot instead of getting away.
-        yield return PlaceCombatants(new Vector3(16f, 0f, -14f), new Vector3(0f, 0f, 18f),
-            facing: new Vector3(20f, 0f, -14f));
-        Assert.That(behavior.Perception.HasEverSeen, Is.False, "sanity: nothing seen");
+        yield return PlaceCombatants(new Vector3(0f, 0f, -18f), new Vector3(0f, 0f, -9f), baseOffset: 1f);
+        Assert.That(behavior.Perception.HasEverSeen, Is.True, "sanity: the target is visible");
+        Assert.That(EnemyPos.y, Is.GreaterThan(0.5f), "sanity: the base offset must actually lift the body off the mesh");
 
-        Vector3 previous = EnemyPos;
-        for (int leg = 0; leg < 3; leg++)
-        {
-            yield return Drive(MovementAction.Retreat, 1f);
-            Assert.That(EnemyPos.x, Is.LessThan(previous.x - 0.5f),
-                $"leg {leg}: the retreat reversed instead of carrying on west");
-            previous = EnemyPos;
-        }
+        yield return Drive(MovementAction.Advance, 0.4f); // give it a path north to abandon
+        Vector3 turnedAt = EnemyPos;
+        yield return Drive(MovementAction.Retreat, 1f);
+
+        Assert.That(EnemyPos.z, Is.LessThan(turnedAt.z - 0.5f),
+            "Retreat must still turn the agent around off a lifted body, not stall against the wall");
     }
 
     [UnityTest]
