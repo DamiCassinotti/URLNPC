@@ -169,6 +169,23 @@ public class MovementPrimitiveTests : PlayModeTestBase
     }
 
     [UnityTest]
+    public IEnumerator Advance_WithNothingSeen_DoesNotWedgeIntoAWall()
+    {
+        arena = CreateArena(0);
+        // Nose to the south wall with nothing seen — the state every episode
+        // opens in, since spawns are further apart than sight range. Walking
+        // on own facing here ends against the wall, and an NPC that stops
+        // moving stops turning and can never see anything to break out with.
+        yield return PlaceCombatants(new Vector3(0f, 0f, -18.5f), new Vector3(0f, 0f, 18f),
+            facing: new Vector3(0f, 0f, -25f));
+        Assert.That(behavior.Perception.HasEverSeen, Is.False, "sanity: nothing seen");
+
+        yield return Drive(MovementAction.Advance, 2.5f);
+
+        Assert.That(travelled, Is.GreaterThan(3f), "Advance with no target must keep covering ground");
+    }
+
+    [UnityTest]
     public IEnumerator Retreat_KeepsOpeningDistance_WithNothingSeen()
     {
         arena = CreateArena(0);

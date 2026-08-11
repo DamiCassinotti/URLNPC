@@ -32,6 +32,8 @@ public class EnemyBehavior : MonoBehaviour
     // Final snap for a destination sitting just off the mesh; the long
     // overshoots are trimmed by SetStepDestination before they get here.
     const float DestinationSampleRadius = 2f;
+    // Below this a trimmed step isn't worth issuing — see SetStepDestination.
+    const float MinStepDistance = 0.5f;
 
     // The only source of target info for the NPC brain (sensory contract,
     // issue #9). Auto-added in Awake because the Enemy prefab is binary
@@ -113,15 +115,20 @@ public class EnemyBehavior : MonoBehaviour
     void Advance()
     {
         navMeshAgent.updateRotation = true;
-        if (Perception.HasEverSeen)
+        if (!Perception.HasEverSeen)
         {
-            // The whole way to the remembered spot, so the solver routes around
-            // whatever is in between. A straight-line step instead would pick
-            // waypoints on the far side of a building and work the doorway.
-            SetDestinationOnNavMesh(Perception.LastSeenPosition);
+            // Nothing to close on: spawns are further apart than sight range,
+            // so this is every episode's opening. Stepping along own facing
+            // would bury the NPC nose-first in the first wall it meets, where
+            // it stops moving, therefore stops turning, therefore never sees
+            // anything to break out with — cover ground instead.
+            Wander();
             return;
         }
-        SetStepDestination(PerceivedBearing());
+        // The whole way to the remembered spot, so the solver routes around
+        // whatever is in between. A straight-line step instead would pick
+        // waypoints on the far side of a building and work the doorway.
+        SetDestinationOnNavMesh(Perception.LastSeenPosition);
     }
 
     void Retreat()
@@ -177,9 +184,10 @@ public class EnemyBehavior : MonoBehaviour
     }
 
     // Where the NPC believes the target is, as a flat unit vector. Before the
-    // first sighting there is no bearing to work from, so the primitives run
-    // off own facing rather than standing still — otherwise most of the branch
-    // is a no-op at episode start and the policy gets no signal on it.
+    // first sighting there is no bearing to work from, so Hold, Retreat and the
+    // strafes run off own facing rather than standing still — otherwise half
+    // the branch is a no-op at episode start and the policy gets no signal on
+    // it. (Advance is the exception: it wanders instead.)
     Vector3 PerceivedBearing()
     {
         if (Perception.HasEverSeen)
@@ -209,6 +217,11 @@ public class EnemyBehavior : MonoBehaviour
         Vector3 point = transform.position + direction * moveStepDistance;
         if (NavMesh.Raycast(transform.position, point, out NavMeshHit edge, NavMesh.AllAreas))
         {
+            // Already on the boundary: the trimmed step is the agent's own
+            // position, and issuing that as a destination pins it there. There
+            // is nowhere to go this way, so leave the path it has for the next
+            // decision to replace.
+            if (edge.distance < MinStepDistance) return;
             point = edge.position;
         }
         SetDestinationOnNavMesh(point);
