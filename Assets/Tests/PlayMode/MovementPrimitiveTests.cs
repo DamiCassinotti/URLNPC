@@ -224,6 +224,30 @@ public class MovementPrimitiveTests : PlayModeTestBase
     }
 
     [UnityTest]
+    public IEnumerator Retreat_Cornered_DoesNotKeepRunningTheLastAdvance()
+    {
+        arena = CreateArena(0);
+        // On the southern NavMesh boundary with the target to the north, so
+        // the retreat step has nowhere to go and is skipped.
+        Assert.That(NavMesh.SamplePosition(new Vector3(0f, 0f, -25f), out NavMeshHit edge, 10f, NavMesh.AllAreas),
+            Is.True, "no walkable ground against the south wall");
+        yield return PlaceCombatants(edge.position, new Vector3(0f, 0f, -9f));
+        Assert.That(behavior.Perception.HasEverSeen, Is.True, "sanity: the target is visible");
+        Assert.That(NavMesh.Raycast(EnemyPos, EnemyPos + Vector3.back * 6f, out NavMeshHit south, NavMesh.AllAreas)
+            && south.distance < 0.5f, Is.True, "sanity: the enemy is backed against the boundary");
+
+        // No frame in between, so the agent is still hard against the boundary
+        // when the retreat is issued.
+        behavior.Move(MovementAction.Advance);
+        Assert.That(nav.destination.z, Is.GreaterThan(EnemyPos.z), "sanity: the advance heads north at the target");
+
+        behavior.Move(MovementAction.Retreat);
+
+        Assert.That(nav.hasPath || nav.pathPending, Is.False,
+            "a cornered Retreat must drop the advance it replaced, not leave it running at the target");
+    }
+
+    [UnityTest]
     public IEnumerator Strafes_StepSidewaysWhileKeepingTheTargetInSight(
         [Values(MovementAction.StrafeLeft, MovementAction.StrafeRight)] MovementAction action)
     {

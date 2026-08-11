@@ -158,6 +158,9 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (Time.time >= nextCoverQueryTime)
         {
+            // The query wants the mask of whatever blocks the *threat's* view;
+            // a human player has no sight model to read, so the NPC's own
+            // stands in. The same thing while both keep the default.
             nextCoverQueryTime = Time.time + coverQueryInterval;
             hasCoverPoint = ArenaManager.Current != null
                 && Perception.HasEverSeen
@@ -218,10 +221,15 @@ public class EnemyBehavior : MonoBehaviour
         if (NavMesh.Raycast(transform.position, point, out NavMeshHit edge, NavMesh.AllAreas))
         {
             // Already on the boundary: the trimmed step is the agent's own
-            // position, and issuing that as a destination pins it there. There
-            // is nowhere to go this way, so leave the path it has for the next
-            // decision to replace.
-            if (edge.distance < MinStepDistance) return;
+            // position, and issuing that as a destination pins it there.
+            // Nowhere to go this way, so stop — carrying on would run out the
+            // destination an earlier primitive set, and a cornered Retreat
+            // would walk the last Advance straight at what it is backing from.
+            if (edge.distance < MinStepDistance)
+            {
+                navMeshAgent.ResetPath();
+                return;
+            }
             point = edge.position;
         }
         SetDestinationOnNavMesh(point);
