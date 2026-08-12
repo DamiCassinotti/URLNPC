@@ -35,6 +35,9 @@ public class ArenaManager : MonoBehaviour
     // Every LOS-blocking box this arena was built from, so cover queries don't
     // have to raycast-search the world.
     readonly List<Collider> coverColliders = new List<Collider>();
+    // Reused by the LOS probe in NearestCoverPoint; that query is rate-limited,
+    // so a fixed buffer avoids a per-call allocation.
+    readonly RaycastHit[] coverLosHits = new RaycastHit[16];
 
     // Half the floor size, i.e. center to the inner wall face.
     public float HalfExtentX { get; private set; }
@@ -149,14 +152,24 @@ public class ArenaManager : MonoBehaviour
 
     // ----------------------------------------------------------------- cover
 
-    const float EyeHeight = 1f;          // matches EnemyBehavior's sight-ray origin
     const float CoverStandOff = 1.2f;    // how far behind the cover face to stand
 
     // Nearest walkable point hidden from breakLosFrom and reachable from `from`.
     // False when this layout offers none — the caller must fall back to another
-    // action. The mask must be the threat's own (EnemyBehavior.SightObstacleMask),
-    // or a point comes back "hidden" behind geometry the threat sees through.
-    public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, LayerMask sightObstacleMask, out Vector3 coverPoint)
+    // action. Two things must match the real actors, so the caller supplies them:
+    // `sightObstacleMask` is the threat's own (EnemyBehavior.SightObstacleMask),
+    // or a point comes back "hidden" behind geometry the threat sees through; and
+    // `eyeHeight` is the asker's own height above the floor — the head cover has
+    // to hide, so a 1 m constant would call a point hidden behind a 1.5 m wall
+    // that a 2 m head clears. Both parameters stand in for the threat too: the
+    // same eyeHeight raises the threat's eye and the asker's, so a human player's
+    // real eye level isn't modelled — the asker's is used for both, the same
+    // approximation as the mask. `asker` is the agent running the query: its own
+    // colliders are ignored, or its capsule can block the LOS probe and get an
+    // exposed point accepted (the default `~0` mask sees it, and arena geometry
+    // shares its layer).
+    public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, LayerMask sightObstacleMask,
+        Transform asker, float eyeHeight, out Vector3 coverPoint)
     {
         coverPoint = default;
         // Snap the origin on-mesh, otherwise the path checks below all fail.
@@ -165,7 +178,7 @@ public class ArenaManager : MonoBehaviour
             from = fromHit.position;
         }
 
-        Vector3 threatEye = breakLosFrom + Vector3.up * EyeHeight;
+        Vector3 threatEye = breakLosFrom + Vector3.up * eyeHeight;
         NavMeshPath path = new NavMeshPath();
         float bestDist = float.PositiveInfinity;
         bool found = false;
@@ -193,10 +206,8 @@ public class ArenaManager : MonoBehaviour
 
             // Something has to interrupt the threat's eye-line — normally this
             // very object, so low geometry like stair steps self-rejects.
-            Vector3 candidateEye = candidate + Vector3.up * EyeHeight;
-            Vector3 toCandidate = candidateEye - threatEye;
-            if (!Physics.Raycast(threatEye, toCandidate.normalized, toCandidate.magnitude - 0.1f,
-                    sightObstacleMask, QueryTriggerInteraction.Ignore)) continue;
+            Vector3 candidateEye = candidate + Vector3.up * eyeHeight;
+            if (!EyeLineBlocked(threatEye, candidateEye, sightObstacleMask, asker)) continue;
 
             if (!NavMesh.CalculatePath(from, candidate, NavMesh.AllAreas, path)) continue;
             if (path.status != NavMeshPathStatus.PathComplete) continue;
@@ -206,6 +217,26 @@ public class ArenaManager : MonoBehaviour
             found = true;
         }
         return found;
+    }
+
+    // Is the eye-line from `eye` to `targetEye` broken by something other than
+    // the asker's own body? A plain Physics.Raycast would accept the asker's
+    // capsule as the blocker and call an exposed point covered, so walk the hits
+    // and ignore anything under `asker`.
+    bool EyeLineBlocked(Vector3 eye, Vector3 targetEye, LayerMask sightObstacleMask, Transform asker)
+    {
+        Vector3 toTarget = targetEye - eye;
+        float distance = toTarget.magnitude - 0.1f;
+        if (distance <= 0f) return false;
+
+        int count = Physics.RaycastNonAlloc(eye, toTarget.normalized, coverLosHits, distance,
+            sightObstacleMask, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            if (asker != null && coverLosHits[i].transform.IsChildOf(asker)) continue;
+            return true;
+        }
+        return false;
     }
 
     // ------------------------------------------------------------- lifecycle

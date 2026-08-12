@@ -57,6 +57,9 @@ public class MovementPrimitiveTests : PlayModeTestBase
         // The shipped Enemy prefab lifts the body a metre off the mesh; pass 1
         // to reproduce that when a query's origin snapping is under test.
         nav.baseOffset = baseOffset;
+        // MoveToCover judges cover against the agent's head — its height. This
+        // bare rig has no body, so pin height to the eye the LOS helper checks.
+        nav.height = EyeHeight;
         behavior = enemyGo.AddComponent<EnemyBehavior>();
         behavior.enabled = false; // skip Start's random respawn: the test picks the spot
         behavior.target = player.transform;
@@ -371,7 +374,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
 
         StripCoverGeometry();
         Physics.SyncTransforms();
-        Assert.That(arena.NearestCoverPoint(EnemyPos, PlayerStart, SightMask, out Vector3 _), Is.False,
+        Assert.That(arena.NearestCoverPoint(EnemyPos, PlayerStart, SightMask, null, EyeHeight, out Vector3 _), Is.False,
             "sanity: no cover left to move to");
 
         float before = FlatDistance(EnemyPos, PlayerStart);
@@ -392,7 +395,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
             float distance = Vector3.Distance(from, threat);
             if (distance < 6f || distance > 15f) continue;
             if (LosBlocked(threat, from)) continue;
-            if (!manager.NearestCoverPoint(from, threat, SightMask, out Vector3 cover)) continue;
+            if (!manager.NearestCoverPoint(from, threat, SightMask, null, EyeHeight, out Vector3 cover)) continue;
             float toCover = Vector3.Distance(from, cover);
             if (toCover < 2f || toCover > 10f) continue;
             return true;
