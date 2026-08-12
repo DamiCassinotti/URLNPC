@@ -159,12 +159,15 @@ public class ArenaManager : MonoBehaviour
     // action. Two things must match the real actors, so the caller supplies them:
     // `sightObstacleMask` is the threat's own (EnemyBehavior.SightObstacleMask),
     // or a point comes back "hidden" behind geometry the threat sees through; and
-    // `eyeHeight` is where the actor's sight ray really starts above the floor —
-    // the Enemy's NavMeshAgent base offset lifts it, so a 1 m constant would call
-    // a point hidden behind a 1.5 m wall that the 2 m head clears. `asker` is the
-    // agent running the query: its own colliders are ignored, or its capsule can
-    // block the LOS probe and get an exposed point accepted (the default `~0`
-    // mask sees it, and arena geometry shares its layer).
+    // `eyeHeight` is the asker's own height above the floor — the head cover has
+    // to hide, so a 1 m constant would call a point hidden behind a 1.5 m wall
+    // that a 2 m head clears. Both parameters stand in for the threat too: the
+    // same eyeHeight raises the threat's eye and the asker's, so a human player's
+    // real eye level isn't modelled — the asker's is used for both, the same
+    // approximation as the mask. `asker` is the agent running the query: its own
+    // colliders are ignored, or its capsule can block the LOS probe and get an
+    // exposed point accepted (the default `~0` mask sees it, and arena geometry
+    // shares its layer).
     public bool NearestCoverPoint(Vector3 from, Vector3 breakLosFrom, LayerMask sightObstacleMask,
         Transform asker, float eyeHeight, out Vector3 coverPoint)
     {

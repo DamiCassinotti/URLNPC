@@ -169,13 +169,14 @@ public class EnemyBehavior : MonoBehaviour
             // The query wants the mask of whatever blocks the *threat's* view;
             // a human player has no sight model to read, so the NPC's own
             // stands in. The same thing while both keep the default. Eye height
-            // is where this body's sight ray starts above the floor — the agent
-            // base offset lifts transform.position, plus the ray's own metre
-            // (see IsTargetInSight) — so cover is judged against the real head.
+            // is the agent's full height — the head above its grounded base that
+            // cover has to hide. Reading height, not baseOffset + 1, keeps it
+            // right whether the body is centred on a lifted transform (the Enemy
+            // prefab) or stands feet-on-mesh (CombatantRig's agent player).
             nextCoverQueryTime = Time.time + coverQueryInterval;
             hasCoverPoint = ArenaManager.Current.NearestCoverPoint(
                 transform.position, Perception.LastSeenPosition, sightObstacleMask,
-                transform, navMeshAgent.baseOffset + 1f, out coverPoint);
+                transform, navMeshAgent.height, out coverPoint);
         }
 
         if (!hasCoverPoint)

@@ -89,6 +89,9 @@ public class CombatantRig : MonoBehaviour
         if (cc != null)
         {
             nav.radius = cc.radius;
+            // Height also feeds MoveToCover's eye height, so the agent player
+            // judges cover against its real head instead of a shorter default
+            // one — leaving it unset reintroduces the #56 low-cover bug.
             nav.height = cc.height;
         }
 

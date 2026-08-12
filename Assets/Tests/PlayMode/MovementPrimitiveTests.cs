@@ -57,6 +57,9 @@ public class MovementPrimitiveTests : PlayModeTestBase
         // The shipped Enemy prefab lifts the body a metre off the mesh; pass 1
         // to reproduce that when a query's origin snapping is under test.
         nav.baseOffset = baseOffset;
+        // MoveToCover judges cover against the agent's head — its height. This
+        // bare rig has no body, so pin height to the eye the LOS helper checks.
+        nav.height = EyeHeight;
         behavior = enemyGo.AddComponent<EnemyBehavior>();
         behavior.enabled = false; // skip Start's random respawn: the test picks the spot
         behavior.target = player.transform;
