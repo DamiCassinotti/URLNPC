@@ -1,6 +1,7 @@
 using System.Collections;
 using NUnit.Framework;
 using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
@@ -54,6 +55,31 @@ public class EnemyAgentTests : PlayModeTestBase
         selfHealth.DecreaseHealth(10f);
         Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0f).Within(1e-4f),
             "getting hit must cost gotHitPenalty (-0.5)");
+    }
+
+    [UnityTest]
+    public IEnumerator StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt()
+    {
+        // The binary FPS scene pins its Enemy prefab instance to the old 3-float
+        // one-branch shape, and no edit to Enemy.prefab can reach that override.
+        LogAssert.ignoreFailingMessages = true;
+
+        GameObject stale = Track(new GameObject("StaleEnemy"));
+        stale.SetActive(false);
+        stale.AddComponent<NavMeshAgent>().enabled = false;
+        var brain = stale.AddComponent<BehaviorParameters>();
+        brain.BrainParameters.VectorObservationSize = 3;
+        brain.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(3);
+        var staleAgent = stale.AddComponent<EnemyAgent>();
+        stale.GetComponent<EnemyBehavior>().enabled = false; // no NavMesh in this fixture
+        stale.SetActive(true);
+        yield return null;
+
+        Assert.That(brain.BrainParameters.VectorObservationSize, Is.EqualTo(NpcBrainSpec.ObservationSize));
+        Assert.That(brain.BrainParameters.ActionSpec.BranchSizes,
+            Is.EqualTo(new[] { NpcBrainSpec.MovementBranchSize, NpcBrainSpec.FireBranchSize }));
+        Assert.That(staleAgent.GetStoredActionBuffers().DiscreteActions.Length, Is.EqualTo(2),
+            "the actuators are built from the action spec before Initialize runs, so the fix has to land in Awake");
     }
 
     // The layout itself is pinned in NpcObservationsTests; this is the wiring —

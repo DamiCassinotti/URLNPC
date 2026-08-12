@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 
 [RequireComponent(typeof(EnemyBehavior))]
@@ -40,6 +41,55 @@ public class EnemyAgent : Agent
     internal float[] LastObservations => observations;
 
     bool episodeEnding;
+
+    // Awake, not Initialize: Agent.OnEnable builds the actuators off the action
+    // spec before Initialize runs, so a branch count fixed there arrives a step
+    // too late.
+    protected override void Awake()
+    {
+        base.Awake();
+        EnforceBrainSpec();
+    }
+
+    // The frozen interface has to hold for the instance that actually plays, and
+    // the binary FPS scene carries prefab-instance overrides pinning the old
+    // 3-float / one-branch shape — a text edit to Enemy.prefab never reaches
+    // them. Same problem, and the same fix, as the stale MaxStep below.
+    void EnforceBrainSpec()
+    {
+        var parameters = GetComponent<BehaviorParameters>();
+        if (parameters == null) return;
+        BrainParameters brain = parameters.BrainParameters;
+
+        if (brain.VectorObservationSize != NpcBrainSpec.ObservationSize
+            || brain.NumStackedVectorObservations != 1)
+        {
+            Debug.LogWarning(
+                $"[EnemyAgent] Overriding serialized observation shape " +
+                $"{brain.VectorObservationSize}x{brain.NumStackedVectorObservations} -> " +
+                $"{NpcBrainSpec.ObservationSize}x1 (#43).", this);
+            brain.VectorObservationSize = NpcBrainSpec.ObservationSize;
+            brain.NumStackedVectorObservations = 1;
+        }
+
+        ActionSpec expected = NpcBrainSpec.Actions;
+        int[] branches = brain.ActionSpec.BranchSizes;
+        bool matches = brain.ActionSpec.NumContinuousActions == 0
+            && branches != null
+            && branches.Length == expected.BranchSizes.Length;
+        for (int i = 0; matches && i < branches.Length; i++)
+        {
+            matches = branches[i] == expected.BranchSizes[i];
+        }
+        if (!matches)
+        {
+            Debug.LogWarning(
+                $"[EnemyAgent] Overriding serialized action branches " +
+                $"[{string.Join(",", branches ?? System.Array.Empty<int>())}] -> " +
+                $"[{string.Join(",", expected.BranchSizes)}] (#43).", this);
+            brain.ActionSpec = expected;
+        }
+    }
 
     public override void Initialize()
     {
@@ -134,7 +184,11 @@ public class EnemyAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Decisions run on the fixed step; Update's snapshot can be a frame old.
+        // Decisions run on the fixed step, where PerceptionMemory's per-frame
+        // Update is stale — badly so at the trainer's time scale. Refresh for
+        // the same reason Move/Attack do, so the observation and the action it
+        // produces are taken from one view of the world.
+        if (behavior.Perception != null) behavior.Perception.Refresh();
         ReadInputs();
         NpcObservations.Fill(observations, inputs);
         sensor.AddObservation(observations);
