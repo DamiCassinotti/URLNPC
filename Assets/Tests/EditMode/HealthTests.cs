@@ -30,13 +30,27 @@ public class HealthTests
     [Test]
     public void DecreaseHealth_SubtractsAndFiresOnDamagedWithAmount()
     {
-        float reported = -1f;
-        health.OnDamaged += amount => reported = amount;
+        DamageInfo reported = default;
+        health.OnDamaged += info => reported = info;
 
         health.DecreaseHealth(30f);
 
         Assert.That(health.health, Is.EqualTo(70f));
-        Assert.That(reported, Is.EqualTo(30f));
+        Assert.That(reported.Amount, Is.EqualTo(30f));
+        Assert.That(reported.HasSource, Is.False, "damage with no shooter must not claim one");
+    }
+
+    [Test]
+    public void DecreaseHealth_CarriesTheShooterPosition()
+    {
+        DamageInfo reported = default;
+        health.OnDamaged += info => reported = info;
+
+        health.DecreaseHealth(new DamageInfo(30f, new Vector3(1f, 2f, 3f)));
+
+        Assert.That(health.health, Is.EqualTo(70f));
+        Assert.That(reported.HasSource, Is.True);
+        Assert.That(reported.SourcePosition, Is.EqualTo(new Vector3(1f, 2f, 3f)));
     }
 
     [Test]
