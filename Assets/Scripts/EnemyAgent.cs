@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 
 [RequireComponent(typeof(EnemyBehavior))]
@@ -32,11 +33,63 @@ public class EnemyAgent : Agent
     GameManager gameManager;
     RewardComputer stepRewards;
 
-    bool canAttack = true;
-    bool targetInSight = false;
-    float normalizedHealth = 1f;
+    readonly float[] observations = new float[NpcBrainSpec.ObservationSize];
+    NpcObservationInput inputs;
+
+    // Test seam: the vector CollectObservations last wrote, so PlayMode can
+    // check the real memories reach the frozen layout.
+    internal float[] LastObservations => observations;
 
     bool episodeEnding;
+
+    // Awake, not Initialize: Agent.OnEnable builds the actuators off the action
+    // spec before Initialize runs, so a branch count fixed there arrives a step
+    // too late.
+    protected override void Awake()
+    {
+        base.Awake();
+        EnforceBrainSpec();
+    }
+
+    // The frozen interface has to hold for the instance that actually plays, and
+    // the binary FPS scene carries prefab-instance overrides pinning the old
+    // 3-float / one-branch shape — a text edit to Enemy.prefab never reaches
+    // them. Same problem, and the same fix, as the stale MaxStep below.
+    void EnforceBrainSpec()
+    {
+        var parameters = GetComponent<BehaviorParameters>();
+        if (parameters == null) return;
+        BrainParameters brain = parameters.BrainParameters;
+
+        if (brain.VectorObservationSize != NpcBrainSpec.ObservationSize
+            || brain.NumStackedVectorObservations != 1)
+        {
+            Debug.LogWarning(
+                $"[EnemyAgent] Overriding serialized observation shape " +
+                $"{brain.VectorObservationSize}x{brain.NumStackedVectorObservations} -> " +
+                $"{NpcBrainSpec.ObservationSize}x1 (#43).", this);
+            brain.VectorObservationSize = NpcBrainSpec.ObservationSize;
+            brain.NumStackedVectorObservations = 1;
+        }
+
+        ActionSpec expected = NpcBrainSpec.Actions;
+        int[] branches = brain.ActionSpec.BranchSizes;
+        bool matches = brain.ActionSpec.NumContinuousActions == 0
+            && branches != null
+            && branches.Length == expected.BranchSizes.Length;
+        for (int i = 0; matches && i < branches.Length; i++)
+        {
+            matches = branches[i] == expected.BranchSizes[i];
+        }
+        if (!matches)
+        {
+            Debug.LogWarning(
+                $"[EnemyAgent] Overriding serialized action branches " +
+                $"[{string.Join(",", branches ?? System.Array.Empty<int>())}] -> " +
+                $"[{string.Join(",", expected.BranchSizes)}] (#43).", this);
+            brain.ActionSpec = expected;
+        }
+    }
 
     public override void Initialize()
     {
@@ -69,13 +122,42 @@ public class EnemyAgent : Agent
 
     void Update()
     {
-        // Sensory contract (issue #9): target info reaches the policy only
-        // through PerceptionMemory, never off the target transform.
-        targetInSight = behavior.Perception != null && behavior.Perception.CurrentlyVisible;
-        canAttack = behavior.ReadCanAttack();
-        float maxHp = selfHealth.maxHealth <= 0f ? 1f : selfHealth.maxHealth;
-        normalizedHealth = Mathf.Clamp01(selfHealth.health / maxHp);
+        // OnActionReceived also runs on the steps between decisions, where
+        // CollectObservations doesn't; keep the snapshot its reward reads fresh.
+        ReadInputs();
         EnsureTargetSubscription();
+    }
+
+    // Sensory contract (issue #9): target info reaches the policy only through
+    // PerceptionMemory, never off the target transform.
+    void ReadInputs()
+    {
+        PerceptionMemory perception = behavior.Perception;
+        DamageMemory damage = behavior.Damage;
+        ModeChannel mode = behavior.Mode;
+        float maxHp = selfHealth.maxHealth <= 0f ? 1f : selfHealth.maxHealth;
+
+        inputs = new NpcObservationInput
+        {
+            canAttack = behavior.ReadCanAttack(),
+            cooldownRemaining01 = behavior.ReadCooldownRemaining01(),
+
+            targetVisible = perception != null && perception.CurrentlyVisible,
+            hasEverSeen = perception != null && perception.HasEverSeen,
+            lastSeenPosition = perception != null ? perception.LastSeenPosition : Vector3.zero,
+            timeSinceSeen = perception != null ? perception.TimeSinceSeen : Mathf.Infinity,
+
+            selfPosition = transform.position,
+            selfForward = transform.forward,
+            sightRange = behavior.SightRange,
+
+            normalizedHealth = selfHealth.health / maxHp,
+            normalizedSpeed = behavior.ReadNormalizedSpeed(),
+
+            recentlyDamaged = damage != null && damage.RecentlyDamaged,
+            hitDirection = damage != null ? damage.LastHitDirection : HitDirection.None,
+            mode = mode != null ? mode.CurrentMode : NpcMode.Hunt,
+        };
     }
 
     void EnsureTargetSubscription()
@@ -102,17 +184,21 @@ public class EnemyAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(canAttack);
-        sensor.AddObservation(targetInSight);
-        sensor.AddObservation(normalizedHealth);
+        // Decisions run on the fixed step, where PerceptionMemory's per-frame
+        // Update is stale — badly so at the trainer's time scale. Refresh for
+        // the same reason Move/Attack do, so the observation and the action it
+        // produces are taken from one view of the world.
+        if (behavior.Perception != null) behavior.Perception.Refresh();
+        ReadInputs();
+        NpcObservations.Fill(observations, inputs);
+        sensor.AddObservation(observations);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discrete = actionsOut.DiscreteActions;
-        if (!targetInSight) discrete[0] = 0;
-        else if (!canAttack) discrete[0] = 1;
-        else discrete[0] = 2;
+        discrete[0] = (int)(inputs.targetVisible ? MovementAction.Advance : MovementAction.Wander);
+        discrete[1] = inputs.targetVisible && inputs.canAttack ? NpcBrainSpec.Fire : NpcBrainSpec.DontFire;
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -123,23 +209,13 @@ public class EnemyAgent : Agent
         // code, not a policy input (sensory contract, issue #9).
         float distanceToTarget = behavior.DistanceToTarget();
 
-        // Still the old three-action branch; the movement branch that reaches
-        // the rest of MovementAction lands with the interface freeze (#43).
-        int action = actions.DiscreteActions[0];
-        switch (action)
-        {
-            case 0:
-                behavior.Move(MovementAction.Wander);
-                break;
-            case 1:
-                behavior.Move(MovementAction.Advance);
-                break;
-            case 2:
-                behavior.Attack();
-                break;
-        }
+        behavior.Move((MovementAction)actions.DiscreteActions[0]);
+        // Fire after moving: the primitives set the facing, and Attack's own
+        // LookAt at the perceived position has to be the last word on the aim.
+        bool fired = actions.DiscreteActions[1] == NpcBrainSpec.Fire;
+        if (fired) behavior.Attack();
 
-        AddReward(stepRewards.StepReward(action, behavior.DidShoot, targetInSight, distanceToTarget));
+        AddReward(stepRewards.StepReward(fired, behavior.DidShoot, inputs.targetVisible, distanceToTarget));
     }
 
     public override void OnEpisodeBegin()

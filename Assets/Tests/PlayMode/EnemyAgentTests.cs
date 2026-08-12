@@ -1,7 +1,9 @@
 using System.Collections;
 using NUnit.Framework;
 using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using Unity.MLAgents.Sensors;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TestTools;
@@ -53,6 +55,57 @@ public class EnemyAgentTests : PlayModeTestBase
         selfHealth.DecreaseHealth(10f);
         Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0f).Within(1e-4f),
             "getting hit must cost gotHitPenalty (-0.5)");
+    }
+
+    [UnityTest]
+    public IEnumerator StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt()
+    {
+        // The binary FPS scene pins its Enemy prefab instance to the old 3-float
+        // one-branch shape, and no edit to Enemy.prefab can reach that override.
+        LogAssert.ignoreFailingMessages = true;
+
+        GameObject stale = Track(new GameObject("StaleEnemy"));
+        stale.SetActive(false);
+        stale.AddComponent<NavMeshAgent>().enabled = false;
+        var brain = stale.AddComponent<BehaviorParameters>();
+        brain.BrainParameters.VectorObservationSize = 3;
+        brain.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(3);
+        var staleAgent = stale.AddComponent<EnemyAgent>();
+        stale.GetComponent<EnemyBehavior>().enabled = false; // no NavMesh in this fixture
+        stale.SetActive(true);
+        yield return null;
+
+        Assert.That(brain.BrainParameters.VectorObservationSize, Is.EqualTo(NpcBrainSpec.ObservationSize));
+        Assert.That(brain.BrainParameters.ActionSpec.BranchSizes,
+            Is.EqualTo(new[] { NpcBrainSpec.MovementBranchSize, NpcBrainSpec.FireBranchSize }));
+        Assert.That(staleAgent.GetStoredActionBuffers().DiscreteActions.Length, Is.EqualTo(2),
+            "the actuators are built from the action spec before Initialize runs, so the fix has to land in Awake");
+    }
+
+    // The layout itself is pinned in NpcObservationsTests; this is the wiring —
+    // that the real PerceptionMemory / DamageMemory / ModeChannel on the body
+    // are what the frozen slots are filled from.
+    [UnityTest]
+    public IEnumerator Observations_AreFedByTheRealMemories()
+    {
+        yield return BuildAgentScene();
+        var sensor = new VectorSensor(NpcBrainSpec.ObservationSize);
+
+        agent.CollectObservations(sensor);
+        float[] obs = agent.LastObservations;
+        Assert.That(obs.Length, Is.EqualTo(NpcBrainSpec.ObservationSize));
+        Assert.That(obs[2], Is.EqualTo(0f), "PerceptionMemory has no sighting yet");
+        Assert.That(obs[6], Is.EqualTo(1f), "never-seen saturates the staleness slot");
+        Assert.That(obs[7], Is.EqualTo(1f), "full health at the start of the episode");
+        Assert.That(obs[13], Is.EqualTo(1f), "the auto-added ModeChannel starts on Hunt");
+
+        // Shot from directly behind: DamageMemory buckets it, and the bucket has
+        // to survive into the one-hot.
+        selfHealth.DecreaseHealth(new DamageInfo(10f, agent.transform.position - agent.transform.forward * 5f));
+        agent.CollectObservations(sensor);
+        obs = agent.LastObservations;
+        Assert.That(obs[8], Is.EqualTo(1f), "recently damaged");
+        Assert.That(obs[10], Is.EqualTo(1f), "hit from behind");
     }
 
     [UnityTest]
@@ -112,11 +165,24 @@ public class EnemyAgentTests : PlayModeTestBase
         var behaviorParams = enemy.GetComponent<BehaviorParameters>();
         Assert.That(behaviorParams, Is.Not.Null, "no BehaviorParameters — ML-Agents cannot drive the enemy");
         Assert.That(behaviorParams.BehaviorName, Is.EqualTo("URLNPC"));
-        Assert.That(behaviorParams.BrainParameters.VectorObservationSize, Is.EqualTo(3));
-        Assert.That(behaviorParams.BrainParameters.ActionSpec.BranchSizes, Is.EqualTo(new[] { 3 }));
+        Assert.That(behaviorParams.BrainParameters.VectorObservationSize,
+            Is.EqualTo(NpcBrainSpec.ObservationSize),
+            "the prefab must declare the same observation width CollectObservations writes");
+        Assert.That(behaviorParams.BrainParameters.NumStackedVectorObservations, Is.EqualTo(1));
+        Assert.That(behaviorParams.BrainParameters.ActionSpec.BranchSizes,
+            Is.EqualTo(new[] { NpcBrainSpec.MovementBranchSize, NpcBrainSpec.FireBranchSize }),
+            "movement x fire");
+
+        // The ray sensor bypassed PerceptionMemory entirely — live detection,
+        // wider than sightFovDegrees, no last-seen memory — and its ~21 floats
+        // are not in the frozen vector. Its removal is the point of #43.
+        Assert.That(enemy.GetComponentInChildren<RayPerceptionSensorComponent3D>(true), Is.Null,
+            "a ray sensor leaks the target's live position past the sensory contract");
 
         Assert.That(enemy.GetComponent<DecisionRequester>(), Is.Not.Null,
             "no DecisionRequester — the enemy would stand still in every mode");
+        Assert.That(enemy.GetComponent<ModeChannel>(), Is.Not.Null,
+            "the mode one-hot has nothing to read without a channel");
     }
 #endif
 }

@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -23,7 +22,10 @@ public class EnemyBehavior : MonoBehaviour
     NavMeshAgent navMeshAgent;
     EnemyWeapon weapon;
     Health enemyHealth;
-    bool canAttack = true;
+    // Earliest Time.time the next shot is allowed. A timestamp rather than a
+    // coroutine flag so the cooldown observation reads off the same value that
+    // gates Attack().
+    float attackReadyTime;
 
     Vector3 coverPoint;
     bool hasCoverPoint;
@@ -44,9 +46,18 @@ public class EnemyBehavior : MonoBehaviour
     // inputs, and auto-added for the same binary-prefab reason.
     public DamageMemory Damage { get; private set; }
 
+    // The commanded mode the policy is conditioned on, auto-added for the same
+    // reason. Without a writer (ModeDirector, or the LLM selector) it just
+    // reports its initial mode.
+    public ModeChannel Mode { get; private set; }
+
     // What this combatant's sight ray can be blocked by. Cover queries must run
     // against the same mask (ArenaManager.NearestCoverPoint).
     public LayerMask SightObstacleMask => sightObstacleMask;
+
+    // How far this combatant can see, i.e. the scale the perceived-distance
+    // observation is normalized against.
+    public float SightRange => sightRange;
 
     void Awake()
     {
@@ -57,6 +68,8 @@ public class EnemyBehavior : MonoBehaviour
         if (Perception == null) Perception = gameObject.AddComponent<PerceptionMemory>();
         Damage = GetComponent<DamageMemory>();
         if (Damage == null) Damage = gameObject.AddComponent<DamageMemory>();
+        Mode = GetComponent<ModeChannel>();
+        if (Mode == null) Mode = gameObject.AddComponent<ModeChannel>();
     }
 
     void Start()
@@ -78,14 +91,13 @@ public class EnemyBehavior : MonoBehaviour
         // Aim at the last-seen position, never the live one. While the target
         // is visible they are the same; behind cover the shot goes where the
         // NPC believes the player is, and eats the wastedShotPenalty if wrong.
-        if (canAttack && Perception.HasEverSeen)
+        if (ReadCanAttack() && Perception.HasEverSeen)
         {
             Vector3 aim = Perception.LastSeenPosition;
             transform.LookAt(new Vector3(aim.x, transform.position.y, aim.z));
             weapon.Shoot();
             DidShoot = true;
-            canAttack = false;
-            StartCoroutine(AttackCooldown());
+            attackReadyTime = Time.time + attackCooldown;
         }
     }
 
@@ -275,12 +287,6 @@ public class EnemyBehavior : MonoBehaviour
         return new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
     }
 
-    IEnumerator AttackCooldown()
-    {
-        yield return new WaitForSeconds(attackCooldown);
-        canAttack = true;
-    }
-
     public void InitAtRandomPosition()
     {
         if (navMeshAgent == null) navMeshAgent = GetComponent<NavMeshAgent>();
@@ -364,8 +370,7 @@ public class EnemyBehavior : MonoBehaviour
 
     public void ResetState()
     {
-        StopAllCoroutines();
-        canAttack = true;
+        attackReadyTime = 0f;
         DidShoot = false;
         hasCoverPoint = false;
         nextCoverQueryTime = 0f;
@@ -415,6 +420,28 @@ public class EnemyBehavior : MonoBehaviour
 
     public bool ReadCanAttack()
     {
-        return canAttack;
+        return Time.time >= attackReadyTime;
+    }
+
+    // 1 the instant after a shot, 0 once the weapon is ready again.
+    public float ReadCooldownRemaining01()
+    {
+        if (attackCooldown <= 0f) return 0f;
+        return Mathf.Clamp01((attackReadyTime - Time.time) / attackCooldown);
+    }
+
+    // Current speed against the agent's own top speed, so the policy can tell
+    // "sprinting" from "stuck against a wall".
+    public float ReadNormalizedSpeed()
+    {
+        // Reading velocity off an agent that isn't attached to a mesh logs an
+        // engine error — before the first spawn, and all through the NavMesh-less
+        // test fixtures, it simply isn't moving.
+        if (navMeshAgent == null || !navMeshAgent.isActiveAndEnabled
+            || !navMeshAgent.isOnNavMesh || navMeshAgent.speed <= 0f)
+        {
+            return 0f;
+        }
+        return Mathf.Clamp01(navMeshAgent.velocity.magnitude / navMeshAgent.speed);
     }
 }

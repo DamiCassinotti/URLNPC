@@ -61,18 +61,18 @@ The `Assets/Prefabs/Characters/Enemy.prefab` GameObject must have these componen
 
 1. **Behavior Parameters** (`Unity.MLAgents.Policies.BehaviorParameters`)
    - **Behavior Name:** `URLNPC` (must match the key in `config/URLNPC.yaml`)
-   - **Vector Observation → Space Size:** `3` (canAttack, targetInSight, normalizedHealth)
+   - **Vector Observation → Space Size:** `18` (see `NpcObservations` for the slot-by-slot layout)
    - **Vector Observation → Stacked Vectors:** `1`
    - **Actions → Continuous Actions:** `0`
-   - **Actions → Discrete Branches:** `1`, **Branch 0 Size:** `3` (Wander, Advance, Attack)
+   - **Actions → Discrete Branches:** `2`, **Branch 0 Size:** `7` (the `MovementAction` primitives), **Branch 1 Size:** `2` (hold fire / fire)
    - **Behavior Type:** `Default` while training, `Inference Only` to play vs a trained `.onnx`, `Heuristic Only` to test the scripted fallback
    - **Model:** the trained `.onnx` once you have one (leave empty for first training)
 2. **Decision Requester** (`Unity.MLAgents.DecisionRequester`)
    - **Decision Period:** `5` (one decision every 5 fixed-update ticks)
    - **Take Actions Between Decisions:** on
-3. **EnemyAgent** — Max Step: `5000` (set in the Inspector on the Agent component itself)
+3. **EnemyAgent** — Max Step: `0`; the round clock owns episode timeout (`EnemyAgent.Initialize` forces this).
 4. **EnemyBehavior** — wire **Target** to the `PlayerCapsule` (or leave empty; it auto-finds the `Player` tag at Start).
-5. **Ray Perception Sensor 3D** is already present and detects the `Player` tag — leave as-is.
+5. **No Ray Perception Sensor.** It used to be on the prefab; it fed the policy live target detections outside `PerceptionMemory` and outside the declared observation width, so it was removed. Don't add one back.
 6. **NavMeshAgent** is required for movement. Bake a NavMesh for the FPS scene if you haven't.
 
 ### Run training

@@ -1,7 +1,7 @@
 using NUnit.Framework;
 
 // The full per-step reward table (CLAUDE.md "Reward shape") enumerated as pure
-// math, including how the penalties combine. Actions: 0=Wander, 1=Advance, 2=Attack.
+// math, including how the penalties combine.
 public class RewardComputerTests
 {
     const float Tolerance = 1e-6f;
@@ -18,7 +18,7 @@ public class RewardComputerTests
     public void PlainStep_PaysTheAliveBonus()
     {
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(action: 0, didShoot: false, targetInSight: false, distanceToTarget: 20f),
+        Assert.That(rewards.StepReward(fired: false, didShoot: false, targetInSight: false, distanceToTarget: 20f),
             Is.EqualTo(0.001f).Within(Tolerance));
     }
 
@@ -26,7 +26,7 @@ public class RewardComputerTests
     public void StandingTooClose_CostsTheShapingPenalty()
     {
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(1, false, true, 3f),
+        Assert.That(rewards.StepReward(false, false, true, 3f),
             Is.EqualTo(0.001f - 0.005f).Within(Tolerance), "melee-rushing must not pay");
     }
 
@@ -34,7 +34,7 @@ public class RewardComputerTests
     public void TooCloseBoundary_IsExclusive()
     {
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(1, false, true, 6f),
+        Assert.That(rewards.StepReward(false, false, true, 6f),
             Is.EqualTo(0.001f).Within(Tolerance), "exactly at tooCloseDistance is not 'too close'");
     }
 
@@ -43,45 +43,43 @@ public class RewardComputerTests
     {
         var rewards = DefaultRewards();
         rewards.tooClosePenaltyPerStep = 0f;
-        Assert.That(rewards.StepReward(1, false, true, 0.5f),
+        Assert.That(rewards.StepReward(false, false, true, 0.5f),
             Is.EqualTo(0.001f).Within(Tolerance));
     }
 
     [Test]
-    public void AttackWithShotInSight_IsNotPenalized()
+    public void FiringWithShotInSight_IsNotPenalized()
     {
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(2, didShoot: true, targetInSight: true, distanceToTarget: 15f),
+        Assert.That(rewards.StepReward(true, didShoot: true, targetInSight: true, distanceToTarget: 15f),
             Is.EqualTo(0.001f).Within(Tolerance));
     }
 
     [Test]
-    public void AttackWithShotWhileBlind_CostsTheWastedShotPenalty()
+    public void FiringWithShotWhileBlind_CostsTheWastedShotPenalty()
     {
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(2, didShoot: true, targetInSight: false, distanceToTarget: 15f),
+        Assert.That(rewards.StepReward(true, didShoot: true, targetInSight: false, distanceToTarget: 15f),
             Is.EqualTo(0.001f - 0.05f).Within(Tolerance), "spraying at memories must not pay");
     }
 
     [Test]
-    public void AttackWithoutAShot_IsNotPenalized()
+    public void FiringWithoutAShot_IsNotPenalized()
     {
-        // Cooldown or never-seen: the attack action fired no bullet, so no
-        // shot was wasted.
+        // Cooldown or never-seen: the trigger was pulled but no bullet left the
+        // barrel, so no shot was wasted.
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(2, didShoot: false, targetInSight: false, distanceToTarget: 15f),
+        Assert.That(rewards.StepReward(true, didShoot: false, targetInSight: false, distanceToTarget: 15f),
             Is.EqualTo(0.001f).Within(Tolerance));
     }
 
     [Test]
-    public void NonAttackActions_NeverPayTheWastedShotPenalty()
+    public void HoldingFire_NeverPaysTheWastedShotPenalty()
     {
-        // DidShoot can hold a stale true from an earlier step; only the
-        // attack action can waste a shot.
+        // DidShoot holds a stale true from the last step the trigger was
+        // pulled, so the fire branch's own choice has to gate the penalty.
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(0, didShoot: true, targetInSight: false, distanceToTarget: 15f),
-            Is.EqualTo(0.001f).Within(Tolerance));
-        Assert.That(rewards.StepReward(1, didShoot: true, targetInSight: false, distanceToTarget: 15f),
+        Assert.That(rewards.StepReward(false, didShoot: true, targetInSight: false, distanceToTarget: 15f),
             Is.EqualTo(0.001f).Within(Tolerance));
     }
 
@@ -89,7 +87,7 @@ public class RewardComputerTests
     public void Penalties_Stack()
     {
         var rewards = DefaultRewards();
-        Assert.That(rewards.StepReward(2, didShoot: true, targetInSight: false, distanceToTarget: 2f),
+        Assert.That(rewards.StepReward(true, didShoot: true, targetInSight: false, distanceToTarget: 2f),
             Is.EqualTo(0.001f - 0.005f - 0.05f).Within(Tolerance));
     }
 }

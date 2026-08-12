@@ -94,9 +94,12 @@ public class CombatantRigTests : PlayModeTestBase
         Assert.That(behavior.targetTag, Is.EqualTo("NPC"),
             "the agent-driven player hunts the enemy, not itself");
 
-        // EnemyBehavior.Awake auto-adds the sensory contract; the agent-driven
-        // player must be bound by it exactly like the enemy is.
+        // EnemyBehavior.Awake auto-adds the sensory contract and the rest of the
+        // brain's inputs; the agent-driven player must be bound by them exactly
+        // like the enemy is, or the shared policy gets a different vector.
         Assert.That(behavior.Perception, Is.Not.Null, "PerceptionMemory must be present on the player side too");
+        Assert.That(behavior.Damage, Is.Not.Null, "the hit-direction observations need a DamageMemory");
+        Assert.That(behavior.Mode, Is.Not.Null, "the mode one-hot needs a ModeChannel");
     }
 
     [UnityTest]
@@ -113,12 +116,11 @@ public class CombatantRigTests : PlayModeTestBase
 
         // Same observation/action shape as the Enemy prefab, or the shared
         // policy cannot be applied to both sides.
-        Assert.That(bp.BrainParameters.VectorObservationSize, Is.EqualTo(3),
-            "canAttack, targetInSight, normalizedHealth");
+        Assert.That(bp.BrainParameters.VectorObservationSize, Is.EqualTo(NpcBrainSpec.ObservationSize));
         Assert.That(bp.BrainParameters.NumStackedVectorObservations, Is.EqualTo(1));
-        Assert.That(bp.BrainParameters.ActionSpec.NumDiscreteActions, Is.EqualTo(1),
-            "one discrete branch: Wander / Advance / Attack");
-        Assert.That(bp.BrainParameters.ActionSpec.BranchSizes[0], Is.EqualTo(3));
+        Assert.That(bp.BrainParameters.ActionSpec.BranchSizes,
+            Is.EqualTo(new[] { NpcBrainSpec.MovementBranchSize, NpcBrainSpec.FireBranchSize }),
+            "two discrete branches: movement x fire");
 
         var requester = body.GetComponent<DecisionRequester>();
         Assert.That(requester, Is.Not.Null,
