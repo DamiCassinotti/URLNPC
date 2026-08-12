@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using Unity.MLAgents;
-using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 
 // Makes the player side interchangeable (issue #10): the same body can be
@@ -112,9 +111,11 @@ public class CombatantRig : MonoBehaviour
         BehaviorParameters bp = gameObject.AddComponent<BehaviorParameters>();
         bp.BehaviorName = agentBehaviorName;
         bp.TeamId = agentTeamId;
-        bp.BrainParameters.VectorObservationSize = 3;   // canAttack, targetInSight, normalizedHealth
+        // One shared copy of the brain interface, so this can't drift from what
+        // the Enemy prefab declares (#43).
+        bp.BrainParameters.VectorObservationSize = NpcBrainSpec.ObservationSize;
         bp.BrainParameters.NumStackedVectorObservations = 1;
-        bp.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(3); // Wander / Advance / Attack
+        bp.BrainParameters.ActionSpec = NpcBrainSpec.Actions;
 
         // MaxStep is deliberately left at 0: EnemyAgent.Initialize forces it
         // there so the GameManager round clock is the single owner of

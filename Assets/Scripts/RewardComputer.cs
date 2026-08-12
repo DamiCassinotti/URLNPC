@@ -10,16 +10,18 @@ public class RewardComputer
     public float tooClosePenaltyPerStep = 0.005f;
     public float tooCloseDistance = 6f;
 
-    // action is 0=Wander, 1=Advance, 2=Attack. distanceToTarget is a true-state
-    // read, which reward computation is allowed (sensory contract, issue #9).
-    public float StepReward(int action, bool didShoot, bool targetInSight, float distanceToTarget)
+    // fired is the fire branch's choice this step; didShoot is whether the shot
+    // actually left the barrel (it also needs the cooldown and a remembered
+    // target), and is stale when fired is false. distanceToTarget is a
+    // true-state read, which reward computation is allowed (issue #9).
+    public float StepReward(bool fired, bool didShoot, bool targetInSight, float distanceToTarget)
     {
         float reward = aliveRewardPerStep;
         if (tooClosePenaltyPerStep > 0f && distanceToTarget < tooCloseDistance)
         {
             reward -= tooClosePenaltyPerStep;
         }
-        if (action == 2 && didShoot && !targetInSight)
+        if (fired && didShoot && !targetInSight)
         {
             reward -= wastedShotPenalty;
         }
