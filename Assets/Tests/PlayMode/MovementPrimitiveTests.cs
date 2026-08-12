@@ -371,7 +371,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
 
         StripCoverGeometry();
         Physics.SyncTransforms();
-        Assert.That(arena.NearestCoverPoint(EnemyPos, PlayerStart, SightMask, out Vector3 _), Is.False,
+        Assert.That(arena.NearestCoverPoint(EnemyPos, PlayerStart, SightMask, null, EyeHeight, out Vector3 _), Is.False,
             "sanity: no cover left to move to");
 
         float before = FlatDistance(EnemyPos, PlayerStart);
@@ -392,7 +392,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
             float distance = Vector3.Distance(from, threat);
             if (distance < 6f || distance > 15f) continue;
             if (LosBlocked(threat, from)) continue;
-            if (!manager.NearestCoverPoint(from, threat, SightMask, out Vector3 cover)) continue;
+            if (!manager.NearestCoverPoint(from, threat, SightMask, null, EyeHeight, out Vector3 cover)) continue;
             float toCover = Vector3.Distance(from, cover);
             if (toCover < 2f || toCover > 10f) continue;
             return true;
