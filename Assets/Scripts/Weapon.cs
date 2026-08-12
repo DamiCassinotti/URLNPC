@@ -49,7 +49,9 @@ public abstract class Weapon : MonoBehaviour
         // RoundEnded, so a shot reported afterwards lands outside the episode
         // it decided.
         ShotFired?.Invoke(this, victim, victim != null ? damage : 0f);
-        if (victim != null) victim.DecreaseHealth(damage);
+        // The ray's origin, not the weapon transform: it is where the victim
+        // would have to look to find the shooter.
+        if (victim != null) victim.DecreaseHealth(new DamageInfo(damage, origin));
 
         SpawnTracer(GetTracerStart(origin), endPoint);
     }

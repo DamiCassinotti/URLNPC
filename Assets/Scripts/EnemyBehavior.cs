@@ -40,6 +40,10 @@ public class EnemyBehavior : MonoBehaviour
     // serialized and can't gain new components via a text edit.
     public PerceptionMemory Perception { get; private set; }
 
+    // "Recently shot, roughly from there" — the other half of the brain's
+    // inputs, and auto-added for the same binary-prefab reason.
+    public DamageMemory Damage { get; private set; }
+
     // What this combatant's sight ray can be blocked by. Cover queries must run
     // against the same mask (ArenaManager.NearestCoverPoint).
     public LayerMask SightObstacleMask => sightObstacleMask;
@@ -51,6 +55,8 @@ public class EnemyBehavior : MonoBehaviour
         enemyHealth = GetComponent<Health>();
         Perception = GetComponent<PerceptionMemory>();
         if (Perception == null) Perception = gameObject.AddComponent<PerceptionMemory>();
+        Damage = GetComponent<DamageMemory>();
+        if (Damage == null) Damage = gameObject.AddComponent<DamageMemory>();
     }
 
     void Start()
@@ -364,6 +370,7 @@ public class EnemyBehavior : MonoBehaviour
         hasCoverPoint = false;
         nextCoverQueryTime = 0f;
         if (Perception != null) Perception.Forget();
+        if (Damage != null) Damage.Forget();
         if (navMeshAgent != null)
         {
             // Hold/the strafes park it on manual rotation; the next episode

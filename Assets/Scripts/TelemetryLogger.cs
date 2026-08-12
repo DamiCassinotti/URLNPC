@@ -136,7 +136,7 @@ public class TelemetryLogger : MonoBehaviour
         {
             Health h = health; // capture per instance
             if (!subscribed.Add(h)) continue;
-            h.OnDamaged += amount => HandleDamaged(h, amount);
+            h.OnDamaged += info => HandleDamaged(h, info);
             h.OnDied += () => HandleDied(h);
         }
     }
@@ -157,14 +157,14 @@ public class TelemetryLogger : MonoBehaviour
         episodes.RecordShot(shooter, hit, damage);
     }
 
-    void HandleDamaged(Health victim, float amount)
+    void HandleDamaged(Health victim, DamageInfo info)
     {
         LogEvent("damage",
             JsonLine.Field("victim", victim.gameObject.tag),
-            JsonLine.Field("amount", amount),
+            JsonLine.Field("amount", info.Amount),
             JsonLine.Field("remaining", victim.health),
             JsonLine.Field("pos", victim.transform.position));
-        episodes.RecordDamage(victim.gameObject.tag, amount);
+        episodes.RecordDamage(victim.gameObject.tag, info.Amount);
     }
 
     void HandleDied(Health victim)

@@ -188,12 +188,12 @@ public class EnemyAgent : Agent
             && Academy.Instance.IsCommunicatorOn;
     }
 
-    void HandleSelfDamaged(float amount)
+    void HandleSelfDamaged(DamageInfo info)
     {
         AddReward(-gotHitPenalty);
     }
 
-    void HandleTargetDamaged(float amount)
+    void HandleTargetDamaged(DamageInfo info)
     {
         AddReward(hitTargetReward);
     }

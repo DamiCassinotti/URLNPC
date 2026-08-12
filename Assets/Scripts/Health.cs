@@ -7,7 +7,7 @@ public class Health : MonoBehaviour
     [SerializeField] public float health = 100f;
     GameManager gameManager;
 
-    public event Action<float> OnDamaged;
+    public event Action<DamageInfo> OnDamaged;
     public event Action OnDied;
 
     bool isDead;
@@ -17,11 +17,14 @@ public class Health : MonoBehaviour
         gameManager = FindAnyObjectByType<GameManager>();
     }
 
-    public void DecreaseHealth(float damage)
+    // Damage with no known shooter.
+    public void DecreaseHealth(float damage) => DecreaseHealth(new DamageInfo(damage));
+
+    public void DecreaseHealth(DamageInfo info)
     {
         if (isDead) return;
-        this.health -= damage;
-        OnDamaged?.Invoke(damage);
+        this.health -= info.Amount;
+        OnDamaged?.Invoke(info);
         this.CheckDeath();
     }
 
