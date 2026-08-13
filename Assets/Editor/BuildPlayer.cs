@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-using System;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -25,17 +24,28 @@ public static class BuildPlayer
             options = BuildOptions.None,
         };
 
-        BuildReport report = BuildPipeline.BuildPlayer(options);
-        BuildSummary summary = report.summary;
+        // BuildPlayer can throw (e.g. Linux Build Support not installed) rather
+        // than returning a failed report. Without this catch the exception rides
+        // -quit to a 0 exit code and build-player.sh reports a phantom success.
+        try
+        {
+            BuildReport report = BuildPipeline.BuildPlayer(options);
+            BuildSummary summary = report.summary;
 
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log($"[BuildPlayer] Succeeded: {summary.outputPath} ({summary.totalSize} bytes)");
-            EditorApplication.Exit(0);
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log($"[BuildPlayer] Succeeded: {summary.outputPath} ({summary.totalSize} bytes)");
+                EditorApplication.Exit(0);
+            }
+            else
+            {
+                Debug.LogError($"[BuildPlayer] {summary.result} with {summary.totalErrors} error(s).");
+                EditorApplication.Exit(1);
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.LogError($"[BuildPlayer] {summary.result} with {summary.totalErrors} error(s).");
+            Debug.LogError($"[BuildPlayer] Build threw: {e}");
             EditorApplication.Exit(1);
         }
     }
