@@ -154,16 +154,26 @@ public class GameManager : MonoBehaviour
     {
         if (counter != null) counter.Draw();
 
-        RoundEnded?.Invoke(DrawResult);
-
         // Training: every agent takes the penalty and resets in place, so the
         // clock is rearmed and the scene keeps running — no reload.
-        if (Academy.IsInitialized && Academy.Instance.IsCommunicatorOn)
+        bool training = Academy.IsInitialized && Academy.Instance.IsCommunicatorOn;
+        if (training)
         {
+            // Ahead of RoundEnded, because that is what closes the episode in
+            // the telemetry log — the per-episode stats the agents emit as
+            // they end have to land in the round they describe. A death
+            // already runs in this order: Health.OnDied reaches the agent
+            // before it reaches ProcessDeath.
             foreach (EnemyAgent agent in FindObjectsByType<EnemyAgent>(FindObjectsSortMode.None))
             {
                 agent.OnRoundTimeout();
             }
+        }
+
+        RoundEnded?.Invoke(DrawResult);
+
+        if (training)
+        {
             ResetRoundClock();
             return;
         }

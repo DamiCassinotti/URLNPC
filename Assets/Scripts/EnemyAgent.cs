@@ -48,9 +48,14 @@ public class EnemyAgent : Agent
     EnemyBehavior behavior;
     Health selfHealth;
     Health targetHealth;
+    ModeChannel modeChannel;
     GameManager gameManager;
     RewardComputer rewards;
     EpisodeProgress progress;
+    ModeComplianceTracker compliance;
+
+    // Built once: the stat name is per mode and the flush runs every episode.
+    static readonly string[] complianceStatNames = BuildComplianceStatNames();
 
     readonly float[] observations = new float[NpcBrainSpec.ObservationSize];
     NpcObservationInput inputs;
@@ -68,6 +73,22 @@ public class EnemyAgent : Agent
     {
         base.Awake();
         EnforceBrainSpec();
+        SubscribeToModeChannel();
+    }
+
+    // The mode timeline the behavior analysis segments on, logged from here
+    // rather than a scan in TelemetryLogger: the channel is added at runtime
+    // (EnemyBehavior.Awake, and CombatantRig for the agent-driven player), so a
+    // scene-load-time scan can miss it. Awake and not Initialize because
+    // component order decides whether EnemyBehavior.Awake has run by then —
+    // finding-or-adding the channel the same way it does leaves exactly one on
+    // the body whichever of the two goes first, and it exists before the first
+    // FixedUpdate a writer could command a mode on.
+    void SubscribeToModeChannel()
+    {
+        modeChannel = GetComponent<ModeChannel>();
+        if (modeChannel == null) modeChannel = gameObject.AddComponent<ModeChannel>();
+        modeChannel.ModeChanged += HandleModeChanged;
     }
 
     // The frozen interface has to hold for the instance that actually plays, and
@@ -148,9 +169,17 @@ public class EnemyAgent : Agent
             };
         }
         progress = new EpisodeProgress { areaCellSize = newAreaCellSize };
+        compliance = new ModeComplianceTracker();
 
         selfHealth.OnDamaged += HandleSelfDamaged;
         selfHealth.OnDied += HandleSelfDied;
+    }
+
+    static string[] BuildComplianceStatNames()
+    {
+        var names = new string[NpcModes.All.Length];
+        foreach (NpcMode mode in NpcModes.All) names[(int)mode] = $"Compliance/{mode}";
+        return names;
     }
 
     static float Column(float[] row, NpcMode mode, float fallback)
@@ -256,7 +285,10 @@ public class EnemyAgent : Agent
         // and unconditionally so the baseline never skips a step.
         float closingDelta = progress.Closing(distanceToTarget);
         bool enteredNewArea = progress.EnterArea(transform.position.x, transform.position.z);
-        bool hidden = rewards.RewardsCover(mode) && behavior.IsHiddenFromTarget();
+        // A raycast, so it is only probed for the modes that read it: the
+        // columns that pay for cover, and HoldCover's compliance rule.
+        bool needsCover = rewards.RewardsCover(mode) || ModeComplianceTracker.ReadsCover(mode);
+        bool hidden = needsCover && behavior.IsHiddenFromTarget();
 
         behavior.Move((MovementAction)actions.DiscreteActions[0]);
         // Fire after moving: the primitives set the facing, and Attack's own
@@ -275,6 +307,15 @@ public class EnemyAgent : Agent
             hiddenFromTarget = hidden,
             enteredNewArea = enteredNewArea,
         }));
+
+        compliance.Record(new ComplianceSample
+        {
+            mode = mode,
+            closingDelta = closingDelta,
+            shotFired = fired && behavior.DidShoot,
+            inCover = hidden,
+            enteredNewArea = enteredNewArea,
+        });
     }
 
     public override void OnEpisodeBegin()
@@ -283,6 +324,10 @@ public class EnemyAgent : Agent
         // Both halves are per-episode: the respawn below is a teleport, not
         // ground closed, and the arena is unexplored again.
         if (progress != null) progress.Reset();
+        // Normally already emptied by the flush on the way out; this catches an
+        // episode the trainer ends from its side, whose tally would otherwise
+        // be counted into the next one.
+        if (compliance != null) compliance.Reset();
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
         // Reposition the player BEFORE the enemy respawns so the enemy's
@@ -310,9 +355,51 @@ public class EnemyAgent : Agent
     public void OnRoundTimeout()
     {
         if (episodeEnding) return;
+        EndEpisodeWith(-timeoutPenalty);
+    }
+
+    // Every terminal path goes through here so the episode's compliance tally
+    // is always reported, and reported before the round-end machinery moves
+    // the telemetry log on to the next episode.
+    void EndEpisodeWith(float terminalReward)
+    {
         episodeEnding = true;
-        AddReward(-timeoutPenalty);
+        AddReward(terminalReward);
+        FlushCompliance();
         EndEpisode();
+    }
+
+    // Per-episode mode compliance (#45): to TensorBoard next to reward and
+    // entropy, and to the JSONL for the offline behavior analysis.
+    void FlushCompliance()
+    {
+        if (compliance == null || compliance.TotalSteps == 0) return;
+
+        if (Academy.IsInitialized)
+        {
+            StatsRecorder stats = Academy.Instance.StatsRecorder;
+            foreach (NpcMode mode in NpcModes.All)
+            {
+                // A mode this episode never ran has no rate to average in.
+                if (compliance.Steps(mode) > 0) stats.Add(complianceStatNames[(int)mode], compliance.Rate(mode));
+            }
+        }
+        if (TelemetryLogger.Instance != null)
+        {
+            TelemetryLogger.Instance.LogEvent("mode_compliance",
+                JsonLine.Field("entity", tag),
+                compliance.ComplianceJson());
+        }
+        compliance.Reset();
+    }
+
+    void HandleModeChanged(NpcMode previous, NpcMode current)
+    {
+        if (TelemetryLogger.Instance == null) return;
+        TelemetryLogger.Instance.LogEvent("mode_change",
+            JsonLine.Field("entity", tag),
+            JsonLine.Field("from", previous.ToString()),
+            JsonLine.Field("to", current.ToString()));
     }
 
     // Only during automated training: in human play the round restarts via a
@@ -339,21 +426,18 @@ public class EnemyAgent : Agent
     void HandleSelfDied()
     {
         if (episodeEnding) return;
-        episodeEnding = true;
-        AddReward(-diedPenalty);
-        EndEpisode();
+        EndEpisodeWith(-diedPenalty);
     }
 
     void HandleTargetDied()
     {
         if (episodeEnding) return;
-        episodeEnding = true;
-        AddReward(killTargetReward);
-        EndEpisode();
+        EndEpisodeWith(killTargetReward);
     }
 
     void OnDestroy()
     {
+        if (modeChannel != null) modeChannel.ModeChanged -= HandleModeChanged;
         if (selfHealth != null)
         {
             selfHealth.OnDamaged -= HandleSelfDamaged;

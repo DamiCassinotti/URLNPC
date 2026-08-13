@@ -136,6 +136,19 @@ The rest is one column per commanded mode (`NpcMode`), so the same policy is pul
 | Per step with the player's line of sight to it broken | `0` | `+0.005` | `+0.002` | `0` |
 | Each patch of the arena first entered this episode | `0` | `0` | `0` | `+0.002` |
 
+### Mode compliance
+
+Whether the policy actually obeys the mode it is commanded. Every decision step is scored against its mode, and the per-episode fraction is reported as `Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat` and `Compliance/Patrol` in TensorBoard, next to reward and entropy:
+
+| Mode | A step counts as compliant when it |
+|---|---|
+| Hunt | closed distance on the player, or got a shot off |
+| HoldCover | kept the player's line of sight to it broken |
+| Retreat | opened distance |
+| Patrol | entered a patch of the arena it had not been in this episode |
+
+The same numbers go to the telemetry log as a `mode_compliance` line per episode (steps, compliant steps and rate per mode), alongside a `mode_change` line for every switch — that pair is the mode timeline the offline analysis reads. Patrol's rate is low by construction: a patch only counts the first time, so compare it between runs rather than reading it as a percentage.
+
 ## Testing
 
 The project carries a Unity Test Framework suite covering the load-bearing behaviors: seeded reproducibility (`RunRng`, arena/spawn replays), the round clock and draw path, win/loss/draw counters, health/death events, episode resets, and the NPC's sensory contract (`PerceptionMemory`).
