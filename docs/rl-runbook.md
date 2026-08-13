@@ -30,23 +30,50 @@ snapshot, not live like editor Play.
 
 ## 2. Run the slice
 
-The slice is the two-mode run: `ModeDirector.enabledModes` ships as `Hunt | Retreat`, so the
-director only ever commands those two and the policy learns the Hunt/Retreat split before the
-full four-mode pool. From the repo root with the venv active:
+`scripts/train.sh` is the one entry point for both training paths; it wraps `mlagents-learn`
+so you don't assemble the `--env` / `--env-args` line by hand:
 
 ```bash
-mlagents-learn config/URLNPC.yaml --run-id=slice-01 --env=Builds/Linux/URLNPC --num-envs=4
+scripts/train.sh editor <run-id> [config] [extra mlagents args...]
+scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S] [extra...]
 ```
 
-- `--run-id` names the run; results land in `results/<run-id>/`. Reuse a name only with
-  `--resume` (continue) or `--force` (overwrite).
-- `--env` points at the standalone build; drop it and press Play to drive from the editor
-  instead.
-- Reproducible run: append `--env-args -runSeed 12345` (README → *Reproducible evaluation
-  runs*). The seed is logged and recorded as `Run/Seed` per episode.
+- **`editor`** starts the trainer and waits for you to press Play — for watching behavior and
+  quick checks.
+- **`build`** runs against the standalone player from step 1, and always drives the player
+  side with the shared agent policy (`-playerDriver agent`) so both bodies fight a live
+  opponent.
+- `config` defaults to `config/URLNPC.yaml`. `--resume` / `--force` and any other flag pass
+  straight through to `mlagents-learn`.
 
-Trained model lands at `results/<run-id>/URLNPC.onnx`; checkpoints every 50k steps
-(`checkpoint_interval`), `max_steps` 1M.
+The slice is the narrowed early run: the short `config/URLNPC-slice.yaml` (50k steps,
+`summary_freq` 2000) paired with the `ModeDirector.enabledModes` default of `Hunt | Retreat`,
+so the policy learns the Hunt/Retreat split before the full four-mode, 1M-step run. Smoke it
+in the editor first:
+
+```bash
+scripts/train.sh editor slice-01 config/URLNPC-slice.yaml
+```
+
+The three configs:
+
+| Config | Steps | Use |
+|---|---|---|
+| `config/URLNPC-slice.yaml` | 50k | slice / smoke run |
+| `config/URLNPC.yaml` | 1M | full run |
+| `config/URLNPC-selfplay.yaml` | 1M | full run plus the self-play block (see step 6) |
+
+For a longer unattended run, point `build` at the standalone player with parallel envs and a
+fixed seed for reproducibility (`--seed` becomes `-runSeed` in the build's env-args; README →
+*Reproducible evaluation runs*):
+
+```bash
+scripts/train.sh build slice-02 config/URLNPC-slice.yaml --num-envs=4 --seed=12345
+```
+
+Results land in `results/<run-id>/`; reuse a `<run-id>` only with `--resume` (continue) or
+`--force` (overwrite). Trained model at `results/<run-id>/URLNPC.onnx`; the slice checkpoints
+every 25k steps, the full run every 50k (`checkpoint_interval`).
 
 ## 3. What to look for in TensorBoard
 
@@ -99,16 +126,16 @@ before your next training run so the director resumes sampling.
 ## 6. Self-play
 
 The player body can be driven by the same policy as the enemy, so both sides train against a
-live opponent instead of a static target. `CombatantRig` swaps the player between a Human
-driver and an Agent driver:
+live opponent instead of a static target. `train.sh build` already drives the player with the
+agent policy, so any `build` run has both bodies fighting. Add the `config/URLNPC-selfplay.yaml`
+config to also turn on ML-Agents' self-play block (snapshot opponents, team swaps, ELO):
 
 ```bash
-mlagents-learn config/URLNPC.yaml --run-id=selfplay-01 --env=Builds/Linux/URLNPC \
-    --num-envs=4 --env-args -playerDriver agent
+scripts/train.sh build selfplay-01 config/URLNPC-selfplay.yaml --num-envs=4
 ```
 
 The agent driver defaults to behavior name `URLNPC` / team id 1 — same behavior name as the
 enemy, so both sides share one policy. In the editor, set **Driver = Agent** on `CombatantRig`
-(or `CombatantRig.DriverOverride` from code) instead of the CLI arg. Both bodies carry a
-`ModeDirector`, so each is independently commanded during the run. Give the agent driver a
-different behavior name to train a separate player policy against the enemy.
+(or `CombatantRig.DriverOverride` from code); `editor` runs don't pass `-playerDriver`. Both
+bodies carry a `ModeDirector`, so each is independently commanded during the run. Give the
+agent driver a different behavior name to train a separate player policy against the enemy.
