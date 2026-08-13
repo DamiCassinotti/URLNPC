@@ -9,13 +9,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Run
 
 - **Play the game:** Open the project in **Unity 6000.0 LTS**, load `Assets/Scenes/FPS.unity`, press Play.
-- **ML training:** Create a Python 3.10 venv, install `requirements.txt`, then from the repo root:
+- **ML training:** Create a Python 3.10 venv, install `requirements.txt`, then drive training through `scripts/train.sh` (wraps `mlagents-learn`) from the repo root:
   ```bash
   python -m venv .venv && source .venv/bin/activate
   pip install -r requirements.txt
-  mlagents-learn config/URLNPC.yaml --run-id=URLNPC
+  scripts/train.sh editor <run-id> [config]   # press Play in the editor to feed it
+  scripts/train.sh build  <run-id> [config]   # headless standalone build, self-play
   ```
-  Trained models (`.onnx` files) are saved to `results/URLNPC/`.
+  `config` defaults to `config/URLNPC.yaml` (slice/full/self-play configs and the full walkthrough are in `docs/rl-runbook.md`). Trained models (`.onnx` files) are saved to `results/<run-id>/`.
 
 ## Tech Stack
 
