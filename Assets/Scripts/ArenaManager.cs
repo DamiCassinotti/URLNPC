@@ -35,9 +35,6 @@ public class ArenaManager : MonoBehaviour
     // Every LOS-blocking box this arena was built from, so cover queries don't
     // have to raycast-search the world.
     readonly List<Collider> coverColliders = new List<Collider>();
-    // Reused by the LOS probe in NearestCoverPoint; that query is rate-limited,
-    // so a fixed buffer avoids a per-call allocation.
-    readonly RaycastHit[] coverLosHits = new RaycastHit[16];
 
     // Half the floor size, i.e. center to the inner wall face.
     public float HalfExtentX { get; private set; }
@@ -207,7 +204,7 @@ public class ArenaManager : MonoBehaviour
             // Something has to interrupt the threat's eye-line — normally this
             // very object, so low geometry like stair steps self-rejects.
             Vector3 candidateEye = candidate + Vector3.up * eyeHeight;
-            if (!EyeLineBlocked(threatEye, candidateEye, sightObstacleMask, asker)) continue;
+            if (!EyeLine.Blocked(threatEye, candidateEye, sightObstacleMask, asker)) continue;
 
             if (!NavMesh.CalculatePath(from, candidate, NavMesh.AllAreas, path)) continue;
             if (path.status != NavMeshPathStatus.PathComplete) continue;
@@ -217,26 +214,6 @@ public class ArenaManager : MonoBehaviour
             found = true;
         }
         return found;
-    }
-
-    // Is the eye-line from `eye` to `targetEye` broken by something other than
-    // the asker's own body? A plain Physics.Raycast would accept the asker's
-    // capsule as the blocker and call an exposed point covered, so walk the hits
-    // and ignore anything under `asker`.
-    bool EyeLineBlocked(Vector3 eye, Vector3 targetEye, LayerMask sightObstacleMask, Transform asker)
-    {
-        Vector3 toTarget = targetEye - eye;
-        float distance = toTarget.magnitude - 0.1f;
-        if (distance <= 0f) return false;
-
-        int count = Physics.RaycastNonAlloc(eye, toTarget.normalized, coverLosHits, distance,
-            sightObstacleMask, QueryTriggerInteraction.Ignore);
-        for (int i = 0; i < count; i++)
-        {
-            if (asker != null && coverLosHits[i].transform.IsChildOf(asker)) continue;
-            return true;
-        }
-        return false;
     }
 
     // ------------------------------------------------------------- lifecycle

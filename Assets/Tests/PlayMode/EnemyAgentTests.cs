@@ -50,11 +50,30 @@ public class EnemyAgentTests : PlayModeTestBase
 
         playerHealth.DecreaseHealth(10f);
         Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0.5f).Within(1e-4f),
-            "hitting the target must pay hitTargetReward (+0.5)");
+            "hitting the target in Hunt must pay the Hunt column (+0.5)");
 
         selfHealth.DecreaseHealth(10f);
-        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0f).Within(1e-4f),
-            "getting hit must cost gotHitPenalty (-0.5)");
+        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0.5f - 0.3f).Within(1e-4f),
+            "getting hit in Hunt must cost the Hunt column (-0.3)");
+    }
+
+    // The mode one-hot is only worth an observation slot if the mode changes
+    // what pays (#44); this pins the agent's serialized columns to the table.
+    [UnityTest]
+    public IEnumerator HitRewards_FollowTheCommandedMode()
+    {
+        yield return BuildAgentScene();
+        agent.GetComponent<ModeChannel>().SetMode(NpcMode.Retreat);
+
+        float baseline = agent.GetCumulativeReward();
+        playerHealth.DecreaseHealth(10f);
+        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0.1f).Within(1e-4f),
+            "a retreating NPC gets little for trading shots");
+
+        baseline = agent.GetCumulativeReward();
+        selfHealth.DecreaseHealth(10f);
+        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(-0.6f).Within(1e-4f),
+            "and being hit while retreating costs double what it does in Hunt");
     }
 
     [UnityTest]

@@ -115,16 +115,26 @@ Unseeded runs draw a random seed and still log it (look for the `[RunRng] Run se
 
 ### Reward shape
 
-Defined in `EnemyAgent.cs` (tunable in Inspector):
+Defined in `EnemyAgent.cs` (tunable in Inspector). The rows the commanded mode doesn't change:
 
 | Event | Reward |
 |---|---|
 | Per decision step while alive | `+0.001` |
-| Dealt damage to player | `+0.5` |
-| Took damage | `-0.5` |
 | Killed player | `+1.0` (ends episode) |
 | Died | `-1.0` (ends episode) |
+| Round clock ran out (draw) | `-0.2` (ends episode) |
 | Shot while target out of sight | `-0.05` |
+| Per step closer to the player than 6 m | `-0.005` |
+
+The rest is one column per commanded mode (`NpcMode`), so the same policy is pulled toward different behavior depending on what it was told to do:
+
+| Event | Hunt | HoldCover | Retreat | Patrol |
+|---|---|---|---|---|
+| Dealt damage to player | `+0.5` | `+0.5` | `+0.1` | `+0.1` |
+| Took damage | `-0.3` | `-0.6` | `-0.6` | `-0.5` |
+| Per metre closed on the player | `+0.01` | `0` | `-0.01` | `0` |
+| Per step with the player's line of sight to it broken | `0` | `+0.005` | `+0.002` | `0` |
+| Each patch of the arena first entered this episode | `0` | `0` | `0` | `+0.002` |
 
 ## Testing
 
