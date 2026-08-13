@@ -89,6 +89,22 @@ To speed training, in the Editor: **Edit → Project Settings → Time → Time 
 
 Trained models land at `results/URLNPC/URLNPC.onnx`.
 
+### Headless standalone build (`--env` runs)
+
+Pressing Play is only one way to feed the trainer. Build a standalone Linux player once and `mlagents-learn` can launch it itself — no editor, parallel environments, unattended overnight runs:
+
+```bash
+scripts/build-player.sh   # close the editor first (single instance per project)
+```
+
+This runs `BuildPlayer.BuildLinux` (`Assets/Editor/BuildPlayer.cs`) in batch mode and writes `Builds/Linux/URLNPC.x86_64` (gitignored). Point the trainer at it with `--env`:
+
+```bash
+mlagents-learn config/URLNPC.yaml --run-id=URLNPC --env=Builds/Linux/URLNPC --num-envs=4
+```
+
+The build honours the same CLI args as Editor Play — `-playerDriver <human|agent>` and `-runSeed <int>` — passed through the trainer's `--env-args`.
+
 ### Stopping and resuming training
 
 You can quit the game and pick training back up later **on the same semi-trained model** — the network is checkpointed entirely on the Python side (`results/URLNPC/`, see `checkpoint_interval` in `config/URLNPC.yaml`), not stored in the Unity project.
