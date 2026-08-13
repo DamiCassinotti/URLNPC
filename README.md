@@ -81,17 +81,22 @@ The `Assets/Prefabs/Characters/Enemy.prefab` GameObject must have these componen
 
 ### Run training
 
-From the repo root, with the venv active:
+From the repo root with the venv active, `scripts/train.sh` is the one entry point for both
+paths (it wraps `mlagents-learn`):
 
 ```bash
-mlagents-learn config/URLNPC.yaml --run-id=URLNPC --force
+scripts/train.sh editor <run-id> [config] [extra mlagents args...]   # press Play to feed it
+scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S]  # headless standalone
 ```
 
-`mlagents-learn` will print "Listening on port 5004. Start training by pressing the Play button in the Unity Editor." Open the FPS scene and press **Play**. Episodes auto-reset on death (the agent calls `EndEpisode()` and `OnEpisodeBegin` re-rolls position and health).
+`config` defaults to `config/URLNPC.yaml`; the slice/full/self-play configs and a step-by-step
+walkthrough are in [`docs/rl-runbook.md`](docs/rl-runbook.md). In `editor` mode the trainer
+prints "Listening on port 5004…" — open the FPS scene and press **Play**. Episodes auto-reset
+on death (the agent calls `EndEpisode()` and `OnEpisodeBegin` re-rolls position and health).
 
 To speed training, in the Editor: **Edit → Project Settings → Time → Time Scale** can be increased, or run multiple parallel envs by duplicating the Enemy/Player setup into separate Training Areas (recommended for longer runs).
 
-Trained models land at `results/URLNPC/URLNPC.onnx`.
+Trained models land at `results/<run-id>/URLNPC.onnx`.
 
 ### Headless standalone build (`--env` runs)
 
@@ -101,23 +106,23 @@ Pressing Play is only one way to feed the trainer. Build a standalone Linux play
 scripts/build-player.sh   # close the editor first (single instance per project)
 ```
 
-This runs `BuildPlayer.BuildLinux` (`Assets/Editor/BuildPlayer.cs`) in batch mode and writes `Builds/Linux/URLNPC.x86_64` (gitignored). Point the trainer at it with `--env`:
+This runs `BuildPlayer.BuildLinux` (`Assets/Editor/BuildPlayer.cs`) in batch mode and writes `Builds/Linux/URLNPC.x86_64` (gitignored). Point the trainer at it with `scripts/train.sh build`:
 
 ```bash
-mlagents-learn config/URLNPC.yaml --run-id=URLNPC --env=Builds/Linux/URLNPC --num-envs=4
+scripts/train.sh build <run-id> [config] --num-envs=4 --seed=12345
 ```
 
-The build honours the same CLI args as Editor Play — `-playerDriver <human|agent>` and `-runSeed <int>` — passed through the trainer's `--env-args`.
+`build` runs against the standalone player and drives the player side with the shared agent policy (`-playerDriver agent`) for self-play; `--seed` becomes the build's `-runSeed`. Both are passed through the trainer's `--env-args`.
 
 ### Stopping and resuming training
 
 You can quit the game and pick training back up later **on the same semi-trained model** — the network is checkpointed entirely on the Python side (`results/URLNPC/`, see `checkpoint_interval` in `config/URLNPC.yaml`), not stored in the Unity project.
 
 1. Stop whenever: exit Play mode in the Editor and/or `Ctrl+C` the trainer.
-2. To continue, run with **`--resume`** instead of `--force`, then press **Play** again:
+2. To continue, run with **`--resume`** instead of `--force` (both pass straight through `train.sh`), then press **Play** again:
 
    ```bash
-   mlagents-learn config/URLNPC.yaml --run-id=URLNPC --resume
+   scripts/train.sh editor <run-id> config/URLNPC.yaml --resume
    ```
 
    `--resume` reloads the network weights, optimizer state, and step count from the last checkpoint. (To instead *fork* a finished model into a brand-new run, use `--initialize-from=URLNPC` with a different `--run-id`.)
