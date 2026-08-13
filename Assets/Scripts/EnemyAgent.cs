@@ -147,10 +147,10 @@ public class EnemyAgent : Agent
 
         behavior = GetComponent<EnemyBehavior>();
         selfHealth = GetComponent<Health>();
-        // The scripted mode writer on this body, when there is one (the Enemy
-        // prefab and CombatantRig's agent-driven player carry it; a bare test
-        // agent may not). OnEpisodeBegin redraws its mode so the new episode
-        // doesn't inherit the last one's dwell.
+        // The scripted mode writer EnemyBehavior.Awake attaches to every AI
+        // body; OnEpisodeBegin redraws its mode so the new episode doesn't
+        // inherit the last one's dwell. Resolved here rather than off the
+        // behavior so it holds even in fixtures that disable EnemyBehavior.
         director = GetComponent<ModeDirector>();
 
         // Snapshot taken once per play session, so these tunables only take

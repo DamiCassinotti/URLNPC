@@ -47,8 +47,7 @@ public class EnemyBehavior : MonoBehaviour
     public DamageMemory Damage { get; private set; }
 
     // The commanded mode the policy is conditioned on, auto-added for the same
-    // reason. Without a writer (ModeDirector, or the LLM selector) it just
-    // reports its initial mode.
+    // reason. Until a writer commands one it just reports its initial mode.
     public ModeChannel Mode { get; private set; }
 
     // What this combatant's sight ray can be blocked by. Cover queries must run
@@ -70,6 +69,13 @@ public class EnemyBehavior : MonoBehaviour
         if (Damage == null) Damage = gameObject.AddComponent<DamageMemory>();
         Mode = GetComponent<ModeChannel>();
         if (Mode == null) Mode = gameObject.AddComponent<ModeChannel>();
+        // The scripted writer that commands Mode during training, attached the
+        // same way so every AI body has one and #65 can't recur on a new
+        // combatant. Inert outside training (ModeDirector.trainingOnly), and the
+        // find-or-add uses the prefab's serialized instance when there is one.
+        // After the channel: its RequireComponent(ModeChannel) would else add a
+        // second one. Read back by EnemyAgent via its own GetComponent.
+        if (GetComponent<ModeDirector>() == null) gameObject.AddComponent<ModeDirector>();
     }
 
     void Start()
