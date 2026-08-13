@@ -20,6 +20,8 @@ GameObject:
   - component: {fileID: 2094766410}
   - component: {fileID: 210935820}
   - component: {fileID: 210935821}
+  - component: {fileID: 210935830}
+  - component: {fileID: 210935831}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: NPC
@@ -256,6 +258,36 @@ MonoBehaviour:
   DecisionPeriod: 5
   DecisionStep: 0
   TakeActionsBetweenDecisions: 1
+--- !u!114 &210935830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418224769242456080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6be3a8485244411aaa7d162d339664d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  initialMode: 0
+--- !u!114 &210935831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418224769242456080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59443c646ad4491392707243ba189e6c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  enabledModes: 5
+  minDwellSeconds: 5
+  trainingOnly: 1
+  useForcedMode: 0
+  forcedMode: 0
 --- !u!1 &3846806824030858784
 GameObject:
   m_ObjectHideFlags: 0
