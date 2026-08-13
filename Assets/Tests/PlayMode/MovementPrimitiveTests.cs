@@ -316,6 +316,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
         yield return PlaceCombatants(from, threat);
         Assert.That(behavior.Perception.HasEverSeen, Is.True, "sanity: the threat starts visible");
         Assert.That(LosBlocked(threat, EnemyPos), Is.False, "sanity: the enemy starts in the open");
+        Assert.That(behavior.IsHiddenFromTarget(), Is.False, "sanity: and the reward flag agrees");
 
         // Walk until it arrives, then check where it ended up. The travelled
         // guard keeps the frame before the first path is computed, where
@@ -334,6 +335,10 @@ public class MovementPrimitiveTests : PlayModeTestBase
 
         Assert.That(LosBlocked(threat, EnemyPos), Is.True,
             $"MoveToCover left the agent at {EnemyPos}, still in the threat's line of sight from {threat}");
+        // The primitive and the reward column have to judge cover the same way,
+        // or the policy is sent to a point that then pays nothing (#44).
+        Assert.That(behavior.IsHiddenFromTarget(), Is.True,
+            "the in-cover reward flag must agree with the point MoveToCover walked to");
     }
 
     [UnityTest]

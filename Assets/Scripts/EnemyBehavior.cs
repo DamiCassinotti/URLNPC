@@ -405,6 +405,23 @@ public class EnemyBehavior : MonoBehaviour
         return true;
     }
 
+    // ENVIRONMENT-SIDE ONLY, same rule as DistanceToTarget: is the target's
+    // eye-line to this body broken? IsTargetInSight can't answer that — it is
+    // FOV-limited, so it would call "in cover" every step the NPC looked away.
+    // Probe and eye height match MoveToCover's cover query, so the point the
+    // policy is sent to is a point the reward column pays for.
+    public bool IsHiddenFromTarget()
+    {
+        if (target == null) return false;
+        float eyeHeight = navMeshAgent != null ? navMeshAgent.height : 2f;
+        // The head above the grounded base: on the Enemy prefab the transform
+        // itself is already lifted by the agent's base offset.
+        float baseOffset = navMeshAgent != null ? navMeshAgent.baseOffset : 0f;
+        Vector3 selfEye = transform.position + Vector3.up * (eyeHeight - baseOffset);
+        Vector3 threatEye = target.position + Vector3.up * eyeHeight;
+        return EyeLine.Blocked(threatEye, selfEye, sightObstacleMask, transform, target);
+    }
+
     // ENVIRONMENT-SIDE ONLY. Reward computation may read true state; never feed
     // this to observations or actions — the brain goes through PerceptionMemory.
     public float DistanceToTarget()

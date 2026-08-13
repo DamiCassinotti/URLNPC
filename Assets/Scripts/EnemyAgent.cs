@@ -23,6 +23,24 @@ public class EnemyAgent : Agent
     [SerializeField] float tooClosePenaltyPerStep = 0.005f;
     [SerializeField] float tooCloseDistance = 6f;
 
+    // One column per NpcMode, in NpcModes.All order: Hunt, HoldCover, Retreat,
+    // Patrol. Rows shorter than that fall back to the global reward above (or to
+    // 0 for the rows that have no global counterpart), so a row edited down in
+    // the Inspector can't throw mid-episode.
+    [Header("Per-mode reward columns (Hunt, HoldCover, Retreat, Patrol)")]
+    [Tooltip("Reward for hitting the target, per commanded mode. Falls back to hitTargetReward.")]
+    [SerializeField] float[] hitTargetRewardByMode = { 0.5f, 0.5f, 0.1f, 0.1f };
+    [Tooltip("Penalty (positive magnitude) for being hit, per commanded mode. Falls back to gotHitPenalty.")]
+    [SerializeField] float[] gotHitPenaltyByMode = { 0.3f, 0.6f, 0.6f, 0.5f };
+    [Tooltip("Reward per metre closed on the target since the last step. Negative pays for opening distance instead.")]
+    [SerializeField] float[] closingRewardPerMeterByMode = { 0.01f, 0f, -0.01f, 0f };
+    [Tooltip("Per-step reward while the target's eye-line to the enemy is broken.")]
+    [SerializeField] float[] coverRewardPerStepByMode = { 0f, 0.005f, 0.002f, 0f };
+    [Tooltip("One-off reward the first time each patch of the arena is entered in an episode.")]
+    [SerializeField] float[] newAreaRewardByMode = { 0f, 0f, 0f, 0.002f };
+    [Tooltip("Side in metres of the square patches the new-area reward counts.")]
+    [SerializeField] float newAreaCellSize = 6f;
+
     [Header("Episode reset")]
     [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play gets its random spawn from ArenaManager.Start on each round's scene reload instead — repositioning here would also fire on mid-round MaxStep resets and yank a live player across the arena.")]
     [SerializeField] bool repositionPlayerOnEpisodeBegin = true;
@@ -31,7 +49,8 @@ public class EnemyAgent : Agent
     Health selfHealth;
     Health targetHealth;
     GameManager gameManager;
-    RewardComputer stepRewards;
+    RewardComputer rewards;
+    EpisodeProgress progress;
 
     readonly float[] observations = new float[NpcBrainSpec.ObservationSize];
     NpcObservationInput inputs;
@@ -106,19 +125,43 @@ public class EnemyAgent : Agent
 
         behavior = GetComponent<EnemyBehavior>();
         selfHealth = GetComponent<Health>();
-        selfHealth.OnDamaged += HandleSelfDamaged;
-        selfHealth.OnDied += HandleSelfDied;
 
         // Snapshot taken once per play session, so these tunables only take
-        // effect between runs. (The event rewards below still read live.)
-        stepRewards = new RewardComputer
+        // effect between runs. Built before the subscriptions below: the
+        // handlers read the mode columns out of it.
+        rewards = new RewardComputer
         {
             aliveRewardPerStep = aliveRewardPerStep,
             wastedShotPenalty = wastedShotPenalty,
             tooClosePenaltyPerStep = tooClosePenaltyPerStep,
             tooCloseDistance = tooCloseDistance,
         };
+        foreach (NpcMode mode in NpcModes.All)
+        {
+            rewards.modes[mode] = new ModeRewardColumn
+            {
+                hitTarget = Column(hitTargetRewardByMode, mode, hitTargetReward),
+                gotHit = Column(gotHitPenaltyByMode, mode, gotHitPenalty),
+                closingPerMeter = Column(closingRewardPerMeterByMode, mode, 0f),
+                coverPerStep = Column(coverRewardPerStepByMode, mode, 0f),
+                newArea = Column(newAreaRewardByMode, mode, 0f),
+            };
+        }
+        progress = new EpisodeProgress { areaCellSize = newAreaCellSize };
+
+        selfHealth.OnDamaged += HandleSelfDamaged;
+        selfHealth.OnDied += HandleSelfDied;
     }
+
+    static float Column(float[] row, NpcMode mode, float fallback)
+    {
+        return row != null && (int)mode < row.Length ? row[(int)mode] : fallback;
+    }
+
+    // What the mode columns are read against. The channel is auto-added by
+    // EnemyBehavior.Awake, so this only falls back before Initialize has run.
+    NpcMode CommandedMode =>
+        behavior != null && behavior.Mode != null ? behavior.Mode.CurrentMode : NpcMode.Hunt;
 
     void Update()
     {
@@ -205,9 +248,15 @@ public class EnemyAgent : Agent
     {
         if (episodeEnding) return;
 
-        // A true-state read is fine here: reward computation is environment
+        // True-state reads are fine here: reward computation is environment
         // code, not a policy input (sensory contract, issue #9).
+        NpcMode mode = CommandedMode;
         float distanceToTarget = behavior.DistanceToTarget();
+        // Taken before the move so consecutive steps measure the same thing,
+        // and unconditionally so the baseline never skips a step.
+        float closingDelta = progress.Closing(distanceToTarget);
+        bool enteredNewArea = progress.EnterArea(transform.position.x, transform.position.z);
+        bool hidden = rewards.RewardsCover(mode) && behavior.IsHiddenFromTarget();
 
         behavior.Move((MovementAction)actions.DiscreteActions[0]);
         // Fire after moving: the primitives set the facing, and Attack's own
@@ -215,12 +264,25 @@ public class EnemyAgent : Agent
         bool fired = actions.DiscreteActions[1] == NpcBrainSpec.Fire;
         if (fired) behavior.Attack();
 
-        AddReward(stepRewards.StepReward(fired, behavior.DidShoot, inputs.targetVisible, distanceToTarget));
+        AddReward(rewards.StepReward(new StepRewardInput
+        {
+            mode = mode,
+            fired = fired,
+            didShoot = behavior.DidShoot,
+            targetInSight = inputs.targetVisible,
+            distanceToTarget = distanceToTarget,
+            closingDelta = closingDelta,
+            hiddenFromTarget = hidden,
+            enteredNewArea = enteredNewArea,
+        }));
     }
 
     public override void OnEpisodeBegin()
     {
         episodeEnding = false;
+        // Both halves are per-episode: the respawn below is a teleport, not
+        // ground closed, and the arena is unexplored again.
+        if (progress != null) progress.Reset();
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
         // Reposition the player BEFORE the enemy respawns so the enemy's
@@ -266,12 +328,12 @@ public class EnemyAgent : Agent
 
     void HandleSelfDamaged(DamageInfo info)
     {
-        AddReward(-gotHitPenalty);
+        AddReward(-rewards.modes[CommandedMode].gotHit);
     }
 
     void HandleTargetDamaged(DamageInfo info)
     {
-        AddReward(hitTargetReward);
+        AddReward(rewards.modes[CommandedMode].hitTarget);
     }
 
     void HandleSelfDied()
