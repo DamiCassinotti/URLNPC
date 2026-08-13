@@ -43,6 +43,10 @@ No NavMesh needs to be baked by hand — `ArenaManager` bakes one at runtime via
 
 ## Training the agent
 
+For the end-to-end sequence of running a session and checking it — build the player, run the
+slice, read TensorBoard, load an `.onnx` for inference, force a mode, run self-play — see
+[`docs/rl-runbook.md`](docs/rl-runbook.md).
+
 ### One-time setup
 
 ```bash
