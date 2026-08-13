@@ -117,6 +117,11 @@ public class CombatantRig : MonoBehaviour
         bp.BrainParameters.NumStackedVectorObservations = 1;
         bp.BrainParameters.ActionSpec = NpcBrainSpec.Actions;
 
+        // The scripted mode writer rides along automatically: EnemyBehavior.Awake
+        // (run when it was added above) find-or-adds a ModeDirector, so this
+        // side commands modes during self-play instead of training the shared
+        // policy stuck on initialMode.
+
         // MaxStep is deliberately left at 0: EnemyAgent.Initialize forces it
         // there so the GameManager round clock is the single owner of
         // time-based episode termination on both sides of the fight.

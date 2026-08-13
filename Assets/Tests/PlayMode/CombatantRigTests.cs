@@ -100,6 +100,8 @@ public class CombatantRigTests : PlayModeTestBase
         Assert.That(behavior.Perception, Is.Not.Null, "PerceptionMemory must be present on the player side too");
         Assert.That(behavior.Damage, Is.Not.Null, "the hit-direction observations need a DamageMemory");
         Assert.That(behavior.Mode, Is.Not.Null, "the mode one-hot needs a ModeChannel");
+        Assert.That(body.GetComponent<ModeDirector>(), Is.Not.Null,
+            "the player side needs its own mode writer, or it trains stuck on initialMode (#65)");
     }
 
     [UnityTest]

@@ -49,6 +49,7 @@ public class EnemyAgent : Agent
     Health selfHealth;
     Health targetHealth;
     ModeChannel modeChannel;
+    ModeDirector director;
     GameManager gameManager;
     RewardComputer rewards;
     EpisodeProgress progress;
@@ -146,6 +147,11 @@ public class EnemyAgent : Agent
 
         behavior = GetComponent<EnemyBehavior>();
         selfHealth = GetComponent<Health>();
+        // The scripted mode writer EnemyBehavior.Awake attaches to every AI
+        // body; OnEpisodeBegin redraws its mode so the new episode doesn't
+        // inherit the last one's dwell. Resolved here rather than off the
+        // behavior so it holds even in fixtures that disable EnemyBehavior.
+        director = GetComponent<ModeDirector>();
 
         // Snapshot taken once per play session, so these tunables only take
         // effect between runs. Built before the subscriptions below: the
@@ -338,6 +344,10 @@ public class EnemyAgent : Agent
             ArenaManager.Current.RepositionPlayerAtRandomPoint();
         }
         if (behavior != null) behavior.ResetState();
+        // Redraw the commanded mode for the fresh episode: without this the new
+        // episode keeps the mode (and the running dwell) the last one ended on.
+        // ResetState stands the director down outside training on its own.
+        if (director != null) director.ResetState();
         // Training episodes reset without a scene reload, so the clock has to
         // be rearmed here to give each one a full budget.
         if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();

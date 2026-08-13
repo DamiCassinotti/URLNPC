@@ -202,6 +202,8 @@ public class EnemyAgentTests : PlayModeTestBase
             "no DecisionRequester — the enemy would stand still in every mode");
         Assert.That(enemy.GetComponent<ModeChannel>(), Is.Not.Null,
             "the mode one-hot has nothing to read without a channel");
+        Assert.That(enemy.GetComponent<ModeDirector>(), Is.Not.Null,
+            "without a director nothing writes the channel during training (#65)");
     }
 #endif
 }
