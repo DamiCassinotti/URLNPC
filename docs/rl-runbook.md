@@ -68,7 +68,7 @@ fixed seed for reproducibility (`--seed` becomes `-runSeed` in the build's env-a
 *Reproducible evaluation runs*):
 
 ```bash
-scripts/train.sh build slice-01 config/URLNPC-slice.yaml --num-envs=4 --seed=12345
+scripts/train.sh build slice-02 config/URLNPC-slice.yaml --num-envs=4 --seed=12345
 ```
 
 Results land in `results/<run-id>/`; reuse a `<run-id>` only with `--resume` (continue) or

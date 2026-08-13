@@ -116,7 +116,7 @@ scripts/train.sh build <run-id> [config] --num-envs=4 --seed=12345
 
 ### Stopping and resuming training
 
-You can quit the game and pick training back up later **on the same semi-trained model** — the network is checkpointed entirely on the Python side (`results/URLNPC/`, see `checkpoint_interval` in `config/URLNPC.yaml`), not stored in the Unity project.
+You can quit the game and pick training back up later **on the same semi-trained model** — the network is checkpointed entirely on the Python side (`results/<run-id>/`, see `checkpoint_interval` in the config), not stored in the Unity project.
 
 1. Stop whenever: exit Play mode in the Editor and/or `Ctrl+C` the trainer.
 2. To continue, run with **`--resume`** instead of `--force` (both pass straight through `train.sh`), then press **Play** again:
@@ -125,7 +125,7 @@ You can quit the game and pick training back up later **on the same semi-trained
    scripts/train.sh editor <run-id> config/URLNPC.yaml --resume
    ```
 
-   `--resume` reloads the network weights, optimizer state, and step count from the last checkpoint. (To instead *fork* a finished model into a brand-new run, use `--initialize-from=URLNPC` with a different `--run-id`.)
+   `--resume` reloads the network weights, optimizer state, and step count from the last checkpoint. (To instead *fork* a finished model into a brand-new run, pass `--initialize-from=<source-run-id>` under a new `<run-id>`.)
 
 The on-screen win/loss tally also survives quitting: `CounterData` persists the score to `PlayerPrefs`, so it carries across Editor Play sessions and standalone builds. Use the **Reset Score** button on the end-of-round canvas (or call `CounterData.ResetScores()`) to clear it.
 

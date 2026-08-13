@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   python -m venv .venv && source .venv/bin/activate
   pip install -r requirements.txt
   scripts/train.sh editor <run-id> [config]   # press Play in the editor to feed it
-  scripts/train.sh build  <run-id> [config]   # headless standalone build, self-play
+  scripts/train.sh build  <run-id> [config]   # headless standalone build, live opponent
   ```
   `config` defaults to `config/URLNPC.yaml` (slice/full/self-play configs and the full walkthrough are in `docs/rl-runbook.md`). Trained models (`.onnx` files) are saved to `results/<run-id>/`.
 
