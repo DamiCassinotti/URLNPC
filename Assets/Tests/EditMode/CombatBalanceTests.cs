@@ -55,6 +55,23 @@ public class CombatBalanceTests
     }
 
     [Test]
+    public void EnemyBehavior_ForcesTheBalanceCooldown()
+    {
+        // EditMode, so Awake runs on AddComponent but Start (which wants a
+        // NavMesh) never does.
+        var body = new GameObject("Combatant").AddComponent<EnemyBehavior>();
+        try
+        {
+            Assert.That(body.AttackCooldown, Is.EqualTo(CombatBalance.AttackCooldown).Within(0.001f),
+                "the scene's Enemy instance overrides this to 1 s — Awake must win");
+        }
+        finally
+        {
+            Object.DestroyImmediate(body.gameObject);
+        }
+    }
+
+    [Test]
     public void FireRate_LeavesRoomForADecisionStep()
     {
         // The agent decides every 5 physics steps (0.1 s); a cooldown shorter
