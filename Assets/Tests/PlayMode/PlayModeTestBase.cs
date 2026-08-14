@@ -119,6 +119,9 @@ public abstract class PlayModeTestBase
         go.transform.forward = Vector3.forward;
         var weapon = go.AddComponent<TestWeapon>();
         weapon.muzzle = go.transform;
+        // A round number the fixtures reason about, instead of whatever the
+        // shipped CombatBalance currently is.
+        weapon.SetDamage(50f);
         return weapon;
     }
 
