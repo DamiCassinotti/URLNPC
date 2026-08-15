@@ -20,6 +20,8 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] LayerMask sightObstacleMask = ~0;
     [Tooltip("Minimum distance between the enemy's random spawn and the player.")]
     [SerializeField] float minSpawnDistanceFromPlayer = 25f;
+    [Tooltip("How close Advance has to get to the last-seen position to call it reached; from there it searches instead of standing on the empty spot.")]
+    [SerializeField] float lastSeenArrivalRadius = 2f;
 
     NavMeshAgent navMeshAgent;
     EnemyWeapon weapon;
@@ -32,6 +34,9 @@ public class EnemyBehavior : MonoBehaviour
     Vector3 coverPoint;
     bool hasCoverPoint;
     float nextCoverQueryTime;
+
+    // Advance reached the last-seen position without finding anyone there.
+    bool searching;
 
     // Final snap for a destination sitting just off the mesh; the long
     // overshoots are trimmed by SetStepDestination before they get here.
@@ -108,7 +113,10 @@ public class EnemyBehavior : MonoBehaviour
         // Aim at the last-seen position, never the live one. While the target
         // is visible they are the same; behind cover the shot goes where the
         // NPC believes the player is, and eats the wastedShotPenalty if wrong.
-        if (ReadCanAttack() && Perception.HasEverSeen)
+        // Gated on a *fresh* sighting rather than HasEverSeen (issue #72): the
+        // old gate let it stand still emptying the magazine at a corner the
+        // player had left long ago.
+        if (ReadCanAttack() && Perception.SeenWithin(CombatBalance.FiringGraceSeconds))
         {
             Vector3 aim = Perception.LastSeenPosition;
             transform.LookAt(new Vector3(aim.x, transform.position.y, aim.z));
@@ -123,6 +131,10 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (!navMeshAgent.isOnNavMesh) return;
         Perception.Refresh();
+        // Any sighting ends a search, not just one Advance happens to be
+        // running for: the primitive the policy picks in between is its own
+        // choice and must not leave the latch stuck.
+        if (Perception.CurrentlyVisible) searching = false;
         switch (action)
         {
             case MovementAction.Hold: Hold(); break;
@@ -150,11 +162,32 @@ public class EnemyBehavior : MonoBehaviour
     void Advance()
     {
         if (WanderIfBlind()) return;
+        if (SearchInsteadOfCamping())
+        {
+            Wander();
+            return;
+        }
         navMeshAgent.updateRotation = true;
         // The whole way to the remembered spot, so the solver routes around
         // whatever is in between. A straight-line step instead would pick
         // waypoints on the far side of a building and work the doorway.
         SetDestinationOnNavMesh(Perception.LastSeenPosition);
+    }
+
+    // Advance walked the whole way to the last-seen position and the target
+    // isn't there (issue #72). Standing on an empty spot is not pursuit, so
+    // sweep for them instead. Latched, because a wander step away from that
+    // spot would otherwise put it back in range of the destination and bounce
+    // the NPC between the two; Move clears it on the next sighting.
+    bool SearchInsteadOfCamping()
+    {
+        if (!searching && !Perception.CurrentlyVisible)
+        {
+            Vector3 toLastSeen = Perception.LastSeenPosition - transform.position;
+            toLastSeen.y = 0f;
+            searching = toLastSeen.sqrMagnitude <= lastSeenArrivalRadius * lastSeenArrivalRadius;
+        }
+        return searching;
     }
 
     void Retreat()
@@ -391,6 +424,7 @@ public class EnemyBehavior : MonoBehaviour
         DidShoot = false;
         hasCoverPoint = false;
         nextCoverQueryTime = 0f;
+        searching = false;
         if (Perception != null) Perception.Forget();
         if (Damage != null) Damage.Forget();
         if (navMeshAgent != null)

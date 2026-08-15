@@ -167,6 +167,67 @@ public class MovementPrimitiveTests : PlayModeTestBase
             "the NPC must not track the player it can no longer see");
     }
 
+    // Issue #72: reaching the last-seen position and finding nobody there is
+    // where the NPC used to stop and camp. It has to keep sweeping instead.
+    [UnityTest]
+    public IEnumerator Advance_OnAnEmptyLastSeenPosition_SearchesOn()
+    {
+        yield return BuildScene();
+
+        // Out of the sight cone, so the memory freezes at PlayerStart — five
+        // metres up the lane, close enough to reach inside the drive below.
+        player.transform.position = new Vector3(0f, 0f, -18f);
+        Physics.SyncTransforms();
+        behavior.Perception.Refresh();
+        Assert.That(behavior.Perception.CurrentlyVisible, Is.False, "sanity: the player must be out of sight");
+
+        // Closest approach, not the distance at the end: once it arrives the
+        // search takes it away from the spot again, which is the point.
+        float closest = Mathf.Infinity;
+        float until = Time.time + 3f;
+        while (Time.time < until)
+        {
+            behavior.Move(MovementAction.Advance);
+            yield return new WaitForFixedUpdate();
+            closest = Mathf.Min(closest, FlatDistance(EnemyPos, PlayerStart));
+        }
+        Assert.That(closest, Is.LessThanOrEqualTo(2f), "sanity: it must reach the remembered spot");
+
+        yield return Drive(MovementAction.Advance, 2f);
+
+        Assert.That(travelled, Is.GreaterThan(2f),
+            "arriving at an empty last-seen position must start a search, not a camp");
+    }
+
+    // The search latch survives whichever primitive the policy picks next, so
+    // it has to be cleared by the sighting itself and not by Advance running.
+    [UnityTest]
+    public IEnumerator Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain()
+    {
+        yield return BuildScene();
+
+        player.transform.position = new Vector3(0f, 0f, -18f); // behind: out of the cone
+        Physics.SyncTransforms();
+        // Standing on the remembered spot, so one Advance latches the search
+        // without a wander step first moving the goalposts.
+        Assert.That(nav.Warp(SnapToNavMesh(new Vector3(0f, 0f, -9.5f))), Is.True);
+        Physics.SyncTransforms();
+        behavior.Move(MovementAction.Advance);
+
+        // Reacquired while another primitive is the one running.
+        Vector3 reacquiredAt = new Vector3(0f, 0f, -6f); // ahead, up the open lane
+        player.transform.position = reacquiredAt;
+        Physics.SyncTransforms();
+        behavior.Move(MovementAction.Hold);
+        Assert.That(behavior.Perception.CurrentlyVisible, Is.True, "sanity: the player must be back in sight");
+
+        float before = FlatDistance(EnemyPos, reacquiredAt);
+        yield return Drive(MovementAction.Advance, 1.5f);
+
+        Assert.That(FlatDistance(EnemyPos, reacquiredAt), Is.LessThan(before - 1f),
+            "a fresh sighting must put Advance back on the chase, not leave it searching");
+    }
+
     [UnityTest]
     public IEnumerator Retreat_OpensDistanceFromTheTarget()
     {

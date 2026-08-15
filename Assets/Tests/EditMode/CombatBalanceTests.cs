@@ -95,6 +95,17 @@ public class CombatBalanceTests
         Assert.That(CombatBalance.SightRange, Is.GreaterThanOrEqualTo(30f * 1.4f));
     }
 
+    // Issue #72: the grace window has to buy at least one follow-up shot at the
+    // corner the player ducked behind, and has to run out well inside the
+    // perception horizon — otherwise "stop shooting" and "stop remembering"
+    // collapse into one and the old camping behavior is back.
+    [Test]
+    public void FiringGrace_OutlivesOneCooldownAndDiesBeforeTheMemory()
+    {
+        Assert.That(CombatBalance.FiringGraceSeconds, Is.GreaterThanOrEqualTo(CombatBalance.AttackCooldown));
+        Assert.That(CombatBalance.FiringGraceSeconds, Is.LessThan(NpcObservations.SeenHorizonSeconds));
+    }
+
     [Test]
     public void FireRate_LeavesRoomForADecisionStep()
     {

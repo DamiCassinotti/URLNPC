@@ -275,7 +275,10 @@ public class EnemyAgent : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discrete = actionsOut.DiscreteActions;
-        discrete[0] = (int)(inputs.targetVisible ? MovementAction.Advance : MovementAction.Wander);
+        // Advance on the memory, not just on sight (issue #72): losing sight
+        // has to mean walking to where they went, and Advance falls through to
+        // a search of its own once it gets there and finds nobody.
+        discrete[0] = (int)(inputs.hasEverSeen ? MovementAction.Advance : MovementAction.Wander);
         discrete[1] = inputs.targetVisible && inputs.canAttack ? NpcBrainSpec.Fire : NpcBrainSpec.DontFire;
     }
 

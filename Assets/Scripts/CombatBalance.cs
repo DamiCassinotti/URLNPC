@@ -34,4 +34,11 @@ public static class CombatBalance
     // Also the scale the perceived-distance observation normalizes by, so
     // changing it invalidates trained models.
     public const float SightRange = 45f;
+
+    // How long after losing sight the NPC may still shoot at the last-seen
+    // position (issue #72). Two shots' worth of suppressing the corner someone
+    // just ducked behind; past that it has to go and look instead of standing
+    // and firing at a memory. A shot inside the window is still a shot out of
+    // sight, so it keeps paying the wasted-shot penalty.
+    public const float FiringGraceSeconds = 1f;
 }
