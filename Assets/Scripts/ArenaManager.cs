@@ -114,13 +114,23 @@ public class ArenaManager : MonoBehaviour
     // actors belong on the open floor, not perched out of sight on cover.
     const float GroundLevelMaxY = 0.6f;
 
+    // Gap a spawn keeps from any cover box, i.e. the body radius (the Enemy
+    // capsule is 0.5) plus a margin. Being on the NavMesh is not enough on its
+    // own: the bake insets the mesh around anything tall enough to block, but
+    // geometry the agent can step over — stair steps — isn't carved at all, so
+    // a sampled point can sit right against a box or on top of a step and the
+    // capsule ends up clipping through it (issue #74).
+    const float SpawnCoverClearance = 0.9f;
+
     // A random floor-level point on the baked NavMesh, comfortably inside the
-    // walls. Once a NavMesh is baked this always returns an on-mesh point,
-    // never the off-mesh origin.
+    // walls and clear of cover. Once a NavMesh is baked this always returns an
+    // on-mesh point, never the off-mesh origin.
     public Vector3 RandomGroundPoint()
     {
         float marginX = Mathf.Max(2f, HalfExtentX - 2f);
         float marginZ = Mathf.Max(2f, HalfExtentZ - 2f);
+        Vector3 crowdedFallback = Vector3.zero;
+        bool haveCrowdedFallback = false;
         Vector3 elevatedFallback = Vector3.zero;
         bool haveElevatedFallback = false;
         for (int i = 0; i < 64; i++)
@@ -131,12 +141,19 @@ public class ArenaManager : MonoBehaviour
             // below it instead of jumping up onto a nearby raised platform.
             if (NavMesh.SamplePosition(new Vector3(x, 0.5f, z), out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
-                if (hit.position.y <= GroundLevelMaxY) return hit.position;
-                if (!haveElevatedFallback) { elevatedFallback = hit.position; haveElevatedFallback = true; }
+                if (hit.position.y > GroundLevelMaxY)
+                {
+                    if (!haveElevatedFallback) { elevatedFallback = hit.position; haveElevatedFallback = true; }
+                    continue;
+                }
+                if (IsClearOfCover(hit.position)) return hit.position;
+                if (!haveCrowdedFallback) { crowdedFallback = hit.position; haveCrowdedFallback = true; }
             }
         }
-        // No floor-level point found — better to use an elevated spot than to
-        // hand back an off-mesh origin that a Warp would silently reject.
+        // Nothing clear turned up — a spot against a box still beats an
+        // elevated one, and both beat an off-mesh origin that a Warp would
+        // silently reject.
+        if (haveCrowdedFallback) return crowdedFallback;
         if (haveElevatedFallback) return elevatedFallback;
         if (NavMesh.SamplePosition(new Vector3(PlayerSpawn.x, 0.5f, PlayerSpawn.z), out NavMeshHit spawnHit, 12f, NavMesh.AllAreas))
             return spawnHit.position;
@@ -150,6 +167,22 @@ public class ArenaManager : MonoBehaviour
     // ----------------------------------------------------------------- cover
 
     const float CoverStandOff = 1.2f;    // how far behind the cover face to stand
+
+    // Whether a body standing here would be clear of every cover box the arena
+    // was built from. Uses the world AABB, which is exact for the axis-aligned
+    // boxes the builder emits (the stairs are rotated in 90° steps).
+    public bool IsClearOfCover(Vector3 point)
+    {
+        const float sqrClearance = SpawnCoverClearance * SpawnCoverClearance;
+        foreach (Collider cover in coverColliders)
+        {
+            if (cover == null) continue;
+            // SqrDistance is 0 inside the box, so "on top of a stair step"
+            // fails this too.
+            if (cover.bounds.SqrDistance(point) < sqrClearance) return false;
+        }
+        return true;
+    }
 
     // Nearest walkable point hidden from breakLosFrom and reachable from `from`.
     // False when this layout offers none — the caller must fall back to another

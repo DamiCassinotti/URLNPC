@@ -69,6 +69,11 @@ public class MovementPrimitiveTests : PlayModeTestBase
         FaceTowards(facing ?? playerAt);
         Physics.SyncTransforms();
         yield return new WaitForFixedUpdate();
+        // A NavMeshAgent lifts its transform by baseOffset in its own per-frame
+        // update, not in FixedUpdate, so the warp alone leaves the body flat on
+        // the mesh. Whether one WaitForFixedUpdate happened to land after that
+        // update depended on where the preceding tests left the frame boundary.
+        yield return null;
 
         behavior.Perception.Refresh();
     }
