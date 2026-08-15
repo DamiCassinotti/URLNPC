@@ -167,6 +167,38 @@ public class MovementPrimitiveTests : PlayModeTestBase
             "the NPC must not track the player it can no longer see");
     }
 
+    // Issue #72: reaching the last-seen position and finding nobody there is
+    // where the NPC used to stop and camp. It has to keep sweeping instead.
+    [UnityTest]
+    public IEnumerator Advance_OnAnEmptyLastSeenPosition_SearchesOn()
+    {
+        yield return BuildScene();
+
+        // Out of the sight cone, so the memory freezes at PlayerStart — five
+        // metres up the lane, close enough to reach inside the drive below.
+        player.transform.position = new Vector3(0f, 0f, -18f);
+        Physics.SyncTransforms();
+        behavior.Perception.Refresh();
+        Assert.That(behavior.Perception.CurrentlyVisible, Is.False, "sanity: the player must be out of sight");
+
+        // Closest approach, not the distance at the end: once it arrives the
+        // search takes it away from the spot again, which is the point.
+        float closest = Mathf.Infinity;
+        float until = Time.time + 3f;
+        while (Time.time < until)
+        {
+            behavior.Move(MovementAction.Advance);
+            yield return new WaitForFixedUpdate();
+            closest = Mathf.Min(closest, FlatDistance(EnemyPos, PlayerStart));
+        }
+        Assert.That(closest, Is.LessThanOrEqualTo(2f), "sanity: it must reach the remembered spot");
+
+        yield return Drive(MovementAction.Advance, 2f);
+
+        Assert.That(travelled, Is.GreaterThan(2f),
+            "arriving at an empty last-seen position must start a search, not a camp");
+    }
+
     [UnityTest]
     public IEnumerator Retreat_OpensDistanceFromTheTarget()
     {

@@ -31,6 +31,9 @@ public class PerceptionContractTests : PlayModeTestBase
         enemyGo = Track(new GameObject("TestEnemy"));
         enemyGo.SetActive(false);
         enemyGo.AddComponent<NavMeshAgent>().enabled = false;
+        // EnemyBehavior resolves its weapon in Awake, so the fire-gate tests
+        // need it on the body before the object goes active.
+        enemyGo.AddComponent<EnemyWeapon>();
         behavior = enemyGo.AddComponent<EnemyBehavior>();
         behavior.enabled = false; // skip Start(): no NavMesh to spawn on
         behavior.target = player.transform;
@@ -119,6 +122,62 @@ public class PerceptionContractTests : PlayModeTestBase
         MoveAndSync(player.transform, new Vector3(0f, 0f, 30f));
         memory.Refresh();
         Assert.That(memory.CurrentlyVisible, Is.True);
+    }
+
+    // Issue #72: a sighting nobody followed up on expires, so the NPC goes back
+    // to knowing nothing instead of navigating and firing at it forever.
+    [UnityTest]
+    public IEnumerator SightingOlderThanTheHorizon_LapsesToNeverSeen()
+    {
+        yield return BuildScene();
+        memory.memorySeconds = 0.25f;
+
+        MoveAndSync(player.transform, new Vector3(0f, 0f, 10f));
+        memory.Refresh();
+        Assert.That(memory.HasEverSeen, Is.True);
+
+        MoveAndSync(player.transform, new Vector3(0f, 0f, -(CombatBalance.SightRange + 10f)));
+        memory.Refresh();
+        Assert.That(memory.HasEverSeen, Is.True, "the memory outlives sight for its horizon");
+
+        yield return new WaitForSeconds(0.4f);
+        memory.Refresh();
+
+        Assert.That(memory.HasEverSeen, Is.False);
+        Assert.That(memory.LastSeenPosition, Is.EqualTo(Vector3.zero));
+    }
+
+    // Issue #72: firing needs a fresh sighting, not just any sighting. A short
+    // grace keeps suppressing the corner the player just ducked behind; past it
+    // the NPC has to go and look instead of emptying the magazine at a memory.
+    [UnityTest]
+    public IEnumerator Firing_SurvivesTheGraceWindowThenStops()
+    {
+        yield return BuildScene();
+
+        MoveAndSync(player.transform, new Vector3(0f, 0f, 10f));
+        memory.Refresh();
+        behavior.Attack();
+        Assert.That(behavior.DidShoot, Is.True, "in sight and off cooldown");
+
+        // A wall breaks sight without moving the player, so the memory stays
+        // put and only its age decides the rest.
+        GameObject wall = Track(GameObject.CreatePrimitive(PrimitiveType.Cube));
+        wall.transform.localScale = new Vector3(8f, 4f, 1f);
+        MoveAndSync(wall.transform, new Vector3(0f, 0f, 5f));
+        memory.Refresh();
+        Assert.That(memory.CurrentlyVisible, Is.False, "sanity: the wall must break line of sight");
+
+        // Past the cooldown, still inside the grace window.
+        yield return new WaitForSeconds(CombatBalance.AttackCooldown + 0.1f);
+        behavior.Attack();
+        Assert.That(behavior.DidShoot, Is.True, "the grace window still allows suppressing fire");
+
+        // Past the grace window: memory intact, but too stale to shoot at.
+        yield return new WaitForSeconds(CombatBalance.FiringGraceSeconds);
+        behavior.Attack();
+        Assert.That(behavior.DidShoot, Is.False, "a lapsed sighting must not be fired at");
+        Assert.That(memory.HasEverSeen, Is.True, "the position is still remembered, just not shootable");
     }
 
     [UnityTest]

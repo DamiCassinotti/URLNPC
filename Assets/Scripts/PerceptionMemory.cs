@@ -2,7 +2,8 @@ using UnityEngine;
 
 // The NPC's only window onto the player (sensory contract, issue #9): it never
 // knows the player's HP, and knows their position only while it can see them —
-// out of sight it works from the last-seen position.
+// out of sight it works from the last-seen position, and once that sighting is
+// older than memorySeconds it knows nothing again.
 //
 // Every policy input and every action that aims or navigates at the player must
 // go through here. Environment code (spawning, reward computation, the sight
@@ -11,6 +12,9 @@ using UnityEngine;
 // The engine adapter half; the remember/freeze rules are in PerceptionState.
 public class PerceptionMemory : MonoBehaviour
 {
+    [Tooltip("How long a sighting survives out of sight before the NPC is blind again (issue #72).")]
+    [SerializeField] internal float memorySeconds = NpcObservations.SeenHorizonSeconds;
+
     readonly PerceptionState state = new PerceptionState();
 
     public bool CurrentlyVisible => state.CurrentlyVisible;
@@ -23,6 +27,11 @@ public class PerceptionMemory : MonoBehaviour
     public float TimeSinceSeen => state.TimeSinceSeen(Time.time);
 
     public bool HasEverSeen => state.HasEverSeen;
+
+    // Is the last sighting no older than the given window? The fire gate reads
+    // this so the NPC can suppress a corner someone just ducked behind without
+    // shooting at a memory for the rest of the round.
+    public bool SeenWithin(float seconds) => state.SeenWithin(seconds, Time.time);
 
     EnemyBehavior behavior;
 
@@ -41,6 +50,9 @@ public class PerceptionMemory : MonoBehaviour
     // snapshot.
     public void Refresh()
     {
+        // Pushed every refresh rather than cached in Awake, so an Inspector (or
+        // fixture) edit to the horizon takes effect without a restart.
+        state.memorySeconds = memorySeconds;
         bool visible = behavior != null && behavior.IsTargetInSight();
         // The one place live player position legitimately enters NPC state:
         // the sensor reading while the target is visible. (IsTargetInSight is
