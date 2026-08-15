@@ -131,6 +131,10 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (!navMeshAgent.isOnNavMesh) return;
         Perception.Refresh();
+        // Any sighting ends a search, not just one Advance happens to be
+        // running for: the primitive the policy picks in between is its own
+        // choice and must not leave the latch stuck.
+        if (Perception.CurrentlyVisible) searching = false;
         switch (action)
         {
             case MovementAction.Hold: Hold(); break;
@@ -174,15 +178,10 @@ public class EnemyBehavior : MonoBehaviour
     // isn't there (issue #72). Standing on an empty spot is not pursuit, so
     // sweep for them instead. Latched, because a wander step away from that
     // spot would otherwise put it back in range of the destination and bounce
-    // the NPC between the two; only a fresh sighting clears it.
+    // the NPC between the two; Move clears it on the next sighting.
     bool SearchInsteadOfCamping()
     {
-        if (Perception.CurrentlyVisible)
-        {
-            searching = false;
-            return false;
-        }
-        if (!searching)
+        if (!searching && !Perception.CurrentlyVisible)
         {
             Vector3 toLastSeen = Perception.LastSeenPosition - transform.position;
             toLastSeen.y = 0f;
