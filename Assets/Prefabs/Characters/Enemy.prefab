@@ -143,7 +143,7 @@ MonoBehaviour:
   MaxStep: 0
   target: {fileID: 0}
   walkPointRange: 10
-  attackCooldown: 0.2
+  attackCooldown: 0.5
   sightRange: 20
 --- !u!195 &210935812
 NavMeshAgent:
@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bdf1522bcd810b128a55ac38ee03514, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 50
+  damage: 15
   muzzleFlash: {fileID: 5640015575482252821}
   hitEffect: {fileID: 2409495363409633794, guid: 4801bea02e36af382abf110c987937e9, type: 3}
 --- !u!114 &2094766410

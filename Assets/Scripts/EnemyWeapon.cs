@@ -3,8 +3,14 @@ using UnityEngine;
 public class EnemyWeapon : Weapon
 {
     [Header("Enemy Aim")]
-    [Tooltip("Max angular error applied to each shot, in degrees. 0 = perfect aim.")]
-    [SerializeField] float aimSpreadDegrees = 5f;
+    [Tooltip("Max angular error applied to each shot, in degrees. 0 = perfect aim. Ignored at runtime — CombatBalance.AimSpreadDegrees is forced on in Awake.")]
+    [SerializeField] float aimSpreadDegrees = CombatBalance.AimSpreadDegrees;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        aimSpreadDegrees = CombatBalance.AimSpreadDegrees;
+    }
 
     override protected Vector3 GetPosition()
     {

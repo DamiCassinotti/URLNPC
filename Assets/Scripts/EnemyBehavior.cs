@@ -12,7 +12,8 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] float moveStepDistance = 6f;
     [Tooltip("Seconds between cover searches. NearestCoverPoint raycasts and path-checks every cover box in the arena, so MoveToCover walks to the point it already picked in between.")]
     [SerializeField] float coverQueryInterval = 0.25f;
-    [SerializeField] float attackCooldown = 0.5f;
+    [Tooltip("Ignored at runtime — CombatBalance.AttackCooldown is forced on in Awake; the FPS scene's Enemy instance pins this at 1 s.")]
+    [SerializeField] float attackCooldown = CombatBalance.AttackCooldown;
     [SerializeField] float sightRange = 20f;
     [SerializeField] float sightFovDegrees = 120f;
     [SerializeField] LayerMask sightObstacleMask = ~0;
@@ -58,8 +59,15 @@ public class EnemyBehavior : MonoBehaviour
     // observation is normalized against.
     public float SightRange => sightRange;
 
+    // Seconds between shots, the scale ReadCooldownRemaining01 normalizes by.
+    public float AttackCooldown => attackCooldown;
+
     void Awake()
     {
+        // The FPS scene's Enemy is a prefab instance pinning attackCooldown at
+        // 1 s as an override, which no edit to Enemy.prefab reaches — same trap
+        // as the stale MaxStep. Code owns the fire rate (CombatBalance).
+        attackCooldown = CombatBalance.AttackCooldown;
         navMeshAgent = GetComponent<NavMeshAgent>();
         weapon = GetComponent<EnemyWeapon>();
         enemyHealth = GetComponent<Health>();

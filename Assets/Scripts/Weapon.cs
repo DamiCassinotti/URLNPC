@@ -3,7 +3,8 @@ using UnityEngine;
 public abstract class Weapon : MonoBehaviour
 {
 
-    [SerializeField] float damage = 50f;
+    [Tooltip("Ignored at runtime — CombatBalance.ShotDamage is forced on in Awake; the scene pins this per weapon where no text edit reaches it.")]
+    [SerializeField] float damage = CombatBalance.ShotDamage;
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] GameObject hitEffect;
 
@@ -19,6 +20,16 @@ public abstract class Weapon : MonoBehaviour
 
     protected abstract Vector3 GetPosition();
     protected abstract Vector3 GetForward();
+
+    // Code owns the per-shot damage, not the scene — see CombatBalance.
+    protected virtual void Awake()
+    {
+        damage = CombatBalance.ShotDamage;
+    }
+
+    // Test seam: fixtures that need a specific per-shot number set it back
+    // after Awake has forced the shipped balance.
+    internal void SetDamage(float value) => damage = value;
 
     // Telemetry hook (issue #12): weapon, the Health hit (null on a miss),
     // damage.
