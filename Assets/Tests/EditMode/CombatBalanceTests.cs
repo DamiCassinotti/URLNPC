@@ -72,6 +72,30 @@ public class CombatBalanceTests
     }
 
     [Test]
+    public void EnemyBehavior_ForcesTheBalanceSightRange()
+    {
+        var body = new GameObject("Combatant").AddComponent<EnemyBehavior>();
+        try
+        {
+            Assert.That(body.SightRange, Is.EqualTo(CombatBalance.SightRange).Within(0.001f),
+                "the scene's Enemy instance may pin the old 20 m — Awake must win");
+        }
+        finally
+        {
+            Object.DestroyImmediate(body.gameObject);
+        }
+    }
+
+    [Test]
+    public void SightRange_CoversTheWidestSpawnSeparation()
+    {
+        // Twin Towers is the biggest layout at 60x60 m, so its cap is the
+        // widest gap any spawn pair can open (ArenaManager.SpawnSeparationCap
+        // = min half-extent * 1.4). Below that the NPC starts rounds blind.
+        Assert.That(CombatBalance.SightRange, Is.GreaterThanOrEqualTo(30f * 1.4f));
+    }
+
+    [Test]
     public void FireRate_LeavesRoomForADecisionStep()
     {
         // The agent decides every 5 physics steps (0.1 s); a cooldown shorter

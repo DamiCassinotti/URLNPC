@@ -26,7 +26,7 @@ public class PerceptionContractTests : PlayModeTestBase
         player = Track(GameObject.CreatePrimitive(PrimitiveType.Capsule));
         player.name = "TestPlayer";
         player.tag = "Player";
-        player.transform.position = new Vector3(0f, 0f, -30f);
+        player.transform.position = new Vector3(0f, 0f, -(CombatBalance.SightRange + 10f));
 
         enemyGo = Track(new GameObject("TestEnemy"));
         enemyGo.SetActive(false);
@@ -103,10 +103,22 @@ public class PerceptionContractTests : PlayModeTestBase
     {
         yield return BuildScene();
 
-        MoveAndSync(player.transform, new Vector3(0f, 0f, 50f)); // sightRange is 20
+        MoveAndSync(player.transform, new Vector3(0f, 0f, behavior.SightRange + 10f));
         memory.Refresh();
         Assert.That(memory.CurrentlyVisible, Is.False);
         Assert.That(memory.HasEverSeen, Is.False);
+    }
+
+    [UnityTest]
+    public IEnumerator TargetAcrossTheArena_IsVisible()
+    {
+        yield return BuildScene();
+
+        // 30 m of clear line of sight — inside every layout, and past the old
+        // 20 m cutoff that had the NPC ignoring the player half a map away.
+        MoveAndSync(player.transform, new Vector3(0f, 0f, 30f));
+        memory.Refresh();
+        Assert.That(memory.CurrentlyVisible, Is.True);
     }
 
     [UnityTest]
