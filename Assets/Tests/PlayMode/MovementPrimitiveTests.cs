@@ -179,9 +179,9 @@ public class MovementPrimitiveTests : PlayModeTestBase
             "Retreat must open the gap to the target");
     }
 
-    // Every bearing-relative primitive with nothing seen — the state every
-    // episode opens in, spawns being further apart than sight range. There is
-    // no bearing to move along, and running off own facing would bury the NPC
+    // Every bearing-relative primitive with nothing seen — the state an episode
+    // opens in whenever the spawn faces away or has geometry in between. There
+    // is no bearing to move along, and running off own facing would bury the NPC
     // nose-first in the first wall it meets, where it stops moving, stops
     // turning and never sees anything to break out with. They must Wander.
     [UnityTest]
@@ -304,7 +304,7 @@ public class MovementPrimitiveTests : PlayModeTestBase
         // owes nothing to the perceived position.
         yield return PlaceCombatants(EnemyStart, new Vector3(0f, 0f, 18f));
         Assert.That(behavior.Perception.HasEverSeen, Is.False,
-            "sanity: 32 m away, past the sight range and the central building");
+            "sanity: the central building's solid north wall breaks the sightline");
 
         yield return Drive(MovementAction.Wander, 2f);
 

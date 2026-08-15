@@ -24,4 +24,14 @@ public static class CombatBalance
     // Max angular error per NPC shot. At the old 5 degrees the cone was wider
     // than a player capsule past ~10 m, so most shots missed on purpose.
     public const float AimSpreadDegrees = 1.5f;
+
+    // How far a combatant can see (issue #73). The arenas run from 28x28 up to
+    // 60x60 m and the enemy spawns at least 25 m from the player — at the old
+    // 20 m it started every round blind and only woke up at knife range. 45 m
+    // covers the widest spawn separation any layout can produce
+    // (ArenaManager.SpawnSeparationCap peaks at 42 m on Twin Towers), so LOS
+    // and the 120 degree FOV are what gate a sighting, not the range cutoff.
+    // Also the scale the perceived-distance observation normalizes by, so
+    // changing it invalidates trained models.
+    public const float SightRange = 45f;
 }
