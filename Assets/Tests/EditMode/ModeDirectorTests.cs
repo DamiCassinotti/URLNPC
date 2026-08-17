@@ -144,6 +144,36 @@ public class ModeDirectorTests
         Assert.That(intervals, Is.EqualTo(new[] { (NpcMode.HoldCover, NpcMode.HoldCover) }));
     }
 
+    // Issue #82: training owns the mode set in code, so the prefab, a scene
+    // override and CombatantRig's composed director can't draw from different
+    // pools on the two sides of a self-play run.
+    [Test]
+    public void Training_CommandsAllFourWhateverWasSerialized()
+    {
+        Assert.That(NpcModes.ResolveEnabled(HuntOrRetreat, training: true), Is.EqualTo(EveryMode));
+        Assert.That(NpcModes.ResolveEnabled(NpcModeMask.None, training: true), Is.EqualTo(EveryMode));
+        Assert.That(EveryMode.Enabled(), Is.EquivalentTo(NpcModes.All));
+    }
+
+    // The other half: manual play and the mode baselines still tune the mask in
+    // the Inspector. EditMode has no communicator, so the director reads it.
+    [Test]
+    public void OutsideTraining_TheSerializedMaskWins()
+    {
+        Assert.That(NpcModes.ResolveEnabled(HuntOrRetreat, training: false), Is.EqualTo(HuntOrRetreat));
+        Assert.That(NewDirector(HuntOrRetreat).ActiveModes, Is.EqualTo(HuntOrRetreat));
+    }
+
+    [Test]
+    public void SerializedDefault_IsAllFourModes()
+    {
+        var go = new GameObject("ModeDirectorDefaults");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+
+        Assert.That(go.AddComponent<ModeDirector>().enabledModes, Is.EqualTo(EveryMode));
+    }
+
     [Test]
     public void SameSeed_ReplaysTheSameModeTimeline()
     {

@@ -30,6 +30,22 @@ public static class NpcModes
         NpcMode.Hunt, NpcMode.HoldCover, NpcMode.Retreat, NpcMode.Patrol,
     };
 
+    public const NpcModeMask AllMask = NpcModeMask.Hunt | NpcModeMask.HoldCover
+                                     | NpcModeMask.Retreat | NpcModeMask.Patrol;
+
+    // Which modes a director may command (issue #82). Training gets all four
+    // from code, the way CombatBalance owns the combat numbers: Enemy.prefab
+    // pinned Hunt|Retreat, the binary FPS scene is a prefab instance that can
+    // override it again, and CombatantRig composes a third director for the
+    // agent-driven player — so a serialized mask can't be the single source and
+    // the two self-play bodies could train on different pools. Outside training
+    // the Inspector field wins, so manual play and the mode-baseline runs can
+    // still pin a subset.
+    public static NpcModeMask ResolveEnabled(NpcModeMask serialized, bool training)
+    {
+        return training ? AllMask : serialized;
+    }
+
     public static NpcModeMask ToMask(this NpcMode mode) => (NpcModeMask)(1 << (int)mode);
 
     public static bool Contains(this NpcModeMask mask, NpcMode mode) => (mask & mode.ToMask()) != 0;
