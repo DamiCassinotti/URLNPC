@@ -36,11 +36,11 @@ public class EnemyAgent : Agent
     [Tooltip("Penalty (positive magnitude) for being hit, per commanded mode. Falls back to gotHitPenalty.")]
     [SerializeField] float[] gotHitPenaltyByMode = { 0.3f, 0.6f, 0.6f, 0.5f };
     [Tooltip("Reward per metre closed on the target since the last step. Negative pays for opening distance instead.")]
-    [SerializeField] float[] closingRewardPerMeterByMode = { 0.01f, 0f, -0.01f, 0f };
+    [SerializeField] float[] closingRewardPerMeterByMode = { 0.03f, 0f, -0.03f, 0f };
     [Tooltip("Per-step reward while the target's eye-line to the enemy is broken.")]
     [SerializeField] float[] coverRewardPerStepByMode = { 0f, 0.005f, 0.002f, 0f };
     [Tooltip("One-off reward the first time each patch of the arena is entered in an episode.")]
-    [SerializeField] float[] newAreaRewardByMode = { 0f, 0f, 0f, 0.002f };
+    [SerializeField] float[] newAreaRewardByMode = { 0f, 0f, 0f, 0.01f };
     [Tooltip("Penalty (positive magnitude) per step inside tooCloseDistance. Zero for Hunt, which has to be free to close. Falls back to tooClosePenaltyPerStep.")]
     [SerializeField] float[] tooClosePenaltyByMode = { 0f, 0.004f, 0.008f, 0.002f };
     [Tooltip("Side in metres of the square patches the new-area reward counts.")]

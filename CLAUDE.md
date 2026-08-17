@@ -103,12 +103,14 @@ Global rows — the commanded mode doesn't move them:
 |---|---|---|---|---|
 | `hitTargetRewardByMode` | +0.5 | +0.5 | +0.1 | +0.1 |
 | `gotHitPenaltyByMode` | -0.3 | -0.6 | -0.6 | -0.5 |
-| `closingRewardPerMeterByMode` | +0.01 | 0 | -0.01 | 0 |
+| `closingRewardPerMeterByMode` (#85) | +0.03 | 0 | -0.03 | 0 |
 | `coverRewardPerStepByMode` | 0 | +0.005 | +0.002 | 0 |
-| `newAreaRewardByMode` | 0 | 0 | 0 | +0.002 |
+| `newAreaRewardByMode` (#85) | 0 | 0 | 0 | +0.01 |
 | `tooClosePenaltyByMode` (#80) | 0 | -0.004 | -0.008 | -0.002 |
 
 Hunt's too-close column is 0 on purpose: as one global row the penalty taxed the one mode whose job is to close, which is part of why Hunt wouldn't engage (#79).
+
+The closing and new-area columns are 3x and 5x their first values (#85): at the old weights the first 4-mode run left Retreat and Patrol compliance near zero (0.015 and 0.005), the positional signal losing to default aggression and to having no reason to roam. HoldCover and `killTargetReward` were held fixed as controls so the lift stays attributable to these two rows.
 
 The columns are the `ModeRewardTable` POCO; `RewardComputer.StepReward` takes a `StepRewardInput` (mode, fire/sight flags, distance, closing delta, cover and new-area flags), with `tooCloseDistance` the one positional scalar that stays global, and the agent reads the same table for the hit/got-hit `Health` events. The two positional inputs come from `EpisodeProgress`: metres closed on the target since the last step (capped, so a respawn or a NavMesh warp isn't progress) and whether this step entered a `newAreaCellSize` patch of the arena not visited yet — both reset on episode begin. The cover flag is `EnemyBehavior.IsHiddenFromTarget()`, an environment-side true-state read like `DistanceToTarget()`: it probes the *target's* eye-line to this body through the shared `EyeLine.Blocked` helper at the same eye height `MoveToCover`'s cover query uses, so the point the policy is sent to is a point the column pays for. `IsTargetInSight` can't answer it — being FOV-limited it would call "in cover" every step the NPC looked away. The probe is a raycast, so the agent only fires it for modes whose column is non-zero (`RewardComputer.RewardsCover`).
 
