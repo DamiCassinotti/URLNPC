@@ -144,12 +144,12 @@ Defined in `EnemyAgent.cs` (tunable in Inspector). The rows the commanded mode d
 
 | Event | Reward |
 |---|---|
-| Per decision step while alive | `+0.001` |
+| Per decision step while alive | `+0.0002` |
 | Killed player | `+1.0` (ends episode) |
 | Died | `-1.0` (ends episode) |
-| Round clock ran out (draw) | `-0.2` (ends episode) |
+| Round clock ran out (draw) | `-0.6` (ends episode) |
 | Shot while target out of sight | `-0.05` |
-| Per step closer to the player than 6 m | `-0.005` |
+| Per step closer to the player than 6 m | `-0.001` |
 
 The rest is one column per commanded mode (`NpcMode`), so the same policy is pulled toward different behavior depending on what it was told to do:
 

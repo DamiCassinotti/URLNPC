@@ -6,15 +6,21 @@ public class RewardComputerTests
 {
     const float Tolerance = 1e-6f;
 
+    // The documented per-step rows, named so the arithmetic below reads as
+    // "alive bonus minus penalty" rather than as bare numbers.
+    const float Alive = 0.0002f;
+    const float TooClose = 0.001f;
+    const float WastedShot = 0.05f;
+
     // The documented columns (#44). EnemyAgent's serialized defaults have to
     // match these; the wiring itself is pinned in EnemyAgentTests.
     static RewardComputer DefaultRewards()
     {
         var rewards = new RewardComputer
         {
-            aliveRewardPerStep = 0.001f,
-            wastedShotPenalty = 0.05f,
-            tooClosePenaltyPerStep = 0.005f,
+            aliveRewardPerStep = Alive,
+            wastedShotPenalty = WastedShot,
+            tooClosePenaltyPerStep = TooClose,
             tooCloseDistance = 6f,
         };
         rewards.modes[NpcMode.Hunt] = new ModeRewardColumn
@@ -46,7 +52,7 @@ public class RewardComputerTests
     [Test]
     public void PlainStep_PaysTheAliveBonus()
     {
-        Assert.That(DefaultRewards().StepReward(Step()), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(DefaultRewards().StepReward(Step()), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     [Test]
@@ -56,7 +62,7 @@ public class RewardComputerTests
         step.distanceToTarget = 3f;
         step.targetInSight = true;
         Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(0.001f - 0.005f).Within(Tolerance), "melee-rushing must not pay");
+            Is.EqualTo(Alive - TooClose).Within(Tolerance), "melee-rushing must not pay");
     }
 
     [Test]
@@ -65,7 +71,7 @@ public class RewardComputerTests
         StepRewardInput step = Step();
         step.distanceToTarget = 6f;
         Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(0.001f).Within(Tolerance), "exactly at tooCloseDistance is not 'too close'");
+            Is.EqualTo(Alive).Within(Tolerance), "exactly at tooCloseDistance is not 'too close'");
     }
 
     [Test]
@@ -75,7 +81,7 @@ public class RewardComputerTests
         rewards.tooClosePenaltyPerStep = 0f;
         StepRewardInput step = Step();
         step.distanceToTarget = 0.5f;
-        Assert.That(rewards.StepReward(step), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(rewards.StepReward(step), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     [Test]
@@ -83,7 +89,7 @@ public class RewardComputerTests
     {
         StepRewardInput step = Step();
         step.fired = step.didShoot = step.targetInSight = true;
-        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     [Test]
@@ -92,7 +98,7 @@ public class RewardComputerTests
         StepRewardInput step = Step();
         step.fired = step.didShoot = true;
         Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(0.001f - 0.05f).Within(Tolerance), "spraying at memories must not pay");
+            Is.EqualTo(Alive - WastedShot).Within(Tolerance), "spraying at memories must not pay");
     }
 
     [Test]
@@ -102,7 +108,7 @@ public class RewardComputerTests
         // barrel, so no shot was wasted.
         StepRewardInput step = Step();
         step.fired = true;
-        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     [Test]
@@ -112,7 +118,7 @@ public class RewardComputerTests
         // pulled, so the fire branch's own choice has to gate the penalty.
         StepRewardInput step = Step();
         step.didShoot = true;
-        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     [Test]
@@ -122,7 +128,7 @@ public class RewardComputerTests
         step.fired = step.didShoot = true;
         step.distanceToTarget = 2f;
         Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(0.001f - 0.005f - 0.05f).Within(Tolerance));
+            Is.EqualTo(Alive - TooClose - WastedShot).Within(Tolerance));
     }
 
     // The rows the commanded mode does not move: same step, every mode.
@@ -133,7 +139,7 @@ public class RewardComputerTests
         step.fired = step.didShoot = true;
         step.distanceToTarget = 2f;
         Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(0.001f - 0.005f - 0.05f).Within(Tolerance));
+            Is.EqualTo(Alive - TooClose - WastedShot).Within(Tolerance));
     }
 
     [Test]
@@ -142,11 +148,11 @@ public class RewardComputerTests
         var rewards = DefaultRewards();
         StepRewardInput closing = Step(NpcMode.Hunt);
         closing.closingDelta = 0.5f;
-        Assert.That(rewards.StepReward(closing), Is.EqualTo(0.001f + 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(closing), Is.EqualTo(Alive + 0.005f).Within(Tolerance));
 
         StepRewardInput opening = Step(NpcMode.Hunt);
         opening.closingDelta = -0.5f;
-        Assert.That(rewards.StepReward(opening), Is.EqualTo(0.001f - 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(opening), Is.EqualTo(Alive - 0.005f).Within(Tolerance));
     }
 
     [Test]
@@ -155,11 +161,11 @@ public class RewardComputerTests
         var rewards = DefaultRewards();
         StepRewardInput opening = Step(NpcMode.Retreat);
         opening.closingDelta = -0.5f;
-        Assert.That(rewards.StepReward(opening), Is.EqualTo(0.001f + 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(opening), Is.EqualTo(Alive + 0.005f).Within(Tolerance));
 
         StepRewardInput closing = Step(NpcMode.Retreat);
         closing.closingDelta = 0.5f;
-        Assert.That(rewards.StepReward(closing), Is.EqualTo(0.001f - 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(closing), Is.EqualTo(Alive - 0.005f).Within(Tolerance));
     }
 
     [Test]
@@ -168,17 +174,17 @@ public class RewardComputerTests
     {
         StepRewardInput step = Step(mode);
         step.closingDelta = 2f;
-        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     [Test]
     public void BreakingLineOfSight_PaysOnlyTheCoverModes()
     {
         var rewards = DefaultRewards();
-        Assert.That(Hidden(rewards, NpcMode.HoldCover), Is.EqualTo(0.001f + 0.005f).Within(Tolerance));
-        Assert.That(Hidden(rewards, NpcMode.Retreat), Is.EqualTo(0.001f + 0.002f).Within(Tolerance));
-        Assert.That(Hidden(rewards, NpcMode.Hunt), Is.EqualTo(0.001f).Within(Tolerance));
-        Assert.That(Hidden(rewards, NpcMode.Patrol), Is.EqualTo(0.001f).Within(Tolerance));
+        Assert.That(Hidden(rewards, NpcMode.HoldCover), Is.EqualTo(Alive + 0.005f).Within(Tolerance));
+        Assert.That(Hidden(rewards, NpcMode.Retreat), Is.EqualTo(Alive + 0.002f).Within(Tolerance));
+        Assert.That(Hidden(rewards, NpcMode.Hunt), Is.EqualTo(Alive).Within(Tolerance));
+        Assert.That(Hidden(rewards, NpcMode.Patrol), Is.EqualTo(Alive).Within(Tolerance));
     }
 
     static float Hidden(RewardComputer rewards, NpcMode mode)
@@ -193,7 +199,7 @@ public class RewardComputerTests
     {
         StepRewardInput step = Step(mode);
         step.enteredNewArea = true;
-        float expected = mode == NpcMode.Patrol ? 0.001f + 0.002f : 0.001f;
+        float expected = mode == NpcMode.Patrol ? Alive + 0.002f : Alive;
         Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(expected).Within(Tolerance));
     }
 
@@ -204,6 +210,23 @@ public class RewardComputerTests
     {
         var rewards = DefaultRewards();
         Assert.That(rewards.RewardsCover(mode), Is.EqualTo(rewards.modes[mode].coverPerStep != 0f));
+    }
+
+    // #79: full-02 converged to running the clock out because a whole round of
+    // alive bonus out-earned a kill. The terminal rewards live on EnemyAgent,
+    // so they are repeated here the way the columns above are.
+    [Test]
+    public void StallingAWholeRound_PaysLessThanWinningOne()
+    {
+        const float KillTarget = 1.0f;
+        const float Timeout = 0.6f;
+        // 120 s round at 50 Hz with a decision period of 5.
+        const int decisionStepsPerRound = 1200;
+
+        float stalled = DefaultRewards().StepReward(Step()) * decisionStepsPerRound - Timeout;
+        Assert.That(stalled, Is.LessThan(KillTarget),
+            "a draw must never be worth more than a kill, or the policy learns to stall");
+        Assert.That(stalled, Is.LessThan(0f), "and running the clock out must be a net loss");
     }
 
     [Test]

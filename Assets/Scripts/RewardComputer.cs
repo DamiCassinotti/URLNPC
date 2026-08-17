@@ -25,9 +25,9 @@ public struct StepRewardInput
 // (kill/death/timeout) don't vary by mode and stay on the agent.
 public class RewardComputer
 {
-    public float aliveRewardPerStep = 0.001f;
+    public float aliveRewardPerStep = 0.0002f;
     public float wastedShotPenalty = 0.05f;
-    public float tooClosePenaltyPerStep = 0.005f;
+    public float tooClosePenaltyPerStep = 0.001f;
     public float tooCloseDistance = 6f;
 
     public readonly ModeRewardTable modes = new ModeRewardTable();
