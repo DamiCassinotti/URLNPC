@@ -17,6 +17,7 @@ public class EnemyAgentTests : PlayModeTestBase
     GameObject player;
     Health playerHealth;
     EnemyAgent agent;
+    EnemyBehavior behavior;
     Health selfHealth;
 
     IEnumerator BuildAgentScene()
@@ -24,19 +25,33 @@ public class EnemyAgentTests : PlayModeTestBase
         player = Track(GameObject.CreatePrimitive(PrimitiveType.Capsule));
         player.name = "TestPlayer";
         player.tag = "Player";
-        player.transform.position = new Vector3(0f, 0f, 10f);
         playerHealth = player.AddComponent<Health>();
 
         GameObject enemyGo = Track(new GameObject("TestEnemyAgent"));
         enemyGo.SetActive(false);
         enemyGo.AddComponent<NavMeshAgent>().enabled = false;
         agent = enemyGo.AddComponent<EnemyAgent>(); // RequireComponent pulls in EnemyBehavior + Health (+ BehaviorParameters)
-        var behavior = enemyGo.GetComponent<EnemyBehavior>();
+        behavior = enemyGo.GetComponent<EnemyBehavior>();
         behavior.enabled = false; // no NavMesh in this fixture: skip Start's spawn
         behavior.target = player.transform;
         selfHealth = enemyGo.GetComponent<Health>();
         enemyGo.SetActive(true); // Agent.OnEnable → Academy init → Initialize()
         yield return null;       // EnemyAgent.Update subscribes to the target's Health
+
+        // Park the player out of sight and wipe whatever the auto-refreshing
+        // memory caught meanwhile, so the fixture starts blind either way.
+        PlacePlayer(-(CombatBalance.SightRange + 10f));
+        behavior.Perception.Forget();
+    }
+
+    // OnEpisodeBegin respawns the body at a random point, so the player has to
+    // be placed relative to the enemy rather than in world coordinates: a fixed
+    // spot lands in or out of the sight cone depending on where it woke up.
+    void PlacePlayer(float distanceAlongEnemyForward)
+    {
+        player.transform.position = agent.transform.position
+                                  + agent.transform.forward * distanceAlongEnemyForward;
+        Physics.SyncTransforms();
     }
 
     [UnityTest]
@@ -117,6 +132,15 @@ public class EnemyAgentTests : PlayModeTestBase
         Assert.That(obs[6], Is.EqualTo(1f), "never-seen saturates the staleness slot");
         Assert.That(obs[7], Is.EqualTo(1f), "full health at the start of the episode");
         Assert.That(obs[13], Is.EqualTo(1f), "the auto-added ModeChannel starts on Hunt");
+
+        // Step into view: the sighting slots must follow the memory, not the
+        // player's true position.
+        PlacePlayer(10f);
+        behavior.Perception.Refresh();
+        agent.CollectObservations(sensor);
+        obs = agent.LastObservations;
+        Assert.That(obs[2], Is.EqualTo(1f), "the target is visible now");
+        Assert.That(obs[6], Is.EqualTo(0f), "a fresh sighting zeroes the staleness slot");
 
         // Shot from directly behind: DamageMemory buckets it, and the bucket has
         // to survive into the one-hot.
