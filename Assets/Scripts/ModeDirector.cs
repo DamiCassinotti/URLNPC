@@ -15,8 +15,8 @@ using Unity.MLAgents;
 [RequireComponent(typeof(ModeChannel))]
 public class ModeDirector : MonoBehaviour
 {
-    [Tooltip("Modes this run may command. The slice run trains Hunt/Retreat only.")]
-    [SerializeField] internal NpcModeMask enabledModes = NpcModeMask.Hunt | NpcModeMask.Retreat;
+    [Tooltip("Modes this run may command outside training. Ignored while the trainer is attached: training always commands all four, so the prefab, the scene's instance override and CombatantRig's composed director can't drift apart.")]
+    [SerializeField] internal NpcModeMask enabledModes = NpcModes.AllMask;
 
     [Tooltip("Seconds a drawn mode is held before the next draw. Kept near the LLM selector's 3-5 s decision period so the policy trains on the switch rate it will see at inference.")]
     [SerializeField] internal float minDwellSeconds = 5f;
@@ -53,7 +53,13 @@ public class ModeDirector : MonoBehaviour
     // The channel takes one writer at a time: this director during training,
     // the LLM selector at inference. Nothing arbitrates between them, so the
     // scripted side stands down unless it was told to run either way.
-    internal bool IsWriter => !trainingOnly || (Academy.IsInitialized && Academy.Instance.IsCommunicatorOn);
+    internal bool IsWriter => !trainingOnly || IsTraining;
+
+    static bool IsTraining => Academy.IsInitialized && Academy.Instance.IsCommunicatorOn;
+
+    // The pool actually drawn from: code-owned during training, the serialized
+    // field outside it. See NpcModes.ResolveEnabled.
+    internal NpcModeMask ActiveModes => NpcModes.ResolveEnabled(enabledModes, IsTraining);
 
     // Internal seam: EditMode tests drive the schedule without play mode, the
     // same way GameManager feeds RoundClock its delta.
@@ -109,10 +115,11 @@ public class ModeDirector : MonoBehaviour
 
     void RebuildPoolIfMaskChanged()
     {
-        if (poolBuilt && builtMask == enabledModes) return;
-        builtMask = enabledModes;
+        NpcModeMask mask = ActiveModes;
+        if (poolBuilt && builtMask == mask) return;
+        builtMask = mask;
         poolBuilt = true;
-        schedule.Pool = enabledModes.Enabled();
+        schedule.Pool = mask.Enabled();
         if (schedule.Pool.Length == 0 && !warnedEmptyMask)
         {
             warnedEmptyMask = true;

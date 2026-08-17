@@ -46,9 +46,11 @@ scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S] [extra...]
 - `config` defaults to `config/URLNPC.yaml`. `--resume` / `--force` and any other flag pass
   straight through to `mlagents-learn`.
 
-The slice is the narrowed early run: the short `config/URLNPC-slice.yaml` (50k steps,
-`summary_freq` 2000) paired with the `ModeDirector.enabledModes` default of `Hunt | Retreat`,
-so the policy learns the Hunt/Retreat split before the full four-mode, 1M-step run. Smoke it
+The slice is the short early run: `config/URLNPC-slice.yaml` (50k steps, `summary_freq` 2000),
+enough to see reward move and the compliance columns appear before the full 1M-step run.
+Training always commands all four modes — the set is owned by code (`NpcModes.AllMask`), so
+the prefab, the scene's instance override and `CombatantRig`'s composed director can't train
+different pools; `ModeDirector.enabledModes` only narrows it outside training. Smoke the slice
 in the editor first:
 
 ```bash
@@ -83,11 +85,11 @@ tensorboard --logdir results
 
 - **`Environment/Cumulative Reward`** — the headline. Should trend up and stabilise; a flat
   line near zero means the policy isn't finding the kill/hit rewards.
-- **`Compliance/Hunt`, `Compliance/Retreat`** — does the policy obey the commanded mode
-  (Hunt closes distance or shoots, Retreat opens distance)? These are the point of the
-  mode-conditioning: reward can climb while compliance stays flat if the policy ignores the
-  command and just fights. Only the enabled modes report on the slice. Patrol's rate reads
-  low by construction (a cell counts once) — compare between runs, not as a percentage.
+- **`Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat`, `Compliance/Patrol`** —
+  does the policy obey the commanded mode (Hunt closes distance or shoots, Retreat opens
+  distance)? These are the point of the mode-conditioning: reward can climb while compliance
+  stays flat if the policy ignores the command and just fights. Patrol's rate reads low by
+  construction (a cell counts once) — compare between runs, not as a percentage.
 - **`Losses/Policy Loss`, `Losses/Value Loss`** — should settle, not diverge.
 - **`Run/Seed`** — confirms which seed each episode ran under.
 

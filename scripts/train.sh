@@ -4,6 +4,9 @@
 #   scripts/train.sh editor <run-id> [config] [extra mlagents args...]
 #   scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S] [extra...]
 #
+# --seed S seeds both the ML-Agents learner and the env RNG (-runSeed), so the
+# run is fully reproducible. build only; the editor path can't take env-args.
+#
 # editor — starts mlagents-learn and waits for you to press Play in the Editor.
 #          For watching behavior and quick manual checks.
 # build  — runs against the headless standalone build (scripts/build-player.sh),
@@ -61,6 +64,9 @@ if [[ "$MODE" == "build" ]]; then
     fi
     CMD+=("--env=$ENV_BIN" --no-graphics)
     [[ -n "$NUM_ENVS" ]] && CMD+=("--num-envs=$NUM_ENVS")
+    # --seed drives both the learner (mlagents) and the env (-runSeed below) so a
+    # seeded run is fully reproducible, not just its arena/spawn RNG.
+    [[ -n "$SEED" ]] && CMD+=("--seed=$SEED")
     [[ ${#PASSTHROUGH[@]} -gt 0 ]] && CMD+=("${PASSTHROUGH[@]}")
     # The player side is driven by the shared agent policy so both bodies train
     # against a live opponent; env-args must come last (they end the arg list).
