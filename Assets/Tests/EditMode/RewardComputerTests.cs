@@ -9,7 +9,6 @@ public class RewardComputerTests
     // The documented per-step rows, named so the arithmetic below reads as
     // "alive bonus minus penalty" rather than as bare numbers.
     const float Alive = 0.0002f;
-    const float TooClose = 0.001f;
     const float WastedShot = 0.05f;
 
     // The documented columns (#44). EnemyAgent's serialized defaults have to
@@ -20,24 +19,24 @@ public class RewardComputerTests
         {
             aliveRewardPerStep = Alive,
             wastedShotPenalty = WastedShot,
-            tooClosePenaltyPerStep = TooClose,
             tooCloseDistance = 6f,
         };
         rewards.modes[NpcMode.Hunt] = new ModeRewardColumn
         {
-            hitTarget = 0.5f, gotHit = 0.3f, closingPerMeter = 0.01f,
+            hitTarget = 0.5f, gotHit = 0.3f, closingPerMeter = 0.01f, tooClosePerStep = 0f,
         };
         rewards.modes[NpcMode.HoldCover] = new ModeRewardColumn
         {
-            hitTarget = 0.5f, gotHit = 0.6f, coverPerStep = 0.005f,
+            hitTarget = 0.5f, gotHit = 0.6f, coverPerStep = 0.005f, tooClosePerStep = 0.004f,
         };
         rewards.modes[NpcMode.Retreat] = new ModeRewardColumn
         {
             hitTarget = 0.1f, gotHit = 0.6f, closingPerMeter = -0.01f, coverPerStep = 0.002f,
+            tooClosePerStep = 0.008f,
         };
         rewards.modes[NpcMode.Patrol] = new ModeRewardColumn
         {
-            hitTarget = 0.1f, gotHit = 0.5f, newArea = 0.002f,
+            hitTarget = 0.1f, gotHit = 0.5f, newArea = 0.002f, tooClosePerStep = 0.002f,
         };
         return rewards;
     }
@@ -55,20 +54,33 @@ public class RewardComputerTests
         Assert.That(DefaultRewards().StepReward(Step()), Is.EqualTo(Alive).Within(Tolerance));
     }
 
+    // #80: the stand-off each mode wants is the mode's own column.
     [Test]
-    public void StandingTooClose_CostsTheShapingPenalty()
+    public void StandingTooClose_CostsTheCommandedModesPenalty(
+        [Values(NpcMode.HoldCover, NpcMode.Retreat, NpcMode.Patrol)] NpcMode mode)
     {
-        StepRewardInput step = Step();
+        var rewards = DefaultRewards();
+        StepRewardInput step = Step(mode);
         step.distanceToTarget = 3f;
         step.targetInSight = true;
-        Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(Alive - TooClose).Within(Tolerance), "melee-rushing must not pay");
+        Assert.That(rewards.StepReward(step),
+            Is.EqualTo(Alive - rewards.modes[mode].tooClosePerStep).Within(Tolerance));
+    }
+
+    [Test]
+    public void Hunt_IsFreeToClose()
+    {
+        StepRewardInput step = Step(NpcMode.Hunt);
+        step.distanceToTarget = 1f;
+        step.targetInSight = true;
+        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(Alive).Within(Tolerance),
+            "a hunting NPC must not be taxed for doing its job");
     }
 
     [Test]
     public void TooCloseBoundary_IsExclusive()
     {
-        StepRewardInput step = Step();
+        StepRewardInput step = Step(NpcMode.Retreat);
         step.distanceToTarget = 6f;
         Assert.That(DefaultRewards().StepReward(step),
             Is.EqualTo(Alive).Within(Tolerance), "exactly at tooCloseDistance is not 'too close'");
@@ -78,8 +90,10 @@ public class RewardComputerTests
     public void DisabledTooClosePenalty_IgnoresDistance()
     {
         var rewards = DefaultRewards();
-        rewards.tooClosePenaltyPerStep = 0f;
-        StepRewardInput step = Step();
+        ModeRewardColumn retreat = rewards.modes[NpcMode.Retreat];
+        retreat.tooClosePerStep = 0f;
+        rewards.modes[NpcMode.Retreat] = retreat;
+        StepRewardInput step = Step(NpcMode.Retreat);
         step.distanceToTarget = 0.5f;
         Assert.That(rewards.StepReward(step), Is.EqualTo(Alive).Within(Tolerance));
     }
@@ -124,11 +138,12 @@ public class RewardComputerTests
     [Test]
     public void Penalties_Stack()
     {
-        StepRewardInput step = Step();
+        var rewards = DefaultRewards();
+        StepRewardInput step = Step(NpcMode.Retreat);
         step.fired = step.didShoot = true;
         step.distanceToTarget = 2f;
-        Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(Alive - TooClose - WastedShot).Within(Tolerance));
+        Assert.That(rewards.StepReward(step),
+            Is.EqualTo(Alive - rewards.modes[NpcMode.Retreat].tooClosePerStep - WastedShot).Within(Tolerance));
     }
 
     // The rows the commanded mode does not move: same step, every mode.
@@ -137,9 +152,8 @@ public class RewardComputerTests
     {
         StepRewardInput step = Step(mode);
         step.fired = step.didShoot = true;
-        step.distanceToTarget = 2f;
         Assert.That(DefaultRewards().StepReward(step),
-            Is.EqualTo(Alive - TooClose - WastedShot).Within(Tolerance));
+            Is.EqualTo(Alive - WastedShot).Within(Tolerance));
     }
 
     [Test]
@@ -239,5 +253,17 @@ public class RewardComputerTests
         Assert.That(rewards.modes[NpcMode.Hunt].gotHit, Is.EqualTo(0.3f).Within(Tolerance));
         Assert.That(rewards.modes[NpcMode.HoldCover].gotHit, Is.EqualTo(0.6f).Within(Tolerance),
             "being hit while the job is to stay covered has to cost more");
+    }
+
+    [Test]
+    public void TooCloseColumn_FollowsTheDocumentedTable()
+    {
+        var rewards = DefaultRewards();
+        Assert.That(rewards.modes[NpcMode.Hunt].tooClosePerStep, Is.EqualTo(0f).Within(Tolerance));
+        Assert.That(rewards.modes[NpcMode.Retreat].tooClosePerStep,
+            Is.GreaterThan(rewards.modes[NpcMode.HoldCover].tooClosePerStep),
+            "opening distance is Retreat's job, so crowding must cost it the most");
+        Assert.That(rewards.modes[NpcMode.HoldCover].tooClosePerStep,
+            Is.GreaterThan(rewards.modes[NpcMode.Patrol].tooClosePerStep));
     }
 }

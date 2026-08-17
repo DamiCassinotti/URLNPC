@@ -27,7 +27,6 @@ public class RewardComputer
 {
     public float aliveRewardPerStep = 0.0002f;
     public float wastedShotPenalty = 0.05f;
-    public float tooClosePenaltyPerStep = 0.001f;
     public float tooCloseDistance = 6f;
 
     public readonly ModeRewardTable modes = new ModeRewardTable();
@@ -37,9 +36,9 @@ public class RewardComputer
         ModeRewardColumn column = modes[step.mode];
 
         float reward = aliveRewardPerStep;
-        if (tooClosePenaltyPerStep > 0f && step.distanceToTarget < tooCloseDistance)
+        if (column.tooClosePerStep > 0f && step.distanceToTarget < tooCloseDistance)
         {
-            reward -= tooClosePenaltyPerStep;
+            reward -= column.tooClosePerStep;
         }
         if (step.fired && step.didShoot && !step.targetInSight)
         {

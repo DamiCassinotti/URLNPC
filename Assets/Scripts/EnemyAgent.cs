@@ -22,9 +22,7 @@ public class EnemyAgent : Agent
     [SerializeField] float timeoutPenalty = 0.6f;
 
     [Header("Positioning shaping")]
-    [Tooltip("Per-step penalty while the enemy is closer to the player than tooCloseDistance. Discourages melee-rush.")]
-    // Kept token-sized: at 0.005 it out-paid Hunt's closing column and taxed the
-    // one mode whose job is to close.
+    [Tooltip("Fallback per-step penalty for being closer to the player than tooCloseDistance, used only where tooClosePenaltyByMode has no entry.")]
     [SerializeField] float tooClosePenaltyPerStep = 0.001f;
     [SerializeField] float tooCloseDistance = 6f;
 
@@ -43,6 +41,8 @@ public class EnemyAgent : Agent
     [SerializeField] float[] coverRewardPerStepByMode = { 0f, 0.005f, 0.002f, 0f };
     [Tooltip("One-off reward the first time each patch of the arena is entered in an episode.")]
     [SerializeField] float[] newAreaRewardByMode = { 0f, 0f, 0f, 0.002f };
+    [Tooltip("Penalty (positive magnitude) per step inside tooCloseDistance. Zero for Hunt, which has to be free to close. Falls back to tooClosePenaltyPerStep.")]
+    [SerializeField] float[] tooClosePenaltyByMode = { 0f, 0.004f, 0.008f, 0.002f };
     [Tooltip("Side in metres of the square patches the new-area reward counts.")]
     [SerializeField] float newAreaCellSize = 6f;
 
@@ -165,7 +165,6 @@ public class EnemyAgent : Agent
         {
             aliveRewardPerStep = aliveRewardPerStep,
             wastedShotPenalty = wastedShotPenalty,
-            tooClosePenaltyPerStep = tooClosePenaltyPerStep,
             tooCloseDistance = tooCloseDistance,
         };
         foreach (NpcMode mode in NpcModes.All)
@@ -177,6 +176,7 @@ public class EnemyAgent : Agent
                 closingPerMeter = Column(closingRewardPerMeterByMode, mode, 0f),
                 coverPerStep = Column(coverRewardPerStepByMode, mode, 0f),
                 newArea = Column(newAreaRewardByMode, mode, 0f),
+                tooClosePerStep = Column(tooClosePenaltyByMode, mode, tooClosePenaltyPerStep),
             };
         }
         progress = new EpisodeProgress { areaCellSize = newAreaCellSize };

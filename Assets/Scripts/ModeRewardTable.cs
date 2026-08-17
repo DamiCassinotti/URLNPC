@@ -14,6 +14,9 @@ public struct ModeRewardColumn
     public float coverPerStep;
     // Once per patch of the arena first entered this episode.
     public float newArea;
+    // Positive magnitude, subtracted per step while inside tooCloseDistance.
+    // Per mode (#80): as one global row it also taxed Hunt, whose job is to close.
+    public float tooClosePerStep;
 }
 
 public class ModeRewardTable
