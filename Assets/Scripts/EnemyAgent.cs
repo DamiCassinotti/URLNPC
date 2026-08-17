@@ -9,18 +9,23 @@ using Unity.MLAgents.Sensors;
 public class EnemyAgent : Agent
 {
     [Header("Rewards")]
-    [SerializeField] float aliveRewardPerStep = 0.001f;
+    // Small enough that a full ~1200-step round of stalling pays less than a
+    // kill: at 0.001 it summed to ~+1.2 and the policy converged to running the
+    // clock out (#79).
+    [SerializeField] float aliveRewardPerStep = 0.0002f;
     [SerializeField] float hitTargetReward = 0.5f;
     [SerializeField] float gotHitPenalty = 0.5f;
     [SerializeField] float killTargetReward = 1.0f;
     [SerializeField] float diedPenalty = 1.0f;
     [SerializeField] float wastedShotPenalty = 0.05f;
-    [Tooltip("Small negative terminal reward when the round clock runs out (draw). Discourages stalling without forcing a winner.")]
-    [SerializeField] float timeoutPenalty = 0.2f;
+    [Tooltip("Negative terminal reward when the round clock runs out (draw). Discourages stalling without forcing a winner.")]
+    [SerializeField] float timeoutPenalty = 0.6f;
 
     [Header("Positioning shaping")]
     [Tooltip("Per-step penalty while the enemy is closer to the player than tooCloseDistance. Discourages melee-rush.")]
-    [SerializeField] float tooClosePenaltyPerStep = 0.005f;
+    // Kept token-sized: at 0.005 it out-paid Hunt's closing column and taxed the
+    // one mode whose job is to close.
+    [SerializeField] float tooClosePenaltyPerStep = 0.001f;
     [SerializeField] float tooCloseDistance = 6f;
 
     // One column per NpcMode, in NpcModes.All order: Hunt, HoldCover, Retreat,
