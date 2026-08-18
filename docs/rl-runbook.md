@@ -90,6 +90,10 @@ tensorboard --logdir results
   distance)? These are the point of the mode-conditioning: reward can climb while compliance
   stays flat if the policy ignores the command and just fights. Patrol's rate reads low by
   construction (a cell counts once) — compare between runs, not as a percentage.
+- **`Visible/<Mode>`** — the fraction of each mode's steps the player was in sight for. Read
+  compliance against it: the positional rewards are only earnable while the player is
+  visible, so near-zero compliance *and* near-zero visibility is low engagement, not a
+  policy ignoring the command.
 - **`Losses/Policy Loss`, `Losses/Value Loss`** — should settle, not diverge.
 - **`Run/Seed`** — confirms which seed each episode ran under.
 
