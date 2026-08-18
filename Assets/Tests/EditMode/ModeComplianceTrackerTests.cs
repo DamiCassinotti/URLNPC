@@ -89,6 +89,7 @@ public class ModeComplianceTrackerTests
         Record(tracker, NpcMode.Retreat, closing: -0.4f, times: 1);
 
         Assert.That(tracker.Steps(NpcMode.Hunt), Is.EqualTo(4));
+        Assert.That(tracker.EligibleSteps(NpcMode.Hunt), Is.EqualTo(4));
         Assert.That(tracker.CompliantSteps(NpcMode.Hunt), Is.EqualTo(3));
         Assert.That(tracker.Rate(NpcMode.Hunt), Is.EqualTo(0.75f).Within(1e-6f));
         Assert.That(tracker.Rate(NpcMode.Retreat), Is.EqualTo(1f).Within(1e-6f));
@@ -115,6 +116,7 @@ public class ModeComplianceTrackerTests
 
         Assert.That(tracker.TotalSteps, Is.Zero);
         Assert.That(tracker.Steps(NpcMode.Hunt), Is.Zero);
+        Assert.That(tracker.EligibleSteps(NpcMode.Hunt), Is.Zero);
         Assert.That(tracker.CompliantSteps(NpcMode.Hunt), Is.Zero);
         Assert.That(tracker.ComplianceJson(), Is.EqualTo("\"compliance\":{}"));
     }
@@ -128,8 +130,58 @@ public class ModeComplianceTrackerTests
         Record(tracker, NpcMode.Retreat, closing: 0.4f, times: 2);
 
         Assert.That(tracker.ComplianceJson(), Is.EqualTo(
-            "\"compliance\":{\"Hunt\":{\"steps\":4,\"compliant\":3,\"rate\":0.75},"
-            + "\"Retreat\":{\"steps\":2,\"compliant\":0,\"rate\":0}}"));
+            "\"compliance\":{\"Hunt\":{\"steps\":4,\"eligible\":4,\"compliant\":3,\"rate\":0.75},"
+            + "\"Retreat\":{\"steps\":2,\"eligible\":2,\"compliant\":0,\"rate\":0}}"));
+    }
+
+    [Test]
+    public void HuntAndRetreat_AreOnlyScoredOnStepsTheTargetIsVisible()
+    {
+        var tracker = Fresh();
+        Record(tracker, NpcMode.Hunt, closing: 0.4f, times: 2, visible: true);
+        Record(tracker, NpcMode.Hunt, closing: 0f, times: 8, visible: false);
+
+        Assert.That(tracker.Steps(NpcMode.Hunt), Is.EqualTo(10), "the raw count keeps every step");
+        Assert.That(tracker.EligibleSteps(NpcMode.Hunt), Is.EqualTo(2));
+        Assert.That(tracker.Rate(NpcMode.Hunt), Is.EqualTo(1f).Within(1e-6f),
+            "a mode that did its job whenever it could see the target scores 1, not 0.2");
+
+        Assert.That(ModeComplianceTracker.Eligible(new ComplianceSample { mode = NpcMode.Retreat, targetVisible = false }), Is.False);
+        Assert.That(ModeComplianceTracker.Eligible(new ComplianceSample { mode = NpcMode.Retreat, targetVisible = true }), Is.True);
+    }
+
+    [Test]
+    public void HoldCoverAndPatrol_AreScoredOnEveryStep()
+    {
+        // Neither rule needs a bearing on the target, so an unseen target is
+        // not an excuse: breaking the eye-line and covering new ground are
+        // things the policy can do blind.
+        foreach (NpcMode mode in new[] { NpcMode.HoldCover, NpcMode.Patrol })
+        {
+            Assert.That(ModeComplianceTracker.Eligible(new ComplianceSample { mode = mode, targetVisible = false }), Is.True, mode.ToString());
+        }
+
+        var tracker = Fresh();
+        var hidden = Step(NpcMode.HoldCover);
+        hidden.inCover = true;
+        tracker.Record(hidden);
+        tracker.Record(Step(NpcMode.HoldCover));
+
+        Assert.That(tracker.EligibleSteps(NpcMode.HoldCover), Is.EqualTo(2));
+        Assert.That(tracker.Rate(NpcMode.HoldCover), Is.EqualTo(0.5f).Within(1e-6f));
+    }
+
+    [Test]
+    public void AModeWithNoEligibleStep_ReportsItsStepsAndNoRate()
+    {
+        var tracker = Fresh();
+        Record(tracker, NpcMode.Hunt, closing: 0.4f, times: 3, visible: false);
+
+        Assert.That(tracker.EligibleSteps(NpcMode.Hunt), Is.Zero);
+        Assert.That(tracker.Rate(NpcMode.Hunt), Is.EqualTo(0f), "no eligible steps is reported as zero, not as a division by zero");
+        Assert.That(tracker.ComplianceJson(), Is.EqualTo(
+            "\"compliance\":{\"Hunt\":{\"steps\":3,\"eligible\":0,\"compliant\":0,\"rate\":0}}"),
+            "the steps still show up, so a never-engaged mode is visible rather than missing");
     }
 
     [Test]
@@ -143,9 +195,9 @@ public class ModeComplianceTrackerTests
         Assert.That(ModeComplianceTracker.ReadsCover(NpcMode.Patrol), Is.False);
     }
 
-    static void Record(ModeComplianceTracker tracker, NpcMode mode, float closing, int times)
+    static void Record(ModeComplianceTracker tracker, NpcMode mode, float closing, int times, bool visible = true)
     {
-        var sample = new ComplianceSample { mode = mode, closingDelta = closing };
+        var sample = new ComplianceSample { mode = mode, closingDelta = closing, targetVisible = visible };
         for (int i = 0; i < times; i++) tracker.Record(sample);
     }
 }

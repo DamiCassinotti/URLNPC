@@ -335,6 +335,7 @@ public class EnemyAgent : Agent
             shotFired = fired && behavior.DidShoot,
             inCover = hidden,
             enteredNewArea = enteredNewArea,
+            targetVisible = inputs.targetVisible,
         });
         visibility.Record(mode, inputs.targetVisible);
     }
@@ -410,7 +411,13 @@ public class EnemyAgent : Agent
             {
                 // A mode this episode never ran has no rate to average in.
                 if (compliance.Steps(mode) == 0) continue;
-                stats.Add(complianceStatNames[(int)mode], compliance.Rate(mode));
+                // Nor has one whose steps were all ineligible — the visibility
+                // row below is what reports that, so averaging in a 0 here
+                // would only drag the rate back to measuring engagement (#88).
+                if (compliance.EligibleSteps(mode) > 0)
+                {
+                    stats.Add(complianceStatNames[(int)mode], compliance.Rate(mode));
+                }
                 stats.Add(visibleStatNames[(int)mode], visibility.Rate(mode));
             }
         }

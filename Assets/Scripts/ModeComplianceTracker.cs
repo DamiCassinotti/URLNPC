@@ -14,6 +14,9 @@ public struct ComplianceSample
     // a step that paid.
     public bool inCover;
     public bool enteredNewArea;
+    // Whether the target was visible on this step — what decides eligibility
+    // for the modes that need a bearing to act on.
+    public bool targetVisible;
 }
 
 // Mode compliance (#45): of the decision steps spent under each commanded mode,
@@ -34,7 +37,22 @@ public class ModeComplianceTracker
 
     public void Reset() => tally.Reset();
 
-    public void Record(in ComplianceSample sample) => tally.Record(sample.mode, Compliant(sample));
+    public void Record(in ComplianceSample sample) =>
+        tally.Record(sample.mode, Compliant(sample), Eligible(sample));
+
+    // Steps the mode had a chance to act on (#88). Hunt closes or shoots and
+    // Retreat opens; neither has a bearing to work from while the target is
+    // unseen, so scoring those steps made the rate mostly a measure of how
+    // often the fight was joined. HoldCover and Patrol need no target.
+    public static bool Eligible(in ComplianceSample sample)
+    {
+        switch (sample.mode)
+        {
+            case NpcMode.Hunt:
+            case NpcMode.Retreat: return sample.targetVisible;
+            default: return true;
+        }
+    }
 
     public bool Compliant(in ComplianceSample sample)
     {
@@ -57,10 +75,13 @@ public class ModeComplianceTracker
 
     public int Steps(NpcMode mode) => tally.Steps(mode);
 
+    public int EligibleSteps(NpcMode mode) => tally.EligibleSteps(mode);
+
     public int CompliantSteps(NpcMode mode) => tally.Hits(mode);
 
-    // 0 for a mode that was never commanded this episode; check Steps to tell
-    // that apart from a mode that complied on no step at all.
+    // Compliant steps over ELIGIBLE steps. 0 for a mode that was never
+    // commanded, and for one that never got an eligible step; check
+    // Steps/EligibleSteps to tell those apart from complying on no step at all.
     public float Rate(NpcMode mode) => tally.Rate(mode);
 
     public string ComplianceJson() => tally.Json("compliance", "compliant");

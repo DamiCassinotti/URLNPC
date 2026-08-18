@@ -88,12 +88,13 @@ tensorboard --logdir results
 - **`Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat`, `Compliance/Patrol`** —
   does the policy obey the commanded mode (Hunt closes distance or shoots, Retreat opens
   distance)? These are the point of the mode-conditioning: reward can climb while compliance
-  stays flat if the policy ignores the command and just fights. Patrol's rate reads low by
+  stays flat if the policy ignores the command and just fights. The denominator is the steps
+  the mode could act on — Hunt and Retreat only while the player is visible — so this reads as
+  policy quality, not as how often the fight was joined. Patrol's rate reads low by
   construction (a cell counts once) — compare between runs, not as a percentage.
-- **`Visible/<Mode>`** — the fraction of each mode's steps the player was in sight for. Read
-  compliance against it: the positional rewards are only earnable while the player is
-  visible, so near-zero compliance *and* near-zero visibility is low engagement, not a
-  policy ignoring the command.
+- **`Visible/<Mode>`** — the fraction of each mode's steps the player was in sight for, i.e.
+  how much of the round Hunt's and Retreat's rates were scored on. A mode that never saw the
+  player logs no compliance rate that episode, and shows up here as a flat zero instead.
 - **`Losses/Policy Loss`, `Losses/Value Loss`** — should settle, not diverge.
 - **`Run/Seed`** — confirms which seed each episode ran under.
 
