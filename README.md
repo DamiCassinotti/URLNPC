@@ -163,7 +163,7 @@ The rest is one column per commanded mode (`NpcMode`), so the same policy is pul
 
 ### Mode compliance
 
-Whether the policy actually obeys the mode it is commanded. Every decision step is scored against its mode, and the per-episode fraction is reported as `Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat` and `Compliance/Patrol` in TensorBoard, next to reward and entropy:
+Whether the policy actually obeys the mode it is commanded. Every decision step is scored against its mode, and the per-episode fraction is reported as `Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat` and `Compliance/Patrol` in TensorBoard, next to reward and entropy. The fraction is over the steps the mode could act on, not over every step it was commanded for: Hunt and Retreat are scored only while the player is visible, since neither closing nor opening has a bearing to work from otherwise; HoldCover and Patrol need no target and are scored on every step.
 
 | Mode | A step counts as compliant when it |
 |---|---|
@@ -172,9 +172,9 @@ Whether the policy actually obeys the mode it is commanded. Every decision step 
 | Retreat | opened distance |
 | Patrol | entered a patch of the arena it had not been in this episode |
 
-Read alongside them is `Visible/<Mode>`, the fraction of those same steps the player was actually in sight. The positional rewards only pay while the player is visible, so a mode whose compliance is near zero *and* whose visibility is near zero was never given the chance to act, which is a different problem from a policy that ignores the command.
+Read alongside them is `Visible/<Mode>`, the fraction of the steps under each mode the player was actually in sight — which for Hunt and Retreat is how much of the round the rate above was scored on. A mode that spent an episode with the player never in sight reports no compliance rate at all rather than a zero.
 
-The same numbers go to the telemetry log as a `mode_compliance` line per episode (steps, compliant steps and rate per mode, plus the same per-mode visible counts), alongside a `mode_change` line for every switch — that pair is the mode timeline the offline analysis reads. Patrol's rate is low by construction: a patch only counts the first time, so compare it between runs rather than reading it as a percentage.
+The same numbers go to the telemetry log as a `mode_compliance` line per episode (steps, eligible steps, compliant steps and rate per mode, plus the same per-mode visible counts), alongside a `mode_change` line for every switch — that pair is the mode timeline the offline analysis reads. Patrol's rate is low by construction: a patch only counts the first time, so compare it between runs rather than reading it as a percentage.
 
 ## Testing
 
