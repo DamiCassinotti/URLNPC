@@ -59,9 +59,14 @@ public class EnemyAgent : Agent
     RewardComputer rewards;
     EpisodeProgress progress;
     ModeComplianceTracker compliance;
+    // How often the target was visible under each mode (#87): the per-mode
+    // positional rewards are only earnable while it is, so a compliance rate is
+    // only readable next to the fraction of steps the mode could act on.
+    ModeTally visibility;
 
     // Built once: the stat name is per mode and the flush runs every episode.
-    static readonly string[] complianceStatNames = BuildComplianceStatNames();
+    static readonly string[] complianceStatNames = BuildStatNames("Compliance");
+    static readonly string[] visibleStatNames = BuildStatNames("Visible");
 
     readonly float[] observations = new float[NpcBrainSpec.ObservationSize];
     NpcObservationInput inputs;
@@ -181,15 +186,16 @@ public class EnemyAgent : Agent
         }
         progress = new EpisodeProgress { areaCellSize = newAreaCellSize };
         compliance = new ModeComplianceTracker();
+        visibility = new ModeTally();
 
         selfHealth.OnDamaged += HandleSelfDamaged;
         selfHealth.OnDied += HandleSelfDied;
     }
 
-    static string[] BuildComplianceStatNames()
+    static string[] BuildStatNames(string prefix)
     {
         var names = new string[NpcModes.All.Length];
-        foreach (NpcMode mode in NpcModes.All) names[(int)mode] = $"Compliance/{mode}";
+        foreach (NpcMode mode in NpcModes.All) names[(int)mode] = $"{prefix}/{mode}";
         return names;
     }
 
@@ -330,6 +336,7 @@ public class EnemyAgent : Agent
             inCover = hidden,
             enteredNewArea = enteredNewArea,
         });
+        visibility.Record(mode, inputs.targetVisible);
     }
 
     public override void OnEpisodeBegin()
@@ -342,6 +349,7 @@ public class EnemyAgent : Agent
         // episode the trainer ends from its side, whose tally would otherwise
         // be counted into the next one.
         if (compliance != null) compliance.Reset();
+        if (visibility != null) visibility.Reset();
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
         // Reposition the player BEFORE the enemy respawns so the enemy's
@@ -387,8 +395,10 @@ public class EnemyAgent : Agent
         EndEpisode();
     }
 
-    // Per-episode mode compliance (#45): to TensorBoard next to reward and
-    // entropy, and to the JSONL for the offline behavior analysis.
+    // Per-episode mode compliance (#45) and target-in-sight fraction (#87): to
+    // TensorBoard next to reward and entropy, and to the JSONL for the offline
+    // behavior analysis. Both go on one line — the compliance rate is only
+    // interpretable against the visibility it was earned under.
     void FlushCompliance()
     {
         if (compliance == null || compliance.TotalSteps == 0) return;
@@ -399,16 +409,20 @@ public class EnemyAgent : Agent
             foreach (NpcMode mode in NpcModes.All)
             {
                 // A mode this episode never ran has no rate to average in.
-                if (compliance.Steps(mode) > 0) stats.Add(complianceStatNames[(int)mode], compliance.Rate(mode));
+                if (compliance.Steps(mode) == 0) continue;
+                stats.Add(complianceStatNames[(int)mode], compliance.Rate(mode));
+                stats.Add(visibleStatNames[(int)mode], visibility.Rate(mode));
             }
         }
         if (TelemetryLogger.Instance != null)
         {
             TelemetryLogger.Instance.LogEvent("mode_compliance",
                 JsonLine.Field("entity", tag),
-                compliance.ComplianceJson());
+                compliance.ComplianceJson(),
+                visibility.Json("visible", "visible_steps"));
         }
         compliance.Reset();
+        visibility.Reset();
     }
 
     void HandleModeChanged(NpcMode previous, NpcMode current)
