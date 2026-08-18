@@ -172,7 +172,9 @@ Whether the policy actually obeys the mode it is commanded. Every decision step 
 | Retreat | opened distance |
 | Patrol | entered a patch of the arena it had not been in this episode |
 
-The same numbers go to the telemetry log as a `mode_compliance` line per episode (steps, compliant steps and rate per mode), alongside a `mode_change` line for every switch — that pair is the mode timeline the offline analysis reads. Patrol's rate is low by construction: a patch only counts the first time, so compare it between runs rather than reading it as a percentage.
+Read alongside them is `Visible/<Mode>`, the fraction of those same steps the player was actually in sight. The positional rewards only pay while the player is visible, so a mode whose compliance is near zero *and* whose visibility is near zero was never given the chance to act, which is a different problem from a policy that ignores the command.
+
+The same numbers go to the telemetry log as a `mode_compliance` line per episode (steps, compliant steps and rate per mode, plus the same per-mode visible counts), alongside a `mode_change` line for every switch — that pair is the mode timeline the offline analysis reads. Patrol's rate is low by construction: a patch only counts the first time, so compare it between runs rather than reading it as a percentage.
 
 ## Testing
 

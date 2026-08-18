@@ -1,5 +1,3 @@
-using System.Text;
-
 // One decision step as the compliance rules see it. The positional fields are
 // the same true-state reads the mode reward columns are paid from, so the
 // metric and the reward can't disagree about what the step did.
@@ -30,25 +28,13 @@ public class ModeComplianceTracker
     // opening: rotation and NavMesh settling move the body a little every step.
     public float movementDeadband = 0.05f;
 
-    readonly int[] steps = new int[NpcModes.All.Length];
-    readonly int[] compliant = new int[NpcModes.All.Length];
+    readonly ModeTally tally = new ModeTally();
 
-    public int TotalSteps { get; private set; }
+    public int TotalSteps => tally.TotalSteps;
 
-    public void Reset()
-    {
-        System.Array.Clear(steps, 0, steps.Length);
-        System.Array.Clear(compliant, 0, compliant.Length);
-        TotalSteps = 0;
-    }
+    public void Reset() => tally.Reset();
 
-    public void Record(in ComplianceSample sample)
-    {
-        int i = (int)sample.mode;
-        steps[i]++;
-        TotalSteps++;
-        if (Compliant(sample)) compliant[i]++;
-    }
+    public void Record(in ComplianceSample sample) => tally.Record(sample.mode, Compliant(sample));
 
     public bool Compliant(in ComplianceSample sample)
     {
@@ -69,36 +55,13 @@ public class ModeComplianceTracker
     // it, the same way RewardComputer.RewardsCover gates the reward's probe.
     public static bool ReadsCover(NpcMode mode) => mode == NpcMode.HoldCover;
 
-    public int Steps(NpcMode mode) => steps[(int)mode];
+    public int Steps(NpcMode mode) => tally.Steps(mode);
 
-    public int CompliantSteps(NpcMode mode) => compliant[(int)mode];
+    public int CompliantSteps(NpcMode mode) => tally.Hits(mode);
 
     // 0 for a mode that was never commanded this episode; check Steps to tell
     // that apart from a mode that complied on no step at all.
-    public float Rate(NpcMode mode)
-    {
-        int n = steps[(int)mode];
-        return n > 0 ? (float)compliant[(int)mode] / n : 0f;
-    }
+    public float Rate(NpcMode mode) => tally.Rate(mode);
 
-    // JSONL fragment for the per-episode telemetry event, same shape as
-    // EpisodeLog.SidesJson. Modes the episode never commanded are left out
-    // rather than reported as a zero rate.
-    public string ComplianceJson()
-    {
-        var sb = new StringBuilder(64);
-        sb.Append("\"compliance\":{");
-        bool first = true;
-        foreach (NpcMode mode in NpcModes.All)
-        {
-            if (steps[(int)mode] == 0) continue;
-            if (!first) sb.Append(',');
-            first = false;
-            sb.Append('"').Append(mode.ToString()).Append("\":{")
-              .Append(JsonLine.Field("steps", steps[(int)mode])).Append(',')
-              .Append(JsonLine.Field("compliant", compliant[(int)mode])).Append(',')
-              .Append(JsonLine.Field("rate", Rate(mode))).Append('}');
-        }
-        return sb.Append('}').ToString();
-    }
+    public string ComplianceJson() => tally.Json("compliance", "compliant");
 }

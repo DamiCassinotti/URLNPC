@@ -121,8 +121,11 @@ public class ModeTelemetryTests : PlayModeTestBase
 
         string line = LineOfType("mode_compliance");
         Assert.That(line, Does.Contain("\"entity\":\"NPC\""));
-        Assert.That(line, Does.Contain("\"Retreat\":{\"steps\":2"),
+        Assert.That(line, Does.Contain("\"compliance\":{\"Retreat\":{\"steps\":2"),
             "both decision steps were commanded Retreat");
+        // Same line, same steps (#87): the compliance rate is only readable
+        // against how often the mode had the target to act on.
+        Assert.That(line, Does.Contain("\"visible\":{\"Retreat\":{\"steps\":2"));
         Assert.That(line, Does.Not.Contain("Hunt"), "a mode the episode never ran has no rate");
     }
 
