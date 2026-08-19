@@ -79,6 +79,23 @@ public class SearchPlannerTests
         Assert.That(planner.NeedsWaypoint(At(28.5f, 0f), 2f), Is.True, "inside the arrival radius");
     }
 
+    // One decision step. The planner only hears from the adapter on the steps
+    // the policy picks Wander, so the tests drive it at that cadence.
+    const float Step = 0.1f;
+
+    // Hold position and keep ticking; how long until the leg is given up on.
+    // Granular to a step, so the assertions allow a couple of them either way.
+    static float SecondsUntilAbandoned(SearchPlanner planner, Vector3 position, float from)
+    {
+        float now = from;
+        for (int i = 0; i < 500; i++)
+        {
+            now += Step;
+            if (planner.NeedsWaypoint(position, now)) return now - from;
+        }
+        return float.NaN;
+    }
+
     [Test]
     public void ALegThatStopsMakingHeadwayIsAbandoned()
     {
@@ -86,9 +103,7 @@ public class SearchPlannerTests
         // the agent against geometry with a path it still considers valid.
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
-        Assert.That(planner.NeedsWaypoint(At(10f, 0f), 1f), Is.False);
-        Assert.That(planner.NeedsWaypoint(At(10.2f, 0f), 4f), Is.False, "not stalled long enough yet");
-        Assert.That(planner.NeedsWaypoint(At(10.2f, 0f), 5.1f), Is.True);
+        Assert.That(SecondsUntilAbandoned(planner, At(10f, 0f), 0f), Is.EqualTo(4f).Within(0.3f));
     }
 
     [Test]
@@ -96,12 +111,29 @@ public class SearchPlannerTests
     {
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
-        planner.NeedsWaypoint(At(10f, 0f), 3f);
-        // Jitter under the epsilon is not headway; a real metre is.
-        Assert.That(planner.NeedsWaypoint(At(10.1f, 0f), 5f), Is.False);
-        Assert.That(planner.NeedsWaypoint(At(12f, 0f), 6f), Is.False);
-        Assert.That(planner.NeedsWaypoint(At(12f, 0f), 9f), Is.False, "the timer restarted at 6");
-        Assert.That(planner.NeedsWaypoint(At(12f, 0f), 10.1f), Is.True);
+        float now = 0f;
+        for (int i = 1; i <= 20; i++) // 2 s of walking, a metre a step
+        {
+            now += Step;
+            Assert.That(planner.NeedsWaypoint(At(i, 0f), now), Is.False, $"step {i} was headway");
+        }
+        // Jitter under the epsilon is not headway, so the timer runs from here.
+        Assert.That(SecondsUntilAbandoned(planner, At(20.1f, 0f), now), Is.EqualTo(4f).Within(0.3f));
+    }
+
+    // The policy picks a primitive per step, so a leg can go seconds without a
+    // Wander step to drive it. That is another primitive at the wheel, not the
+    // leg stalling — counting it would drop legs that were never attempted.
+    [Test]
+    public void AGapWithNoWanderStepIsNotStalling()
+    {
+        var planner = Fresh();
+        planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
+
+        Assert.That(planner.NeedsWaypoint(At(2f, 0f), 6f), Is.False, "six seconds of some other primitive");
+        // And the leg gets its full timeout from there, measured on the ticks
+        // that actually drove it.
+        Assert.That(SecondsUntilAbandoned(planner, At(2f, 0f), 6f), Is.EqualTo(4f).Within(0.3f));
     }
 
     [Test]
@@ -113,6 +145,19 @@ public class SearchPlannerTests
         Assert.That(planner.TryChoose(Vector3.zero, null, 1f, out _), Is.False);
         Assert.That(planner.Waypoint, Is.EqualTo(At(30f, 0f)));
         Assert.That(planner.HasWaypoint, Is.True);
+    }
+
+    [Test]
+    public void ADegenerateCellSizeOrCoordinateSweepsNothing()
+    {
+        var offGrid = Fresh();
+        offGrid.cellSize = 0f;
+        offGrid.MarkSwept(At(1f, 1f));
+        Assert.That(offGrid.SweptCells, Is.EqualTo(0));
+
+        var planner = Fresh();
+        planner.MarkSwept(new Vector3(float.NaN, 0f, 1f));
+        Assert.That(planner.SweptCells, Is.EqualTo(0));
     }
 
     [Test]

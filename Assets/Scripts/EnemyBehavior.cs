@@ -12,6 +12,16 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] float walkPointRange = 10f;
     [Tooltip("How many arena points a search leg is picked between: the farthest one in ground not swept yet wins.")]
     [SerializeField] int searchCandidateCount = 4;
+    [Tooltip("Side of the patches the search counts as already swept — roughly the width a walk-through clears, not the sight range.")]
+    [SerializeField] float searchCellSize = 8f;
+    [Tooltip("What a candidate in already-swept ground is worth against one that isn't. Not 0: late in an episode every patch is swept and the sweep still has to go somewhere.")]
+    [SerializeField] float searchSweptWeight = 0.35f;
+    [Tooltip("Close enough to call a search leg walked.")]
+    [SerializeField] float searchArrivalRadius = 2f;
+    [Tooltip("Give up on a search leg that hasn't got any closer for this long — a cross-arena destination can come back as a partial path that strands the agent.")]
+    [SerializeField] float searchLegTimeoutSeconds = 4f;
+    [Tooltip("Slack on \"got closer\", so per-step jitter doesn't keep a stalled search leg alive.")]
+    [SerializeField] float searchProgressEpsilon = 0.5f;
     [Tooltip("How far ahead of itself Retreat and the strafes place their NavMesh destination each decision step. (Advance walks the whole way to the last-seen position.)")]
     [SerializeField] float moveStepDistance = 6f;
     [Tooltip("Seconds between cover searches. NearestCoverPoint raycasts and path-checks every cover box in the arena, so MoveToCover walks to the point it already picked in between.")]
@@ -87,6 +97,11 @@ public class EnemyBehavior : MonoBehaviour
         attackCooldown = CombatBalance.AttackCooldown;
         // Same trap: the prefab instance in the scene may pin the old 20 m.
         sightRange = CombatBalance.SightRange;
+        search.cellSize = searchCellSize;
+        search.sweptWeight = searchSweptWeight;
+        search.arrivalRadius = searchArrivalRadius;
+        search.legTimeoutSeconds = searchLegTimeoutSeconds;
+        search.progressEpsilon = searchProgressEpsilon;
         navMeshAgent = GetComponent<NavMeshAgent>();
         weapon = GetComponent<EnemyWeapon>();
         enemyHealth = GetComponent<Health>();

@@ -35,6 +35,13 @@ public class SearchPlanner
     // Slack on "got closer", so per-step jitter doesn't keep a stalled leg alive.
     public float progressEpsilon = 0.5f;
 
+    // Longest gap between two calls that still counts as this leg being walked.
+    // The policy picks a primitive per step, so a leg can go seconds without a
+    // Wander step to drive it; that is another primitive at the wheel, not the
+    // leg stalling, and counting it would drop legs that were never attempted.
+    // A guard on the caller's step rate, not a tuning knob.
+    public float maxTickSeconds = 0.5f;
+
     readonly HashSet<long> swept = new HashSet<long>();
 
     public bool HasWaypoint { get; private set; }
@@ -48,25 +55,38 @@ public class SearchPlanner
         Waypoint = Vector3.zero;
         bestDistance = 0f;
         lastProgressTime = 0f;
+        lastTickTime = 0f;
     }
 
     float bestDistance;
     float lastProgressTime;
+    float lastTickTime;
 
     // The patch the body is standing in has been looked at.
     public void MarkSwept(Vector3 position)
     {
-        if (cellSize <= 0f) return;
-        swept.Add(Cell(position));
+        if (GridCell.TryPack(position.x, position.z, cellSize, out long cell)) swept.Add(cell);
     }
 
     // Is the current leg done — never had one, walked it, or stopped making
     // headway? Also advances the stall timer, so call it once per step.
     public bool NeedsWaypoint(Vector3 position, float now)
     {
+        float sinceTick = now - lastTickTime;
+        lastTickTime = now;
         if (!HasWaypoint) return true;
+
         float distance = FlatDistance(position, Waypoint);
         if (distance <= arrivalRadius) return true;
+        // Nobody drove this leg for a while: the body may be metres from where
+        // it left off, so re-baseline instead of judging it on a headway
+        // measurement and a clock that belong to a stretch it wasn't walked in.
+        if (sinceTick > maxTickSeconds)
+        {
+            bestDistance = distance;
+            lastProgressTime = now;
+            return false;
+        }
         if (distance < bestDistance - progressEpsilon)
         {
             bestDistance = distance;
@@ -88,7 +108,11 @@ public class SearchPlanner
         for (int i = 0; i < candidates.Count; i++)
         {
             float score = FlatDistance(from, candidates[i]);
-            if (cellSize > 0f && swept.Contains(Cell(candidates[i]))) score *= sweptWeight;
+            if (GridCell.TryPack(candidates[i].x, candidates[i].z, cellSize, out long cell)
+                && swept.Contains(cell))
+            {
+                score *= sweptWeight;
+            }
             if (score > bestScore)
             {
                 bestScore = score;
@@ -100,14 +124,8 @@ public class SearchPlanner
         HasWaypoint = true;
         bestDistance = FlatDistance(from, waypoint);
         lastProgressTime = now;
+        lastTickTime = now;
         return true;
-    }
-
-    long Cell(Vector3 position)
-    {
-        long cellX = (long)Mathf.Floor(position.x / cellSize);
-        long cellZ = (long)Mathf.Floor(position.z / cellSize);
-        return (cellX << 32) ^ (cellZ & 0xffffffffL);
     }
 
     static float FlatDistance(Vector3 a, Vector3 b)

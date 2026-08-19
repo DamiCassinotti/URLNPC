@@ -47,13 +47,7 @@ public class EpisodeProgress
     // True the first time this episode the body stands in this patch.
     public bool EnterArea(float x, float z)
     {
-        if (areaCellSize <= 0f || float.IsNaN(x) || float.IsNaN(z)
-            || float.IsInfinity(x) || float.IsInfinity(z))
-        {
-            return false;
-        }
-        long cellX = (long)Mathf.Floor(x / areaCellSize);
-        long cellZ = (long)Mathf.Floor(z / areaCellSize);
-        return visited.Add((cellX << 32) ^ (cellZ & 0xffffffffL));
+        if (!GridCell.TryPack(x, z, areaCellSize, out long cell)) return false;
+        return visited.Add(cell);
     }
 }
