@@ -289,38 +289,69 @@ public class EnemyBehavior : MonoBehaviour
     // what every moving primitive falls through to, so how much ground it covers
     // is most of whether the round ends in a kill or a draw. A leg crosses the
     // arena towards ground not swept yet rather than hopping to a point a few
-    // metres away, and it is abandoned when it stops making headway — the
-    // remainingDistance/hasPath check it replaces could not tell a partial path
-    // that had stranded the agent from one still being walked.
+    // metres away, and it is abandoned when it stops making headway.
     void Wander()
     {
         navMeshAgent.updateRotation = true;
-        if (search.NeedsWaypoint(transform.position, Time.time))
+        if (!search.HasWaypoint)
         {
-            CollectSearchCandidates();
-            if (search.TryChoose(transform.position, searchCandidates, Time.time, out Vector3 waypoint))
-            {
-                SetDestinationOnNavMesh(waypoint);
-            }
+            PickSearchLeg();
             return;
         }
         // The policy picks a primitive per decision step, and the others take
         // the wheel while a leg is half walked — Hold clears the path outright,
         // Retreat and the strafes point the agent somewhere else. Put the leg
         // back rather than stand still until it times out.
-        if (!navMeshAgent.pathPending
-            && (!navMeshAgent.hasPath
-                || (navMeshAgent.destination - search.Waypoint).sqrMagnitude > WaypointTolerance * WaypointTolerance))
+        if (!DestinationIsSearchLeg())
         {
-            SetDestinationOnNavMesh(search.Waypoint);
+            navMeshAgent.SetDestination(search.Waypoint);
+            return;
         }
+        // Nothing to judge the leg on until the solver has answered.
+        if (navMeshAgent.pathPending) return;
+        if (search.NeedsWaypoint(RemainingToWaypoint(), Time.time)) PickSearchLeg();
+    }
+
+    void PickSearchLeg()
+    {
+        CollectSearchCandidates();
+        // The candidates are already on-mesh, so the leg is issued raw rather
+        // than through SetDestinationOnNavMesh: a re-snap could land the
+        // agent's destination further from the waypoint than the tolerance
+        // below, and then every step would re-issue the same leg.
+        if (search.TryChoose(transform.position, searchCandidates, Time.time, out Vector3 waypoint))
+        {
+            navMeshAgent.SetDestination(waypoint);
+        }
+    }
+
+    // Is the agent still walking the leg the search set, or has another
+    // primitive pointed it somewhere else since?
+    bool DestinationIsSearchLeg()
+    {
+        if (!navMeshAgent.hasPath && !navMeshAgent.pathPending) return false;
+        return (navMeshAgent.destination - search.Waypoint).sqrMagnitude
+               <= WaypointTolerance * WaypointTolerance;
+    }
+
+    // How much walking the leg has left. The path length, not the straight
+    // line: a leg routed the long way around a building holds its straight-line
+    // distance flat for seconds, which the stall check would read as stranded.
+    // The straight line is the fallback for when the solver has no length to
+    // give, which is the stranded case the timeout is actually for.
+    float RemainingToWaypoint()
+    {
+        float remaining = navMeshAgent.remainingDistance;
+        if (!float.IsInfinity(remaining)) return remaining;
+        Vector3 toWaypoint = search.Waypoint - transform.position;
+        toWaypoint.y = 0f;
+        return toWaypoint.magnitude;
     }
 
     // On-mesh points for the planner to pick a leg between. Arena-wide when the
     // builder is up; the local jitter is the bare fallback for a scene with a
-    // NavMesh and no ArenaManager. Off-mesh candidates are dropped rather than
-    // snapped far away, so the leg the planner commits to is the one the agent
-    // is actually sent to and its arrival check means something.
+    // NavMesh and no ArenaManager, and an unsampleable jitter point is still
+    // offered raw — a leg that has to be timed out beats standing still.
     void CollectSearchCandidates()
     {
         searchCandidates.Clear();
@@ -331,12 +362,13 @@ public class EnemyBehavior : MonoBehaviour
             if (arena != null)
             {
                 searchCandidates.Add(arena.RandomGroundPoint(RunRng.Stream.Wander));
+                continue;
             }
-            else if (NavMesh.SamplePosition(GetNextDestination(), out NavMeshHit hit,
-                                            DestinationSampleRadius, NavMesh.AllAreas))
-            {
-                searchCandidates.Add(hit.position);
-            }
+            Vector3 local = GetNextDestination();
+            searchCandidates.Add(
+                NavMesh.SamplePosition(local, out NavMeshHit hit, DestinationSampleRadius, NavMesh.AllAreas)
+                    ? hit.position
+                    : local);
         }
     }
 

@@ -22,7 +22,7 @@ public class SearchPlannerTests
     [Test]
     public void WithNoLeg_ItNeedsAWaypoint()
     {
-        Assert.That(Fresh().NeedsWaypoint(Vector3.zero, 0f), Is.True);
+        Assert.That(Fresh().NeedsWaypoint(30f, 0f), Is.True);
     }
 
     [Test]
@@ -75,8 +75,26 @@ public class SearchPlannerTests
     {
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
-        Assert.That(planner.NeedsWaypoint(At(20f, 0f), 1f), Is.False);
-        Assert.That(planner.NeedsWaypoint(At(28.5f, 0f), 2f), Is.True, "inside the arrival radius");
+        Assert.That(planner.NeedsWaypoint(10f, 1f), Is.False);
+        Assert.That(planner.NeedsWaypoint(1.5f, 2f), Is.True, "inside the arrival radius");
+    }
+
+    // The caller measures along the path, so a leg routed the long way around a
+    // building can report further to walk than the straight line it was picked
+    // on. That is the first reading, not a leg already failing to make headway.
+    [Test]
+    public void TheFirstReadingSetsTheBar_NotTheStraightLine()
+    {
+        var planner = Fresh();
+        planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
+        // A 45 m path to a waypoint 30 m away, walked down steadily.
+        float now = 0f;
+        for (float remaining = 45f; remaining > 3f; remaining -= 1f)
+        {
+            now += Step;
+            Assert.That(planner.NeedsWaypoint(remaining, now), Is.False,
+                $"{remaining:0} m of path left is progress, not a stall");
+        }
     }
 
     // One decision step. The planner only hears from the adapter on the steps
@@ -85,14 +103,14 @@ public class SearchPlannerTests
 
     // Hold position and keep ticking; how long until the leg is given up on.
     // Granular to a tick, so the assertions allow a couple either way.
-    static float SecondsUntilAbandoned(SearchPlanner planner, Vector3 position, float from,
+    static float SecondsUntilAbandoned(SearchPlanner planner, float remaining, float from,
                                        float tick = Step)
     {
         float now = from;
         for (int i = 0; i < 500; i++)
         {
             now += tick;
-            if (planner.NeedsWaypoint(position, now)) return now - from;
+            if (planner.NeedsWaypoint(remaining, now)) return now - from;
         }
         return float.NaN;
     }
@@ -104,7 +122,7 @@ public class SearchPlannerTests
         // the agent against geometry with a path it still considers valid.
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
-        Assert.That(SecondsUntilAbandoned(planner, At(10f, 0f), 0f), Is.EqualTo(4f).Within(0.3f));
+        Assert.That(SecondsUntilAbandoned(planner, 20f, 0f), Is.EqualTo(4f).Within(0.3f));
     }
 
     [Test]
@@ -116,10 +134,10 @@ public class SearchPlannerTests
         for (int i = 1; i <= 20; i++) // 2 s of walking, a metre a step
         {
             now += Step;
-            Assert.That(planner.NeedsWaypoint(At(i, 0f), now), Is.False, $"step {i} was headway");
+            Assert.That(planner.NeedsWaypoint(30f - i, now), Is.False, $"step {i} was headway");
         }
         // Jitter under the epsilon is not headway, so the timer runs from here.
-        Assert.That(SecondsUntilAbandoned(planner, At(20.1f, 0f), now), Is.EqualTo(4f).Within(0.3f));
+        Assert.That(SecondsUntilAbandoned(planner, 9.9f, now), Is.EqualTo(4f).Within(0.3f));
     }
 
     // The policy picks a primitive per step, so a leg can go seconds without a
@@ -131,10 +149,12 @@ public class SearchPlannerTests
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
 
-        // Parked short of the waypoint the whole time, so nothing here is headway.
-        Assert.That(planner.NeedsWaypoint(At(-2f, 0f), 6f), Is.False, "six seconds of some other primitive");
+        // The same distance to walk throughout, so after the first reading sets
+        // the bar nothing here is headway.
+        planner.NeedsWaypoint(32f, 0.1f);
+        Assert.That(planner.NeedsWaypoint(32f, 6.1f), Is.False, "six seconds of some other primitive");
         // The gap cost it one step of the budget, not six seconds of it.
-        Assert.That(SecondsUntilAbandoned(planner, At(-2f, 0f), 6f), Is.EqualTo(3.5f).Within(0.3f));
+        Assert.That(SecondsUntilAbandoned(planner, 32f, 6.1f), Is.EqualTo(3.5f).Within(0.3f));
     }
 
     // ...but the gaps still have to add up, or a leg the policy only comes back
@@ -146,11 +166,12 @@ public class SearchPlannerTests
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
 
-        // The policy comes back to Wander every 0.6 s and the body hasn't
-        // moved: eight of those spend the 4 s budget at a capped 0.5 s each.
-        float seconds = SecondsUntilAbandoned(planner, At(-10f, 0f), 0f, tick: 0.6f);
+        // The policy comes back to Wander every 0.6 s and there is never any
+        // less of the leg to walk: the budget goes at a capped 0.5 s a call.
+        float seconds = SecondsUntilAbandoned(planner, 40f, 0f, tick: 0.6f);
         Assert.That(seconds, Is.Not.NaN, "a stranded leg must be given up on eventually");
-        Assert.That(seconds, Is.EqualTo(4.8f).Within(0.7f));
+        Assert.That(seconds, Is.GreaterThan(4f), "and not faster than its budget");
+        Assert.That(seconds, Is.LessThan(8f), "nor an order of magnitude later");
     }
 
     [Test]
@@ -186,19 +207,18 @@ public class SearchPlannerTests
         planner.Reset();
         Assert.That(planner.SweptCells, Is.EqualTo(0));
         Assert.That(planner.HasWaypoint, Is.False);
-        Assert.That(planner.NeedsWaypoint(Vector3.zero, 0f), Is.True);
+        Assert.That(planner.NeedsWaypoint(30f, 0f), Is.True);
     }
 
     [Test]
-    public void HeightIsIgnored()
+    public void HeightIsIgnoredWhenScoringCandidates()
     {
-        // Arena points sit on stairs and platforms; a leg is a distance across
-        // the floor, not through it.
+        // Arena points sit on stairs and platforms; how far a leg goes is a
+        // distance across the floor, not through it.
         var planner = Fresh();
         planner.TryChoose(Vector3.zero,
                           Candidates(new Vector3(10f, 6f, 0f), new Vector3(12f, 0f, 0f)), 0f,
                           out Vector3 waypoint);
         Assert.That(waypoint, Is.EqualTo(new Vector3(12f, 0f, 0f)));
-        Assert.That(planner.NeedsWaypoint(new Vector3(12f, 5f, 0f), 1f), Is.True);
     }
 }

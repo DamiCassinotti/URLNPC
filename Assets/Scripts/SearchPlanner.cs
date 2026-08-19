@@ -71,13 +71,18 @@ public class SearchPlanner
 
     // Is the current leg done — never had one, walked it, or stopped making
     // headway? Also advances the stall timer, so call it once per step.
-    public bool NeedsWaypoint(Vector3 position, float now)
+    //
+    // The distance is how far the body still has to walk, which the caller
+    // measures: the arena is full of buildings, so a straight line to the
+    // waypoint says nothing about whether a leg routed around one is going
+    // anywhere (EnemyBehavior.RemainingToWaypoint reads it off the path).
+    public bool NeedsWaypoint(float distanceToWaypoint, float now)
     {
         float sinceTick = now - lastTickTime;
         lastTickTime = now;
         if (!HasWaypoint) return true;
 
-        float distance = FlatDistance(position, Waypoint);
+        float distance = distanceToWaypoint;
         if (distance <= arrivalRadius) return true;
         if (distance < bestDistance - progressEpsilon)
         {
@@ -120,7 +125,10 @@ public class SearchPlanner
 
         Waypoint = waypoint;
         HasWaypoint = true;
-        bestDistance = FlatDistance(from, waypoint);
+        // The first measurement sets the bar, whatever the caller measures in:
+        // seeding it with the straight line would have a leg routed around a
+        // building start out already "not making headway".
+        bestDistance = float.PositiveInfinity;
         stalledSeconds = 0f;
         lastTickTime = now;
         return true;
