@@ -146,3 +146,33 @@ enemy, so both sides share one policy. In the editor, set **Driver = Agent** on 
 (or `CombatantRig.DriverOverride` from code); `editor` runs don't pass `-playerDriver`. Both
 bodies carry a `ModeDirector`, so each is independently commanded during the run. Give the
 agent driver a different behavior name to train a separate player policy against the enemy.
+
+## 7. Score a model headlessly
+
+`scripts/eval.sh` plays a fixed number of rounds against the standalone build with no trainer
+attached and summarizes the telemetry:
+
+```bash
+scripts/eval.sh results/full-03-seed-1001/URLNPC.onnx --episodes 100 --seed 1001 \
+    --opponent heuristic
+```
+
+Output lands in `results/eval/<model>_<opponent>_<stamp>/`: `unity.log`, the run's
+`telemetry.jsonl`, and `summary.txt`/`summary.json` — win/loss/draw, damage dealt and taken,
+accuracy, time to kill, survival time, and per-mode compliance, visibility and step counts.
+
+- `--opponent policy` keeps both sides on the model (self-play); `--opponent heuristic` puts
+  the far side on the scripted heuristic, which is what the ≥70% win-rate gate is measured on.
+- `--modes scripted` (default) lets the `ModeDirector` sample as it does in training;
+  `--modes Hunt` pins one mode for a per-mode baseline; `--modes none` leaves the channel on
+  `initialMode`.
+- `--seed` fixes arenas, spawns and the mode schedule. It does *not* make two runs identical:
+  aim spread is deliberately unseeded (see `CLAUDE.md`), so the fights still diverge — read
+  the numbers as an average over enough episodes, not as a replay.
+- `--time-scale` is game time per rendered frame in physics steps; 1 is the most faithful.
+  The run is never throttled to real time, so a 120 s round takes far less than that.
+
+The model is copied into `Assets/Resources/EvalModels/` and the player rebuilt whenever it
+changes: Inference Engine only imports ONNX in the editor, so the build has to carry it. Pass
+`--no-build` to reuse a build that already does. `scripts/eval_summary.py` runs standalone on
+any session JSONL, including one from a human-played round.

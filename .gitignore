@@ -76,3 +76,8 @@ venv/
 mono_crash.mem.*
 mono_crash.*.json
 /UserSettings/
+
+# Model scripts/eval.sh copies in so the player build can carry it — Inference
+# Engine only imports ONNX in the editor, so an eval run bakes the model in.
+/Assets/Resources/EvalModels/*.onnx
+/Assets/Resources/EvalModels/*.onnx.meta
