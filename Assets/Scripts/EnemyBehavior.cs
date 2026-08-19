@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,7 +8,20 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] public Transform target;
     [Tooltip("Tag of the opponent this combatant hunts. \"Player\" on the enemy NPC; CombatantRig sets it to \"NPC\" when this script drives the agent-side player body.")]
     [SerializeField] public string targetTag = "Player";
+    [Tooltip("Range of the local waypoint jitter Wander falls back on when there is no ArenaManager to sample arena-wide points from.")]
     [SerializeField] float walkPointRange = 10f;
+    [Tooltip("How many arena points a search leg is picked between: the farthest one in ground not swept yet wins.")]
+    [SerializeField] int searchCandidateCount = 4;
+    [Tooltip("Side of the patches the search counts as already swept — roughly the width a walk-through clears, not the sight range.")]
+    [SerializeField] float searchCellSize = 8f;
+    [Tooltip("What a candidate in already-swept ground is worth against one that isn't. Not 0: late in an episode every patch is swept and the sweep still has to go somewhere.")]
+    [SerializeField] float searchSweptWeight = 0.35f;
+    [Tooltip("Close enough to call a search leg walked.")]
+    [SerializeField] float searchArrivalRadius = 2f;
+    [Tooltip("Give up on a search leg that hasn't got any closer for this long — a cross-arena destination can come back as a partial path that strands the agent.")]
+    [SerializeField] float searchLegTimeoutSeconds = 4f;
+    [Tooltip("Slack on \"got closer\", so per-step jitter doesn't keep a stalled search leg alive.")]
+    [SerializeField] float searchProgressEpsilon = 0.5f;
     [Tooltip("How far ahead of itself Retreat and the strafes place their NavMesh destination each decision step. (Advance walks the whole way to the last-seen position.)")]
     [SerializeField] float moveStepDistance = 6f;
     [Tooltip("Seconds between cover searches. NearestCoverPoint raycasts and path-checks every cover box in the arena, so MoveToCover walks to the point it already picked in between.")]
@@ -38,11 +52,18 @@ public class EnemyBehavior : MonoBehaviour
     // Advance reached the last-seen position without finding anyone there.
     bool searching;
 
+    // Where Wander looks next, and the ground it has already swept this episode.
+    readonly SearchPlanner search = new SearchPlanner();
+    readonly List<Vector3> searchCandidates = new List<Vector3>();
+
     // Final snap for a destination sitting just off the mesh; the long
     // overshoots are trimmed by SetStepDestination before they get here.
     const float DestinationSampleRadius = 2f;
     // Below this a trimmed step isn't worth issuing — see SetStepDestination.
     const float MinStepDistance = 0.5f;
+    // How far the agent's destination may sit from the search leg's waypoint
+    // before Wander calls it someone else's and re-issues its own.
+    const float WaypointTolerance = 0.5f;
 
     // The only source of target info for the NPC brain (sensory contract,
     // issue #9). Auto-added in Awake because the Enemy prefab is binary
@@ -76,6 +97,11 @@ public class EnemyBehavior : MonoBehaviour
         attackCooldown = CombatBalance.AttackCooldown;
         // Same trap: the prefab instance in the scene may pin the old 20 m.
         sightRange = CombatBalance.SightRange;
+        search.cellSize = searchCellSize;
+        search.sweptWeight = searchSweptWeight;
+        search.arrivalRadius = searchArrivalRadius;
+        search.legTimeoutSeconds = searchLegTimeoutSeconds;
+        search.progressEpsilon = searchProgressEpsilon;
         navMeshAgent = GetComponent<NavMeshAgent>();
         weapon = GetComponent<EnemyWeapon>();
         enemyHealth = GetComponent<Health>();
@@ -135,6 +161,9 @@ public class EnemyBehavior : MonoBehaviour
         // running for: the primitive the policy picks in between is its own
         // choice and must not leave the latch stuck.
         if (Perception.CurrentlyVisible) searching = false;
+        // Ground covered under any primitive is ground the search has looked at,
+        // so a later Wander doesn't send the NPC back through it.
+        search.MarkSwept(transform.position);
         switch (action)
         {
             case MovementAction.Hold: Hold(); break;
@@ -256,12 +285,90 @@ public class EnemyBehavior : MonoBehaviour
         SetDestinationOnNavMesh(coverPoint);
     }
 
+    // The search half of the behavior (issue #93): with nobody in sight this is
+    // what every moving primitive falls through to, so how much ground it covers
+    // is most of whether the round ends in a kill or a draw. A leg crosses the
+    // arena towards ground not swept yet rather than hopping to a point a few
+    // metres away, and it is abandoned when it stops making headway.
     void Wander()
     {
         navMeshAgent.updateRotation = true;
-        if (navMeshAgent.remainingDistance < 0.5f || !navMeshAgent.hasPath)
+        if (!search.HasWaypoint)
         {
-            SetDestinationOnNavMesh(GetNextDestination());
+            PickSearchLeg();
+            return;
+        }
+        // The policy picks a primitive per decision step, and the others take
+        // the wheel while a leg is half walked — Hold clears the path outright,
+        // Retreat and the strafes point the agent somewhere else. Put the leg
+        // back rather than stand still until it times out.
+        if (!DestinationIsSearchLeg())
+        {
+            navMeshAgent.SetDestination(search.Waypoint);
+            return;
+        }
+        // Nothing to judge the leg on until the solver has answered.
+        if (navMeshAgent.pathPending) return;
+        if (search.NeedsWaypoint(RemainingToWaypoint(), Time.time)) PickSearchLeg();
+    }
+
+    void PickSearchLeg()
+    {
+        CollectSearchCandidates();
+        // The candidates are already on-mesh, so the leg is issued raw rather
+        // than through SetDestinationOnNavMesh: a re-snap could land the
+        // agent's destination further from the waypoint than the tolerance
+        // below, and then every step would re-issue the same leg.
+        if (search.TryChoose(transform.position, searchCandidates, Time.time, out Vector3 waypoint))
+        {
+            navMeshAgent.SetDestination(waypoint);
+        }
+    }
+
+    // Is the agent still walking the leg the search set, or has another
+    // primitive pointed it somewhere else since?
+    bool DestinationIsSearchLeg()
+    {
+        if (!navMeshAgent.hasPath && !navMeshAgent.pathPending) return false;
+        return (navMeshAgent.destination - search.Waypoint).sqrMagnitude
+               <= WaypointTolerance * WaypointTolerance;
+    }
+
+    // How much walking the leg has left. The path length, not the straight
+    // line: a leg routed the long way around a building holds its straight-line
+    // distance flat for seconds, which the stall check would read as stranded.
+    // The straight line is the fallback for when the solver has no length to
+    // give, which is the stranded case the timeout is actually for.
+    float RemainingToWaypoint()
+    {
+        float remaining = navMeshAgent.remainingDistance;
+        if (!float.IsInfinity(remaining)) return remaining;
+        Vector3 toWaypoint = search.Waypoint - transform.position;
+        toWaypoint.y = 0f;
+        return toWaypoint.magnitude;
+    }
+
+    // On-mesh points for the planner to pick a leg between. Arena-wide when the
+    // builder is up; the local jitter is the bare fallback for a scene with a
+    // NavMesh and no ArenaManager, and an unsampleable jitter point is still
+    // offered raw — a leg that has to be timed out beats standing still.
+    void CollectSearchCandidates()
+    {
+        searchCandidates.Clear();
+        ArenaManager arena = ArenaManager.Current;
+        int wanted = Mathf.Max(1, searchCandidateCount);
+        for (int i = 0; i < wanted; i++)
+        {
+            if (arena != null)
+            {
+                searchCandidates.Add(arena.RandomGroundPoint(RunRng.Stream.Wander));
+                continue;
+            }
+            Vector3 local = GetNextDestination();
+            searchCandidates.Add(
+                NavMesh.SamplePosition(local, out NavMeshHit hit, DestinationSampleRadius, NavMesh.AllAreas)
+                    ? hit.position
+                    : local);
         }
     }
 
@@ -425,6 +532,7 @@ public class EnemyBehavior : MonoBehaviour
         hasCoverPoint = false;
         nextCoverQueryTime = 0f;
         searching = false;
+        search.Reset();
         if (Perception != null) Perception.Forget();
         if (Damage != null) Damage.Forget();
         if (navMeshAgent != null)

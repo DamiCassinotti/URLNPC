@@ -372,6 +372,50 @@ public class MovementPrimitiveTests : PlayModeTestBase
         Assert.That(travelled, Is.GreaterThan(2f), "Wander must keep picking new waypoints and walking to them");
     }
 
+    // The search is what runs for most of a round the NPC spends blind, so it
+    // has to cross the arena rather than mill about where it started (#93):
+    // that is the difference between finding the player and drawing.
+    [UnityTest]
+    public IEnumerator Wander_SweepsAcrossTheArena()
+    {
+        arena = CreateArena(0); // Courtyard, 40x40
+        yield return PlaceCombatants(EnemyStart, new Vector3(0f, 0f, 18f));
+
+        Vector3 start = EnemyPos;
+        float furthest = 0f;
+        var cells = new HashSet<(int, int)>();
+        float until = Time.time + 8f;
+        while (Time.time < until)
+        {
+            behavior.Move(MovementAction.Wander);
+            yield return new WaitForFixedUpdate();
+            furthest = Mathf.Max(furthest, FlatDistance(EnemyPos, start));
+            cells.Add((Mathf.FloorToInt(EnemyPos.x / 8f), Mathf.FloorToInt(EnemyPos.z / 8f)));
+        }
+
+        Assert.That(furthest, Is.GreaterThan(14f), $"the search stayed within {furthest:0.0} m of its start");
+        Assert.That(cells.Count, Is.GreaterThanOrEqualTo(4), "the search must cover new ground, not circle one patch");
+    }
+
+    // The policy picks a primitive per decision step, so a search leg is
+    // routinely interrupted by one that clears or overwrites the path.
+    [UnityTest]
+    public IEnumerator Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel()
+    {
+        arena = CreateArena(0);
+        yield return PlaceCombatants(EnemyStart, new Vector3(0f, 0f, 18f));
+
+        yield return Drive(MovementAction.Wander, 1f);
+        yield return Drive(MovementAction.Hold, 0.2f); // ResetPath: the leg is gone
+        Assert.That(nav.hasPath, Is.False, "sanity: Hold clears the path");
+
+        Vector3 held = EnemyPos;
+        yield return Drive(MovementAction.Wander, 1f);
+
+        Assert.That(FlatDistance(EnemyPos, held), Is.GreaterThan(1f),
+            "Wander must put its leg back instead of waiting out the leg timeout");
+    }
+
     [UnityTest]
     public IEnumerator MoveToCover_EndsWhereTheThreatCannotSeeIt()
     {

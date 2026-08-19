@@ -64,6 +64,29 @@ public class ArenaSeedingTests : PlayModeTestBase
         }
     }
 
+    // Search waypoints are drawn a policy-dependent number of times per round
+    // (#93), so they get their own stream: on the spawn stream they would move
+    // every later spawn and a seed would stop replaying a run.
+    [Test]
+    public void SearchWaypointDraws_DoNotShiftTheSpawnSequence()
+    {
+        ArenaManager m1 = CreateManager(777);
+        Vector3[] spawns1 = DrawGroundPoints(m1, 4);
+
+        DestroyArena(m1);
+        RunRng.ResetForNewRun();
+
+        ArenaManager m2 = CreateManager(777);
+        for (int i = 0; i < 9; i++) m2.RandomGroundPoint(RunRng.Stream.Wander);
+        Vector3[] spawns2 = DrawGroundPoints(m2, 4);
+
+        for (int i = 0; i < spawns1.Length; i++)
+        {
+            Assert.That((spawns2[i] - spawns1[i]).magnitude, Is.LessThan(1e-3f),
+                $"spawn point #{i} moved because the search drew waypoints");
+        }
+    }
+
     [Test]
     public void DifferentSeeds_ProduceDifferentSpawns()
     {
