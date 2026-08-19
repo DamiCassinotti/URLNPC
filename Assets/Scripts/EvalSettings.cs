@@ -33,8 +33,9 @@ public class EvalSettings
     public OpponentKind Opponent = OpponentKind.Policy;
     public ModeSourceKind ModeSource = ModeSourceKind.Scripted;
     public NpcMode FixedMode = NpcMode.Hunt;
-    // Evaluation runs at game speed by default; raising it trades fidelity
-    // (physics and NavMesh steps get coarser) for wall-clock time.
+    // Game time per rendered frame, in physics steps (EvalSession drives the
+    // clock off captureDeltaTime). 1 is the most faithful; raising it trades
+    // fidelity for speed the way the trainer's time_scale does.
     public float TimeScale = 1f;
 
     // Null when the settings are usable. A malformed value is an error rather

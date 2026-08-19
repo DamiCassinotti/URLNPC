@@ -3,7 +3,8 @@
 #
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
-#                   [--time-scale F] [--out DIR] [--no-build] [--timeout SEC]
+#                   [--time-scale F] [--out DIR]
+#                   [--rebuild | --no-build] [--timeout SEC]
 #
 # Runs N rounds against the standalone build with no trainer attached, then
 # summarizes the telemetry JSONL: win rate, damage dealt/taken, accuracy, time
@@ -14,8 +15,13 @@
 #                         baseline the ≥70% win-rate gate (#50) is measured on
 #   --modes               who commands the NPC's mode: the scripted director,
 #                         nobody, or one mode pinned for the whole run
-#   --seed                fixes arenas, spawns and the mode schedule, so a run
-#                         is replayable
+#   --seed                fixes arenas, spawns and the mode schedule; aim
+#                         spread stays unseeded by design, so rounds still
+#                         differ — run enough episodes for the average
+#   --time-scale          game time per rendered frame, in physics steps; 1 is
+#                         the most faithful, higher is faster and coarser. The
+#                         run is never throttled to real time either way.
+#   --rebuild             rebuild the player even if it already has this model
 #
 # The model is baked into the player: Inference Engine only imports ONNX in the
 # editor, so <model.onnx> is copied into Assets/Resources and the player is
@@ -31,7 +37,7 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    sed -n '2,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,29p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -49,6 +55,7 @@ TIME_SCALE=1
 OUT=""
 BUILD=1
 TIMEOUT=""
+REBUILD=0
 while [[ $# -ge 1 ]]; do
     case "$1" in
         --episodes) EPISODES="$2"; shift 2 ;;
@@ -58,6 +65,7 @@ while [[ $# -ge 1 ]]; do
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;
+        --rebuild) REBUILD=1; shift ;;
         --timeout) TIMEOUT="$2"; shift 2 ;;
         -h|--help) usage 0 ;;
         *) echo "error: unknown argument '$1'" >&2; usage ;;
@@ -73,13 +81,28 @@ case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "er
 OUT="${OUT:-$PROJECT_ROOT/results/eval/$(basename "${MODEL%.onnx}")_${OPPONENT}_$(date +%Y%m%d_%H%M%S)}"
 mkdir -p "$OUT"
 
+# What was scored, next to the numbers: a summary is only comparable against
+# another run if the condition it was produced under is on record.
+cat > "$OUT/config.json" <<JSON
+{
+  "model": "$MODEL",
+  "episodes": $EPISODES,
+  "seed": $SEED,
+  "opponent": "$OPPONENT",
+  "modes": "$MODES",
+  "timeScale": $TIME_SCALE,
+  "commit": "$(git -C "$PROJECT_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)",
+  "startedUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+JSON
+
 # ------------------------------------------------------------------- build
 
 MODEL_HASH="$(sha256sum "$MODEL" | cut -d' ' -f1)"
 if [[ $BUILD -eq 1 ]]; then
     mkdir -p "$MODEL_DIR"
     cp "$MODEL" "$MODEL_DEST"
-    if [[ -x "$ENV_BIN" && -f "$STAMP_FILE" && "$(cat "$STAMP_FILE")" == "$MODEL_HASH" ]]; then
+    if [[ $REBUILD -eq 0 && -x "$ENV_BIN" && -f "$STAMP_FILE" && "$(cat "$STAMP_FILE")" == "$MODEL_HASH" ]]; then
         echo "==> Build already carries this model, skipping the rebuild."
     else
         rm -f "$STAMP_FILE"   # a failed build must not look like a good one
@@ -97,9 +120,10 @@ fi
 
 UNITY_LOG="$OUT/unity.log"
 # Rounds always end (the clock is a draw), so the only way the player runs
-# forever is a startup failure that never starts one. Budget a full-length
-# round per episode plus slack; --timeout 0 disables the guard.
-TIMEOUT="${TIMEOUT:-$(python3 -c "import sys; print(int(int(sys.argv[1]) * 150 / float(sys.argv[2]) + 300))" "$EPISODES" "$TIME_SCALE")}"
+# forever is a startup failure that never starts one. The run is not throttled
+# to real time, so this is a loose wall-clock bound, not the expected duration;
+# --timeout 0 disables the guard.
+TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
 echo "==> $EPISODES episodes, seed $SEED, opponent $OPPONENT, modes $MODES, timeScale $TIME_SCALE"
 echo "    log: $UNITY_LOG"
 set +e

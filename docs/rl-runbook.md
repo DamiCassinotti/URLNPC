@@ -166,9 +166,11 @@ accuracy, time to kill, survival time, and per-mode compliance, visibility and s
 - `--modes scripted` (default) lets the `ModeDirector` sample as it does in training;
   `--modes Hunt` pins one mode for a per-mode baseline; `--modes none` leaves the channel on
   `initialMode`.
-- `--seed` fixes arenas, spawns and the mode schedule, so a run is replayable.
-- `--time-scale` trades fidelity for wall-clock time; 100 rounds at the default 1 can take
-  hours, since a round runs to 120 s of game time before the clock draws it.
+- `--seed` fixes arenas, spawns and the mode schedule. It does *not* make two runs identical:
+  aim spread is deliberately unseeded (see `CLAUDE.md`), so the fights still diverge — read
+  the numbers as an average over enough episodes, not as a replay.
+- `--time-scale` is game time per rendered frame in physics steps; 1 is the most faithful.
+  The run is never throttled to real time, so a 120 s round takes far less than that.
 
 The model is copied into `Assets/Resources/EvalModels/` and the player rebuilt whenever it
 changes: Inference Engine only imports ONNX in the editor, so the build has to carry it. Pass

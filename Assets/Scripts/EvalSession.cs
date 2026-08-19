@@ -60,7 +60,7 @@ public class EvalSession : MonoBehaviour
         instance = this;
         IsActive = true;
         DontDestroyOnLoad(gameObject);
-        Time.timeScale = settings.TimeScale;
+        ApplyClock();
         GameManager.RoundEnded += HandleRoundEnded;
         SceneManager.sceneLoaded += HandleSceneLoaded;
         applyPending = true;
@@ -100,9 +100,20 @@ public class EvalSession : MonoBehaviour
             reloadPending = false;
             // FinishRound froze the scene; the reload is what starts the next
             // round, exactly like the end-of-round button in human play.
-            Time.timeScale = settings.TimeScale;
+            ApplyClock();
             SceneManager.LoadScene(0);
         }
+    }
+
+    // Game time advances by a fixed step per frame instead of by the wall
+    // clock: a round then covers the same number of decisions whatever frame
+    // rate the machine hits, and frames aren't throttled to real time, so an
+    // eval runs far faster than the fight it simulates. Putting timeScale back
+    // to 1 also undoes the freeze FinishRound left behind.
+    void ApplyClock()
+    {
+        Time.timeScale = 1f;
+        Time.captureDeltaTime = Time.fixedDeltaTime * settings.TimeScale;
     }
 
     void HandleSceneLoaded(Scene scene, LoadSceneMode mode) => applyPending = true;

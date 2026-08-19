@@ -146,7 +146,7 @@ Unseeded runs draw a random seed and still log it (look for the `[RunRng] Run se
 scripts/eval.sh results/<run-id>/URLNPC.onnx --episodes 100 --seed 1001 --opponent heuristic
 ```
 
-`--opponent policy` puts both sides on the model (self-play), `--opponent heuristic` puts the far side on the scripted baseline. `--modes scripted|none|<Mode>` picks who commands the NPC's mode, and `--time-scale` trades fidelity for wall-clock time. Results land in `results/eval/<...>/` as `summary.txt`, `summary.json` and the raw `telemetry.jsonl`. The model is copied into the project and the player rebuilt when it changes — Inference Engine only imports ONNX in the editor, so the build has to carry it. See `docs/rl-runbook.md` §7.
+`--opponent policy` puts both sides on the model (self-play), `--opponent heuristic` puts the far side on the scripted baseline. `--modes scripted|none|<Mode>` picks who commands the NPC's mode, and `--time-scale` trades fidelity for speed. `--seed` fixes arenas, spawns and the mode schedule, but not the fight itself — aim spread stays unseeded, so read a run as an average over episodes. Results land in `results/eval/<...>/` as `summary.txt`, `summary.json` and the raw `telemetry.jsonl`. The model is copied into the project and the player rebuilt when it changes — Inference Engine only imports ONNX in the editor, so the build has to carry it. See `docs/rl-runbook.md` §7.
 
 ### Reward shape
 

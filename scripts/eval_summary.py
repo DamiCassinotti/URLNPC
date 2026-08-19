@@ -21,7 +21,8 @@ MODES = ("Hunt", "HoldCover", "Retreat", "Patrol")
 
 def read_events(path):
     events = []
-    with open(path, encoding="utf-8") as handle:
+    # utf-8-sig: TelemetryLogger's StreamWriter puts a BOM on the first line.
+    with open(path, encoding="utf-8-sig") as handle:
         for number, line in enumerate(handle, 1):
             line = line.strip()
             if not line:
@@ -59,6 +60,8 @@ def summarize(events, entity):
     taken = [side(r, entity).get("damageTaken", 0.0) for r in rounds]
     shots = sum(side(r, entity).get("shots", 0) for r in rounds)
     hits = sum(side(r, entity).get("hits", 0) for r in rounds)
+    own_deaths = [d.get("survivalSeconds", 0.0) for d in deaths if d.get("entity") == entity]
+    durations = [r.get("durationSeconds", 0.0) for r in decided]
 
     # Pooled over steps rather than averaged over episodes: a 10-step mode in
     # one round shouldn't weigh as much as a 500-step one in another.
@@ -75,7 +78,7 @@ def summarize(events, entity):
             seen = event.get("visible", {}).get(mode)
             if seen:
                 visible_eligible += seen.get("eligible", 0)
-                visible_hits += seen.get("visible", 0)
+                visible_hits += seen.get("visible_steps", 0)
         if steps == 0:
             continue
         modes[mode] = {
@@ -100,17 +103,21 @@ def summarize(events, entity):
         "hits": hits,
         "accuracy": hits / shots if shots else 0.0,
         # Decided rounds only: a draw's duration is the round length, not a
-        # time to kill.
-        "timeToKillSeconds": mean([r.get("durationSeconds", 0.0) for r in decided]),
-        "survivalSeconds": mean(
-            [d.get("survivalSeconds", 0.0) for d in deaths if d.get("entity") == entity]
-        ),
+        # time to kill, so an all-draw run reports none at all.
+        "timeToKillSeconds": mean(durations) if durations else None,
+        # None, not 0: a side that never died has no survival time, and a 0
+        # would read as the opposite of what happened.
+        "survivalSeconds": mean(own_deaths) if own_deaths else None,
         "modes": modes,
     }
 
 
 def rate(value):
     return "     -" if value is None else f"{value * 100:5.1f}%"
+
+
+def seconds(value):
+    return "-" if value is None else f"{value:.1f} s"
 
 
 def render(summary):
@@ -123,8 +130,8 @@ def render(summary):
         f"damage taken      {summary['damageTakenPerEpisode']:.1f} per episode",
         f"accuracy          {summary['accuracy'] * 100:.1f}%"
         f"   ({summary['hits']}/{summary['shots']} shots)",
-        f"time to kill      {summary['timeToKillSeconds']:.1f} s (decided rounds)",
-        f"survival          {summary['survivalSeconds']:.1f} s (rounds it died in)",
+        f"time to kill      {seconds(summary['timeToKillSeconds'])} (decided rounds)",
+        f"survival          {seconds(summary['survivalSeconds'])} (rounds it died in)",
     ]
     if summary["modes"]:
         lines.append("")
