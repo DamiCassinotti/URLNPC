@@ -51,6 +51,9 @@ public class EnemyBehavior : MonoBehaviour
     const float DestinationSampleRadius = 2f;
     // Below this a trimmed step isn't worth issuing — see SetStepDestination.
     const float MinStepDistance = 0.5f;
+    // How far the agent's destination may sit from the search leg's waypoint
+    // before Wander calls it someone else's and re-issues its own.
+    const float WaypointTolerance = 0.5f;
 
     // The only source of target info for the NPC brain (sensory contract,
     // issue #9). Auto-added in Awake because the Enemy prefab is binary
@@ -277,11 +280,24 @@ public class EnemyBehavior : MonoBehaviour
     void Wander()
     {
         navMeshAgent.updateRotation = true;
-        if (!search.NeedsWaypoint(transform.position, Time.time)) return;
-        CollectSearchCandidates();
-        if (search.TryChoose(transform.position, searchCandidates, Time.time, out Vector3 waypoint))
+        if (search.NeedsWaypoint(transform.position, Time.time))
         {
-            SetDestinationOnNavMesh(waypoint);
+            CollectSearchCandidates();
+            if (search.TryChoose(transform.position, searchCandidates, Time.time, out Vector3 waypoint))
+            {
+                SetDestinationOnNavMesh(waypoint);
+            }
+            return;
+        }
+        // The policy picks a primitive per decision step, and the others take
+        // the wheel while a leg is half walked — Hold clears the path outright,
+        // Retreat and the strafes point the agent somewhere else. Put the leg
+        // back rather than stand still until it times out.
+        if (!navMeshAgent.pathPending
+            && (!navMeshAgent.hasPath
+                || (navMeshAgent.destination - search.Waypoint).sqrMagnitude > WaypointTolerance * WaypointTolerance))
+        {
+            SetDestinationOnNavMesh(search.Waypoint);
         }
     }
 
