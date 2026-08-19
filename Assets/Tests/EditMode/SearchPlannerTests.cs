@@ -84,13 +84,14 @@ public class SearchPlannerTests
     const float Step = 0.1f;
 
     // Hold position and keep ticking; how long until the leg is given up on.
-    // Granular to a step, so the assertions allow a couple of them either way.
-    static float SecondsUntilAbandoned(SearchPlanner planner, Vector3 position, float from)
+    // Granular to a tick, so the assertions allow a couple either way.
+    static float SecondsUntilAbandoned(SearchPlanner planner, Vector3 position, float from,
+                                       float tick = Step)
     {
         float now = from;
         for (int i = 0; i < 500; i++)
         {
-            now += Step;
+            now += tick;
             if (planner.NeedsWaypoint(position, now)) return now - from;
         }
         return float.NaN;
@@ -130,10 +131,26 @@ public class SearchPlannerTests
         var planner = Fresh();
         planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
 
-        Assert.That(planner.NeedsWaypoint(At(2f, 0f), 6f), Is.False, "six seconds of some other primitive");
-        // And the leg gets its full timeout from there, measured on the ticks
-        // that actually drove it.
-        Assert.That(SecondsUntilAbandoned(planner, At(2f, 0f), 6f), Is.EqualTo(4f).Within(0.3f));
+        // Parked short of the waypoint the whole time, so nothing here is headway.
+        Assert.That(planner.NeedsWaypoint(At(-2f, 0f), 6f), Is.False, "six seconds of some other primitive");
+        // The gap cost it one step of the budget, not six seconds of it.
+        Assert.That(SecondsUntilAbandoned(planner, At(-2f, 0f), 6f), Is.EqualTo(3.5f).Within(0.3f));
+    }
+
+    // ...but the gaps still have to add up, or a leg the policy only comes back
+    // to every few steps would never expire — and a stranded one is exactly
+    // what the timeout is for.
+    [Test]
+    public void RepeatedGapsStillExpireAStrandedLeg()
+    {
+        var planner = Fresh();
+        planner.TryChoose(Vector3.zero, Candidates(At(30f, 0f)), 0f, out _);
+
+        // The policy comes back to Wander every 0.6 s and the body hasn't
+        // moved: eight of those spend the 4 s budget at a capped 0.5 s each.
+        float seconds = SecondsUntilAbandoned(planner, At(-10f, 0f), 0f, tick: 0.6f);
+        Assert.That(seconds, Is.Not.NaN, "a stranded leg must be given up on eventually");
+        Assert.That(seconds, Is.EqualTo(4.8f).Within(0.7f));
     }
 
     [Test]

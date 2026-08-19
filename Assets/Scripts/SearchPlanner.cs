@@ -26,7 +26,8 @@ public class SearchPlanner
     // Close enough to call the leg walked.
     public float arrivalRadius = 2f;
 
-    // Give up on a leg that hasn't got any closer for this long. A cross-arena
+    // Give up on a leg that hasn't got any closer for this long a stretch of
+    // being driven (see maxTickSeconds). A cross-arena
     // destination can come back as a partial path that strands the agent
     // against geometry with a path it still considers valid, and without this
     // it would stand there for the rest of the round.
@@ -35,11 +36,11 @@ public class SearchPlanner
     // Slack on "got closer", so per-step jitter doesn't keep a stalled leg alive.
     public float progressEpsilon = 0.5f;
 
-    // Longest gap between two calls that still counts as this leg being walked.
-    // The policy picks a primitive per step, so a leg can go seconds without a
-    // Wander step to drive it; that is another primitive at the wheel, not the
-    // leg stalling, and counting it would drop legs that were never attempted.
-    // A guard on the caller's step rate, not a tuning knob.
+    // Most one call can contribute to the stall clock. The policy picks a
+    // primitive per step, so a leg can go seconds without a Wander step to
+    // drive it; that gap is another primitive at the wheel, not the leg
+    // stalling, and charging it in full would expire legs that were never
+    // attempted. A guard on the caller's step rate, not a tuning knob.
     public float maxTickSeconds = 0.5f;
 
     readonly HashSet<long> swept = new HashSet<long>();
@@ -54,12 +55,12 @@ public class SearchPlanner
         HasWaypoint = false;
         Waypoint = Vector3.zero;
         bestDistance = 0f;
-        lastProgressTime = 0f;
+        stalledSeconds = 0f;
         lastTickTime = 0f;
     }
 
     float bestDistance;
-    float lastProgressTime;
+    float stalledSeconds;
     float lastTickTime;
 
     // The patch the body is standing in has been looked at.
@@ -78,22 +79,19 @@ public class SearchPlanner
 
         float distance = FlatDistance(position, Waypoint);
         if (distance <= arrivalRadius) return true;
-        // Nobody drove this leg for a while: the body may be metres from where
-        // it left off, so re-baseline instead of judging it on a headway
-        // measurement and a clock that belong to a stretch it wasn't walked in.
-        if (sinceTick > maxTickSeconds)
-        {
-            bestDistance = distance;
-            lastProgressTime = now;
-            return false;
-        }
         if (distance < bestDistance - progressEpsilon)
         {
             bestDistance = distance;
-            lastProgressTime = now;
+            stalledSeconds = 0f;
             return false;
         }
-        return now - lastProgressTime >= legTimeoutSeconds;
+        // Charge the gap since the last call, capped at one step: a stretch
+        // where another primitive was driving can't expire the leg on its own,
+        // but it still counts for something. Cleared outright instead, a leg
+        // the policy only comes back to every few steps would never expire at
+        // all — and being stranded on a partial path is what the timeout is for.
+        stalledSeconds += Mathf.Min(sinceTick, maxTickSeconds);
+        return stalledSeconds >= legTimeoutSeconds;
     }
 
     // The farthest candidate, discounting the ones in ground already swept.
@@ -123,7 +121,7 @@ public class SearchPlanner
         Waypoint = waypoint;
         HasWaypoint = true;
         bestDistance = FlatDistance(from, waypoint);
-        lastProgressTime = now;
+        stalledSeconds = 0f;
         lastTickTime = now;
         return true;
     }
