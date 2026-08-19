@@ -372,6 +372,31 @@ public class MovementPrimitiveTests : PlayModeTestBase
         Assert.That(travelled, Is.GreaterThan(2f), "Wander must keep picking new waypoints and walking to them");
     }
 
+    // The search is what runs for most of a round the NPC spends blind, so it
+    // has to cross the arena rather than mill about where it started (#93):
+    // that is the difference between finding the player and drawing.
+    [UnityTest]
+    public IEnumerator Wander_SweepsAcrossTheArena()
+    {
+        arena = CreateArena(0); // Courtyard, 40x40
+        yield return PlaceCombatants(EnemyStart, new Vector3(0f, 0f, 18f));
+
+        Vector3 start = EnemyPos;
+        float furthest = 0f;
+        var cells = new HashSet<(int, int)>();
+        float until = Time.time + 8f;
+        while (Time.time < until)
+        {
+            behavior.Move(MovementAction.Wander);
+            yield return new WaitForFixedUpdate();
+            furthest = Mathf.Max(furthest, FlatDistance(EnemyPos, start));
+            cells.Add((Mathf.FloorToInt(EnemyPos.x / 8f), Mathf.FloorToInt(EnemyPos.z / 8f)));
+        }
+
+        Assert.That(furthest, Is.GreaterThan(14f), $"the search stayed within {furthest:0.0} m of its start");
+        Assert.That(cells.Count, Is.GreaterThanOrEqualTo(4), "the search must cover new ground, not circle one patch");
+    }
+
     [UnityTest]
     public IEnumerator MoveToCover_EndsWhereTheThreatCannotSeeIt()
     {

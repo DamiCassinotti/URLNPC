@@ -125,7 +125,12 @@ public class ArenaManager : MonoBehaviour
     // A random floor-level point on the baked NavMesh, comfortably inside the
     // walls and clear of cover. Once a NavMesh is baked this always returns an
     // on-mesh point, never the off-mesh origin.
-    public Vector3 RandomGroundPoint()
+    public Vector3 RandomGroundPoint() => RandomGroundPoint(RunRng.Stream.Spawn);
+
+    // Same point sampling off a caller-chosen stream: search waypoints draw a
+    // policy-dependent number of times, which on the spawn stream would shift
+    // every later spawn and break the per-domain isolation RunRng is for.
+    public Vector3 RandomGroundPoint(RunRng.Stream stream)
     {
         float marginX = Mathf.Max(2f, HalfExtentX - 2f);
         float marginZ = Mathf.Max(2f, HalfExtentZ - 2f);
@@ -135,8 +140,8 @@ public class ArenaManager : MonoBehaviour
         bool haveElevatedFallback = false;
         for (int i = 0; i < 64; i++)
         {
-            float x = RunRng.Range(RunRng.Stream.Spawn, -marginX, marginX);
-            float z = RunRng.Range(RunRng.Stream.Spawn, -marginZ, marginZ);
+            float x = RunRng.Range(stream, -marginX, marginX);
+            float z = RunRng.Range(stream, -marginZ, marginZ);
             // Small search radius so a floor query snaps to the floor directly
             // below it instead of jumping up onto a nearby raised platform.
             if (NavMesh.SamplePosition(new Vector3(x, 0.5f, z), out NavMeshHit hit, 2f, NavMesh.AllAreas))
