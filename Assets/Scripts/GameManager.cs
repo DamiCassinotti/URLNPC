@@ -157,7 +157,10 @@ public class GameManager : MonoBehaviour
         // Training: every agent takes the penalty and resets in place, so the
         // clock is rearmed and the scene keeps running — no reload.
         bool training = Academy.IsInitialized && Academy.Instance.IsCommunicatorOn;
-        if (training)
+        // A headless eval round ends here too, and its per-episode compliance
+        // stats are flushed by the same notification — without it a draw would
+        // report no compliance at all.
+        if (training || EvalSession.IsActive)
         {
             // Ahead of RoundEnded, because that is what closes the episode in
             // the telemetry log — the per-episode stats the agents emit as
