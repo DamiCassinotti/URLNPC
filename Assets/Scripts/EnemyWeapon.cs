@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyWeapon : Weapon
 {
@@ -6,15 +7,25 @@ public class EnemyWeapon : Weapon
     [Tooltip("Max angular error applied to each shot, in degrees. 0 = perfect aim. Ignored at runtime — CombatBalance.AimSpreadDegrees is forced on in Awake.")]
     [SerializeField] float aimSpreadDegrees = CombatBalance.AimSpreadDegrees;
 
+    NavMeshAgent navMeshAgent;
+
     protected override void Awake()
     {
         base.Awake();
         aimSpreadDegrees = CombatBalance.AimSpreadDegrees;
+        navMeshAgent = GetComponent<NavMeshAgent>();
     }
 
     override protected Vector3 GetPosition()
     {
-        return gameObject.transform.position;
+        // Not the bare transform (#103): the Enemy prefab's origin is its
+        // capsule centre lifted 1 m onto the mesh, so it happened to read as
+        // chest height, while CombatantRig's player body has its origin at the
+        // feet and fired from the ankles — its rays clipped the cover the
+        // enemy's cleared. No agent means no lifted origin to correct for.
+        if (navMeshAgent == null) return transform.position;
+        return transform.position
+            + Vector3.up * BodyMetrics.MuzzleOffset(navMeshAgent.height, navMeshAgent.baseOffset);
     }
 
     override protected Vector3 GetForward()
