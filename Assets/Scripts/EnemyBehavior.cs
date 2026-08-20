@@ -557,8 +557,14 @@ public class EnemyBehavior : MonoBehaviour
     public bool IsTargetInSight()
     {
         if (target == null) return false;
-        Vector3 origin = transform.position + Vector3.up;
-        Vector3 toTarget = (target.position + Vector3.up) - origin;
+        // Muzzle height on both ends, not a flat metre off two transforms that
+        // don't share an origin (#103). Muzzle rather than eye because this is
+        // the shot's own line: Attack turns the body at the target and fires
+        // horizontally from there, so probing higher would report a sighting
+        // over a wall the bullet goes straight into.
+        Vector3 origin = transform.position + Vector3.up * BodyMetrics.MuzzleOffset(SelfHeight, SelfBaseOffset);
+        Vector3 aimPoint = target.position + Vector3.up * BodyMetrics.MuzzleOffset(SelfHeight, TargetBaseOffset);
+        Vector3 toTarget = aimPoint - origin;
         float distance = toTarget.magnitude;
         if (distance > sightRange) return false;
         float angle = Vector3.Angle(transform.forward, toTarget.normalized);
@@ -585,12 +591,17 @@ public class EnemyBehavior : MonoBehaviour
         // already lifted by its own agent's base offset (#103) — reading the
         // threat's off this body's made the probe asymmetric, and the two sides
         // of a self-play round disagreed about what cover is.
-        float eyeHeight = navMeshAgent != null ? navMeshAgent.height : 2f;
-        float baseOffset = navMeshAgent != null ? navMeshAgent.baseOffset : 0f;
-        Vector3 selfEye = transform.position + Vector3.up * BodyMetrics.EyeOffset(eyeHeight, baseOffset);
-        Vector3 threatEye = target.position + Vector3.up * BodyMetrics.EyeOffset(eyeHeight, TargetBaseOffset);
+        Vector3 selfEye = transform.position + Vector3.up * BodyMetrics.EyeOffset(SelfHeight, SelfBaseOffset);
+        Vector3 threatEye = target.position + Vector3.up * BodyMetrics.EyeOffset(SelfHeight, TargetBaseOffset);
         return EyeLine.Blocked(threatEye, selfEye, sightObstacleMask, transform, target);
     }
+
+    // This body's agent dimensions, falling back to the 2 m capsule both
+    // combatants are. The target's height is not read separately: a human body
+    // has no agent to read one off, so the asker's stands in for both — the
+    // same approximation MoveToCover's cover query makes with the sight mask.
+    float SelfHeight => navMeshAgent != null ? navMeshAgent.height : 2f;
+    float SelfBaseOffset => navMeshAgent != null ? navMeshAgent.baseOffset : 0f;
 
     // How far the target's transform origin sits above the ground it stands on.
     // Zero for a human body, whose origin is its feet.
