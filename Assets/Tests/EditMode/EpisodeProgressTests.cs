@@ -104,4 +104,66 @@ public class EpisodeProgressTests
         Assert.That(progress.EnterArea(0f, 0f), Is.False);
         Assert.That(progress.EnterArea(100f, 100f), Is.False);
     }
+
+    [Test]
+    public void InNewArea_HoldsForTheWholeCrossing_AndDropsOnTroddenGround()
+    {
+        // Patrol's compliance rule scores every step of a fresh patch, not the
+        // one that entered it (#105).
+        var progress = Fresh();
+        progress.EnterArea(0f, 0f);
+        Assert.That(progress.InNewArea, Is.True);
+        progress.EnterArea(1f, 1f);
+        Assert.That(progress.InNewArea, Is.True, "still walking through the same fresh patch");
+
+        progress.EnterArea(7f, 0f);
+        Assert.That(progress.InNewArea, Is.True, "a cell over, also fresh");
+        progress.EnterArea(0f, 0f);
+        Assert.That(progress.InNewArea, Is.False, "back on ground it has already covered");
+        progress.EnterArea(1f, 1f);
+        Assert.That(progress.InNewArea, Is.False, "and it stays false for the whole re-crossing");
+    }
+
+    [Test]
+    public void Reset_ForgetsTheFreshPatch()
+    {
+        var progress = Fresh();
+        progress.EnterArea(0f, 0f);
+        progress.EnterArea(7f, 0f);
+        progress.EnterArea(0f, 0f);
+        progress.Reset();
+        Assert.That(progress.InNewArea, Is.False, "nothing has been entered yet");
+        progress.EnterArea(0f, 0f);
+        Assert.That(progress.InNewArea, Is.True);
+    }
+
+    [Test]
+    public void Travelled_MeasuresGroundCoveredSinceTheLastStep()
+    {
+        var progress = Fresh();
+        Assert.That(progress.Travelled(0f, 0f), Is.EqualTo(0f).Within(Tolerance), "no baseline yet");
+        Assert.That(progress.Travelled(0.3f, 0.4f), Is.EqualTo(0.5f).Within(Tolerance));
+        Assert.That(progress.Travelled(0.3f, 0.4f), Is.EqualTo(0f).Within(Tolerance), "standing still");
+    }
+
+    [Test]
+    public void Travelled_CapsATeleportAndRecoversFromANonFinitePosition()
+    {
+        var progress = Fresh();
+        progress.Travelled(0f, 0f);
+        Assert.That(progress.Travelled(50f, 0f), Is.EqualTo(2f).Within(Tolerance), "a respawn is not ground covered");
+
+        Assert.That(progress.Travelled(float.NaN, 0f), Is.EqualTo(0f).Within(Tolerance));
+        Assert.That(progress.Travelled(50f, 0f), Is.EqualTo(0f).Within(Tolerance), "no baseline to measure from");
+        Assert.That(progress.Travelled(50.5f, 0f), Is.EqualTo(0.5f).Within(Tolerance), "and it picks back up from there");
+    }
+
+    [Test]
+    public void Reset_ForgetsTheTravelBaseline()
+    {
+        var progress = Fresh();
+        progress.Travelled(0f, 0f);
+        progress.Reset();
+        Assert.That(progress.Travelled(30f, 30f), Is.EqualTo(0f).Within(Tolerance));
+    }
 }

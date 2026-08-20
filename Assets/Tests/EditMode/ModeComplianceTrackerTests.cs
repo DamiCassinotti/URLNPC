@@ -47,6 +47,23 @@ public class ModeComplianceTrackerTests
     }
 
     [Test]
+    public void Hunt_DoesNotCreditHoldingWhileBackingAwayWithoutFiring()
+    {
+        // #102's holding credit paid for every in-range step whatever the body
+        // did with it, which floored the random control at 76% (#105).
+        var tracker = Fresh();
+        var backingOff = Step(NpcMode.Hunt);
+        backingOff.targetVisible = true;
+        backingOff.distanceToTarget = 10f;
+        backingOff.closingDelta = -0.4f;
+        var backingOffFiring = backingOff;
+        backingOffFiring.shotFired = true;
+
+        Assert.That(tracker.Compliant(backingOff), Is.False);
+        Assert.That(tracker.Compliant(backingOffFiring), Is.True, "shooting is hunting wherever it walks");
+    }
+
+    [Test]
     public void Retreat_CompliesByOpeningDistanceOrByBreakingTheEyeLine()
     {
         var tracker = Fresh();
@@ -98,12 +115,16 @@ public class ModeComplianceTrackerTests
     {
         var tracker = Fresh();
         var fresh = Step(NpcMode.Patrol);
-        fresh.enteredNewArea = true;
+        fresh.inNewArea = true;
+        fresh.distanceMoved = 0.3f;
         var trodden = Step(NpcMode.Patrol);
-        trodden.closingDelta = 0.4f;
+        trodden.distanceMoved = 0.3f;
+        var parked = fresh;
+        parked.distanceMoved = 0.01f;
 
         Assert.That(tracker.Compliant(fresh), Is.True);
-        Assert.That(tracker.Compliant(trodden), Is.False);
+        Assert.That(tracker.Compliant(trodden), Is.False, "ground it has already been over");
+        Assert.That(tracker.Compliant(parked), Is.False, "standing in fresh ground is not covering it");
     }
 
     [Test]
@@ -196,24 +217,49 @@ public class ModeComplianceTrackerTests
     }
 
     [Test]
-    public void HoldCoverAndPatrol_AreScoredOnEveryStep()
+    public void HoldCover_IsScoredWhileThereIsSomeoneToTakeCoverFrom()
     {
-        // Neither rule needs a bearing on the target, so an unseen target is
-        // not an excuse: breaking the eye-line and covering new ground are
-        // things the policy can do blind.
+        // Scored over every step it measured the arena's ambient occlusion —
+        // the target is unseen most of a round, so the whole map reads as
+        // cover and a random walk outscored the heuristic bot (#105). The
+        // window is PerceptionMemory's horizon: holding cover is worth credit
+        // for as long as the threat is still known about.
         var tracker = Fresh();
-        foreach (NpcMode mode in new[] { NpcMode.HoldCover, NpcMode.Patrol })
-        {
-            Assert.That(tracker.Eligible(Step(mode)), Is.True, mode.ToString());
-        }
+        var stillKnown = Step(NpcMode.HoldCover);
+        stillKnown.timeSinceSeen = 8f;
+        var longGone = Step(NpcMode.HoldCover);
+        longGone.timeSinceSeen = 30f;
+        var visible = Step(NpcMode.HoldCover);
+        visible.targetVisible = true;
+        visible.timeSinceSeen = 0f;
 
-        var hidden = Step(NpcMode.HoldCover);
-        hidden.inCover = true;
-        tracker.Record(hidden);
-        tracker.Record(Step(NpcMode.HoldCover));
+        Assert.That(tracker.Eligible(stillKnown), Is.True);
+        Assert.That(tracker.Eligible(visible), Is.True);
+        Assert.That(tracker.Eligible(longGone), Is.False, "an empty arena is not cover");
+        Assert.That(tracker.Eligible(Step(NpcMode.HoldCover)), Is.False, "never seen is not contact either");
 
-        Assert.That(tracker.EligibleSteps(NpcMode.HoldCover), Is.EqualTo(2));
-        Assert.That(tracker.Rate(NpcMode.HoldCover), Is.EqualTo(0.5f).Within(1e-6f));
+        var retreating = stillKnown;
+        retreating.mode = NpcMode.Retreat;
+        Assert.That(tracker.Eligible(retreating), Is.False,
+            "Retreat's window is the shorter one — rounding a corner, not holding a position");
+    }
+
+    [Test]
+    public void Patrol_IsScoredOnEveryStep()
+    {
+        // Its rule needs no bearing on the target: covering new ground is
+        // something the policy can do blind.
+        var tracker = Fresh();
+        Assert.That(tracker.Eligible(Step(NpcMode.Patrol)), Is.True);
+
+        var covering = Step(NpcMode.Patrol);
+        covering.inNewArea = true;
+        covering.distanceMoved = 0.3f;
+        tracker.Record(covering);
+        tracker.Record(Step(NpcMode.Patrol));
+
+        Assert.That(tracker.EligibleSteps(NpcMode.Patrol), Is.EqualTo(2));
+        Assert.That(tracker.Rate(NpcMode.Patrol), Is.EqualTo(0.5f).Within(1e-6f));
     }
 
     [Test]

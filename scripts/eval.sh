@@ -2,7 +2,7 @@
 # Headless evaluation of a trained policy (issue #52).
 #
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
-#                   [--subject policy|heuristic|random]
+#                   [--subject policy|heuristic|random|flee]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
@@ -12,11 +12,13 @@
 # to kill, survival time, and per-mode compliance and step counts.
 #
 #   --subject policy      the NPC side runs the model — what is being scored
-#   --subject heuristic|random
+#   --subject heuristic|random|flee
 #                         put the NPC side on a control instead: the scripted
-#                         heuristic, or uniform draws over the action branches.
-#                         A model is still required — it is what the build
-#                         carries — but nothing on the NPC side runs it.
+#                         heuristic, uniform draws over the action branches, or
+#                         a scripted retreat that backs off, takes cover and
+#                         never fires. A model is still required — it is what
+#                         the build carries — but nothing on the NPC side runs
+#                         it.
 #   --opponent policy     both sides run the model (self-play)
 #   --opponent heuristic  the far side runs the scripted heuristic — the
 #                         baseline the ≥70% win-rate gate (#50) is measured on
@@ -44,7 +46,7 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    sed -n '2,36p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,38p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -86,7 +88,7 @@ done
 # this check must not reject a spelling the run would otherwise have accepted.
 SUBJECT="${SUBJECT,,}"
 OPPONENT="${OPPONENT,,}"
-case "$SUBJECT" in policy|heuristic|random) ;; *) echo "error: --subject takes policy|heuristic|random" >&2; exit 1 ;; esac
+case "$SUBJECT" in policy|heuristic|random|flee) ;; *) echo "error: --subject takes policy|heuristic|random|flee" >&2; exit 1 ;; esac
 case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy|heuristic" >&2; exit 1 ;; esac
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
 [[ "$EPISODES" =~ ^[1-9][0-9]*$ ]] || { echo "error: --episodes takes a positive integer" >&2; exit 1; }
