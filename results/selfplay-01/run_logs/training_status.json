@@ -1,0 +1,66 @@
+{
+    "URLNPC": {
+        "checkpoints": [
+            {
+                "steps": 99996,
+                "file_path": "results/selfplay-01/URLNPC/URLNPC-99996.onnx",
+                "reward": -2.3375623140129305,
+                "creation_time": 1787240413.2493215,
+                "auxillary_file_paths": [
+                    "results/selfplay-01/URLNPC/URLNPC-99996.pt"
+                ]
+            },
+            {
+                "steps": 149981,
+                "file_path": "results/selfplay-01/URLNPC/URLNPC-149981.onnx",
+                "reward": 2.6169666156724647,
+                "creation_time": 1787240849.0267138,
+                "auxillary_file_paths": [
+                    "results/selfplay-01/URLNPC/URLNPC-149981.pt"
+                ]
+            },
+            {
+                "steps": 199983,
+                "file_path": "results/selfplay-01/URLNPC/URLNPC-199983.onnx",
+                "reward": 2.807093034171172,
+                "creation_time": 1787241322.438976,
+                "auxillary_file_paths": [
+                    "results/selfplay-01/URLNPC/URLNPC-199983.pt"
+                ]
+            },
+            {
+                "steps": 249983,
+                "file_path": "results/selfplay-01/URLNPC/URLNPC-249983.onnx",
+                "reward": -3.027044174007394,
+                "creation_time": 1787241902.5404842,
+                "auxillary_file_paths": [
+                    "results/selfplay-01/URLNPC/URLNPC-249983.pt"
+                ]
+            },
+            {
+                "steps": 266259,
+                "file_path": "results/selfplay-01/URLNPC/URLNPC-266259.onnx",
+                "reward": -3.2075069611538436,
+                "creation_time": 1787242085.4901502,
+                "auxillary_file_paths": [
+                    "results/selfplay-01/URLNPC/URLNPC-266259.pt"
+                ]
+            }
+        ],
+        "elo": 1172.7995803389445,
+        "final_checkpoint": {
+            "steps": 266259,
+            "file_path": "results/selfplay-01/URLNPC.onnx",
+            "reward": -3.2075069611538436,
+            "creation_time": 1787242085.4901502,
+            "auxillary_file_paths": [
+                "results/selfplay-01/URLNPC/URLNPC-266259.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.1+cu121"
+    }
+}

@@ -1,0 +1,48 @@
+warning: the existing build was made from a different model — results describe whatever it carries
+==> 200 episodes, seed 1234, subject heuristic, opponent heuristic, modes scripted, timeScale 1
+    log: /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/scripted/unity.log
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=4194304"
+    "memorysetup-bucket-allocator-block-count=1"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=4194304"
+    "memorysetup-profiler-bucket-allocator-block-count=1"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=4194304"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+entity            NPC
+episodes          200
+win / loss / draw 178 / 1 / 21   (win rate 89.0%)
+damage dealt      93.5 per episode
+damage taken      0.5 per episode
+accuracy          79.6%   (1246/1565 shots)
+time to kill      18.6 s (decided rounds)
+survival          15.8 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible
+Hunt          76174      8019       99.4%     10.5%
+HoldCover     73922     73922       64.8%     14.6%
+Retreat       77100      8250        2.1%     10.6%
+Patrol        65617     65617        0.8%     11.6%
+==> results in /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/scripted

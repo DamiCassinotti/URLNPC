@@ -1,0 +1,84 @@
+batch URLNPC.onnx  modes: Hunt HoldCover Retreat Patrol scripted  args: --subject heuristic --opponent heuristic --episodes 200 --seed 1234 --no-build
+==> [19:53:11] start Hunt  -> /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/Hunt
+    [19:54:38] done  Hunt
+==> [19:54:38] start HoldCover  -> /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/HoldCover
+    [19:56:07] done  HoldCover
+==> [19:56:07] start Retreat  -> /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/Retreat
+    [19:57:33] done  Retreat
+==> [19:57:33] start Patrol  -> /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/Patrol
+    [19:59:01] done  Patrol
+==> [19:59:01] start scripted  -> /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311/scripted
+    [20:00:28] done  scripted
+
+----- Hunt -----
+entity            NPC
+episodes          200
+win / loss / draw 178 / 1 / 21   (win rate 89.0%)
+damage dealt      93.5 per episode
+damage taken      0.5 per episode
+accuracy          79.8%   (1246/1562 shots)
+time to kill      18.6 s (decided rounds)
+survival          15.8 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible
+Hunt         292538     34528       99.1%     11.8%
+Patrol          200       200      100.0%      0.0%
+
+----- HoldCover -----
+entity            NPC
+episodes          200
+win / loss / draw 178 / 1 / 21   (win rate 89.0%)
+damage dealt      93.5 per episode
+damage taken      0.5 per episode
+accuracy          80.5%   (1246/1548 shots)
+time to kill      18.6 s (decided rounds)
+survival          15.8 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible
+HoldCover    292198    292198       63.1%     11.7%
+Patrol          200       200      100.0%      0.0%
+
+----- Retreat -----
+entity            NPC
+episodes          200
+win / loss / draw 178 / 1 / 21   (win rate 89.0%)
+damage dealt      93.5 per episode
+damage taken      0.5 per episode
+accuracy          80.0%   (1246/1557 shots)
+time to kill      18.6 s (decided rounds)
+survival          15.8 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible
+Retreat      292418     36404        5.6%     11.8%
+Patrol          200       200      100.0%      0.0%
+
+----- Patrol -----
+entity            NPC
+episodes          200
+win / loss / draw 178 / 1 / 21   (win rate 89.0%)
+damage dealt      93.5 per episode
+damage taken      0.5 per episode
+accuracy          80.4%   (1246/1550 shots)
+time to kill      18.6 s (decided rounds)
+survival          15.8 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible
+Patrol       292443    292443        0.6%     11.7%
+
+----- scripted -----
+entity            NPC
+episodes          200
+win / loss / draw 178 / 1 / 21   (win rate 89.0%)
+damage dealt      93.5 per episode
+damage taken      0.5 per episode
+accuracy          79.6%   (1246/1565 shots)
+time to kill      18.6 s (decided rounds)
+survival          15.8 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible
+Hunt          76174      8019       99.4%     10.5%
+HoldCover     73922     73922       64.8%     14.6%
+Retreat       77100      8250        2.1%     10.6%
+Patrol        65617     65617        0.8%     11.6%
+
+batch complete: 5 runs, 0 failed. results in /home/damian/repos/URLNPC/results/eval/URLNPC_modes_20260820_195311
