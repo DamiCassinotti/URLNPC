@@ -55,6 +55,8 @@ public class EnemyAgent : Agent
     [SerializeField] float retreatContactSeconds = 3f;
     [Tooltip("Seconds after a sighting that a HoldCover step is still holding cover against someone — the window its rate is scored over.")]
     [SerializeField] float holdCoverContactSeconds = 10f;
+    [Tooltip("Metres per step above which a Patrol step counts as walking rather than parked. A step is a physics step, so walking pace is about 0.07 m.")]
+    [SerializeField] float patrolMovementMetres = 0.01f;
 
     [Header("Episode reset")]
     [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play gets its random spawn from ArenaManager.Start on each round's scene reload instead — repositioning here would also fire on mid-round MaxStep resets and yank a live player across the arena.")]
@@ -212,6 +214,7 @@ public class EnemyAgent : Agent
             huntEngagementDistance = huntEngagementDistance,
             contactSeconds = retreatContactSeconds,
             coverContactSeconds = holdCoverContactSeconds,
+            patrolMovementMetres = patrolMovementMetres,
         };
         visibility = new ModeTally();
 

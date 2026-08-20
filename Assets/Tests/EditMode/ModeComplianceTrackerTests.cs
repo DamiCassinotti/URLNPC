@@ -120,11 +120,17 @@ public class ModeComplianceTrackerTests
         var trodden = Step(NpcMode.Patrol);
         trodden.distanceMoved = 0.3f;
         var parked = fresh;
-        parked.distanceMoved = 0.01f;
+        parked.distanceMoved = 0f;
+        // A step is a physics step: at 3.5 m/s the body covers ~0.07 m, so the
+        // walking test has to sit well under the closing deadband or a body
+        // that slows to turn reads as parked.
+        var slow = fresh;
+        slow.distanceMoved = 0.04f;
 
         Assert.That(tracker.Compliant(fresh), Is.True);
         Assert.That(tracker.Compliant(trodden), Is.False, "ground it has already been over");
         Assert.That(tracker.Compliant(parked), Is.False, "standing in fresh ground is not covering it");
+        Assert.That(tracker.Compliant(slow), Is.True, "walking slowly is still walking");
     }
 
     [Test]

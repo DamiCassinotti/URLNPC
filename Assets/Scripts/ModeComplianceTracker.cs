@@ -55,6 +55,13 @@ public class ModeComplianceTracker
     // that roaming an empty arena isn't retreating from anyone.
     public float contactSeconds = 3f;
 
+    // Metres per step above which a Patrol step is walking rather than parked.
+    // Its own number and not movementDeadband: a step is a physics step, which
+    // at walking pace covers about 0.07 m, so the deadband that separates
+    // closing from opening would call a body at anything under two thirds of
+    // its own walking speed stationary.
+    public float patrolMovementMetres = 0.01f;
+
     // The same idea for HoldCover, but over the horizon PerceptionMemory keeps
     // a sighting for (#105): holding cover is holding it against a threat you
     // still know is out there, and it is worth doing for as long as you do.
@@ -115,7 +122,7 @@ public class ModeComplianceTracker
             // entering step alone capped the rate near 6% — the arena has more
             // steps than patches — and read the same 0.5% for a sweep as for a
             // random walk. A body standing in fresh ground is not covering it.
-            case NpcMode.Patrol: return sample.inNewArea && sample.distanceMoved > movementDeadband;
+            case NpcMode.Patrol: return sample.inNewArea && sample.distanceMoved > patrolMovementMetres;
             default: return false;
         }
     }
