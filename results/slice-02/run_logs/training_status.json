@@ -1,0 +1,47 @@
+{
+    "URLNPC": {
+        "checkpoints": [
+            {
+                "steps": 24990,
+                "file_path": "results/slice-02/URLNPC/URLNPC-24990.onnx",
+                "reward": 4.89075331731389,
+                "creation_time": 1786779268.5993316,
+                "auxillary_file_paths": [
+                    "results/slice-02/URLNPC/URLNPC-24990.pt"
+                ]
+            },
+            {
+                "steps": 49940,
+                "file_path": "results/slice-02/URLNPC/URLNPC-49940.onnx",
+                "reward": 2.91633147909306,
+                "creation_time": 1786779371.8683703,
+                "auxillary_file_paths": [
+                    "results/slice-02/URLNPC/URLNPC-49940.pt"
+                ]
+            },
+            {
+                "steps": 50068,
+                "file_path": "results/slice-02/URLNPC/URLNPC-50068.onnx",
+                "reward": 2.91633147909306,
+                "creation_time": 1786779371.9367793,
+                "auxillary_file_paths": [
+                    "results/slice-02/URLNPC/URLNPC-50068.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 50068,
+            "file_path": "results/slice-02/URLNPC.onnx",
+            "reward": 2.91633147909306,
+            "creation_time": 1786779371.9367793,
+            "auxillary_file_paths": [
+                "results/slice-02/URLNPC/URLNPC-50068.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.1+cu121"
+    }
+}

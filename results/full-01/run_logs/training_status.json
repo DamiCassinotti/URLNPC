@@ -1,0 +1,65 @@
+{
+    "URLNPC": {
+        "checkpoints": [
+            {
+                "steps": 849968,
+                "file_path": "results/full-01/URLNPC/URLNPC-849968.onnx",
+                "reward": 1.0827715401537716,
+                "creation_time": 1786694033.1854336,
+                "auxillary_file_paths": [
+                    "results/full-01/URLNPC/URLNPC-849968.pt"
+                ]
+            },
+            {
+                "steps": 899988,
+                "file_path": "results/full-01/URLNPC/URLNPC-899988.onnx",
+                "reward": 2.176532178052834,
+                "creation_time": 1786694159.3174968,
+                "auxillary_file_paths": [
+                    "results/full-01/URLNPC/URLNPC-899988.pt"
+                ]
+            },
+            {
+                "steps": 949962,
+                "file_path": "results/full-01/URLNPC/URLNPC-949962.onnx",
+                "reward": 0.7158804535865784,
+                "creation_time": 1786694284.9561112,
+                "auxillary_file_paths": [
+                    "results/full-01/URLNPC/URLNPC-949962.pt"
+                ]
+            },
+            {
+                "steps": 999976,
+                "file_path": "results/full-01/URLNPC/URLNPC-999976.onnx",
+                "reward": null,
+                "creation_time": 1786694410.4818358,
+                "auxillary_file_paths": [
+                    "results/full-01/URLNPC/URLNPC-999976.pt"
+                ]
+            },
+            {
+                "steps": 1000040,
+                "file_path": "results/full-01/URLNPC/URLNPC-1000040.onnx",
+                "reward": null,
+                "creation_time": 1786694410.5576596,
+                "auxillary_file_paths": [
+                    "results/full-01/URLNPC/URLNPC-1000040.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1000040,
+            "file_path": "results/full-01/URLNPC.onnx",
+            "reward": null,
+            "creation_time": 1786694410.5576596,
+            "auxillary_file_paths": [
+                "results/full-01/URLNPC/URLNPC-1000040.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.1+cu121"
+    }
+}

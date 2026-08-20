@@ -1,0 +1,29 @@
+{
+  "entity": "NPC",
+  "episodes": 200,
+  "wins": 180,
+  "losses": 0,
+  "draws": 20,
+  "winRate": 0.9,
+  "damageDealtPerEpisode": 95.025,
+  "damageTakenPerEpisode": 0.15,
+  "shots": 1827,
+  "hits": 1267,
+  "accuracy": 0.6934865900383141,
+  "timeToKillSeconds": 30.1515,
+  "survivalSeconds": null,
+  "modes": {
+    "Hunt": {
+      "steps": 200,
+      "eligible": 1,
+      "compliance": 1.0,
+      "visible": 0.005
+    },
+    "Patrol": {
+      "steps": 391351,
+      "eligible": 391351,
+      "compliance": 0.004254492769917542,
+      "visible": 0.06008672521598259
+    }
+  }
+}
