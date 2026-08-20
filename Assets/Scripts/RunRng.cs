@@ -22,10 +22,11 @@ public static class RunRng
         Spawn = 1,  // NavMesh spawn-point sampling (player + enemy)
         Wander = 2, // patrol/wander waypoints
         Mode = 3,   // commanded-mode sampling (ModeDirector)
+        Action = 4, // the random-action control policy (eval --subject random)
     }
 
     const string CommandLineArg = "-runSeed";
-    const int StreamCount = 4;
+    const int StreamCount = 5;
 
     public static bool Initialized { get; private set; }
     public static int Seed { get; private set; }

@@ -2,6 +2,7 @@
 # Headless evaluation of a trained policy (issue #52).
 #
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
+#                   [--subject policy|heuristic|random]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
@@ -10,6 +11,12 @@
 # summarizes the telemetry JSONL: win rate, damage dealt/taken, accuracy, time
 # to kill, survival time, and per-mode compliance and step counts.
 #
+#   --subject policy      the NPC side runs the model — what is being scored
+#   --subject heuristic|random
+#                         put the NPC side on a control instead: the scripted
+#                         heuristic, or uniform draws over the action branches.
+#                         A model is still required — it is what the build
+#                         carries — but nothing on the NPC side runs it.
 #   --opponent policy     both sides run the model (self-play)
 #   --opponent heuristic  the far side runs the scripted heuristic — the
 #                         baseline the ≥70% win-rate gate (#50) is measured on
@@ -37,7 +44,7 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    sed -n '2,29p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,36p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -49,6 +56,7 @@ MODEL="$1"; shift
 
 EPISODES=100
 SEED=1001
+SUBJECT="policy"
 OPPONENT="policy"
 MODES="scripted"
 TIME_SCALE=1
@@ -60,6 +68,7 @@ while [[ $# -ge 1 ]]; do
     case "$1" in
         --episodes) EPISODES="$2"; shift 2 ;;
         --seed) SEED="$2"; shift 2 ;;
+        --subject) SUBJECT="$2"; shift 2 ;;
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
@@ -73,12 +82,13 @@ while [[ $# -ge 1 ]]; do
 done
 
 # The player rejects these too, but only after a rebuild that can take minutes.
+case "$SUBJECT" in policy|heuristic|random) ;; *) echo "error: --subject takes policy|heuristic|random" >&2; exit 1 ;; esac
 case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy|heuristic" >&2; exit 1 ;; esac
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
 [[ "$EPISODES" =~ ^[1-9][0-9]*$ ]] || { echo "error: --episodes takes a positive integer" >&2; exit 1; }
 [[ "$SEED" =~ ^-?[0-9]+$ ]] || { echo "error: --seed takes an integer" >&2; exit 1; }
 
-OUT="${OUT:-$PROJECT_ROOT/results/eval/$(basename "${MODEL%.onnx}")_${OPPONENT}_$(date +%Y%m%d_%H%M%S)}"
+OUT="${OUT:-$PROJECT_ROOT/results/eval/$(basename "${MODEL%.onnx}")_${SUBJECT}-vs-${OPPONENT}_$(date +%Y%m%d_%H%M%S)}"
 mkdir -p "$OUT"
 
 # What was scored, next to the numbers: a summary is only comparable against
@@ -88,6 +98,7 @@ cat > "$OUT/config.json" <<JSON
   "model": "$MODEL",
   "episodes": $EPISODES,
   "seed": $SEED,
+  "subject": "$SUBJECT",
   "opponent": "$OPPONENT",
   "modes": "$MODES",
   "timeScale": $TIME_SCALE,
@@ -124,7 +135,7 @@ UNITY_LOG="$OUT/unity.log"
 # to real time, so this is a loose wall-clock bound, not the expected duration;
 # --timeout 0 disables the guard.
 TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
-echo "==> $EPISODES episodes, seed $SEED, opponent $OPPONENT, modes $MODES, timeScale $TIME_SCALE"
+echo "==> $EPISODES episodes, seed $SEED, subject $SUBJECT, opponent $OPPONENT, modes $MODES, timeScale $TIME_SCALE"
 echo "    log: $UNITY_LOG"
 set +e
 timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
@@ -132,6 +143,7 @@ timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
     -runSeed "$SEED" \
     -evalEpisodes "$EPISODES" \
     -evalModel "$MODEL_RESOURCE" \
+    -evalSubject "$SUBJECT" \
     -evalOpponent "$OPPONENT" \
     -evalModes "$MODES" \
     -evalTimeScale "$TIME_SCALE"

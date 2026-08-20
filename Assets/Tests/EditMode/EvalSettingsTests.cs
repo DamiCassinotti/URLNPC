@@ -38,6 +38,7 @@ public class EvalSettingsTests
     public void Defaults_AreSelfPlayScriptedModesAtGameSpeed()
     {
         EvalSettings settings = EvalSettings.Parse(MinimalRun());
+        Assert.That(settings.Subject, Is.EqualTo(EvalSettings.SubjectKind.Policy));
         Assert.That(settings.Opponent, Is.EqualTo(EvalSettings.OpponentKind.Policy));
         Assert.That(settings.ModeSource, Is.EqualTo(EvalSettings.ModeSourceKind.Scripted));
         Assert.That(settings.TimeScale, Is.EqualTo(1f));
@@ -50,6 +51,30 @@ public class EvalSettingsTests
             Is.EqualTo(EvalSettings.OpponentKind.Heuristic));
         Assert.That(EvalSettings.Parse(MinimalRun("-evalOpponent", "policy")).Opponent,
             Is.EqualTo(EvalSettings.OpponentKind.Policy));
+    }
+
+    // Issue #97: the control runs the model's numbers are read against.
+    [Test]
+    public void Subject_TakesThePolicyOrEitherControl()
+    {
+        Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "Heuristic")).Subject,
+            Is.EqualTo(EvalSettings.SubjectKind.Heuristic));
+        Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "random")).Subject,
+            Is.EqualTo(EvalSettings.SubjectKind.Random));
+        Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "policy")).Subject,
+            Is.EqualTo(EvalSettings.SubjectKind.Policy));
+        Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "llm")).Error, Is.Not.Null);
+    }
+
+    // The two sides are independent: -evalOpponent must not move the subject.
+    [Test]
+    public void SubjectAndOpponent_AreSetSeparately()
+    {
+        EvalSettings settings = EvalSettings.Parse(
+            MinimalRun("-evalSubject", "random", "-evalOpponent", "heuristic"));
+        Assert.That(settings.Error, Is.Null);
+        Assert.That(settings.Subject, Is.EqualTo(EvalSettings.SubjectKind.Random));
+        Assert.That(settings.Opponent, Is.EqualTo(EvalSettings.OpponentKind.Heuristic));
     }
 
     [Test]
