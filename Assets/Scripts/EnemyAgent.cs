@@ -46,6 +46,14 @@ public class EnemyAgent : Agent
     [Tooltip("Side in metres of the square patches the new-area reward counts.")]
     [SerializeField] float newAreaCellSize = 6f;
 
+    [Header("Mode compliance")]
+    [Tooltip("Metres per step below which movement counts as neither closing nor opening: rotation and NavMesh settling move the body a little every step.")]
+    [SerializeField] float complianceMovementDeadband = 0.05f;
+    [Tooltip("Range within which a Hunt step counts as engaging a visible target even if it neither moved nor fired.")]
+    [SerializeField] float huntEngagementDistance = 20f;
+    [Tooltip("Seconds after a sighting that a Retreat step is still breaking contact — the window its rate is scored over.")]
+    [SerializeField] float retreatContactSeconds = 3f;
+
     [Header("Episode reset")]
     [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play gets its random spawn from ArenaManager.Start on each round's scene reload instead — repositioning here would also fire on mid-round MaxStep resets and yank a live player across the arena.")]
     [SerializeField] bool repositionPlayerOnEpisodeBegin = true;
@@ -193,7 +201,12 @@ public class EnemyAgent : Agent
             };
         }
         progress = new EpisodeProgress { areaCellSize = newAreaCellSize };
-        compliance = new ModeComplianceTracker();
+        compliance = new ModeComplianceTracker
+        {
+            movementDeadband = complianceMovementDeadband,
+            huntEngagementDistance = huntEngagementDistance,
+            contactSeconds = retreatContactSeconds,
+        };
         visibility = new ModeTally();
 
         selfHealth.OnDamaged += HandleSelfDamaged;
@@ -351,6 +364,8 @@ public class EnemyAgent : Agent
             inCover = hidden,
             enteredNewArea = enteredNewArea,
             targetVisible = inputs.targetVisible,
+            distanceToTarget = distanceToTarget,
+            timeSinceSeen = inputs.timeSinceSeen,
         });
         visibility.Record(mode, inputs.targetVisible);
     }

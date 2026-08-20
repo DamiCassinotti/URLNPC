@@ -17,6 +17,12 @@ public struct ComplianceSample
     // Whether the target was visible on this step — what decides eligibility
     // for the modes that need a bearing to act on.
     public bool targetVisible;
+    // Metres to the target, true state like closingDelta. Hunt reads it to
+    // credit holding at a range it can actually shoot from.
+    public float distanceToTarget;
+    // Seconds since the target was last seen, infinity when never seen — the
+    // window in which a Retreat step is still breaking contact with someone.
+    public float timeSinceSeen;
 }
 
 // Mode compliance (#45): of the decision steps spent under each commanded mode,
@@ -31,6 +37,19 @@ public class ModeComplianceTracker
     // opening: rotation and NavMesh settling move the body a little every step.
     public float movementDeadband = 0.05f;
 
+    // Inside this range Hunt is engaging, whether or not it moved or fired on
+    // this step (#91). The cooldown is 0.5 s against a ~0.1 s decision period,
+    // so a hunter that has closed and is trading shots spends four steps in
+    // five neither shooting nor closing — scored on those two alone, Hunt was
+    // capped near its own weapon's duty cycle. Past ~20 m the 1.5 degree aim
+    // spread is wider than a body, so out there closing is still the job.
+    public float huntEngagementDistance = 20f;
+
+    // How long after a sighting a Retreat step is still breaking contact.
+    // Longer than the two seconds it takes to round a corner, short enough
+    // that roaming an empty arena isn't retreating from anyone.
+    public float contactSeconds = 3f;
+
     readonly ModeTally tally = new ModeTally();
 
     public int TotalSteps => tally.TotalSteps;
@@ -40,16 +59,19 @@ public class ModeComplianceTracker
     public void Record(in ComplianceSample sample) =>
         tally.Record(sample.mode, Compliant(sample), Eligible(sample));
 
-    // Steps the mode had a chance to act on (#88). Hunt closes or shoots and
-    // Retreat opens; neither has a bearing to work from while the target is
-    // unseen, so scoring those steps made the rate mostly a measure of how
-    // often the fight was joined. HoldCover and Patrol need no target.
-    public static bool Eligible(in ComplianceSample sample)
+    // Steps the mode had a chance to act on (#88). Hunt has nothing to close on
+    // while the target is unseen, so scoring those steps made its rate mostly a
+    // measure of how often the fight was joined. Retreat is scored while there
+    // is someone to break contact with: sight of the target, or a sighting
+    // recent enough that staying out of their eye-line is still the retreat
+    // working rather than an empty corner of the arena. HoldCover and Patrol
+    // need no target.
+    public bool Eligible(in ComplianceSample sample)
     {
         switch (sample.mode)
         {
-            case NpcMode.Hunt:
-            case NpcMode.Retreat: return sample.targetVisible;
+            case NpcMode.Hunt: return sample.targetVisible;
+            case NpcMode.Retreat: return sample.targetVisible || sample.timeSinceSeen <= contactSeconds;
             default: return true;
         }
     }
@@ -58,9 +80,15 @@ public class ModeComplianceTracker
     {
         switch (sample.mode)
         {
-            case NpcMode.Hunt: return sample.shotFired || sample.closingDelta > movementDeadband;
+            case NpcMode.Hunt:
+                return sample.shotFired
+                    || sample.closingDelta > movementDeadband
+                    || (sample.targetVisible && sample.distanceToTarget <= huntEngagementDistance);
             case NpcMode.HoldCover: return sample.inCover;
-            case NpcMode.Retreat: return sample.closingDelta < -movementDeadband;
+            // Opening distance is one way out of a fight; the other is the
+            // eye-line, and a body that broke it has broken contact whether or
+            // not it kept walking.
+            case NpcMode.Retreat: return sample.closingDelta < -movementDeadband || sample.inCover;
             // A cell is only new once, so this rate has a low ceiling by
             // construction — read it as new ground per step, comparable
             // between policies, not as a percentage of correct behavior.
@@ -69,9 +97,9 @@ public class ModeComplianceTracker
         }
     }
 
-    // The cover flag costs a raycast to produce; only HoldCover's rule reads
-    // it, the same way RewardComputer.RewardsCover gates the reward's probe.
-    public static bool ReadsCover(NpcMode mode) => mode == NpcMode.HoldCover;
+    // The cover flag costs a raycast to produce; only these two rules read it,
+    // the same way RewardComputer.RewardsCover gates the reward's probe.
+    public static bool ReadsCover(NpcMode mode) => mode == NpcMode.HoldCover || mode == NpcMode.Retreat;
 
     public int Steps(NpcMode mode) => tally.Steps(mode);
 

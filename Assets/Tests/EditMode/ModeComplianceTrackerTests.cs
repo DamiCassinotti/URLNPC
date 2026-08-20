@@ -6,7 +6,10 @@ public class ModeComplianceTrackerTests
 {
     static ModeComplianceTracker Fresh() => new ModeComplianceTracker { movementDeadband = 0.05f };
 
-    static ComplianceSample Step(NpcMode mode) => new ComplianceSample { mode = mode };
+    // Out of engagement range and long out of contact, so a mode's own rule is
+    // what decides the step rather than the ranges the defaults hand it.
+    static ComplianceSample Step(NpcMode mode) =>
+        new ComplianceSample { mode = mode, distanceToTarget = 40f, timeSinceSeen = float.PositiveInfinity };
 
     [Test]
     public void Hunt_CompliesByClosingOrByShooting()
@@ -20,22 +23,45 @@ public class ModeComplianceTrackerTests
 
         Assert.That(tracker.Compliant(closing), Is.True);
         Assert.That(tracker.Compliant(shooting), Is.True);
-        Assert.That(tracker.Compliant(Step(NpcMode.Hunt)), Is.False, "standing still is not hunting");
+        Assert.That(tracker.Compliant(Step(NpcMode.Hunt)), Is.False, "standing still out of range is not hunting");
     }
 
     [Test]
-    public void Retreat_CompliesOnlyByOpeningDistance()
+    public void Hunt_CompliesWhileHoldingAtARangeItCanShootFrom()
+    {
+        // The cooldown is five decision steps long, so a hunter that has closed
+        // and is trading shots is neither moving nor firing on most of them
+        // (#91).
+        var tracker = Fresh();
+        var inRange = Step(NpcMode.Hunt);
+        inRange.targetVisible = true;
+        inRange.distanceToTarget = 10f;
+        var outOfRange = inRange;
+        outOfRange.distanceToTarget = 30f;
+        var unseen = inRange;
+        unseen.targetVisible = false;
+
+        Assert.That(tracker.Compliant(inRange), Is.True);
+        Assert.That(tracker.Compliant(outOfRange), Is.False, "far off, closing is still the job");
+        Assert.That(tracker.Compliant(unseen), Is.False, "in range of someone it cannot see is not engaging");
+    }
+
+    [Test]
+    public void Retreat_CompliesByOpeningDistanceOrByBreakingTheEyeLine()
     {
         var tracker = Fresh();
         var opening = Step(NpcMode.Retreat);
         opening.closingDelta = -0.4f;
         var closing = Step(NpcMode.Retreat);
         closing.closingDelta = 0.4f;
+        var hidden = closing;
+        hidden.inCover = true;
         var shooting = Step(NpcMode.Retreat);
         shooting.shotFired = true;
 
         Assert.That(tracker.Compliant(opening), Is.True);
         Assert.That(tracker.Compliant(closing), Is.False);
+        Assert.That(tracker.Compliant(hidden), Is.True, "contact broken by cover is a retreat that arrived");
         Assert.That(tracker.Compliant(shooting), Is.False, "firing is Hunt's rule, not Retreat's");
     }
 
@@ -135,7 +161,7 @@ public class ModeComplianceTrackerTests
     }
 
     [Test]
-    public void HuntAndRetreat_AreOnlyScoredOnStepsTheTargetIsVisible()
+    public void Hunt_IsOnlyScoredOnStepsTheTargetIsVisible()
     {
         var tracker = Fresh();
         Record(tracker, NpcMode.Hunt, closing: 0.4f, times: 2, visible: true);
@@ -145,9 +171,28 @@ public class ModeComplianceTrackerTests
         Assert.That(tracker.EligibleSteps(NpcMode.Hunt), Is.EqualTo(2));
         Assert.That(tracker.Rate(NpcMode.Hunt), Is.EqualTo(1f).Within(1e-6f),
             "a mode that did its job whenever it could see the target scores 1, not 0.2");
+    }
 
-        Assert.That(ModeComplianceTracker.Eligible(new ComplianceSample { mode = NpcMode.Retreat, targetVisible = false }), Is.False);
-        Assert.That(ModeComplianceTracker.Eligible(new ComplianceSample { mode = NpcMode.Retreat, targetVisible = true }), Is.True);
+    [Test]
+    public void Retreat_IsScoredWhileThereIsSomeoneToBreakContactWith()
+    {
+        // Cover is what a retreat is aiming for, and cover ends visibility — so
+        // scoring only the visible steps would have made the new rule
+        // unreachable. The window past the last sighting is the denominator
+        // instead.
+        var tracker = Fresh();
+        var justHidden = Step(NpcMode.Retreat);
+        justHidden.timeSinceSeen = 1f;
+        var longGone = Step(NpcMode.Retreat);
+        longGone.timeSinceSeen = 30f;
+        var visible = Step(NpcMode.Retreat);
+        visible.targetVisible = true;
+        visible.timeSinceSeen = 0f;
+
+        Assert.That(tracker.Eligible(justHidden), Is.True);
+        Assert.That(tracker.Eligible(visible), Is.True);
+        Assert.That(tracker.Eligible(longGone), Is.False, "nobody in contact to retreat from");
+        Assert.That(tracker.Eligible(Step(NpcMode.Retreat)), Is.False, "never seen is not contact either");
     }
 
     [Test]
@@ -156,12 +201,12 @@ public class ModeComplianceTrackerTests
         // Neither rule needs a bearing on the target, so an unseen target is
         // not an excuse: breaking the eye-line and covering new ground are
         // things the policy can do blind.
+        var tracker = Fresh();
         foreach (NpcMode mode in new[] { NpcMode.HoldCover, NpcMode.Patrol })
         {
-            Assert.That(ModeComplianceTracker.Eligible(new ComplianceSample { mode = mode, targetVisible = false }), Is.True, mode.ToString());
+            Assert.That(tracker.Eligible(Step(mode)), Is.True, mode.ToString());
         }
 
-        var tracker = Fresh();
         var hidden = Step(NpcMode.HoldCover);
         hidden.inCover = true;
         tracker.Record(hidden);
@@ -185,19 +230,22 @@ public class ModeComplianceTrackerTests
     }
 
     [Test]
-    public void OnlyHoldCover_NeedsTheCoverProbe()
+    public void OnlyTheCoverRules_NeedTheCoverProbe()
     {
         // The flag costs a raycast, so the agent only produces it for the modes
         // whose rules read it.
         Assert.That(ModeComplianceTracker.ReadsCover(NpcMode.HoldCover), Is.True);
+        Assert.That(ModeComplianceTracker.ReadsCover(NpcMode.Retreat), Is.True);
         Assert.That(ModeComplianceTracker.ReadsCover(NpcMode.Hunt), Is.False);
-        Assert.That(ModeComplianceTracker.ReadsCover(NpcMode.Retreat), Is.False);
         Assert.That(ModeComplianceTracker.ReadsCover(NpcMode.Patrol), Is.False);
     }
 
     static void Record(ModeComplianceTracker tracker, NpcMode mode, float closing, int times, bool visible = true)
     {
-        var sample = new ComplianceSample { mode = mode, closingDelta = closing, targetVisible = visible };
+        var sample = Step(mode);
+        sample.closingDelta = closing;
+        sample.targetVisible = visible;
+        if (visible) sample.timeSinceSeen = 0f;
         for (int i = 0; i < times; i++) tracker.Record(sample);
     }
 }
