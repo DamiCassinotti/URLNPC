@@ -155,6 +155,54 @@ public class ModeDirectorTests
         Assert.That(EveryMode.Enabled(), Is.EquivalentTo(NpcModes.All));
     }
 
+    // Issue #97: the one exception to "training commands all four" — a restricted
+    // pool has to come from the command line, since three serialized masks can't
+    // agree on one.
+    [Test]
+    public void TrainModes_NarrowsTheTrainingPool()
+    {
+        Assert.That(NpcModes.ResolveEnabled(EveryMode, training: true, HuntOrRetreat),
+            Is.EqualTo(HuntOrRetreat));
+        Assert.That(NpcModes.ResolveEnabled(NpcModeMask.None, training: true, NpcModeMask.Patrol),
+            Is.EqualTo(NpcModeMask.Patrol));
+        // Outside training it changes nothing: the Inspector still owns that side.
+        Assert.That(NpcModes.ResolveEnabled(NpcModeMask.Hunt, training: false, HuntOrRetreat),
+            Is.EqualTo(NpcModeMask.Hunt));
+    }
+
+    [Test]
+    public void TrainModes_ParsesAllOrAList()
+    {
+        Assert.That(NpcModes.TryParseModeList("all", out NpcModeMask all), Is.True);
+        Assert.That(all, Is.EqualTo(EveryMode));
+
+        Assert.That(NpcModes.TryParseModeList("Hunt", out NpcModeMask one), Is.True);
+        Assert.That(one, Is.EqualTo(NpcModeMask.Hunt));
+
+        // Case and stray spacing are the shell's to produce, not ours to reject.
+        Assert.That(NpcModes.TryParseModeList(" hunt , Retreat ", out NpcModeMask two), Is.True);
+        Assert.That(two, Is.EqualTo(HuntOrRetreat));
+
+        // A repeat is a set, not a weighting.
+        Assert.That(NpcModes.TryParseModeList("Hunt,Hunt", out NpcModeMask dup), Is.True);
+        Assert.That(dup, Is.EqualTo(NpcModeMask.Hunt));
+    }
+
+    [TestCase("")]
+    [TestCase("   ")]
+    [TestCase(null)]
+    [TestCase("none")]
+    [TestCase("Sprint")]
+    [TestCase("Hunt,Sprint")]
+    [TestCase("Hunt,")]
+    [TestCase("99")] // Enum.TryParse takes any number; 1 << 99 would land on some other mode
+    public void TrainModes_RejectsAnythingUndrawable(string value)
+    {
+        Assert.That(NpcModes.TryParseModeList(value, out NpcModeMask mask), Is.False,
+            "an empty or misspelled pool would leave the director with nothing to draw");
+        Assert.That(mask, Is.EqualTo(NpcModeMask.None));
+    }
+
     // The other half: manual play and the mode baselines still tune the mask in
     // the Inspector. EditMode has no communicator, so the director reads it.
     [Test]

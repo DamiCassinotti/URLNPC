@@ -22,10 +22,11 @@ public static class RunRng
         Spawn = 1,  // NavMesh spawn-point sampling (player + enemy)
         Wander = 2, // patrol/wander waypoints
         Mode = 3,   // commanded-mode sampling (ModeDirector)
+        Action = 4, // the random-action control policy (eval --subject random)
     }
 
     const string CommandLineArg = "-runSeed";
-    const int StreamCount = 4;
+    const int StreamCount = 5;
 
     public static bool Initialized { get; private set; }
     public static int Seed { get; private set; }
@@ -103,15 +104,7 @@ public static class RunRng
 
     static bool TryReadCommandLineSeed(out int seed)
     {
-        string[] args = System.Environment.GetCommandLineArgs();
-        for (int i = 0; i < args.Length - 1; i++)
-        {
-            if (args[i] == CommandLineArg && int.TryParse(args[i + 1], out seed))
-            {
-                return true;
-            }
-        }
-        seed = 0;
-        return false;
+        return CommandLineArgs.TryRead(
+            System.Environment.GetCommandLineArgs(), CommandLineArg, int.TryParse, out seed);
     }
 }

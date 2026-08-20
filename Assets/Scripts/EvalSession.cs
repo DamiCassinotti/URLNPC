@@ -64,7 +64,7 @@ public class EvalSession : MonoBehaviour
         GameManager.RoundEnded += HandleRoundEnded;
         SceneManager.sceneLoaded += HandleSceneLoaded;
         applyPending = true;
-        Debug.Log($"[Eval] {settings.Episodes} episodes, model {settings.ModelResource}, opponent {settings.Opponent}, modes {settings.ModeSource}, timeScale {settings.TimeScale}.");
+        Debug.Log($"[Eval] {settings.Episodes} episodes, model {settings.ModelResource}, subject {settings.Subject}, opponent {settings.Opponent}, modes {settings.ModeSource}, timeScale {settings.TimeScale}.");
     }
 
     void OnDestroy()
@@ -130,9 +130,16 @@ public class EvalSession : MonoBehaviour
         foreach (EnemyAgent agent in FindObjectsByType<EnemyAgent>(FindObjectsSortMode.None))
         {
             // The NPC is what is being scored; anything else on the field is
-            // the opponent, and only the self-play opponent runs the model.
-            bool subject = agent.CompareTag("NPC");
-            bool runsModel = subject || settings.Opponent == EvalSettings.OpponentKind.Policy;
+            // the opponent. The subject may be a control (heuristic or random)
+            // rather than the model; the opponent only ever runs the model or
+            // the heuristic.
+            bool isSubject = agent.CompareTag("NPC");
+            bool runsModel = isSubject
+                ? settings.Subject == EvalSettings.SubjectKind.Policy
+                : settings.Opponent == EvalSettings.OpponentKind.Policy;
+            // Only the subject can be random: a random far side is a weaker
+            // opponent, not a condition anything in the plan is scored against.
+            agent.randomActions = isSubject && settings.Subject == EvalSettings.SubjectKind.Random;
             ConfigurePolicy(agent, runsModel);
             ConfigureModeSource(agent);
         }

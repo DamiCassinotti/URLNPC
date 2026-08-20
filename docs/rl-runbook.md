@@ -35,7 +35,8 @@ so you don't assemble the `--env` / `--env-args` line by hand:
 
 ```bash
 scripts/train.sh editor <run-id> [config] [extra mlagents args...]
-scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S] [extra...]
+scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S]
+                       [--train-modes all|<Mode>[,<Mode>...]] [extra...]
 ```
 
 - **`editor`** starts the trainer and waits for you to press Play — for watching behavior and
@@ -48,10 +49,13 @@ scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S] [extra...]
 
 The slice is the short early run: `config/URLNPC-slice.yaml` (50k steps, `summary_freq` 2000),
 enough to see reward move and the compliance columns appear before the full 1M-step run.
-Training always commands all four modes — the set is owned by code (`NpcModes.AllMask`), so
-the prefab, the scene's instance override and `CombatantRig`'s composed director can't train
-different pools; `ModeDirector.enabledModes` only narrows it outside training. Smoke the slice
-in the editor first:
+Training commands all four modes by default — the set is owned by code (`NpcModes.AllMask`),
+so the prefab, the scene's instance override and `CombatantRig`'s composed director can't
+train different pools; `ModeDirector.enabledModes` only narrows it outside training. To train
+a restricted pool, pass `--train-modes` on a `build` run (`--train-modes Hunt`,
+`--train-modes Hunt,Retreat`, `--train-modes all`): it becomes `-trainModes` in the env-args,
+so the one argument reaches both self-play bodies and the pool stays symmetric. Smoke the
+slice in the editor first:
 
 ```bash
 scripts/train.sh editor slice-01 config/URLNPC-slice.yaml
@@ -157,12 +161,16 @@ scripts/eval.sh results/full-03-seed-1001/URLNPC.onnx --episodes 100 --seed 1001
     --opponent heuristic
 ```
 
-Output lands in `results/eval/<model>_<opponent>_<stamp>/`: `unity.log`, the run's
+Output lands in `results/eval/<model>_<subject>-vs-<opponent>_<stamp>/`: `unity.log`, the run's
 `telemetry.jsonl`, and `summary.txt`/`summary.json` — win/loss/draw, damage dealt and taken,
 accuracy, time to kill, survival time, and per-mode compliance, visibility and step counts.
 
 - `--opponent policy` keeps both sides on the model (self-play); `--opponent heuristic` puts
   the far side on the scripted heuristic, which is what the ≥70% win-rate gate is measured on.
+- `--subject` picks what drives the NPC side — the side the summary scores. `policy` (default)
+  is the model; `heuristic` and `random` are the controls its numbers are read against, the
+  scripted baseline and uniform draws over the 7x2 action branches. A model is still required
+  either way (it is what the build carries); nothing on the NPC side runs it.
 - `--modes scripted` (default) lets the `ModeDirector` sample as it does in training;
   `--modes Hunt` pins one mode for a per-mode baseline; `--modes none` leaves the channel on
   `initialMode`.

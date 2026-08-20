@@ -6,6 +6,7 @@ public class EvalSettings
     public const string EpisodesArg = "-evalEpisodes";
     public const string ModelArg = "-evalModel";
     public const string OpponentArg = "-evalOpponent";
+    public const string SubjectArg = "-evalSubject";
     public const string ModesArg = "-evalModes";
     public const string TimeScaleArg = "-evalTimeScale";
 
@@ -13,6 +14,15 @@ public class EvalSettings
     {
         Policy,    // the far side runs the same model: self-play
         Heuristic, // the far side runs EnemyAgent.Heuristic, the scripted baseline
+    }
+
+    // What drives the NPC side — the side the summary scores. Anything but
+    // Policy is a control run: the numbers a model has to beat.
+    public enum SubjectKind
+    {
+        Policy,    // the model named by -evalModel
+        Heuristic, // EnemyAgent.Heuristic, the scripted baseline
+        Random,    // uniform over the 7x2 action branches
     }
 
     public enum ModeSourceKind
@@ -30,6 +40,7 @@ public class EvalSettings
     // Runtime ONNX import is editor-only, so the model is baked into the build
     // and named here rather than loaded from a file path.
     public string ModelResource;
+    public SubjectKind Subject = SubjectKind.Policy;
     public OpponentKind Opponent = OpponentKind.Policy;
     public ModeSourceKind ModeSource = ModeSourceKind.Scripted;
     public NpcMode FixedMode = NpcMode.Hunt;
@@ -71,6 +82,15 @@ public class EvalSettings
                         case "policy": settings.Opponent = OpponentKind.Policy; break;
                         case "heuristic": settings.Opponent = OpponentKind.Heuristic; break;
                         default: return settings.Fail($"{OpponentArg} takes policy|heuristic, got '{value}'.");
+                    }
+                    break;
+                case SubjectArg:
+                    switch (value.ToLowerInvariant())
+                    {
+                        case "policy": settings.Subject = SubjectKind.Policy; break;
+                        case "heuristic": settings.Subject = SubjectKind.Heuristic; break;
+                        case "random": settings.Subject = SubjectKind.Random; break;
+                        default: return settings.Fail($"{SubjectArg} takes policy|heuristic|random, got '{value}'.");
                     }
                     break;
                 case ModesArg:

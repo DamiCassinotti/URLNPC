@@ -75,6 +75,14 @@ public class EnemyAgent : Agent
     // check the real memories reach the frozen layout.
     internal float[] LastObservations => observations;
 
+    // Set by EvalSession for a random control run (#97): the heuristic draws
+    // uniformly over the action branches instead of chasing the target.
+    internal bool randomActions;
+
+    // Cached: a method group would allocate a delegate on every decision.
+    static readonly System.Func<int, int, int> DrawAction =
+        (min, max) => RunRng.Range(RunRng.Stream.Action, min, max);
+
     bool episodeEnding;
 
     // Awake, not Initialize: Agent.OnEnable builds the actuators off the action
@@ -286,6 +294,13 @@ public class EnemyAgent : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discrete = actionsOut.DiscreteActions;
+        if (randomActions)
+        {
+            RandomActionPolicy.Draw(DrawAction, out int movement, out int fire);
+            discrete[0] = movement;
+            discrete[1] = fire;
+            return;
+        }
         // Advance on the memory, not just on sight (issue #72): losing sight
         // has to mean walking to where they went, and Advance falls through to
         // a search of its own once it gets there and finds nobody.
