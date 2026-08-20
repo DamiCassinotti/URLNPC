@@ -52,6 +52,11 @@ public class EnemyBehavior : MonoBehaviour
     // Advance reached the last-seen position without finding anyone there.
     bool searching;
 
+    // The target's own agent, resolved lazily: target is a public field the rig
+    // writes after Awake, and it can point at either kind of body.
+    Transform targetAgentOwner;
+    NavMeshAgent targetAgent;
+
     // Where Wander looks next, and the ground it has already swept this episode.
     readonly SearchPlanner search = new SearchPlanner();
     readonly List<Vector3> searchCandidates = new List<Vector3>();
@@ -271,8 +276,12 @@ public class EnemyBehavior : MonoBehaviour
             // right whether the body is centred on a lifted transform (the Enemy
             // prefab) or stands feet-on-mesh (CombatantRig's agent player).
             nextCoverQueryTime = Time.time + coverQueryInterval;
+            // The query raises the threat's eye off the position it is handed,
+            // so hand it the ground under the remembered one — on an
+            // agent-driven target that origin is already lifted (#103).
+            Vector3 threat = Perception.LastSeenPosition + Vector3.down * TargetBaseOffset;
             hasCoverPoint = ArenaManager.Current.NearestCoverPoint(
-                transform.position, Perception.LastSeenPosition, sightObstacleMask,
+                transform.position, threat, sightObstacleMask,
                 transform, navMeshAgent.height, out coverPoint);
         }
 
@@ -548,8 +557,14 @@ public class EnemyBehavior : MonoBehaviour
     public bool IsTargetInSight()
     {
         if (target == null) return false;
-        Vector3 origin = transform.position + Vector3.up;
-        Vector3 toTarget = (target.position + Vector3.up) - origin;
+        // Muzzle height on both ends, not a flat metre off two transforms that
+        // don't share an origin (#103). Muzzle rather than eye because this is
+        // the shot's own line: Attack turns the body at the target and fires
+        // horizontally from there, so probing higher would report a sighting
+        // over a wall the bullet goes straight into.
+        Vector3 origin = transform.position + Vector3.up * BodyMetrics.MuzzleOffset(SelfHeight, SelfBaseOffset);
+        Vector3 aimPoint = target.position + Vector3.up * BodyMetrics.MuzzleOffset(SelfHeight, TargetBaseOffset);
+        Vector3 toTarget = aimPoint - origin;
         float distance = toTarget.magnitude;
         if (distance > sightRange) return false;
         float angle = Vector3.Angle(transform.forward, toTarget.normalized);
@@ -572,13 +587,36 @@ public class EnemyBehavior : MonoBehaviour
     public bool IsHiddenFromTarget()
     {
         if (target == null) return false;
-        float eyeHeight = navMeshAgent != null ? navMeshAgent.height : 2f;
-        // The head above the grounded base: on the Enemy prefab the transform
-        // itself is already lifted by the agent's base offset.
-        float baseOffset = navMeshAgent != null ? navMeshAgent.baseOffset : 0f;
-        Vector3 selfEye = transform.position + Vector3.up * (eyeHeight - baseOffset);
-        Vector3 threatEye = target.position + Vector3.up * eyeHeight;
+        // The head above the grounded base, on both ends: each transform is
+        // already lifted by its own agent's base offset (#103) — reading the
+        // threat's off this body's made the probe asymmetric, and the two sides
+        // of a self-play round disagreed about what cover is.
+        Vector3 selfEye = transform.position + Vector3.up * BodyMetrics.EyeOffset(SelfHeight, SelfBaseOffset);
+        Vector3 threatEye = target.position + Vector3.up * BodyMetrics.EyeOffset(SelfHeight, TargetBaseOffset);
         return EyeLine.Blocked(threatEye, selfEye, sightObstacleMask, transform, target);
+    }
+
+    // This body's agent dimensions, falling back to the 2 m capsule both
+    // combatants are. The target's height is not read separately: a human body
+    // has no agent to read one off, so the asker's stands in for both — the
+    // same approximation MoveToCover's cover query makes with the sight mask.
+    float SelfHeight => navMeshAgent != null ? navMeshAgent.height : 2f;
+    float SelfBaseOffset => navMeshAgent != null ? navMeshAgent.baseOffset : 0f;
+
+    // How far the target's transform origin sits above the ground it stands on.
+    // Zero for a human body, whose origin is its feet.
+    float TargetBaseOffset
+    {
+        get
+        {
+            if (target == null) return 0f;
+            if (targetAgentOwner != target)
+            {
+                targetAgentOwner = target;
+                targetAgent = target.GetComponent<NavMeshAgent>();
+            }
+            return targetAgent != null ? targetAgent.baseOffset : 0f;
+        }
     }
 
     // ENVIRONMENT-SIDE ONLY. Reward computation may read true state; never feed
