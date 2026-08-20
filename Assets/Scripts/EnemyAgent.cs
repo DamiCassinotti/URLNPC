@@ -351,6 +351,8 @@ public class EnemyAgent : Agent
             inCover = hidden,
             enteredNewArea = enteredNewArea,
             targetVisible = inputs.targetVisible,
+            distanceToTarget = distanceToTarget,
+            timeSinceSeen = inputs.timeSinceSeen,
         });
         visibility.Record(mode, inputs.targetVisible);
     }

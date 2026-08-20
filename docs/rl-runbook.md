@@ -90,11 +90,12 @@ tensorboard --logdir results
 - **`Environment/Cumulative Reward`** — the headline. Should trend up and stabilise; a flat
   line near zero means the policy isn't finding the kill/hit rewards.
 - **`Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat`, `Compliance/Patrol`** —
-  does the policy obey the commanded mode (Hunt closes distance or shoots, Retreat opens
-  distance)? These are the point of the mode-conditioning: reward can climb while compliance
-  stays flat if the policy ignores the command and just fights. The denominator is the steps
-  the mode could act on — Hunt and Retreat only while the player is visible — so this reads as
-  policy quality, not as how often the fight was joined. Patrol's rate reads low by
+  does the policy obey the commanded mode (Hunt closes, shoots or holds inside 20 m of a
+  visible player; Retreat opens distance or stays out of the player's eye-line)? These are the
+  point of the mode-conditioning: reward can climb while compliance stays flat if the policy
+  ignores the command and just fights. The denominator is the steps the mode could act on —
+  Hunt only while the player is visible, Retreat while there is contact to break — so this
+  reads as policy quality, not as how often the fight was joined. Patrol's rate reads low by
   construction (a cell counts once) — compare between runs, not as a percentage.
 - **`Visible/<Mode>`** — the fraction of each mode's steps the player was in sight for, i.e.
   how much of the round Hunt's and Retreat's rates were scored on. A mode that never saw the

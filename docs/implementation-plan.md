@@ -218,7 +218,7 @@ Before any human plays, run **real-time (1×) agent-vs-agent matches**: Enemy = 
 
 - **During training:** TensorBoard — cumulative reward, episode length, ELO (self-play), policy entropy. Entropy collapse = premature convergence; entropy *plateau above max−0.2* = reward signal too weak (this is exactly what runs full-01…03 showed).
 - **Post-training eval harness** *(#52, still open)*: headless Unity `-batchmode`, ≥100 episodes/condition, seeded arenas. Per-episode telemetry: winner, damage dealt/taken, accuracy, time-to-kill, survival time, per-mode step counts, distance timeline.
-- **Mode-compliance ratio** — the metric bridging both layers and the strongest defensible number *(as-built: `ModeComplianceTracker`, logged to `Compliance/<Mode>` + telemetry)*. Hunt: closes distance or lands a shot. Retreat: opens distance. HoldCover: keeps the eye-line broken. Patrol: enters a fresh area cell. Two caveats to report: the closing rules use a deadband so jitter counts as neither; **Patrol's rate has a low ceiling by construction** (a cell counts once), so read it as new-ground-per-step, not a percentage.
+- **Mode-compliance ratio** — the metric bridging both layers and the strongest defensible number *(as-built: `ModeComplianceTracker`, logged to `Compliance/<Mode>` + telemetry)*. Hunt: closes distance, lands a shot, or holds inside 20 m of a visible player. Retreat: opens distance or keeps the eye-line broken. HoldCover: keeps the eye-line broken. Patrol: enters a fresh area cell. Two caveats to report: the closing rules use a deadband so jitter counts as neither; **Patrol's rate has a low ceiling by construction** (a cell counts once), so read it as new-ground-per-step, not a percentage.
 
 ### 4.2 LLM component (fast inner loop, offline)
 

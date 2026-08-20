@@ -173,14 +173,16 @@ The rest is one column per commanded mode (`NpcMode`), so the same policy is pul
 
 ### Mode compliance
 
-Whether the policy actually obeys the mode it is commanded. Every decision step is scored against its mode, and the per-episode fraction is reported as `Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat` and `Compliance/Patrol` in TensorBoard, next to reward and entropy. The fraction is over the steps the mode could act on, not over every step it was commanded for: Hunt and Retreat are scored only while the player is visible, since neither closing nor opening has a bearing to work from otherwise; HoldCover and Patrol need no target and are scored on every step.
+Whether the policy actually obeys the mode it is commanded. Every decision step is scored against its mode, and the per-episode fraction is reported as `Compliance/Hunt`, `Compliance/HoldCover`, `Compliance/Retreat` and `Compliance/Patrol` in TensorBoard, next to reward and entropy. The fraction is over the steps the mode could act on, not over every step it was commanded for: Hunt is scored only while the player is visible, since it has nothing to close on otherwise; Retreat while the player is visible or was seen in the last few seconds, i.e. while there is contact to break; HoldCover and Patrol need no target and are scored on every step.
 
 | Mode | A step counts as compliant when it |
 |---|---|
-| Hunt | closed distance on the player, or got a shot off |
+| Hunt | closed distance on the player, got a shot off, or held within 20 m of a player it can see |
 | HoldCover | kept the player's line of sight to it broken |
-| Retreat | opened distance |
+| Retreat | opened distance, or kept the player's line of sight to it broken |
 | Patrol | entered a patch of the arena it had not been in this episode |
+
+Hunt and Retreat credit more than movement on purpose (#91). The fire cooldown is 0.5 s against a 0.1 s decision period, so a hunter that has closed to killing range and is trading shots is neither moving nor firing on four steps in five — scored on those two alone, Hunt could not clear about 20% however well it fought. And a retreat that reached cover has broken contact whether or not it kept walking.
 
 Read alongside them is `Visible/<Mode>`, the fraction of the steps under each mode the player was actually in sight — which for Hunt and Retreat is how much of the round the rate above was scored on. A mode that spent an episode with the player never in sight reports no compliance rate at all rather than a zero.
 
