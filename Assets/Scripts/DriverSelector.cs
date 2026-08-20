@@ -8,32 +8,31 @@ public static class DriverSelector
     // Highest priority first: command line, code-level override, Inspector
     // default.
     //
-    // The command line scan is deliberately lenient — the editor and player are
-    // launched with plenty of arguments this code knows nothing about, so an
-    // unparseable occurrence is skipped rather than treated as an error. The
-    // first occurrence naming a real driver wins.
+    // The scan is CommandLineArgs.TryRead: lenient, so an occurrence naming
+    // something that isn't a driver is skipped and the first one that does
+    // wins.
     public static CombatantRig.DriverKind Resolve(
         string[] args,
         CombatantRig.DriverKind? codeOverride,
         CombatantRig.DriverKind inspectorDefault)
     {
-        if (args != null)
+        if (CommandLineArgs.TryRead(args, CommandLineArg, TryParseDriver, out CombatantRig.DriverKind fromArgs))
         {
-            // Stop one short of the end: the flag needs a value after it.
-            for (int i = 0; i < args.Length - 1; i++)
-            {
-                if (args[i] != CommandLineArg) continue;
-                string value = args[i + 1];
-                if (value == null) continue;
-                switch (value.ToLowerInvariant())
-                {
-                    case "agent": return CombatantRig.DriverKind.Agent;
-                    case "human": return CombatantRig.DriverKind.Human;
-                }
-            }
+            return fromArgs;
         }
 
         if (codeOverride.HasValue) return codeOverride.Value;
         return inspectorDefault;
+    }
+
+    static bool TryParseDriver(string value, out CombatantRig.DriverKind driver)
+    {
+        driver = CombatantRig.DriverKind.Human;
+        switch (value.ToLowerInvariant())
+        {
+            case "agent": driver = CombatantRig.DriverKind.Agent; return true;
+            case "human": driver = CombatantRig.DriverKind.Human; return true;
+            default: return false;
+        }
     }
 }

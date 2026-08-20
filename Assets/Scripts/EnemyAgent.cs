@@ -79,6 +79,10 @@ public class EnemyAgent : Agent
     // uniformly over the action branches instead of chasing the target.
     internal bool randomActions;
 
+    // Cached: a method group would allocate a delegate on every decision.
+    static readonly System.Func<int, int, int> DrawAction =
+        (min, max) => RunRng.Range(RunRng.Stream.Action, min, max);
+
     bool episodeEnding;
 
     // Awake, not Initialize: Agent.OnEnable builds the actuators off the action
@@ -292,10 +296,9 @@ public class EnemyAgent : Agent
         var discrete = actionsOut.DiscreteActions;
         if (randomActions)
         {
-            // Two draws per decision whatever the world looks like, so this
-            // stream stays in step across runs at the same seed.
-            discrete[0] = RunRng.Range(RunRng.Stream.Action, 0, NpcBrainSpec.MovementBranchSize);
-            discrete[1] = RunRng.Range(RunRng.Stream.Action, 0, NpcBrainSpec.FireBranchSize);
+            RandomActionPolicy.Draw(DrawAction, out int movement, out int fire);
+            discrete[0] = movement;
+            discrete[1] = fire;
             return;
         }
         // Advance on the memory, not just on sight (issue #72): losing sight

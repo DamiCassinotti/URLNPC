@@ -104,15 +104,7 @@ public static class RunRng
 
     static bool TryReadCommandLineSeed(out int seed)
     {
-        string[] args = System.Environment.GetCommandLineArgs();
-        for (int i = 0; i < args.Length - 1; i++)
-        {
-            if (args[i] == CommandLineArg && int.TryParse(args[i + 1], out seed))
-            {
-                return true;
-            }
-        }
-        seed = 0;
-        return false;
+        return CommandLineArgs.TryRead(
+            System.Environment.GetCommandLineArgs(), CommandLineArg, int.TryParse, out seed);
     }
 }

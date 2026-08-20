@@ -96,21 +96,17 @@ public static class NpcModes
             if (commandLineRead) return commandLineMask;
             commandLineRead = true;
             string[] args = System.Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length - 1; i++)
+            if (CommandLineArgs.TryRead(args, TrainModesArg, TryParseModeList, out NpcModeMask parsed))
             {
-                if (args[i] != TrainModesArg) continue;
-                if (TryParseModeList(args[i + 1], out NpcModeMask parsed))
-                {
-                    commandLineMask = parsed;
-                }
-                else
-                {
-                    // Falls back to all four rather than failing the run: this
-                    // is read mid-training, where there is no clean exit.
-                    UnityEngine.Debug.LogError(
-                        $"[NpcModes] {TrainModesArg} takes all|<Mode>[,<Mode>...], got '{args[i + 1]}' — training all four modes.");
-                }
-                break;
+                commandLineMask = parsed;
+            }
+            else if (CommandLineArgs.Contains(args, TrainModesArg))
+            {
+                // Falls back to all four rather than failing the run: this is
+                // read mid-training, where there is no clean exit. Loudly,
+                // though — a run on the wrong pool is hours wasted.
+                UnityEngine.Debug.LogError(
+                    $"[NpcModes] {TrainModesArg} takes all|<Mode>[,<Mode>...] — training all four modes instead.");
             }
             return commandLineMask;
         }

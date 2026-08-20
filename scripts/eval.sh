@@ -82,6 +82,10 @@ while [[ $# -ge 1 ]]; do
 done
 
 # The player rejects these too, but only after a rebuild that can take minutes.
+# Lower-cased first, because the player's own parsers are case-insensitive and
+# this check must not reject a spelling the run would otherwise have accepted.
+SUBJECT="${SUBJECT,,}"
+OPPONENT="${OPPONENT,,}"
 case "$SUBJECT" in policy|heuristic|random) ;; *) echo "error: --subject takes policy|heuristic|random" >&2; exit 1 ;; esac
 case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy|heuristic" >&2; exit 1 ;; esac
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
