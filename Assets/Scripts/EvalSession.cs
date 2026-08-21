@@ -137,11 +137,23 @@ public class EvalSession : MonoBehaviour
             bool runsModel = isSubject
                 ? settings.Subject == EvalSettings.SubjectKind.Policy
                 : settings.Opponent == EvalSettings.OpponentKind.Policy;
-            // Only the subject can be random: a random far side is a weaker
-            // opponent, not a condition anything in the plan is scored against.
-            agent.randomActions = isSubject && settings.Subject == EvalSettings.SubjectKind.Random;
+            // Only the subject runs a control: a random or fleeing far side is
+            // a weaker opponent, not a condition anything in the plan is
+            // scored against.
+            agent.control = isSubject ? ControlFor(settings.Subject) : EnemyAgent.ControlPolicy.Heuristic;
             ConfigurePolicy(agent, runsModel);
             ConfigureModeSource(agent);
+        }
+    }
+
+    // Policy runs the model, so what Heuristic would play never comes up.
+    static EnemyAgent.ControlPolicy ControlFor(EvalSettings.SubjectKind subject)
+    {
+        switch (subject)
+        {
+            case EvalSettings.SubjectKind.Random: return EnemyAgent.ControlPolicy.Random;
+            case EvalSettings.SubjectKind.Flee: return EnemyAgent.ControlPolicy.Flee;
+            default: return EnemyAgent.ControlPolicy.Heuristic;
         }
     }
 

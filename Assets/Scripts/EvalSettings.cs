@@ -23,6 +23,7 @@ public class EvalSettings
         Policy,    // the model named by -evalModel
         Heuristic, // EnemyAgent.Heuristic, the scripted baseline
         Random,    // uniform over the 7x2 action branches
+        Flee,      // scripted retreat: backs off, takes cover, never fires
     }
 
     public enum ModeSourceKind
@@ -90,7 +91,8 @@ public class EvalSettings
                         case "policy": settings.Subject = SubjectKind.Policy; break;
                         case "heuristic": settings.Subject = SubjectKind.Heuristic; break;
                         case "random": settings.Subject = SubjectKind.Random; break;
-                        default: return settings.Fail($"{SubjectArg} takes policy|heuristic|random, got '{value}'.");
+                        case "flee": settings.Subject = SubjectKind.Flee; break;
+                        default: return settings.Fail($"{SubjectArg} takes policy|heuristic|random|flee, got '{value}'.");
                     }
                     break;
                 case ModesArg:

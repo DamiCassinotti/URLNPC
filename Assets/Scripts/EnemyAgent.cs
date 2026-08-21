@@ -53,6 +53,10 @@ public class EnemyAgent : Agent
     [SerializeField] float huntEngagementDistance = 20f;
     [Tooltip("Seconds after a sighting that a Retreat step is still breaking contact — the window its rate is scored over.")]
     [SerializeField] float retreatContactSeconds = 3f;
+    [Tooltip("Seconds after a sighting that a HoldCover step is still holding cover against someone — the window its rate is scored over.")]
+    [SerializeField] float holdCoverContactSeconds = 10f;
+    [Tooltip("Metres per step above which a Patrol step counts as walking rather than parked. A step is a physics step, so walking pace is about 0.07 m.")]
+    [SerializeField] float patrolMovementMetres = 0.01f;
 
     [Header("Episode reset")]
     [Tooltip("During training (communicator on), teleport the player to a random NavMesh point on episode begin so spawn positions don't cluster wherever the player last died. Human play gets its random spawn from ArenaManager.Start on each round's scene reload instead — repositioning here would also fire on mid-round MaxStep resets and yank a live player across the arena.")]
@@ -83,9 +87,12 @@ public class EnemyAgent : Agent
     // check the real memories reach the frozen layout.
     internal float[] LastObservations => observations;
 
-    // Set by EvalSession for a random control run (#97): the heuristic draws
-    // uniformly over the action branches instead of chasing the target.
-    internal bool randomActions;
+    // What Heuristic plays when this side is a control run rather than the
+    // model (#97, #105). Set by EvalSession; Heuristic is the hunt-and-shoot
+    // baseline everything else is measured against.
+    internal enum ControlPolicy { Heuristic, Random, Flee }
+
+    internal ControlPolicy control = ControlPolicy.Heuristic;
 
     // Cached: a method group would allocate a delegate on every decision.
     static readonly System.Func<int, int, int> DrawAction =
@@ -206,6 +213,8 @@ public class EnemyAgent : Agent
             movementDeadband = complianceMovementDeadband,
             huntEngagementDistance = huntEngagementDistance,
             contactSeconds = retreatContactSeconds,
+            coverContactSeconds = holdCoverContactSeconds,
+            patrolMovementMetres = patrolMovementMetres,
         };
         visibility = new ModeTally();
 
@@ -307,9 +316,11 @@ public class EnemyAgent : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discrete = actionsOut.DiscreteActions;
-        if (randomActions)
+        if (control != ControlPolicy.Heuristic)
         {
-            RandomActionPolicy.Draw(DrawAction, out int movement, out int fire);
+            int movement, fire;
+            if (control == ControlPolicy.Random) RandomActionPolicy.Draw(DrawAction, out movement, out fire);
+            else ScriptedRetreatPolicy.Choose(inputs.hasEverSeen, inputs.targetVisible, out movement, out fire);
             discrete[0] = movement;
             discrete[1] = fire;
             return;
@@ -333,6 +344,7 @@ public class EnemyAgent : Agent
         // and unconditionally so the baseline never skips a step.
         float closingDelta = progress.Closing(distanceToTarget);
         bool enteredNewArea = progress.EnterArea(transform.position.x, transform.position.z);
+        float distanceMoved = progress.Travelled(transform.position.x, transform.position.z);
         // A raycast, so it is only probed for the modes that read it: the
         // columns that pay for cover, and HoldCover's compliance rule.
         bool needsCover = rewards.RewardsCover(mode) || ModeComplianceTracker.ReadsCover(mode);
@@ -362,7 +374,8 @@ public class EnemyAgent : Agent
             closingDelta = closingDelta,
             shotFired = fired && behavior.DidShoot,
             inCover = hidden,
-            enteredNewArea = enteredNewArea,
+            inNewArea = progress.InNewArea,
+            distanceMoved = distanceMoved,
             targetVisible = inputs.targetVisible,
             distanceToTarget = distanceToTarget,
             timeSinceSeen = inputs.timeSinceSeen,

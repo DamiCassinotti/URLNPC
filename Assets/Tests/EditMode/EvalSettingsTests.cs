@@ -53,14 +53,17 @@ public class EvalSettingsTests
             Is.EqualTo(EvalSettings.OpponentKind.Policy));
     }
 
-    // Issue #97: the control runs the model's numbers are read against.
+    // Issue #97: the control runs the model's numbers are read against, plus
+    // the scripted retreat Retreat and HoldCover are calibrated on (#105).
     [Test]
-    public void Subject_TakesThePolicyOrEitherControl()
+    public void Subject_TakesThePolicyOrAnyControl()
     {
         Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "Heuristic")).Subject,
             Is.EqualTo(EvalSettings.SubjectKind.Heuristic));
         Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "random")).Subject,
             Is.EqualTo(EvalSettings.SubjectKind.Random));
+        Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "Flee")).Subject,
+            Is.EqualTo(EvalSettings.SubjectKind.Flee));
         Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "policy")).Subject,
             Is.EqualTo(EvalSettings.SubjectKind.Policy));
         Assert.That(EvalSettings.Parse(MinimalRun("-evalSubject", "llm")).Error, Is.Not.Null);

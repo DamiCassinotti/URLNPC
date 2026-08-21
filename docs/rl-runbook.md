@@ -169,9 +169,14 @@ accuracy, time to kill, survival time, and per-mode compliance, visibility and s
 - `--opponent policy` keeps both sides on the model (self-play); `--opponent heuristic` puts
   the far side on the scripted heuristic, which is what the ≥70% win-rate gate is measured on.
 - `--subject` picks what drives the NPC side — the side the summary scores. `policy` (default)
-  is the model; `heuristic` and `random` are the controls its numbers are read against, the
-  scripted baseline and uniform draws over the 7x2 action branches. A model is still required
-  either way (it is what the build carries); nothing on the NPC side runs it.
+  is the model; `heuristic`, `random` and `flee` are the controls its numbers are read against:
+  the scripted baseline, uniform draws over the 7x2 action branches, and a scripted retreat
+  that backs off, takes cover and never fires. A model is still required either way (it is what
+  the build carries); nothing on the NPC side runs it. A compliance rule is only worth reading
+  if the controls separate on it — `heuristic` should top Hunt, `flee` should top Retreat and
+  HoldCover, and `random` should be under both. Worth running the control batch against
+  `--opponent policy` as well: training is self-play, so that is the opponent the rates the
+  gate is read on were produced against.
 - `--modes scripted` (default) lets the `ModeDirector` sample as it does in training;
   `--modes Hunt` pins one mode for a per-mode baseline; `--modes none` leaves the channel on
   `initialMode`.
