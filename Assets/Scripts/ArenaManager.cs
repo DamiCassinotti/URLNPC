@@ -71,7 +71,9 @@ public class ArenaManager : MonoBehaviour
     // have an arena auto-spawned into them by the sceneLoaded hook.
     internal static bool suppressAutoBootstrap;
 
-    static void EnsureExists()
+    // Internal so CombatantRig can pull the arena up before composing a
+    // NavMeshAgent onto the player body.
+    internal static void EnsureExists()
     {
         if (suppressAutoBootstrap) return;
         if (Current != null) return;

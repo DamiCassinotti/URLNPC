@@ -25,12 +25,10 @@ public class CombatantRigTests : PlayModeTestBase
         LogAssert.ignoreFailingMessages = false;
     }
 
-    // A player body carrying what the rig expects to already be there. Built
-    // inactive so the driver override is in place before Awake resolves.
-    IEnumerator BuildBody(DriverKind driver)
+    // The rig reads the real command line first, so an editor launched with
+    // -playerDriver would outrank the override these tests rely on.
+    static void RequireNoDriverArg()
     {
-        // The rig reads the real command line first, so an editor launched with
-        // -playerDriver would outrank the override these tests rely on.
         foreach (string arg in System.Environment.GetCommandLineArgs())
         {
             if (arg == DriverSelector.CommandLineArg)
@@ -38,6 +36,13 @@ public class CombatantRigTests : PlayModeTestBase
                 Assert.Ignore("Editor was launched with -playerDriver; driver-override tests do not apply.");
             }
         }
+    }
+
+    // A player body carrying what the rig expects to already be there. Built
+    // inactive so the driver override is in place before Awake resolves.
+    IEnumerator BuildBody(DriverKind driver)
+    {
+        RequireNoDriverArg();
 
         LogAssert.ignoreFailingMessages = true; // no NavMesh in this fixture
 
@@ -152,5 +157,64 @@ public class CombatantRigTests : PlayModeTestBase
     {
         yield return BuildBody(DriverKind.Agent);
         Assert.That(body.GetComponent<CombatantRig>().ActiveDriver, Is.EqualTo(DriverKind.Agent));
+    }
+
+    // The bootstrap that runs on every scene load (#107). A rig-less player
+    // body is what a reloaded scene hands us: without this, an eval's rounds
+    // 2+ fell back to the authored human driver and the opponent went inert.
+    [UnityTest]
+    public IEnumerator Bootstrap_ComposesTheDriverOntoARigLessPlayerBody()
+    {
+        RequireNoDriverArg();
+        LogAssert.ignoreFailingMessages = true; // no NavMesh in this fixture
+        CombatantRig.DriverOverride = DriverKind.Agent;
+
+        body = Track(new GameObject("ReloadedPlayerBody"));
+        body.tag = "Player";
+        body.AddComponent<CharacterController>();
+        body.AddComponent<Health>();
+
+        CombatantRig.suppressAutoBootstrap = false;
+        CombatantRig.EnsureExists();
+        CombatantRig.EnsureExists(); // a second load must not stack a second rig
+        CombatantRig.suppressAutoBootstrap = true;
+
+        yield return null;
+
+        Assert.That(body.GetComponents<CombatantRig>().Length, Is.EqualTo(1),
+            "exactly one rig per body, however often the bootstrap runs");
+        Assert.That(body.GetComponent<PlayerAgent>(), Is.Not.Null,
+            "the re-attached rig must compose the agent driver, not leave the body inert");
+    }
+
+    // The other half of the bootstrap: the arena is pulled up first, so the
+    // NavMeshAgent the rig composes lands on a baked mesh however the two
+    // sceneLoaded handlers happen to be ordered. Runs with a live arena — the
+    // only fixture here that does.
+    [UnityTest]
+    public IEnumerator Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver()
+    {
+        RequireNoDriverArg();
+        CombatantRig.DriverOverride = DriverKind.Agent;
+
+        body = Track(new GameObject("ReloadedPlayerBody"));
+        body.tag = "Player";
+        body.AddComponent<CharacterController>();
+        body.AddComponent<Health>();
+
+        ArenaManager.suppressAutoBootstrap = false;
+        CombatantRig.suppressAutoBootstrap = false;
+        CombatantRig.EnsureExists();
+        CombatantRig.suppressAutoBootstrap = true;
+        ArenaManager.suppressAutoBootstrap = true;
+
+        yield return null;
+
+        Assert.That(ArenaManager.Current, Is.Not.Null,
+            "the rig bootstrap must bring an arena up rather than assume one landed first");
+        var nav = body.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        Assert.That(nav, Is.Not.Null);
+        Assert.That(nav.isOnNavMesh, Is.True,
+            "composed without a baked mesh, the agent-driven player cannot move at all");
     }
 }

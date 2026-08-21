@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using Unity.MLAgents;
 using Unity.MLAgents.Policies;
 
@@ -44,11 +45,38 @@ public class CombatantRig : MonoBehaviour
     };
 
     // AfterSceneLoad runs after the scene's Awakes but before Starts, which is
-    // early enough to silence the human driver before it initializes.
+    // early enough to silence the human driver before it initializes. It only
+    // fires for the FIRST scene of a session, though, and the rig dies with
+    // every SceneManager.LoadScene — hence the sceneLoaded hook, without which
+    // an eval's rounds 2+ get the authored human driver back and the player
+    // body stands there inert in batchmode (#107).
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void AutoBootstrap()
     {
+        // -= before += so a second play session (domain reload disabled)
+        // doesn't stack subscriptions.
+        SceneManager.sceneLoaded -= EnsureExistsOnSceneLoad;
+        SceneManager.sceneLoaded += EnsureExistsOnSceneLoad;
+        EnsureExists();
+    }
+
+    static void EnsureExistsOnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        EnsureExists();
+    }
+
+    // Test seam: PlayMode tests build their own Player-tagged bodies and must
+    // not have a rig composed onto them by the sceneLoaded hook.
+    internal static bool suppressAutoBootstrap;
+
+    internal static void EnsureExists()
+    {
+        if (suppressAutoBootstrap) return;
         if (FindAnyObjectByType<CombatantRig>() != null) return;
+        // The agent driver's NavMeshAgent needs the arena's fresh bake, and the
+        // relative order of two sceneLoaded handlers is not ours to pick — so
+        // ask for the arena rather than assume it landed first. Idempotent.
+        ArenaManager.EnsureExists();
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null) player.AddComponent<CombatantRig>();
     }
