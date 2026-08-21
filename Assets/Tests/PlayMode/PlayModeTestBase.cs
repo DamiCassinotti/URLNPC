@@ -24,6 +24,7 @@ public abstract class PlayModeTestBase
     public void BaseSetUp()
     {
         ArenaManager.suppressAutoBootstrap = true;
+        CombatantRig.suppressAutoBootstrap = true;
         SweepArenas();
 
         for (int i = 0; i < PrefKeys.Length; i++)
@@ -58,6 +59,7 @@ public abstract class PlayModeTestBase
         Cursor.visible = true;
         RunRng.ResetForNewRun();
         ArenaManager.suppressAutoBootstrap = false;
+        CombatantRig.suppressAutoBootstrap = false;
     }
 
     // Register a spawned object for teardown destruction.
