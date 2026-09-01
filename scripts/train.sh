@@ -3,11 +3,17 @@
 #
 #   scripts/train.sh editor <run-id> [config] [extra mlagents args...]
 #   scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S]
-#                          [--train-modes all|<Mode>[,<Mode>...]] [extra...]
+#                          [--train-modes all|<Mode>[,<Mode>...]]
+#                          [--heuristic-opponent F] [extra...]
 #
 # --train-modes restricts the pool the ModeDirector commands during training
 # (default: all four). One argument reaches both self-play bodies, so the pool
 # stays symmetric. build only, like --seed.
+#
+# --heuristic-opponent F puts the player side on the scripted hunt-and-shoot
+# heuristic for that fraction of the episodes (0..1, default 0 = pure
+# self-play), so the policy also trains against a competent aggressor instead of
+# only its own past selves. build only.
 #
 # --seed S seeds both the ML-Agents learner and the env RNG (-runSeed), so the
 # run is fully reproducible. build only; the editor path can't take env-args.
@@ -29,7 +35,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_BIN="$PROJECT_ROOT/Builds/Linux/URLNPC.x86_64"
 
 usage() {
-    sed -n '2,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,31p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -49,6 +55,7 @@ fi
 NUM_ENVS=""
 SEED=""
 TRAIN_MODES=""
+HEURISTIC_OPPONENT=""
 PASSTHROUGH=()
 while [[ $# -ge 1 ]]; do
     case "$1" in
@@ -58,6 +65,8 @@ while [[ $# -ge 1 ]]; do
         --seed=*) SEED="${1#*=}"; shift ;;
         --train-modes) TRAIN_MODES="$2"; shift 2 ;;
         --train-modes=*) TRAIN_MODES="${1#*=}"; shift ;;
+        --heuristic-opponent) HEURISTIC_OPPONENT="$2"; shift 2 ;;
+        --heuristic-opponent=*) HEURISTIC_OPPONENT="${1#*=}"; shift ;;
         *) PASSTHROUGH+=("$1"); shift ;;
     esac
 done
@@ -66,6 +75,12 @@ done
 # spent on the wrong pool — reject it here instead.
 if [[ -n "$TRAIN_MODES" && ! "${TRAIN_MODES,,}" =~ ^(all|(hunt|holdcover|retreat|patrol)(,(hunt|holdcover|retreat|patrol))*)$ ]]; then
     echo "error: --train-modes takes all|<Mode>[,<Mode>...] (Hunt, HoldCover, Retreat, Patrol)" >&2
+    exit 1
+fi
+
+# Same reason: a rejected value only logs and trains pure self-play.
+if [[ -n "$HEURISTIC_OPPONENT" && ! "$HEURISTIC_OPPONENT" =~ ^(0(\.[0-9]+)?|1(\.0+)?|\.[0-9]+)$ ]]; then
+    echo "error: --heuristic-opponent takes a fraction in [0, 1]" >&2
     exit 1
 fi
 
@@ -88,11 +103,13 @@ if [[ "$MODE" == "build" ]]; then
     ENV_ARGS=(-playerDriver agent)
     [[ -n "$SEED" ]] && ENV_ARGS+=(-runSeed "$SEED")
     [[ -n "$TRAIN_MODES" ]] && ENV_ARGS+=(-trainModes "$TRAIN_MODES")
+    [[ -n "$HEURISTIC_OPPONENT" ]] && ENV_ARGS+=(-heuristicOpponent "$HEURISTIC_OPPONENT")
     CMD+=(--env-args "${ENV_ARGS[@]}")
 else
     [[ -z "$NUM_ENVS" ]] || { echo "error: --num-envs applies to 'build', not 'editor'" >&2; exit 1; }
     [[ -z "$SEED" ]] || { echo "error: --seed applies to 'build' env-args; not available in editor mode" >&2; exit 1; }
     [[ -z "$TRAIN_MODES" ]] || { echo "error: --train-modes applies to 'build' env-args; not available in editor mode" >&2; exit 1; }
+    [[ -z "$HEURISTIC_OPPONENT" ]] || { echo "error: --heuristic-opponent applies to 'build' env-args; not available in editor mode" >&2; exit 1; }
     [[ ${#PASSTHROUGH[@]} -gt 0 ]] && CMD+=("${PASSTHROUGH[@]}")
     echo "==> Starting trainer; press Play in the Unity editor when it says 'Listening on port'..."
 fi

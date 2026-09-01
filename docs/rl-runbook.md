@@ -36,7 +36,8 @@ so you don't assemble the `--env` / `--env-args` line by hand:
 ```bash
 scripts/train.sh editor <run-id> [config] [extra mlagents args...]
 scripts/train.sh build  <run-id> [config] [--num-envs N] [--seed S]
-                       [--train-modes all|<Mode>[,<Mode>...]] [extra...]
+                       [--train-modes all|<Mode>[,<Mode>...]]
+                       [--heuristic-opponent F] [extra...]
 ```
 
 - **`editor`** starts the trainer and waits for you to press Play — for watching behavior and
@@ -151,6 +152,24 @@ enemy, so both sides share one policy. In the editor, set **Driver = Agent** on 
 (or `CombatantRig.DriverOverride` from code); `editor` runs don't pass `-playerDriver`. Both
 bodies carry a `ModeDirector`, so each is independently commanded during the run. Give the
 agent driver a different behavior name to train a separate player policy against the enemy.
+
+Pure self-play alone is not enough: `selfplay-02` scored ~50/50 against itself and ~1283 ELO,
+then lost ~2:1 to the scripted heuristic in every mode including Hunt (#109) — two mutually
+weak agents, neither aggressive enough to teach the other to punish aggression. Mix the
+heuristic in for a share of the episodes so the policy also has a competent aggressor to beat:
+
+```bash
+scripts/train.sh build selfplay-03 config/URLNPC-selfplay.yaml --num-envs=4 \
+    --heuristic-opponent 0.3
+```
+
+It becomes `-heuristicOpponent` in the env-args and puts the **player** side (the opponent;
+the enemy is what the eval scores) on `BehaviorType.HeuristicOnly` for that fraction of
+episodes, spread evenly and swapped only between episodes. Those episodes train the enemy
+alone — a heuristic body sends the trainer nothing. `Run/HeuristicOpponent` in TensorBoard
+averages to the realized fraction; the `Compliance/*` and `Visible/*` stats are pooled over
+both bodies, so on those episodes part of what they report is the bot's, not the policy's. Read the result off `eval.sh --opponent heuristic`, not
+ELO, which is self-referential: the gate is beating the heuristic in Hunt.
 
 ## 7. Score a model headlessly
 
