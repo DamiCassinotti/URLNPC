@@ -26,11 +26,14 @@ public class OpponentScheduleTests
         Assert.That(CountHeuristic(new OpponentSchedule(1f), 100), Is.EqualTo(100));
     }
 
-    // 0.1 is the case a running float sum drifts under 1 on and drops episodes.
+    // 0.1 is the case a running float sum drifts under 1 on; 0.7 and 0.9 are the
+    // ones whose float32 value sits below the decimal and floors one short.
     [TestCase(0.1f, 100)]
     [TestCase(0.25f, 250)]
     [TestCase(0.5f, 500)]
+    [TestCase(0.7f, 700)]
     [TestCase(0.75f, 750)]
+    [TestCase(0.9f, 900)]
     public void ItDeliversTheFractionOverTheRun(float fraction, int expected)
     {
         Assert.That(CountHeuristic(new OpponentSchedule(fraction), 1000), Is.EqualTo(expected));

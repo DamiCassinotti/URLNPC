@@ -13,24 +13,31 @@ public class OpponentSchedule
 {
     public const string FractionArg = "-heuristicOpponent";
 
-    public float HeuristicFraction { get; }
+    // Basis points, so the cadence is integer arithmetic: a float doesn't hold
+    // the fraction that was asked for (0.7f is 0.69999998...), and flooring that
+    // product quietly under-delivers an episode per thousand.
+    const long Basis = 10000;
 
-    int episodes;
-    int heuristicEpisodes;
+    readonly long heuristicPerBasis;
+
+    public float HeuristicFraction => heuristicPerBasis / (float)Basis;
+
+    long episodes;
+    long heuristicEpisodes;
 
     public OpponentSchedule(float heuristicFraction)
     {
-        HeuristicFraction = heuristicFraction < 0f ? 0f
-                          : heuristicFraction > 1f ? 1f : heuristicFraction;
+        float clamped = heuristicFraction < 0f ? 0f
+                      : heuristicFraction > 1f ? 1f : heuristicFraction;
+        heuristicPerBasis = (long)System.Math.Round(clamped * (double)Basis);
     }
 
-    // Counting owed episodes against the total rather than accumulating the
-    // fraction: 0.1 added ten times lands under 1 and would drop an episode
-    // every so often.
+    // Owed episodes counted against the total rather than a running sum of the
+    // fraction, which drifts under 1 and drops an episode every so often.
     public bool NextEpisodeIsHeuristic()
     {
         episodes++;
-        int owed = (int)(episodes * (double)HeuristicFraction);
+        long owed = episodes * heuristicPerBasis / Basis;
         if (owed <= heuristicEpisodes) return false;
         heuristicEpisodes++;
         return true;

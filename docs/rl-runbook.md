@@ -167,8 +167,9 @@ It becomes `-heuristicOpponent` in the env-args and puts the **player** side (th
 the enemy is what the eval scores) on `BehaviorType.HeuristicOnly` for that fraction of
 episodes, spread evenly and swapped only between episodes. Those episodes train the enemy
 alone — a heuristic body sends the trainer nothing. `Run/HeuristicOpponent` in TensorBoard
-averages to the realized fraction; the `Compliance/*` and `Visible/*` stats are pooled over
-both bodies, so on those episodes part of what they report is the bot's, not the policy's. Read the result off `eval.sh --opponent heuristic`, not
+averages to the realized fraction. The bot ignores the commanded mode, so on those episodes
+the player body reports no `Compliance/*`, `Visible/*` or `mode_change` rows at all — the
+per-mode numbers stay about bodies the mode actually drove. Read the result off `eval.sh --opponent heuristic`, not
 ELO, which is self-referential: the gate is beating the heuristic in Hunt.
 
 ## 7. Score a model headlessly

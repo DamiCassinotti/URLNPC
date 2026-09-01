@@ -1,5 +1,7 @@
 using System.Collections;
+using System.IO;
 using NUnit.Framework;
+using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 using UnityEngine;
 using UnityEngine.AI;
@@ -49,5 +51,63 @@ public class HeuristicOpponentTests : PlayModeTestBase
 
         Assert.That(parameters.BehaviorType, Is.EqualTo(BehaviorType.Default),
             "no communicator: nothing is learning from this body, so its policy is not ours to swap");
+    }
+
+    // The test runner has no trainer to connect, so training is stubbed; the
+    // real gate is the negative test above.
+    [UnityTest]
+    public IEnumerator InTraining_TheScheduledEpisodesRunTheHeuristic()
+    {
+        yield return BuildPlayerAgent();
+        var parameters = agent.GetComponent<BehaviorParameters>();
+        parameters.BehaviorType = BehaviorType.Default;
+        agent.isTraining = () => true;
+        agent.schedule = new OpponentSchedule(0.5f); // every other episode
+
+        agent.OnEpisodeBegin();
+        Assert.That(parameters.BehaviorType, Is.EqualTo(BehaviorType.Default), "episode 1 is a self-play one");
+
+        agent.OnEpisodeBegin();
+        Assert.That(parameters.BehaviorType, Is.EqualTo(BehaviorType.HeuristicOnly), "episode 2 is the scripted bot");
+
+        agent.OnEpisodeBegin();
+        Assert.That(parameters.BehaviorType, Is.EqualTo(BehaviorType.Default), "and back to the shared policy");
+    }
+
+    // The heuristic never reads the commanded mode, but the director goes on
+    // commanding one — so a per-mode row from such an episode would be labelled
+    // with a mode that drove nothing.
+    [UnityTest]
+    public IEnumerator AHeuristicEpisode_ReportsNoPerModeRows()
+    {
+        TelemetryLogger logger = TelemetryLogger.Instance;
+        if (logger == null) Assert.Ignore("no TelemetryLogger bootstrapped in this run");
+        var captured = new StringWriter();
+        TextWriter sessionWriter = logger.SwapWriter(captured);
+        try
+        {
+            yield return BuildPlayerAgent();
+            agent.isTraining = () => true;
+            agent.schedule = new OpponentSchedule(1f); // every episode is the bot
+
+            agent.OnEpisodeBegin();
+            agent.GetComponent<ModeChannel>().SetMode(NpcMode.Retreat);
+            Step(MovementAction.Advance);
+            agent.OnRoundTimeout();
+
+            Assert.That(captured.ToString(), Does.Not.Contain("mode_change"));
+            Assert.That(captured.ToString(), Does.Not.Contain("mode_compliance"));
+        }
+        finally
+        {
+            logger.SwapWriter(sessionWriter);
+            captured.Dispose();
+        }
+    }
+
+    void Step(MovementAction movement)
+    {
+        var discrete = new ActionSegment<int>(new[] { (int)movement, NpcBrainSpec.DontFire });
+        agent.OnActionReceived(new ActionBuffers(ActionSegment<float>.Empty, discrete));
     }
 }

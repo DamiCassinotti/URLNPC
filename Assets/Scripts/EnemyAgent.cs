@@ -94,6 +94,13 @@ public class EnemyAgent : Agent
 
     internal ControlPolicy control = ControlPolicy.Heuristic;
 
+    // Whether this body's per-mode rows (compliance, visibility, the mode_change
+    // timeline) are worth recording. PlayerAgent turns it off for the episodes
+    // it runs the scripted heuristic (#109): the director keeps commanding modes,
+    // but the heuristic never reads the commanded mode, so every sample would be
+    // labelled with a mode the behavior was not conditioned on.
+    protected bool reportsModeStats = true;
+
     // Cached: a method group would allocate a delegate on every decision.
     static readonly System.Func<int, int, int> DrawAction =
         (min, max) => RunRng.Range(RunRng.Stream.Action, min, max);
@@ -368,6 +375,7 @@ public class EnemyAgent : Agent
             enteredNewArea = enteredNewArea,
         }));
 
+        if (!reportsModeStats) return;
         compliance.Record(new ComplianceSample
         {
             mode = mode,
@@ -477,7 +485,7 @@ public class EnemyAgent : Agent
 
     void HandleModeChanged(NpcMode previous, NpcMode current)
     {
-        if (TelemetryLogger.Instance == null) return;
+        if (!reportsModeStats || TelemetryLogger.Instance == null) return;
         TelemetryLogger.Instance.LogEvent("mode_change",
             JsonLine.Field("entity", tag),
             JsonLine.Field("from", previous.ToString()),
