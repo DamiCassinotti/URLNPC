@@ -1,0 +1,1786 @@
+The selected window backend is x11 
+Mono path[0] = '/home/damian/repos/URLNPC/Builds/Linux/URLNPC_Data/Managed'
+Mono config path = '/home/damian/repos/URLNPC/Builds/Linux/URLNPC_Data/MonoBleedingEdge/etc'
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Initialize engine version: 6000.0.74f1 (7685f01dc6be)
+[Subsystems] Discovering subsystems at path /home/damian/repos/URLNPC/Builds/Linux/URLNPC_Data/UnitySubsystems
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.131 seconds
+- Finished resetting the current domain, in  0.003 seconds
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+<b>[App UI]</b> Unable to find an AppUISettings instance, creating a default one...
+UnloadTime: 0.563142 ms
+Registered Communicator in Agent.
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[RunRng] Run seed: 1234 (source: command line). Replay with '-runSeed 1234' or ArenaManager.runSeed = 1234.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+[CombatantRig] Player driver: Agent.
+[Eval] 200 episodes, model EvalModels/eval, subject Heuristic, opponent Policy, modes Fixed, timeScale 1.
+[Telemetry] Logging to /home/damian/.config/unity3d/DefaultCompany/URLNPC/Telemetry/session_20260821_091049_175529.jsonl
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 9.179226 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 17 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.953035 ms (FindLiveObjects: 0.212181 ms CreateObjectMapping: 0.111785 ms MarkObjects: 2.558376 ms  DeleteObjects: 0.070287 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.489479 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.350314 ms (FindLiveObjects: 0.137954 ms CreateObjectMapping: 0.096611 ms MarkObjects: 2.071814 ms  DeleteObjects: 0.043465 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.734639 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 1.998529 ms (FindLiveObjects: 0.143914 ms CreateObjectMapping: 0.110201 ms MarkObjects: 1.714545 ms  DeleteObjects: 0.029466 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.617170 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.643462 ms (FindLiveObjects: 0.127497 ms CreateObjectMapping: 0.087626 ms MarkObjects: 2.393724 ms  DeleteObjects: 0.034237 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.512707 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.451250 ms (FindLiveObjects: 0.138471 ms CreateObjectMapping: 0.101346 ms MarkObjects: 2.182579 ms  DeleteObjects: 0.028436 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.594258 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.793424 ms (FindLiveObjects: 0.226401 ms CreateObjectMapping: 0.141421 ms MarkObjects: 2.396066 ms  DeleteObjects: 0.029013 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.776391 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.916058 ms (FindLiveObjects: 0.132435 ms CreateObjectMapping: 0.157765 ms MarkObjects: 2.594241 ms  DeleteObjects: 0.031045 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.507643 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.937428 ms (FindLiveObjects: 0.202123 ms CreateObjectMapping: 0.140431 ms MarkObjects: 2.553653 ms  DeleteObjects: 0.040786 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.613079 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.099707 ms (FindLiveObjects: 0.118369 ms CreateObjectMapping: 0.081824 ms MarkObjects: 1.871431 ms  DeleteObjects: 0.027773 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.632986 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.162127 ms (FindLiveObjects: 0.147046 ms CreateObjectMapping: 0.093052 ms MarkObjects: 1.894845 ms  DeleteObjects: 0.026858 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.467799 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.236080 ms (FindLiveObjects: 0.214926 ms CreateObjectMapping: 0.163656 ms MarkObjects: 1.831163 ms  DeleteObjects: 0.025896 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.819475 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.156265 ms (FindLiveObjects: 0.129432 ms CreateObjectMapping: 0.081437 ms MarkObjects: 1.923002 ms  DeleteObjects: 0.022177 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.690523 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.474246 ms (FindLiveObjects: 0.151877 ms CreateObjectMapping: 0.105090 ms MarkObjects: 2.175662 ms  DeleteObjects: 0.041242 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.490295 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.231974 ms (FindLiveObjects: 0.136198 ms CreateObjectMapping: 0.099708 ms MarkObjects: 1.967464 ms  DeleteObjects: 0.028311 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.475921 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.528385 ms (FindLiveObjects: 0.158251 ms CreateObjectMapping: 0.149787 ms MarkObjects: 2.189593 ms  DeleteObjects: 0.030323 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.601429 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.267859 ms (FindLiveObjects: 0.180053 ms CreateObjectMapping: 0.089548 ms MarkObjects: 1.973063 ms  DeleteObjects: 0.024978 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.776576 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.599012 ms (FindLiveObjects: 0.125491 ms CreateObjectMapping: 0.096699 ms MarkObjects: 2.344865 ms  DeleteObjects: 0.031381 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.507591 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 3.046234 ms (FindLiveObjects: 0.117146 ms CreateObjectMapping: 0.091353 ms MarkObjects: 2.807475 ms  DeleteObjects: 0.029917 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.533828 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 1.997298 ms (FindLiveObjects: 0.150198 ms CreateObjectMapping: 0.132080 ms MarkObjects: 1.684058 ms  DeleteObjects: 0.030556 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.558381 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.450643 ms (FindLiveObjects: 0.123408 ms CreateObjectMapping: 0.112034 ms MarkObjects: 2.185975 ms  DeleteObjects: 0.028874 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.644884 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.260074 ms (FindLiveObjects: 0.238881 ms CreateObjectMapping: 0.112359 ms MarkObjects: 2.869444 ms  DeleteObjects: 0.038997 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.688397 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 4.151637 ms (FindLiveObjects: 0.208751 ms CreateObjectMapping: 0.166248 ms MarkObjects: 3.736937 ms  DeleteObjects: 0.039147 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.812779 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 8.397245 ms (FindLiveObjects: 0.224340 ms CreateObjectMapping: 0.265422 ms MarkObjects: 7.869922 ms  DeleteObjects: 0.037085 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.612521 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 4.173160 ms (FindLiveObjects: 0.179745 ms CreateObjectMapping: 0.148928 ms MarkObjects: 3.812822 ms  DeleteObjects: 0.031276 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.385391 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.277507 ms (FindLiveObjects: 0.168525 ms CreateObjectMapping: 0.188076 ms MarkObjects: 1.893523 ms  DeleteObjects: 0.027009 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.465409 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.974854 ms (FindLiveObjects: 0.118426 ms CreateObjectMapping: 0.096040 ms MarkObjects: 2.731834 ms  DeleteObjects: 0.028206 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.617079 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.963395 ms (FindLiveObjects: 0.245909 ms CreateObjectMapping: 0.171583 ms MarkObjects: 2.499902 ms  DeleteObjects: 0.045548 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.498161 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.085981 ms (FindLiveObjects: 0.122309 ms CreateObjectMapping: 0.080972 ms MarkObjects: 2.848601 ms  DeleteObjects: 0.033756 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.722610 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.163235 ms (FindLiveObjects: 0.219795 ms CreateObjectMapping: 0.170077 ms MarkObjects: 1.742195 ms  DeleteObjects: 0.030713 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.550481 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.498036 ms (FindLiveObjects: 0.128392 ms CreateObjectMapping: 0.095796 ms MarkObjects: 2.244748 ms  DeleteObjects: 0.028393 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.463319 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.054350 ms (FindLiveObjects: 0.135895 ms CreateObjectMapping: 0.109174 ms MarkObjects: 1.778481 ms  DeleteObjects: 0.030420 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.425560 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.593484 ms (FindLiveObjects: 0.223280 ms CreateObjectMapping: 0.129870 ms MarkObjects: 2.210243 ms  DeleteObjects: 0.029733 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.596571 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.059852 ms (FindLiveObjects: 0.133494 ms CreateObjectMapping: 0.089367 ms MarkObjects: 1.802003 ms  DeleteObjects: 0.034664 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.623830 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.724883 ms (FindLiveObjects: 0.280781 ms CreateObjectMapping: 0.145030 ms MarkObjects: 2.274453 ms  DeleteObjects: 0.023979 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.866626 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.402664 ms (FindLiveObjects: 0.245333 ms CreateObjectMapping: 0.168641 ms MarkObjects: 1.960646 ms  DeleteObjects: 0.027548 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.741334 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.727323 ms (FindLiveObjects: 0.151587 ms CreateObjectMapping: 0.146145 ms MarkObjects: 3.400838 ms  DeleteObjects: 0.028396 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.565739 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.526843 ms (FindLiveObjects: 0.154426 ms CreateObjectMapping: 0.089647 ms MarkObjects: 2.250976 ms  DeleteObjects: 0.031484 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.513960 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.769703 ms (FindLiveObjects: 0.205149 ms CreateObjectMapping: 0.148431 ms MarkObjects: 3.386454 ms  DeleteObjects: 0.029195 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.575096 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.733786 ms (FindLiveObjects: 0.150474 ms CreateObjectMapping: 0.121393 ms MarkObjects: 2.413037 ms  DeleteObjects: 0.048420 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.244110 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 4.466351 ms (FindLiveObjects: 0.344476 ms CreateObjectMapping: 0.520381 ms MarkObjects: 3.564371 ms  DeleteObjects: 0.036390 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.758051 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 5.877309 ms (FindLiveObjects: 0.196053 ms CreateObjectMapping: 0.125345 ms MarkObjects: 5.501861 ms  DeleteObjects: 0.053554 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.530383 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 4.534190 ms (FindLiveObjects: 0.143413 ms CreateObjectMapping: 0.113066 ms MarkObjects: 4.230138 ms  DeleteObjects: 0.047182 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.018803 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 3.121115 ms (FindLiveObjects: 0.227177 ms CreateObjectMapping: 0.168178 ms MarkObjects: 2.676802 ms  DeleteObjects: 0.048170 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.761812 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 4.590413 ms (FindLiveObjects: 0.256413 ms CreateObjectMapping: 0.207101 ms MarkObjects: 4.096688 ms  DeleteObjects: 0.029702 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.766507 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.210544 ms (FindLiveObjects: 0.156827 ms CreateObjectMapping: 0.093925 ms MarkObjects: 1.928333 ms  DeleteObjects: 0.031045 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.591086 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.631487 ms (FindLiveObjects: 0.170309 ms CreateObjectMapping: 0.109313 ms MarkObjects: 2.316098 ms  DeleteObjects: 0.035410 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.514627 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.055633 ms (FindLiveObjects: 0.128941 ms CreateObjectMapping: 0.115561 ms MarkObjects: 2.782484 ms  DeleteObjects: 0.028340 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.675386 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.697083 ms (FindLiveObjects: 0.127836 ms CreateObjectMapping: 0.108350 ms MarkObjects: 3.427378 ms  DeleteObjects: 0.031553 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.552042 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.088817 ms (FindLiveObjects: 0.197167 ms CreateObjectMapping: 0.143618 ms MarkObjects: 2.706097 ms  DeleteObjects: 0.041513 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.518496 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 4.454129 ms (FindLiveObjects: 0.232160 ms CreateObjectMapping: 0.172602 ms MarkObjects: 3.975806 ms  DeleteObjects: 0.072923 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.743628 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 9.497544 ms (FindLiveObjects: 0.538852 ms CreateObjectMapping: 0.568237 ms MarkObjects: 8.332567 ms  DeleteObjects: 0.056819 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.571068 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.771142 ms (FindLiveObjects: 0.138236 ms CreateObjectMapping: 0.112452 ms MarkObjects: 2.471460 ms  DeleteObjects: 0.048176 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.494173 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.982796 ms (FindLiveObjects: 0.120597 ms CreateObjectMapping: 0.082097 ms MarkObjects: 2.744464 ms  DeleteObjects: 0.035018 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.527628 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 7.009731 ms (FindLiveObjects: 0.215200 ms CreateObjectMapping: 0.205325 ms MarkObjects: 6.540448 ms  DeleteObjects: 0.048274 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.468285 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.264100 ms (FindLiveObjects: 0.138565 ms CreateObjectMapping: 0.110705 ms MarkObjects: 1.981621 ms  DeleteObjects: 0.032892 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.460500 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.246480 ms (FindLiveObjects: 0.155433 ms CreateObjectMapping: 0.163515 ms MarkObjects: 2.896356 ms  DeleteObjects: 0.030581 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.564389 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.914481 ms (FindLiveObjects: 0.143593 ms CreateObjectMapping: 0.088152 ms MarkObjects: 2.654308 ms  DeleteObjects: 0.028064 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.461483 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.344023 ms (FindLiveObjects: 0.163833 ms CreateObjectMapping: 0.086933 ms MarkObjects: 2.064126 ms  DeleteObjects: 0.028628 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.542977 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.138093 ms (FindLiveObjects: 0.132575 ms CreateObjectMapping: 0.091782 ms MarkObjects: 1.883460 ms  DeleteObjects: 0.029949 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.519003 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.440020 ms (FindLiveObjects: 0.185334 ms CreateObjectMapping: 0.146800 ms MarkObjects: 2.077387 ms  DeleteObjects: 0.030104 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.598475 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.903624 ms (FindLiveObjects: 0.224721 ms CreateObjectMapping: 0.135161 ms MarkObjects: 2.494302 ms  DeleteObjects: 0.048286 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.566249 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.819503 ms (FindLiveObjects: 0.162906 ms CreateObjectMapping: 0.093330 ms MarkObjects: 2.517632 ms  DeleteObjects: 0.045271 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.768876 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.218977 ms (FindLiveObjects: 0.125007 ms CreateObjectMapping: 0.115316 ms MarkObjects: 1.950090 ms  DeleteObjects: 0.028178 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.495276 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.888807 ms (FindLiveObjects: 0.172937 ms CreateObjectMapping: 0.197843 ms MarkObjects: 2.487794 ms  DeleteObjects: 0.029722 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.500467 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.310131 ms (FindLiveObjects: 0.197095 ms CreateObjectMapping: 0.107062 ms MarkObjects: 1.974181 ms  DeleteObjects: 0.031452 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.590095 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.665421 ms (FindLiveObjects: 0.334228 ms CreateObjectMapping: 0.162766 ms MarkObjects: 3.090096 ms  DeleteObjects: 0.077848 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.541555 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.062877 ms (FindLiveObjects: 0.119858 ms CreateObjectMapping: 0.085665 ms MarkObjects: 1.824190 ms  DeleteObjects: 0.032774 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.880849 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.451431 ms (FindLiveObjects: 0.179259 ms CreateObjectMapping: 0.139501 ms MarkObjects: 2.103106 ms  DeleteObjects: 0.029077 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.602771 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.870751 ms (FindLiveObjects: 0.161419 ms CreateObjectMapping: 0.114015 ms MarkObjects: 2.559900 ms  DeleteObjects: 0.035044 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.727599 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.205325 ms (FindLiveObjects: 0.126000 ms CreateObjectMapping: 0.105869 ms MarkObjects: 1.933665 ms  DeleteObjects: 0.039391 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.529339 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 1.993764 ms (FindLiveObjects: 0.124449 ms CreateObjectMapping: 0.101832 ms MarkObjects: 1.740267 ms  DeleteObjects: 0.026869 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.609736 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.084262 ms (FindLiveObjects: 0.159429 ms CreateObjectMapping: 0.170909 ms MarkObjects: 2.726575 ms  DeleteObjects: 0.026947 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.736754 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.649826 ms (FindLiveObjects: 0.198306 ms CreateObjectMapping: 0.166717 ms MarkObjects: 2.230156 ms  DeleteObjects: 0.053729 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.547708 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.063081 ms (FindLiveObjects: 0.164427 ms CreateObjectMapping: 0.106781 ms MarkObjects: 2.750390 ms  DeleteObjects: 0.041140 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.832396 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.484204 ms (FindLiveObjects: 0.138357 ms CreateObjectMapping: 0.090946 ms MarkObjects: 2.231663 ms  DeleteObjects: 0.023042 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.583798 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.840382 ms (FindLiveObjects: 0.162842 ms CreateObjectMapping: 0.104440 ms MarkObjects: 2.525112 ms  DeleteObjects: 0.047669 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.614985 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.398878 ms (FindLiveObjects: 0.140871 ms CreateObjectMapping: 0.104301 ms MarkObjects: 2.126016 ms  DeleteObjects: 0.027150 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.179432 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.951154 ms (FindLiveObjects: 0.150040 ms CreateObjectMapping: 0.083694 ms MarkObjects: 2.685313 ms  DeleteObjects: 0.031719 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.566715 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.428609 ms (FindLiveObjects: 0.131679 ms CreateObjectMapping: 0.107584 ms MarkObjects: 2.139504 ms  DeleteObjects: 0.049170 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.517915 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.157669 ms (FindLiveObjects: 0.152155 ms CreateObjectMapping: 0.127127 ms MarkObjects: 1.848592 ms  DeleteObjects: 0.029359 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.581927 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.283098 ms (FindLiveObjects: 0.133689 ms CreateObjectMapping: 0.097881 ms MarkObjects: 2.020703 ms  DeleteObjects: 0.030456 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.552465 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.069908 ms (FindLiveObjects: 0.132766 ms CreateObjectMapping: 0.129412 ms MarkObjects: 1.779863 ms  DeleteObjects: 0.027555 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.411339 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.107812 ms (FindLiveObjects: 0.136423 ms CreateObjectMapping: 0.095625 ms MarkObjects: 1.848873 ms  DeleteObjects: 0.026578 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.686135 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 1.979235 ms (FindLiveObjects: 0.129187 ms CreateObjectMapping: 0.092664 ms MarkObjects: 1.729472 ms  DeleteObjects: 0.027707 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.521761 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.536398 ms (FindLiveObjects: 0.148653 ms CreateObjectMapping: 0.109076 ms MarkObjects: 2.247359 ms  DeleteObjects: 0.030912 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.618659 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.500128 ms (FindLiveObjects: 0.418201 ms CreateObjectMapping: 0.130146 ms MarkObjects: 1.924020 ms  DeleteObjects: 0.027327 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.546654 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.166172 ms (FindLiveObjects: 0.176803 ms CreateObjectMapping: 0.137615 ms MarkObjects: 2.821398 ms  DeleteObjects: 0.030058 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.872325 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 1.871168 ms (FindLiveObjects: 0.128339 ms CreateObjectMapping: 0.084477 ms MarkObjects: 1.630693 ms  DeleteObjects: 0.027394 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.711618 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.141828 ms (FindLiveObjects: 0.127065 ms CreateObjectMapping: 0.088575 ms MarkObjects: 1.897016 ms  DeleteObjects: 0.028814 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.454436 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 4.904126 ms (FindLiveObjects: 0.130625 ms CreateObjectMapping: 0.097080 ms MarkObjects: 4.599681 ms  DeleteObjects: 0.075212 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.391686 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.384665 ms (FindLiveObjects: 0.305101 ms CreateObjectMapping: 0.197881 ms MarkObjects: 1.851921 ms  DeleteObjects: 0.029347 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.558655 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 3.152374 ms (FindLiveObjects: 0.124637 ms CreateObjectMapping: 0.096716 ms MarkObjects: 2.902224 ms  DeleteObjects: 0.028323 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.619310 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.388017 ms (FindLiveObjects: 0.528137 ms CreateObjectMapping: 0.395139 ms MarkObjects: 2.428277 ms  DeleteObjects: 0.035710 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.624389 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 4.059013 ms (FindLiveObjects: 0.141252 ms CreateObjectMapping: 0.096491 ms MarkObjects: 3.737300 ms  DeleteObjects: 0.083286 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.593018 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.088491 ms (FindLiveObjects: 0.131959 ms CreateObjectMapping: 0.095959 ms MarkObjects: 1.836677 ms  DeleteObjects: 0.023676 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.706850 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.035290 ms (FindLiveObjects: 0.147287 ms CreateObjectMapping: 0.292582 ms MarkObjects: 2.568829 ms  DeleteObjects: 0.026124 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.565775 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.596271 ms (FindLiveObjects: 0.138151 ms CreateObjectMapping: 0.099664 ms MarkObjects: 2.323237 ms  DeleteObjects: 0.034813 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.504509 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.502382 ms (FindLiveObjects: 0.274010 ms CreateObjectMapping: 0.313239 ms MarkObjects: 1.877440 ms  DeleteObjects: 0.037178 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.581197 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.032174 ms (FindLiveObjects: 0.146175 ms CreateObjectMapping: 0.091380 ms MarkObjects: 1.763015 ms  DeleteObjects: 0.031174 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.439656 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.188416 ms (FindLiveObjects: 0.140633 ms CreateObjectMapping: 0.109098 ms MarkObjects: 1.907743 ms  DeleteObjects: 0.030620 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.517622 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.427275 ms (FindLiveObjects: 0.163220 ms CreateObjectMapping: 0.132375 ms MarkObjects: 2.099239 ms  DeleteObjects: 0.031980 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.931053 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.399992 ms (FindLiveObjects: 0.152744 ms CreateObjectMapping: 0.102671 ms MarkObjects: 2.116804 ms  DeleteObjects: 0.027508 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.543031 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 3.664232 ms (FindLiveObjects: 0.152077 ms CreateObjectMapping: 0.121616 ms MarkObjects: 3.345569 ms  DeleteObjects: 0.044546 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.396045 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.146424 ms (FindLiveObjects: 0.150824 ms CreateObjectMapping: 0.095875 ms MarkObjects: 1.868941 ms  DeleteObjects: 0.030412 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.682313 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.639012 ms (FindLiveObjects: 0.126638 ms CreateObjectMapping: 0.094513 ms MarkObjects: 2.378648 ms  DeleteObjects: 0.038690 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.608524 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.318146 ms (FindLiveObjects: 0.125099 ms CreateObjectMapping: 0.090034 ms MarkObjects: 2.058262 ms  DeleteObjects: 0.044218 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.616571 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.250368 ms (FindLiveObjects: 0.129017 ms CreateObjectMapping: 0.090997 ms MarkObjects: 1.989453 ms  DeleteObjects: 0.040476 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.566596 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.057344 ms (FindLiveObjects: 0.115950 ms CreateObjectMapping: 0.098459 ms MarkObjects: 1.816385 ms  DeleteObjects: 0.026158 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.567048 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.132458 ms (FindLiveObjects: 0.139221 ms CreateObjectMapping: 0.095162 ms MarkObjects: 1.867441 ms  DeleteObjects: 0.030321 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.431887 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.088650 ms (FindLiveObjects: 0.142197 ms CreateObjectMapping: 0.121239 ms MarkObjects: 1.791160 ms  DeleteObjects: 0.033661 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.534436 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.033655 ms (FindLiveObjects: 0.146955 ms CreateObjectMapping: 0.137204 ms MarkObjects: 1.707481 ms  DeleteObjects: 0.041630 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.535808 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.067929 ms (FindLiveObjects: 0.120325 ms CreateObjectMapping: 0.096862 ms MarkObjects: 2.779644 ms  DeleteObjects: 0.070479 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.472616 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 5.866171 ms (FindLiveObjects: 0.154905 ms CreateObjectMapping: 0.109563 ms MarkObjects: 5.558758 ms  DeleteObjects: 0.042679 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.486069 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.497412 ms (FindLiveObjects: 0.193601 ms CreateObjectMapping: 0.098710 ms MarkObjects: 2.171294 ms  DeleteObjects: 0.033296 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.635871 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.223130 ms (FindLiveObjects: 0.132521 ms CreateObjectMapping: 0.087716 ms MarkObjects: 1.970717 ms  DeleteObjects: 0.031863 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.601066 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.403068 ms (FindLiveObjects: 0.125484 ms CreateObjectMapping: 0.109703 ms MarkObjects: 2.126837 ms  DeleteObjects: 0.040610 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.544194 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.159653 ms (FindLiveObjects: 0.150736 ms CreateObjectMapping: 0.098316 ms MarkObjects: 1.877947 ms  DeleteObjects: 0.032333 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.559401 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.566296 ms (FindLiveObjects: 0.121860 ms CreateObjectMapping: 0.103632 ms MarkObjects: 2.309575 ms  DeleteObjects: 0.030886 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.642186 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 1.978392 ms (FindLiveObjects: 0.171750 ms CreateObjectMapping: 0.098578 ms MarkObjects: 1.681018 ms  DeleteObjects: 0.026709 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.674784 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 1.904422 ms (FindLiveObjects: 0.133461 ms CreateObjectMapping: 0.089506 ms MarkObjects: 1.656336 ms  DeleteObjects: 0.024703 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.754525 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 5.303954 ms (FindLiveObjects: 0.159503 ms CreateObjectMapping: 0.111278 ms MarkObjects: 5.001405 ms  DeleteObjects: 0.031308 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.576485 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.659439 ms (FindLiveObjects: 0.133511 ms CreateObjectMapping: 0.102867 ms MarkObjects: 2.384788 ms  DeleteObjects: 0.037946 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.755473 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.223742 ms (FindLiveObjects: 0.185593 ms CreateObjectMapping: 0.155125 ms MarkObjects: 1.856029 ms  DeleteObjects: 0.026607 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.642050 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.765294 ms (FindLiveObjects: 0.196486 ms CreateObjectMapping: 0.162414 ms MarkObjects: 2.376866 ms  DeleteObjects: 0.029160 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.539976 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.819171 ms (FindLiveObjects: 0.169767 ms CreateObjectMapping: 0.138798 ms MarkObjects: 2.479279 ms  DeleteObjects: 0.030880 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.386672 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 3.122119 ms (FindLiveObjects: 0.158497 ms CreateObjectMapping: 0.099065 ms MarkObjects: 2.831626 ms  DeleteObjects: 0.031854 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.600380 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.925624 ms (FindLiveObjects: 0.120834 ms CreateObjectMapping: 0.092050 ms MarkObjects: 2.676288 ms  DeleteObjects: 0.035450 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.589489 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.330593 ms (FindLiveObjects: 0.160406 ms CreateObjectMapping: 0.107686 ms MarkObjects: 2.035217 ms  DeleteObjects: 0.026926 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.628223 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.543847 ms (FindLiveObjects: 0.178584 ms CreateObjectMapping: 0.181361 ms MarkObjects: 2.151198 ms  DeleteObjects: 0.032148 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.605213 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.522809 ms (FindLiveObjects: 0.168276 ms CreateObjectMapping: 0.119197 ms MarkObjects: 2.204440 ms  DeleteObjects: 0.030329 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.962120 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.238521 ms (FindLiveObjects: 0.130371 ms CreateObjectMapping: 0.097239 ms MarkObjects: 1.975139 ms  DeleteObjects: 0.035450 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.887266 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.256957 ms (FindLiveObjects: 0.129605 ms CreateObjectMapping: 0.100586 ms MarkObjects: 1.999821 ms  DeleteObjects: 0.026644 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.565110 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.721039 ms (FindLiveObjects: 0.144328 ms CreateObjectMapping: 0.097876 ms MarkObjects: 2.446688 ms  DeleteObjects: 0.031791 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.627156 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.158304 ms (FindLiveObjects: 0.139079 ms CreateObjectMapping: 0.089756 ms MarkObjects: 1.897921 ms  DeleteObjects: 0.031156 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.472471 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.328787 ms (FindLiveObjects: 0.289383 ms CreateObjectMapping: 0.128062 ms MarkObjects: 1.881601 ms  DeleteObjects: 0.029381 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.078717 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.719609 ms (FindLiveObjects: 0.148033 ms CreateObjectMapping: 0.098736 ms MarkObjects: 2.444327 ms  DeleteObjects: 0.028167 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.434503 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.155226 ms (FindLiveObjects: 0.144575 ms CreateObjectMapping: 0.147323 ms MarkObjects: 2.774307 ms  DeleteObjects: 0.088049 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.461550 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.525772 ms (FindLiveObjects: 0.189718 ms CreateObjectMapping: 0.099700 ms MarkObjects: 3.156563 ms  DeleteObjects: 0.079128 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.363310 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.789888 ms (FindLiveObjects: 0.149955 ms CreateObjectMapping: 0.109986 ms MarkObjects: 2.488493 ms  DeleteObjects: 0.041047 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.551029 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.235139 ms (FindLiveObjects: 0.121334 ms CreateObjectMapping: 0.080995 ms MarkObjects: 2.003781 ms  DeleteObjects: 0.028745 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.594468 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.518477 ms (FindLiveObjects: 0.122514 ms CreateObjectMapping: 0.085297 ms MarkObjects: 2.278789 ms  DeleteObjects: 0.031493 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.379322 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.641903 ms (FindLiveObjects: 0.140828 ms CreateObjectMapping: 0.089916 ms MarkObjects: 2.376262 ms  DeleteObjects: 0.034535 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.370568 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.267796 ms (FindLiveObjects: 0.246232 ms CreateObjectMapping: 0.109003 ms MarkObjects: 1.885709 ms  DeleteObjects: 0.026286 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.499094 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.440520 ms (FindLiveObjects: 0.125228 ms CreateObjectMapping: 0.094984 ms MarkObjects: 3.182846 ms  DeleteObjects: 0.037080 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.609710 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.852371 ms (FindLiveObjects: 0.119972 ms CreateObjectMapping: 0.096515 ms MarkObjects: 2.605228 ms  DeleteObjects: 0.030267 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.709383 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.790485 ms (FindLiveObjects: 0.242890 ms CreateObjectMapping: 0.200031 ms MarkObjects: 3.296031 ms  DeleteObjects: 0.051073 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.439189 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.002875 ms (FindLiveObjects: 0.152577 ms CreateObjectMapping: 0.105479 ms MarkObjects: 1.713483 ms  DeleteObjects: 0.030859 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.633240 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.385742 ms (FindLiveObjects: 0.156673 ms CreateObjectMapping: 0.091735 ms MarkObjects: 2.104935 ms  DeleteObjects: 0.032059 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.473614 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.499061 ms (FindLiveObjects: 0.259424 ms CreateObjectMapping: 0.173987 ms MarkObjects: 2.034140 ms  DeleteObjects: 0.031094 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.640967 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.227842 ms (FindLiveObjects: 0.147928 ms CreateObjectMapping: 0.104685 ms MarkObjects: 1.947323 ms  DeleteObjects: 0.027575 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.454737 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.795197 ms (FindLiveObjects: 0.488534 ms CreateObjectMapping: 0.141713 ms MarkObjects: 2.131885 ms  DeleteObjects: 0.032679 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.846409 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.159050 ms (FindLiveObjects: 0.222076 ms CreateObjectMapping: 0.110025 ms MarkObjects: 1.803176 ms  DeleteObjects: 0.023253 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.668452 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.315843 ms (FindLiveObjects: 0.135970 ms CreateObjectMapping: 0.124216 ms MarkObjects: 2.024107 ms  DeleteObjects: 0.031140 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.557499 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.613667 ms (FindLiveObjects: 0.266073 ms CreateObjectMapping: 0.272866 ms MarkObjects: 2.041610 ms  DeleteObjects: 0.032649 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.368309 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.978845 ms (FindLiveObjects: 0.215450 ms CreateObjectMapping: 0.186373 ms MarkObjects: 2.533555 ms  DeleteObjects: 0.042863 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.452205 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.213266 ms (FindLiveObjects: 0.133321 ms CreateObjectMapping: 0.091529 ms MarkObjects: 2.946728 ms  DeleteObjects: 0.041377 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.595293 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.091302 ms (FindLiveObjects: 0.128749 ms CreateObjectMapping: 0.091576 ms MarkObjects: 2.836353 ms  DeleteObjects: 0.033855 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.625670 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 3.097913 ms (FindLiveObjects: 0.197753 ms CreateObjectMapping: 0.229111 ms MarkObjects: 2.642751 ms  DeleteObjects: 0.027818 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.702185 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.146745 ms (FindLiveObjects: 0.191005 ms CreateObjectMapping: 0.115221 ms MarkObjects: 2.813644 ms  DeleteObjects: 0.026521 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.460470 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.089420 ms (FindLiveObjects: 0.196538 ms CreateObjectMapping: 0.140959 ms MarkObjects: 2.713312 ms  DeleteObjects: 0.038202 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.568427 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.831293 ms (FindLiveObjects: 0.185450 ms CreateObjectMapping: 0.151062 ms MarkObjects: 2.463311 ms  DeleteObjects: 0.031023 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.437718 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.582932 ms (FindLiveObjects: 0.122051 ms CreateObjectMapping: 0.080048 ms MarkObjects: 2.325762 ms  DeleteObjects: 0.054716 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.638272 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.347011 ms (FindLiveObjects: 0.119886 ms CreateObjectMapping: 0.087077 ms MarkObjects: 3.094224 ms  DeleteObjects: 0.045007 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.468847 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.230802 ms (FindLiveObjects: 0.125854 ms CreateObjectMapping: 0.098749 ms MarkObjects: 1.974233 ms  DeleteObjects: 0.031627 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.550389 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.814622 ms (FindLiveObjects: 0.181284 ms CreateObjectMapping: 0.156341 ms MarkObjects: 2.448707 ms  DeleteObjects: 0.026986 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.451256 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.384774 ms (FindLiveObjects: 0.154015 ms CreateObjectMapping: 0.101719 ms MarkObjects: 2.100100 ms  DeleteObjects: 0.028554 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.619783 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.195258 ms (FindLiveObjects: 0.136167 ms CreateObjectMapping: 0.109145 ms MarkObjects: 1.915374 ms  DeleteObjects: 0.034237 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.545085 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 1.889974 ms (FindLiveObjects: 0.117728 ms CreateObjectMapping: 0.083969 ms MarkObjects: 1.660318 ms  DeleteObjects: 0.027726 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.532731 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 1.921296 ms (FindLiveObjects: 0.119324 ms CreateObjectMapping: 0.087125 ms MarkObjects: 1.690702 ms  DeleteObjects: 0.023850 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.511540 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.109039 ms (FindLiveObjects: 0.132897 ms CreateObjectMapping: 0.098254 ms MarkObjects: 1.852848 ms  DeleteObjects: 0.024723 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.478048 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 4.166660 ms (FindLiveObjects: 0.143296 ms CreateObjectMapping: 0.153187 ms MarkObjects: 3.832460 ms  DeleteObjects: 0.037181 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.491321 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 3.226658 ms (FindLiveObjects: 0.143753 ms CreateObjectMapping: 0.098115 ms MarkObjects: 2.948360 ms  DeleteObjects: 0.036038 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.080184 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.702712 ms (FindLiveObjects: 0.149498 ms CreateObjectMapping: 0.081040 ms MarkObjects: 2.437317 ms  DeleteObjects: 0.034149 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.186486 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.139291 ms (FindLiveObjects: 0.154603 ms CreateObjectMapping: 0.123807 ms MarkObjects: 1.831468 ms  DeleteObjects: 0.029051 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.573687 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 3.310357 ms (FindLiveObjects: 0.173033 ms CreateObjectMapping: 0.101516 ms MarkObjects: 2.996732 ms  DeleteObjects: 0.038653 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.646860 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.780895 ms (FindLiveObjects: 0.251374 ms CreateObjectMapping: 0.247546 ms MarkObjects: 2.242662 ms  DeleteObjects: 0.038662 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.508622 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.936349 ms (FindLiveObjects: 0.134314 ms CreateObjectMapping: 0.094838 ms MarkObjects: 2.613796 ms  DeleteObjects: 0.092853 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.462326 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 3.023042 ms (FindLiveObjects: 0.285906 ms CreateObjectMapping: 0.231040 ms MarkObjects: 2.465383 ms  DeleteObjects: 0.040175 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.490967 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.270721 ms (FindLiveObjects: 0.137119 ms CreateObjectMapping: 0.095464 ms MarkObjects: 2.005062 ms  DeleteObjects: 0.032699 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.552419 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 3.006278 ms (FindLiveObjects: 0.121271 ms CreateObjectMapping: 0.089933 ms MarkObjects: 2.761177 ms  DeleteObjects: 0.033529 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.616335 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.250213 ms (FindLiveObjects: 0.259267 ms CreateObjectMapping: 0.144990 ms MarkObjects: 1.808114 ms  DeleteObjects: 0.036873 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.479255 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.456811 ms (FindLiveObjects: 0.190920 ms CreateObjectMapping: 0.146098 ms MarkObjects: 2.072875 ms  DeleteObjects: 0.046315 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.673987 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.562570 ms (FindLiveObjects: 0.137941 ms CreateObjectMapping: 0.096356 ms MarkObjects: 3.295259 ms  DeleteObjects: 0.032698 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.553222 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.303484 ms (FindLiveObjects: 0.131742 ms CreateObjectMapping: 0.102789 ms MarkObjects: 2.034604 ms  DeleteObjects: 0.033973 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.540483 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.122201 ms (FindLiveObjects: 0.267964 ms CreateObjectMapping: 0.175648 ms MarkObjects: 1.654174 ms  DeleteObjects: 0.024036 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.546650 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 3.988674 ms (FindLiveObjects: 0.274408 ms CreateObjectMapping: 0.462062 ms MarkObjects: 3.218863 ms  DeleteObjects: 0.032873 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.620960 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 7.033052 ms (FindLiveObjects: 0.231701 ms CreateObjectMapping: 0.158119 ms MarkObjects: 6.601635 ms  DeleteObjects: 0.041158 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.498016 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.687371 ms (FindLiveObjects: 0.225931 ms CreateObjectMapping: 0.171209 ms MarkObjects: 2.264024 ms  DeleteObjects: 0.025673 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.665127 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.282412 ms (FindLiveObjects: 0.225486 ms CreateObjectMapping: 0.097642 ms MarkObjects: 1.935152 ms  DeleteObjects: 0.023803 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.679145 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 3.502599 ms (FindLiveObjects: 0.213879 ms CreateObjectMapping: 0.123652 ms MarkObjects: 3.123695 ms  DeleteObjects: 0.040923 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.758661 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #2 "Twin Towers" (60x60).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2901.
+Total: 2.893917 ms (FindLiveObjects: 0.258370 ms CreateObjectMapping: 0.395288 ms MarkObjects: 2.209476 ms  DeleteObjects: 0.030032 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.770970 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 9.205682 ms (FindLiveObjects: 0.130756 ms CreateObjectMapping: 0.090412 ms MarkObjects: 8.950672 ms  DeleteObjects: 0.033496 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.690221 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 1.953123 ms (FindLiveObjects: 0.132013 ms CreateObjectMapping: 0.082955 ms MarkObjects: 1.696336 ms  DeleteObjects: 0.041537 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.621651 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.285405 ms (FindLiveObjects: 0.161856 ms CreateObjectMapping: 0.106616 ms MarkObjects: 1.983065 ms  DeleteObjects: 0.033519 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.715843 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #3 "Maze" (44x44).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2875.
+Total: 2.847547 ms (FindLiveObjects: 0.155965 ms CreateObjectMapping: 0.101646 ms MarkObjects: 2.529722 ms  DeleteObjects: 0.059568 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.635629 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #4 "Ramparts" (56x36).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2950.
+Total: 2.429042 ms (FindLiveObjects: 0.154987 ms CreateObjectMapping: 0.116029 ms MarkObjects: 2.129796 ms  DeleteObjects: 0.027913 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.657652 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.535486 ms (FindLiveObjects: 0.122457 ms CreateObjectMapping: 0.092518 ms MarkObjects: 2.293668 ms  DeleteObjects: 0.026633 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.682770 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
+Failed to create agent because it is not close enough to the NavMesh
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2945.
+Total: 2.365290 ms (FindLiveObjects: 0.163194 ms CreateObjectMapping: 0.117162 ms MarkObjects: 2.047879 ms  DeleteObjects: 0.036659 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.390671 ms
+[EnemyAgent] Overriding serialized MaxStep 5000 -> 0; the round clock owns episode timeout.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+[CombatantRig] Player driver: Agent.
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2895.
+Total: 2.038302 ms (FindLiveObjects: 0.122742 ms CreateObjectMapping: 0.091392 ms MarkObjects: 1.795383 ms  DeleteObjects: 0.028364 ms)
+
+[Eval] Completed 200 episodes.
+Unable to save timers to file /home/damian/repos/URLNPC/Builds/Linux/URLNPC_Data/ML-Agents/Timers/FPS_timers.json
+[Physics::Module] Cleanup current backned.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.
