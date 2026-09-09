@@ -1,0 +1,66 @@
+{
+    "URLNPC": {
+        "checkpoints": [
+            {
+                "steps": 849966,
+                "file_path": "results/hunt-only/URLNPC/URLNPC-849966.onnx",
+                "reward": 1.876277288862767,
+                "creation_time": 1788881934.6932006,
+                "auxillary_file_paths": [
+                    "results/hunt-only/URLNPC/URLNPC-849966.pt"
+                ]
+            },
+            {
+                "steps": 899965,
+                "file_path": "results/hunt-only/URLNPC/URLNPC-899965.onnx",
+                "reward": 1.8221906937732555,
+                "creation_time": 1788882504.7788265,
+                "auxillary_file_paths": [
+                    "results/hunt-only/URLNPC/URLNPC-899965.pt"
+                ]
+            },
+            {
+                "steps": 949968,
+                "file_path": "results/hunt-only/URLNPC/URLNPC-949968.onnx",
+                "reward": 2.1396302016780657,
+                "creation_time": 1788882908.3146918,
+                "auxillary_file_paths": [
+                    "results/hunt-only/URLNPC/URLNPC-949968.pt"
+                ]
+            },
+            {
+                "steps": 999964,
+                "file_path": "results/hunt-only/URLNPC/URLNPC-999964.onnx",
+                "reward": 1.9891207231716677,
+                "creation_time": 1788883309.4141364,
+                "auxillary_file_paths": [
+                    "results/hunt-only/URLNPC/URLNPC-999964.pt"
+                ]
+            },
+            {
+                "steps": 1000006,
+                "file_path": "results/hunt-only/URLNPC/URLNPC-1000006.onnx",
+                "reward": 1.9627105064356505,
+                "creation_time": 1788883309.4603255,
+                "auxillary_file_paths": [
+                    "results/hunt-only/URLNPC/URLNPC-1000006.pt"
+                ]
+            }
+        ],
+        "elo": 1346.6417500452246,
+        "final_checkpoint": {
+            "steps": 1000006,
+            "file_path": "results/hunt-only/URLNPC.onnx",
+            "reward": 1.9627105064356505,
+            "creation_time": 1788883309.4603255,
+            "auxillary_file_paths": [
+                "results/hunt-only/URLNPC/URLNPC-1000006.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.1+cu121"
+    }
+}

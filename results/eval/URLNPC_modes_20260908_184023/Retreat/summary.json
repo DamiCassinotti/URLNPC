@@ -1,0 +1,29 @@
+{
+  "entity": "NPC",
+  "episodes": 200,
+  "wins": 105,
+  "losses": 90,
+  "draws": 5,
+  "winRate": 0.525,
+  "damageDealtPerEpisode": 75.75,
+  "damageTakenPerEpisode": 80.25,
+  "shots": 1380,
+  "hits": 1010,
+  "accuracy": 0.7318840579710145,
+  "timeToKillSeconds": 18.15985128205128,
+  "survivalSeconds": 20.39,
+  "modes": {
+    "Retreat": {
+      "steps": 207141,
+      "eligible": 43016,
+      "compliance": 0.4325599776827227,
+      "visible": 0.11006029709231877
+    },
+    "Patrol": {
+      "steps": 200,
+      "eligible": 200,
+      "compliance": 0.0,
+      "visible": 0.015
+    }
+  }
+}

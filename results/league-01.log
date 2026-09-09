@@ -1,0 +1,3 @@
+nohup: ignoring input
+==> mlagents-learn config/URLNPC-selfplay.yaml --run-id=league-01 --env=/home/damian/repos/URLNPC/Builds/Linux/URLNPC.x86_64 --no-graphics --seed=1234 --env-args -playerDriver agent -runSeed 1234 -heuristicOpponent 0.3
+scripts/train.sh: line 119: exec: mlagents-learn: not found
