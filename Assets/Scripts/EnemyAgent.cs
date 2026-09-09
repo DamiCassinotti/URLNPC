@@ -51,8 +51,8 @@ public class EnemyAgent : Agent
     [SerializeField] float complianceMovementDeadband = 0.05f;
     [Tooltip("Range within which a Hunt step counts as engaging a visible target even if it neither moved nor fired.")]
     [SerializeField] float huntEngagementDistance = 20f;
-    [Tooltip("Seconds after a sighting that a Retreat step is still breaking contact — the window its rate is scored over.")]
-    [SerializeField] float retreatContactSeconds = 3f;
+    [Tooltip("Seconds after a sighting that a Retreat step is still breaking contact — the window its rate is scored over. PerceptionMemory's horizon: a shorter one scores a contact-avoidant policy only on the steps where the avoidance failed.")]
+    [SerializeField] float retreatContactSeconds = 10f;
     [Tooltip("Seconds after a sighting that a HoldCover step is still holding cover against someone — the window its rate is scored over.")]
     [SerializeField] float holdCoverContactSeconds = 10f;
     [Tooltip("Metres per step above which a Patrol step counts as walking rather than parked. A step is a physics step, so walking pace is about 0.07 m.")]
