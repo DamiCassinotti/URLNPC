@@ -1,0 +1,66 @@
+{
+    "URLNPC": {
+        "checkpoints": [
+            {
+                "steps": 849981,
+                "file_path": "results/holdcover-only/URLNPC/URLNPC-849981.onnx",
+                "reward": 0.3624429292200754,
+                "creation_time": 1788862318.9844115,
+                "auxillary_file_paths": [
+                    "results/holdcover-only/URLNPC/URLNPC-849981.pt"
+                ]
+            },
+            {
+                "steps": 899977,
+                "file_path": "results/holdcover-only/URLNPC/URLNPC-899977.onnx",
+                "reward": -0.12684397720373594,
+                "creation_time": 1788862773.1377747,
+                "auxillary_file_paths": [
+                    "results/holdcover-only/URLNPC/URLNPC-899977.pt"
+                ]
+            },
+            {
+                "steps": 949978,
+                "file_path": "results/holdcover-only/URLNPC/URLNPC-949978.onnx",
+                "reward": 0.866463302722517,
+                "creation_time": 1788863347.3569732,
+                "auxillary_file_paths": [
+                    "results/holdcover-only/URLNPC/URLNPC-949978.pt"
+                ]
+            },
+            {
+                "steps": 999973,
+                "file_path": "results/holdcover-only/URLNPC/URLNPC-999973.onnx",
+                "reward": 0.6137041717767715,
+                "creation_time": 1788863923.3014255,
+                "auxillary_file_paths": [
+                    "results/holdcover-only/URLNPC/URLNPC-999973.pt"
+                ]
+            },
+            {
+                "steps": 1000028,
+                "file_path": "results/holdcover-only/URLNPC/URLNPC-1000028.onnx",
+                "reward": 0.588930871428513,
+                "creation_time": 1788863923.363838,
+                "auxillary_file_paths": [
+                    "results/holdcover-only/URLNPC/URLNPC-1000028.pt"
+                ]
+            }
+        ],
+        "elo": 1308.0515913534693,
+        "final_checkpoint": {
+            "steps": 1000028,
+            "file_path": "results/holdcover-only/URLNPC.onnx",
+            "reward": 0.588930871428513,
+            "creation_time": 1788863923.363838,
+            "auxillary_file_paths": [
+                "results/holdcover-only/URLNPC/URLNPC-1000028.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.1+cu121"
+    }
+}

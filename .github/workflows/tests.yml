@@ -50,8 +50,15 @@ jobs:
       # -assemblyNames keeps the embedded ML-Agents package tests out of the
       # run, same as scripts/run-tests.sh. Never pass -runSeed here: it
       # outranks the inspector seeds the reproducibility tests set on purpose.
+      # Pinned, not @v4: v4.4.0 (2026-09-09) rewrote the action as a thin
+      # wrapper around game-ci/cli, and its activation prefers a serial pulled
+      # out of the .ulf, then falls back to loading the file itself — which a
+      # Personal license fails with "Machine bindings don't match", since the
+      # file is bound to the machine that activated it and the runner is not it.
+      # v4.3.2 is the old architecture that has been activating this license all
+      # along, plus the shared-memory backport.
       - name: Run ${{ matrix.assembly }}
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@v4.3.2
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}

@@ -206,10 +206,14 @@ public class ModeComplianceTrackerTests
         // Cover is what a retreat is aiming for, and cover ends visibility — so
         // scoring only the visible steps would have made the new rule
         // unreachable. The window past the last sighting is the denominator
-        // instead.
+        // instead, and it runs to PerceptionMemory's horizon (#111): a shorter
+        // one scores a contact-avoidant policy on the few steps where the
+        // avoidance failed and on nothing else.
         var tracker = Fresh();
         var justHidden = Step(NpcMode.Retreat);
         justHidden.timeSinceSeen = 1f;
+        var stillKnown = Step(NpcMode.Retreat);
+        stillKnown.timeSinceSeen = 8f;
         var longGone = Step(NpcMode.Retreat);
         longGone.timeSinceSeen = 30f;
         var visible = Step(NpcMode.Retreat);
@@ -217,9 +221,32 @@ public class ModeComplianceTrackerTests
         visible.timeSinceSeen = 0f;
 
         Assert.That(tracker.Eligible(justHidden), Is.True);
+        Assert.That(tracker.Eligible(stillKnown), Is.True);
         Assert.That(tracker.Eligible(visible), Is.True);
         Assert.That(tracker.Eligible(longGone), Is.False, "nobody in contact to retreat from");
         Assert.That(tracker.Eligible(Step(NpcMode.Retreat)), Is.False, "never seen is not contact either");
+    }
+
+    [Test]
+    public void Retreat_CreditsStayingHiddenLongAfterTheSighting()
+    {
+        // The whole point of the wider window (#111): a body that broke the
+        // eye-line and kept it broken is retreating on every one of those steps,
+        // where the three-second window dropped them from the denominator and
+        // scored the retreat on its failures alone.
+        var tracker = Fresh();
+        var hidden = Step(NpcMode.Retreat);
+        hidden.timeSinceSeen = 6f;
+        hidden.inCover = true;
+        var exposed = hidden;
+        exposed.inCover = false;
+
+        tracker.Record(hidden);
+        tracker.Record(exposed);
+
+        Assert.That(tracker.EligibleSteps(NpcMode.Retreat), Is.EqualTo(2));
+        Assert.That(tracker.Rate(NpcMode.Retreat), Is.EqualTo(0.5f).Within(1e-6f),
+            "out of sight in the open is not cover, so the window doesn't hand out free credit");
     }
 
     [Test]
@@ -244,10 +271,14 @@ public class ModeComplianceTrackerTests
         Assert.That(tracker.Eligible(longGone), Is.False, "an empty arena is not cover");
         Assert.That(tracker.Eligible(Step(NpcMode.HoldCover)), Is.False, "never seen is not contact either");
 
+        // The two windows are separate knobs, so a run can score the rules over
+        // different spans; they hold the same horizon by default.
+        var shortWindow = new ModeComplianceTracker { contactSeconds = 3f };
         var retreating = stillKnown;
         retreating.mode = NpcMode.Retreat;
-        Assert.That(tracker.Eligible(retreating), Is.False,
-            "Retreat's window is the shorter one — rounding a corner, not holding a position");
+        Assert.That(tracker.Eligible(retreating), Is.True);
+        Assert.That(shortWindow.Eligible(retreating), Is.False);
+        Assert.That(shortWindow.Eligible(stillKnown), Is.True, "HoldCover reads its own window");
     }
 
     [Test]

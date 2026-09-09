@@ -51,9 +51,14 @@ public class ModeComplianceTracker
     public float huntEngagementDistance = 20f;
 
     // How long after a sighting a Retreat step is still breaking contact.
-    // Longer than the two seconds it takes to round a corner, short enough
-    // that roaming an empty arena isn't retreating from anyone.
-    public float contactSeconds = 3f;
+    // PerceptionMemory's horizon, the same window HoldCover is scored over
+    // (#111): at three seconds the rule only saw the steps where contact had
+    // just been made, which for a policy whose whole strategy is to avoid
+    // contact are the steps where it is failing — the retreat-only specialist
+    // kept the target visible on 2% of steps, the most contact-avoidant of the
+    // four, and read ~random. Past the horizon the memory lapses and there is
+    // nobody to retreat from, so roaming an empty arena still isn't retreating.
+    public float contactSeconds = 10f;
 
     // Metres per step above which a Patrol step is walking rather than parked.
     // Its own number and not movementDeadband: a step is a physics step, which
@@ -62,9 +67,9 @@ public class ModeComplianceTracker
     // its own walking speed stationary.
     public float patrolMovementMetres = 0.01f;
 
-    // The same idea for HoldCover, but over the horizon PerceptionMemory keeps
-    // a sighting for (#105): holding cover is holding it against a threat you
-    // still know is out there, and it is worth doing for as long as you do.
+    // The same window for HoldCover, kept as its own knob so the two rules stay
+    // separately tunable (#105): holding cover is holding it against a threat
+    // you still know is out there, and it is worth doing for as long as you do.
     // Scored over every step instead, the rule read the arena's ambient
     // occlusion — the target is unseen ~90% of a round, so a random walk sat at
     // 70% and outscored the heuristic bot.
@@ -81,11 +86,11 @@ public class ModeComplianceTracker
 
     // Steps the mode had a chance to act on (#88). Hunt has nothing to close on
     // while the target is unseen, so scoring those steps made its rate mostly a
-    // measure of how often the fight was joined. Retreat is scored while there
-    // is someone to break contact with: sight of the target, or a sighting
-    // recent enough that staying out of their eye-line is still the retreat
-    // working rather than an empty corner of the arena. HoldCover is scored over
-    // the longer window it takes cover against. Patrol needs no target.
+    // measure of how often the fight was joined. Retreat and HoldCover are
+    // scored while there is someone to break contact with or hide from: sight of
+    // the target, or a sighting recent enough that staying out of their eye-line
+    // is still the retreat working rather than an empty corner of the arena.
+    // Patrol needs no target.
     public bool Eligible(in ComplianceSample sample)
     {
         switch (sample.mode)
