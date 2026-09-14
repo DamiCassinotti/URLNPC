@@ -320,6 +320,20 @@ public class EnemyAgent : Agent
         sensor.AddObservation(observations);
     }
 
+    // Per-mode action masking (#113): the commanded mode decides which movement
+    // primitives are on the table, so one shared policy can't collapse to the
+    // same behavior under all four. Only the trainer and the inference model
+    // read the mask — Heuristic below (the scripted opponent and the eval
+    // controls) is unaffected, which is what keeps the controls comparable to
+    // their pre-masking calibration.
+    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    {
+        foreach (MovementAction action in MovementMask.BlockedFor(CommandedMode))
+        {
+            actionMask.SetActionEnabled(NpcBrainSpec.MovementBranch, (int)action, false);
+        }
+    }
+
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discrete = actionsOut.DiscreteActions;

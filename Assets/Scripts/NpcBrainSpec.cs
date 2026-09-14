@@ -11,6 +11,9 @@ public static class NpcBrainSpec
 
     // Branch 0 picks a MovementAction, branch 1 decides whether to pull the
     // trigger. Splitting them lets the policy move and shoot in the same step.
+    public const int MovementBranch = 0;
+    public const int FireBranch = 1;
+
     public const int MovementBranchSize = MovementActions.Count;
     public const int FireBranchSize = 2;
 

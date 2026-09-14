@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
@@ -89,6 +90,45 @@ public class EnemyAgentTests : PlayModeTestBase
         selfHealth.DecreaseHealth(10f);
         Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(-0.6f).Within(1e-4f),
             "and being hit while retreating costs double what it does in Hunt");
+    }
+
+    // Records what WriteDiscreteActionMask disables. ML-Agents' own
+    // ActuatorDiscreteActionMask is internal to its assembly.
+    class RecordingMask : IDiscreteActionMask
+    {
+        public readonly List<(int branch, int index)> Disabled = new List<(int, int)>();
+
+        public void SetActionEnabled(int branch, int actionIndex, bool isEnabled)
+        {
+            if (!isEnabled) Disabled.Add((branch, actionIndex));
+        }
+    }
+
+    // The mask table itself is pinned in MovementMaskTests; this is the wiring —
+    // that the live ModeChannel on the body is what selects the row (#113).
+    [UnityTest]
+    public IEnumerator ActionMask_FollowsTheCommandedMode()
+    {
+        yield return BuildAgentScene();
+
+        var mask = new RecordingMask();
+        agent.WriteDiscreteActionMask(mask);
+        Assert.That(mask.Disabled, Is.EquivalentTo(new[]
+        {
+            (NpcBrainSpec.MovementBranch, (int)MovementAction.Retreat),
+            (NpcBrainSpec.MovementBranch, (int)MovementAction.MoveToCover),
+        }), "the auto-added ModeChannel starts on Hunt");
+
+        agent.GetComponent<ModeChannel>().SetMode(NpcMode.Retreat);
+        mask = new RecordingMask();
+        agent.WriteDiscreteActionMask(mask);
+        Assert.That(mask.Disabled, Is.EquivalentTo(new[]
+        {
+            (NpcBrainSpec.MovementBranch, (int)MovementAction.Advance),
+            (NpcBrainSpec.MovementBranch, (int)MovementAction.Hold),
+        }));
+        Assert.That(mask.Disabled.Exists(d => d.branch == NpcBrainSpec.FireBranch), Is.False,
+            "the fire branch stays free in every mode");
     }
 
     [UnityTest]
