@@ -15,6 +15,7 @@ public class EnemyAgent : Agent
     [SerializeField] float aliveRewardPerStep = 0.0002f;
     [SerializeField] float hitTargetReward = 0.5f;
     [SerializeField] float gotHitPenalty = 0.5f;
+    [Tooltip("Fallback terminal reward for killing the target, used only where killTargetRewardByMode has no entry.")]
     [SerializeField] float killTargetReward = 1.0f;
     [SerializeField] float diedPenalty = 1.0f;
     [SerializeField] float wastedShotPenalty = 0.05f;
@@ -31,14 +32,16 @@ public class EnemyAgent : Agent
     // 0 for the rows that have no global counterpart), so a row edited down in
     // the Inspector can't throw mid-episode.
     [Header("Per-mode reward columns (Hunt, HoldCover, Retreat, Patrol)")]
+    [Tooltip("Terminal reward for killing the target, per commanded mode. Falls back to killTargetReward.")]
+    [SerializeField] float[] killTargetRewardByMode = { 1.0f, 0.3f, 0f, 0.2f };
     [Tooltip("Reward for hitting the target, per commanded mode. Falls back to hitTargetReward.")]
-    [SerializeField] float[] hitTargetRewardByMode = { 0.5f, 0.5f, 0.1f, 0.1f };
+    [SerializeField] float[] hitTargetRewardByMode = { 0.5f, 0.2f, 0f, 0.1f };
     [Tooltip("Penalty (positive magnitude) for being hit, per commanded mode. Falls back to gotHitPenalty.")]
-    [SerializeField] float[] gotHitPenaltyByMode = { 0.3f, 0.6f, 0.6f, 0.5f };
+    [SerializeField] float[] gotHitPenaltyByMode = { 0.3f, 0.8f, 1.0f, 0.5f };
     [Tooltip("Reward per metre closed on the target since the last step. Negative pays for opening distance instead.")]
-    [SerializeField] float[] closingRewardPerMeterByMode = { 0.03f, 0f, -0.03f, 0f };
+    [SerializeField] float[] closingRewardPerMeterByMode = { 0.03f, 0f, -0.06f, 0f };
     [Tooltip("Per-step reward while the target's eye-line to the enemy is broken.")]
-    [SerializeField] float[] coverRewardPerStepByMode = { 0f, 0.005f, 0.002f, 0f };
+    [SerializeField] float[] coverRewardPerStepByMode = { 0f, 0.02f, 0.01f, 0f };
     [Tooltip("One-off reward the first time each patch of the arena is entered in an episode.")]
     [SerializeField] float[] newAreaRewardByMode = { 0f, 0f, 0f, 0.01f };
     [Tooltip("Penalty (positive magnitude) per step inside tooCloseDistance. Zero for Hunt, which has to be free to close. Falls back to tooClosePenaltyPerStep.")]
@@ -207,6 +210,7 @@ public class EnemyAgent : Agent
             rewards.modes[mode] = new ModeRewardColumn
             {
                 hitTarget = Column(hitTargetRewardByMode, mode, hitTargetReward),
+                killTarget = Column(killTargetRewardByMode, mode, killTargetReward),
                 gotHit = Column(gotHitPenaltyByMode, mode, gotHitPenalty),
                 closingPerMeter = Column(closingRewardPerMeterByMode, mode, 0f),
                 coverPerStep = Column(coverRewardPerStepByMode, mode, 0f),
@@ -536,7 +540,7 @@ public class EnemyAgent : Agent
     void HandleTargetDied()
     {
         if (episodeEnding) return;
-        EndEpisodeWith(killTargetReward);
+        EndEpisodeWith(rewards.modes[CommandedMode].killTarget);
     }
 
     void OnDestroy()

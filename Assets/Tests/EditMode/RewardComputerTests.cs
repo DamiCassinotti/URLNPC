@@ -23,20 +23,23 @@ public class RewardComputerTests
         };
         rewards.modes[NpcMode.Hunt] = new ModeRewardColumn
         {
-            hitTarget = 0.5f, gotHit = 0.3f, closingPerMeter = 0.01f, tooClosePerStep = 0f,
+            hitTarget = 0.5f, killTarget = 1.0f, gotHit = 0.3f, closingPerMeter = 0.03f,
+            tooClosePerStep = 0f,
         };
         rewards.modes[NpcMode.HoldCover] = new ModeRewardColumn
         {
-            hitTarget = 0.5f, gotHit = 0.6f, coverPerStep = 0.005f, tooClosePerStep = 0.004f,
+            hitTarget = 0.2f, killTarget = 0.3f, gotHit = 0.8f, coverPerStep = 0.02f,
+            tooClosePerStep = 0.004f,
         };
         rewards.modes[NpcMode.Retreat] = new ModeRewardColumn
         {
-            hitTarget = 0.1f, gotHit = 0.6f, closingPerMeter = -0.01f, coverPerStep = 0.002f,
-            tooClosePerStep = 0.008f,
+            hitTarget = 0f, killTarget = 0f, gotHit = 1.0f, closingPerMeter = -0.06f,
+            coverPerStep = 0.01f, tooClosePerStep = 0.008f,
         };
         rewards.modes[NpcMode.Patrol] = new ModeRewardColumn
         {
-            hitTarget = 0.1f, gotHit = 0.5f, newArea = 0.002f, tooClosePerStep = 0.002f,
+            hitTarget = 0.1f, killTarget = 0.2f, gotHit = 0.5f, newArea = 0.01f,
+            tooClosePerStep = 0.002f,
         };
         return rewards;
     }
@@ -160,26 +163,31 @@ public class RewardComputerTests
     public void Hunt_PaysForClosingAndChargesForOpening()
     {
         var rewards = DefaultRewards();
+        float perHalfMetre = rewards.modes[NpcMode.Hunt].closingPerMeter * 0.5f;
+
         StepRewardInput closing = Step(NpcMode.Hunt);
         closing.closingDelta = 0.5f;
-        Assert.That(rewards.StepReward(closing), Is.EqualTo(Alive + 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(closing), Is.EqualTo(Alive + perHalfMetre).Within(Tolerance));
 
         StepRewardInput opening = Step(NpcMode.Hunt);
         opening.closingDelta = -0.5f;
-        Assert.That(rewards.StepReward(opening), Is.EqualTo(Alive - 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(opening), Is.EqualTo(Alive - perHalfMetre).Within(Tolerance));
     }
 
     [Test]
     public void Retreat_PaysForOpeningInstead()
     {
         var rewards = DefaultRewards();
+        // The column is negative, so opening (a negative delta) is what pays.
+        float perHalfMetre = -rewards.modes[NpcMode.Retreat].closingPerMeter * 0.5f;
+
         StepRewardInput opening = Step(NpcMode.Retreat);
         opening.closingDelta = -0.5f;
-        Assert.That(rewards.StepReward(opening), Is.EqualTo(Alive + 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(opening), Is.EqualTo(Alive + perHalfMetre).Within(Tolerance));
 
         StepRewardInput closing = Step(NpcMode.Retreat);
         closing.closingDelta = 0.5f;
-        Assert.That(rewards.StepReward(closing), Is.EqualTo(Alive - 0.005f).Within(Tolerance));
+        Assert.That(rewards.StepReward(closing), Is.EqualTo(Alive - perHalfMetre).Within(Tolerance));
     }
 
     [Test]
@@ -195,8 +203,10 @@ public class RewardComputerTests
     public void BreakingLineOfSight_PaysOnlyTheCoverModes()
     {
         var rewards = DefaultRewards();
-        Assert.That(Hidden(rewards, NpcMode.HoldCover), Is.EqualTo(Alive + 0.005f).Within(Tolerance));
-        Assert.That(Hidden(rewards, NpcMode.Retreat), Is.EqualTo(Alive + 0.002f).Within(Tolerance));
+        Assert.That(Hidden(rewards, NpcMode.HoldCover),
+            Is.EqualTo(Alive + rewards.modes[NpcMode.HoldCover].coverPerStep).Within(Tolerance));
+        Assert.That(Hidden(rewards, NpcMode.Retreat),
+            Is.EqualTo(Alive + rewards.modes[NpcMode.Retreat].coverPerStep).Within(Tolerance));
         Assert.That(Hidden(rewards, NpcMode.Hunt), Is.EqualTo(Alive).Within(Tolerance));
         Assert.That(Hidden(rewards, NpcMode.Patrol), Is.EqualTo(Alive).Within(Tolerance));
     }
@@ -211,10 +221,11 @@ public class RewardComputerTests
     [Test]
     public void NewGround_PaysOnlyPatrol([ValueSource(typeof(NpcModes), nameof(NpcModes.All))] NpcMode mode)
     {
+        var rewards = DefaultRewards();
         StepRewardInput step = Step(mode);
         step.enteredNewArea = true;
-        float expected = mode == NpcMode.Patrol ? Alive + 0.002f : Alive;
-        Assert.That(DefaultRewards().StepReward(step), Is.EqualTo(expected).Within(Tolerance));
+        float expected = Alive + (mode == NpcMode.Patrol ? rewards.modes[NpcMode.Patrol].newArea : 0f);
+        Assert.That(rewards.StepReward(step), Is.EqualTo(expected).Within(Tolerance));
     }
 
     // The flag that lets the agent skip the cover raycast must never disagree
@@ -227,20 +238,36 @@ public class RewardComputerTests
     }
 
     // #79: full-02 converged to running the clock out because a whole round of
-    // alive bonus out-earned a kill. The terminal rewards live on EnemyAgent,
-    // so they are repeated here the way the columns above are.
+    // alive bonus out-earned a kill. The timeout penalty lives on EnemyAgent,
+    // so it is repeated here the way the columns above are.
     [Test]
-    public void StallingAWholeRound_PaysLessThanWinningOne()
+    public void StallingAWholeRound_PaysLessThanWinningOne(
+        [ValueSource(typeof(NpcModes), nameof(NpcModes.All))] NpcMode mode)
     {
-        const float KillTarget = 1.0f;
         const float Timeout = 0.6f;
         // 120 s round at 50 Hz with a decision period of 5.
         const int decisionStepsPerRound = 1200;
 
-        float stalled = DefaultRewards().StepReward(Step()) * decisionStepsPerRound - Timeout;
-        Assert.That(stalled, Is.LessThan(KillTarget),
+        var rewards = DefaultRewards();
+        float stalled = rewards.StepReward(Step(mode)) * decisionStepsPerRound - Timeout;
+        Assert.That(stalled, Is.LessThan(rewards.modes[mode].killTarget),
             "a draw must never be worth more than a kill, or the policy learns to stall");
         Assert.That(stalled, Is.LessThan(0f), "and running the clock out must be a net loss");
+    }
+
+    // #115: Retreat is no longer paid for winning the fight it was told to
+    // leave, and every defensive mode values a kill below Hunt's.
+    [Test]
+    public void KillReward_IsHighestInHunt_AndZeroInRetreat()
+    {
+        var rewards = DefaultRewards();
+        Assert.That(rewards.modes[NpcMode.Retreat].killTarget, Is.EqualTo(0f));
+        foreach (NpcMode mode in NpcModes.All)
+        {
+            if (mode == NpcMode.Hunt) continue;
+            Assert.That(rewards.modes[mode].killTarget,
+                Is.LessThan(rewards.modes[NpcMode.Hunt].killTarget), mode.ToString());
+        }
     }
 
     [Test]
@@ -248,11 +275,14 @@ public class RewardComputerTests
     {
         var rewards = DefaultRewards();
         Assert.That(rewards.modes[NpcMode.Hunt].hitTarget, Is.EqualTo(0.5f).Within(Tolerance));
-        Assert.That(rewards.modes[NpcMode.Retreat].hitTarget, Is.EqualTo(0.1f).Within(Tolerance),
+        Assert.That(rewards.modes[NpcMode.Retreat].hitTarget, Is.EqualTo(0f).Within(Tolerance),
             "a retreating NPC is not there to trade shots");
         Assert.That(rewards.modes[NpcMode.Hunt].gotHit, Is.EqualTo(0.3f).Within(Tolerance));
-        Assert.That(rewards.modes[NpcMode.HoldCover].gotHit, Is.EqualTo(0.6f).Within(Tolerance),
+        Assert.That(rewards.modes[NpcMode.HoldCover].gotHit, Is.EqualTo(0.8f).Within(Tolerance),
             "being hit while the job is to stay covered has to cost more");
+        Assert.That(rewards.modes[NpcMode.Retreat].gotHit,
+            Is.GreaterThan(rewards.modes[NpcMode.HoldCover].gotHit),
+            "and taking a hit while withdrawing has to cost most of all");
     }
 
     [Test]

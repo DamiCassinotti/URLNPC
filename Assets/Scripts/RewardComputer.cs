@@ -21,8 +21,8 @@ public struct StepRewardInput
 // The reward mapping as pure math, engine-free so the whole table is testable
 // without an Academy. EnemyAgent builds one from its serialized tunables in
 // Initialize: it calls StepReward once per OnActionReceived and reads the mode
-// columns for the hit/got-hit events off its Health handlers. Terminal rewards
-// (kill/death/timeout) don't vary by mode and stay on the agent.
+// columns for the hit/got-hit/kill events off its Health handlers. The terminal
+// rewards that don't vary by mode — death, timeout — stay on the agent.
 public class RewardComputer
 {
     public float aliveRewardPerStep = 0.0002f;

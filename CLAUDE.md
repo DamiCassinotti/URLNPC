@@ -100,28 +100,30 @@ The Enemy GameObject **must** carry `BehaviorParameters` + `DecisionRequester` f
 Global rows — the commanded mode doesn't move them:
 
 - `aliveRewardPerStep` `+0.0002`
-- `killTargetReward` `+1.0` (ends episode)
 - `diedPenalty` `-1.0` (ends episode)
 - `wastedShotPenalty` `-0.05` (fire branch put a bullet downrange while the target was not in sight)
 - `timeoutPenalty` `-0.6` (round clock ran out — draw, ends episode)
 - `tooCloseDistance` `6 m` — the radius the per-mode `tooClosePenaltyByMode` column below applies inside (the distance itself is global; only the penalty varies)
 
-**Per-mode columns (#44):** the mode in the `ModeChannel` selects which column is live, so the one-hot the policy observes actually changes what pays. Serialized as one `float[]` row per event, indexed in `NpcModes.All` order (Hunt, HoldCover, Retreat, Patrol); a row shorter than that falls back to the global `hitTargetReward`/`gotHitPenalty`/`tooClosePenaltyPerStep` (or to 0 for the rows with no global counterpart), so an Inspector edit can't throw mid-episode. Those scalars keep their names — the binary FPS scene may carry overrides a rename would silently drop.
+**Per-mode columns (#44):** the mode in the `ModeChannel` selects which column is live, so the one-hot the policy observes actually changes what pays. Serialized as one `float[]` row per event, indexed in `NpcModes.All` order (Hunt, HoldCover, Retreat, Patrol); a row shorter than that falls back to the global `killTargetReward`/`hitTargetReward`/`gotHitPenalty`/`tooClosePenaltyPerStep` (or to 0 for the rows with no global counterpart), so an Inspector edit can't throw mid-episode. Those scalars keep their names — the binary FPS scene may carry overrides a rename would silently drop (it has them for `killTargetReward` and `hitTargetReward`; with the full-length rows below they are never read).
 
 | event | Hunt | HoldCover | Retreat | Patrol |
 |---|---|---|---|---|
-| `hitTargetRewardByMode` | +0.5 | +0.5 | +0.1 | +0.1 |
-| `gotHitPenaltyByMode` | -0.3 | -0.6 | -0.6 | -0.5 |
-| `closingRewardPerMeterByMode` (#85) | +0.03 | 0 | -0.03 | 0 |
-| `coverRewardPerStepByMode` | 0 | +0.005 | +0.002 | 0 |
+| `killTargetRewardByMode` (#115) | +1.0 | +0.3 | 0 | +0.2 |
+| `hitTargetRewardByMode` | +0.5 | +0.2 | 0 | +0.1 |
+| `gotHitPenaltyByMode` | -0.3 | -0.8 | -1.0 | -0.5 |
+| `closingRewardPerMeterByMode` (#85) | +0.03 | 0 | -0.06 | 0 |
+| `coverRewardPerStepByMode` | 0 | +0.02 | +0.01 | 0 |
 | `newAreaRewardByMode` (#85) | 0 | 0 | 0 | +0.01 |
 | `tooClosePenaltyByMode` (#80) | 0 | -0.004 | -0.008 | -0.002 |
 
 Hunt's too-close column is 0 on purpose: as one global row the penalty taxed the one mode whose job is to close, which is part of why Hunt wouldn't engage (#79).
 
-The closing and new-area columns are 3x and 5x their first values (#85): at the old weights the first 4-mode run left Retreat and Patrol compliance near zero (0.015 and 0.005), the positional signal losing to default aggression and to having no reason to roam. HoldCover and `killTargetReward` were held fixed as controls so the lift stays attributable to these two rows.
+The closing and new-area columns are 3x and 5x their first values (#85): at the old weights the first 4-mode run left Retreat and Patrol compliance near zero (0.015 and 0.005), the positional signal losing to default aggression and to having no reason to roam.
 
-The columns are the `ModeRewardTable` POCO; `RewardComputer.StepReward` takes a `StepRewardInput` (mode, fire/sight flags, distance, closing delta, cover and new-area flags), with `tooCloseDistance` the one positional scalar that stays global, and the agent reads the same table for the hit/got-hit `Health` events. The two positional inputs come from `EpisodeProgress`: metres closed on the target since the last step (capped, so a respawn or a NavMesh warp isn't progress) and whether this step entered a `newAreaCellSize` patch of the arena not visited yet — both reset on episode begin. The cover flag is `EnemyBehavior.IsHiddenFromTarget()`, an environment-side true-state read like `DistanceToTarget()`: it probes the *target's* eye-line to this body through the shared `EyeLine.Blocked` helper at the same eye height `MoveToCover`'s cover query uses, so the point the policy is sent to is a point the column pays for. `IsTargetInSight` can't answer it — being FOV-limited it would call "in cover" every step the NPC looked away. The probe is a raycast, so the agent only fires it for modes whose column is non-zero (`RewardComputer.RewardsCover`).
+**The kill row is per-mode too (#115).** Under per-mode masking (#113) the modes still made the same engage/disengage choice — commanded-Retreat out-damaged Hunt and the defensive modes sat at the random floor — because a global `killTargetReward` `+1.0` was the largest number on the board and a Retreat body collected it by winning anyway. Retreat is now paid nothing for a hit or a kill, punished hardest for taking one, and paid double to open distance; HoldCover's and Retreat's cover columns are 4x and 5x their previous values.
+
+The columns are the `ModeRewardTable` POCO; `RewardComputer.StepReward` takes a `StepRewardInput` (mode, fire/sight flags, distance, closing delta, cover and new-area flags), with `tooCloseDistance` the one positional scalar that stays global, and the agent reads the same table for the hit/got-hit/kill `Health` events. The two positional inputs come from `EpisodeProgress`: metres closed on the target since the last step (capped, so a respawn or a NavMesh warp isn't progress) and whether this step entered a `newAreaCellSize` patch of the arena not visited yet — both reset on episode begin. The cover flag is `EnemyBehavior.IsHiddenFromTarget()`, an environment-side true-state read like `DistanceToTarget()`: it probes the *target's* eye-line to this body through the shared `EyeLine.Blocked` helper at the same eye height `MoveToCover`'s cover query uses, so the point the policy is sent to is a point the column pays for. `IsTargetInSight` can't answer it — being FOV-limited it would call "in cover" every step the NPC looked away. The probe is a raycast, so the agent only fires it for modes whose column is non-zero (`RewardComputer.RewardsCover`).
 
 ## Tests
 

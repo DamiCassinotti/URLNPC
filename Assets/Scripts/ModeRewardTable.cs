@@ -1,10 +1,14 @@
 // One reward column per commanded mode (#44): the mode in the ModeChannel picks
 // which column is live, so the mode one-hot the policy observes actually changes
-// what pays. Rows the mode doesn't move — kill, death, timeout, alive-per-step,
+// what pays. Rows the mode doesn't move — death, timeout, alive-per-step,
 // wasted shot — stay global on EnemyAgent.
 public struct ModeRewardColumn
 {
     public float hitTarget;
+    // Terminal reward for killing the target. Per mode (#115): as one global
+    // +1.0 it was the biggest number on the board, so a body commanded to
+    // Retreat was still paid for winning the fight it was told to leave.
+    public float killTarget;
     // Positive magnitude; the agent subtracts it.
     public float gotHit;
     // Per metre closed on the target since the last step. Negative pays for
