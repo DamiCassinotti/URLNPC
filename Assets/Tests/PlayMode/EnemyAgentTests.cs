@@ -83,13 +83,19 @@ public class EnemyAgentTests : PlayModeTestBase
 
         float baseline = agent.GetCumulativeReward();
         playerHealth.DecreaseHealth(10f);
-        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0.1f).Within(1e-4f),
-            "a retreating NPC gets little for trading shots");
+        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0f).Within(1e-4f),
+            "a retreating NPC is not paid for trading shots (#115)");
 
         baseline = agent.GetCumulativeReward();
         selfHealth.DecreaseHealth(10f);
-        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(-0.6f).Within(1e-4f),
-            "and being hit while retreating costs double what it does in Hunt");
+        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(-1.0f).Within(1e-4f),
+            "and being hit while retreating costs more than three times what it does in Hunt");
+
+        agent.GetComponent<ModeChannel>().SetMode(NpcMode.HoldCover);
+        baseline = agent.GetCumulativeReward();
+        playerHealth.DecreaseHealth(10f);
+        Assert.That(agent.GetCumulativeReward() - baseline, Is.EqualTo(0.2f).Within(1e-4f),
+            "holding cover pays something for a hit, but well under Hunt's");
     }
 
     // Records what WriteDiscreteActionMask disables. ML-Agents' own
