@@ -36,6 +36,37 @@ public class ModeMeanTallyTests
     }
 
     [Test]
+    public void IneligibleSteps_CountIntoTheTotalButNotTheEligibleOne()
+    {
+        // Unlike ModeTally, the two figures sit side by side: a pursuit closes
+        // most of its range with the target out of sight, so dropping those
+        // steps from the primary total would drop the charge it measures.
+        var tally = new ModeMeanTally();
+        tally.Record(NpcMode.Hunt, -1f, stepIsEligible: false);
+        tally.Record(NpcMode.Hunt, -1f, stepIsEligible: false);
+        tally.Record(NpcMode.Hunt, -0.5f, stepIsEligible: true);
+
+        Assert.That(tally.Steps(NpcMode.Hunt), Is.EqualTo(3));
+        Assert.That(tally.Total(NpcMode.Hunt), Is.EqualTo(-2.5f).Within(1e-5f));
+        Assert.That(tally.EligibleSteps(NpcMode.Hunt), Is.EqualTo(1));
+        Assert.That(tally.EligibleTotal(NpcMode.Hunt), Is.EqualTo(-0.5f).Within(1e-5f));
+        Assert.That(tally.EligibleMean(NpcMode.Hunt), Is.EqualTo(-0.5f).Within(1e-5f));
+    }
+
+    [Test]
+    public void AModeWithNoEligibleStep_ReportsZeroRatherThanDividingByIt()
+    {
+        var tally = new ModeMeanTally();
+        tally.Record(NpcMode.Patrol, -0.3f, stepIsEligible: false);
+
+        Assert.That(tally.EligibleSteps(NpcMode.Patrol), Is.Zero);
+        Assert.That(tally.EligibleTotal(NpcMode.Patrol), Is.EqualTo(0f));
+        Assert.That(tally.EligibleMean(NpcMode.Patrol), Is.EqualTo(0f));
+        Assert.That(tally.Mean(NpcMode.Patrol), Is.EqualTo(-0.3f).Within(1e-5f),
+            "the step still counts where it is not gated on visibility");
+    }
+
+    [Test]
     public void AModeNeverCommanded_HasNoStepsAndNoMean()
     {
         var tally = new ModeMeanTally();
@@ -62,13 +93,15 @@ public class ModeMeanTallyTests
     public void Json_ReportsEveryCommandedModeUnderTheCallersKey()
     {
         var tally = new ModeMeanTally();
-        tally.Record(NpcMode.Hunt, -0.25f);
-        tally.Record(NpcMode.Hunt, -0.75f);
-        tally.Record(NpcMode.Retreat, 0.5f);
+        tally.Record(NpcMode.Hunt, -0.25f, stepIsEligible: true);
+        tally.Record(NpcMode.Hunt, -0.75f, stepIsEligible: false);
+        tally.Record(NpcMode.Retreat, 0.5f, stepIsEligible: true);
 
         Assert.That(tally.Json("closing"), Is.EqualTo(
-            "\"closing\":{\"Hunt\":{\"steps\":2,\"total\":-1,\"mean\":-0.5},"
-            + "\"Retreat\":{\"steps\":1,\"total\":0.5,\"mean\":0.5}}"));
+            "\"closing\":{\"Hunt\":{\"steps\":2,\"total\":-1,\"mean\":-0.5,"
+            + "\"eligible\":1,\"eligibleTotal\":-0.25,\"eligibleMean\":-0.25},"
+            + "\"Retreat\":{\"steps\":1,\"total\":0.5,\"mean\":0.5,"
+            + "\"eligible\":1,\"eligibleTotal\":0.5,\"eligibleMean\":0.5}}"));
     }
 
     [Test]
@@ -81,6 +114,8 @@ public class ModeMeanTallyTests
         Assert.That(tally.TotalSteps, Is.Zero);
         Assert.That(tally.Steps(NpcMode.Hunt), Is.Zero);
         Assert.That(tally.Total(NpcMode.Hunt), Is.EqualTo(0f));
+        Assert.That(tally.EligibleSteps(NpcMode.Hunt), Is.Zero);
+        Assert.That(tally.EligibleTotal(NpcMode.Hunt), Is.EqualTo(0f));
         Assert.That(tally.Json("closing"), Is.EqualTo("\"closing\":{}"));
     }
 }

@@ -70,8 +70,8 @@ def summarize(events, entity):
     for mode in MODES:
         steps = eligible = compliant = 0
         visible_eligible = visible_hits = 0
-        closing_steps = 0
-        closing_total = 0.0
+        closing_steps = closing_seen_steps = 0
+        closing_total = closing_seen_total = 0.0
         for event in compliance_events:
             row = event.get("compliance", {}).get(mode)
             if row:
@@ -86,6 +86,8 @@ def summarize(events, entity):
             if closed:
                 closing_steps += closed.get("steps", 0)
                 closing_total += closed.get("total", 0.0)
+                closing_seen_steps += closed.get("eligible", 0)
+                closing_seen_total += closed.get("eligibleTotal", 0.0)
         if steps == 0:
             continue
         modes[mode] = {
@@ -99,6 +101,11 @@ def summarize(events, entity):
             # None when missing, so a run recorded before the metric existed
             # reports a dash instead of a flat zero.
             "closing": closing_total / closing_steps if closing_steps else None,
+            # The same over the steps the target was visible on: in-contact
+            # positioning, where the whole-episode figure is mostly the walk in.
+            "closingVisible": (
+                closing_seen_total / closing_seen_steps if closing_seen_steps else None
+            ),
         }
 
     return {
@@ -153,13 +160,13 @@ def render(summary):
         lines.append("")
         lines.append(
             f"{'mode':<10}{'steps':>9}{'eligible':>10}{'compliance':>12}{'visible':>10}"
-            f"{'m/step':>10}"
+            f"{'m/step':>10}{'m/step seen':>13}"
         )
         for mode, row in summary["modes"].items():
             lines.append(
                 f"{mode:<10}{row['steps']:>9}{row['eligible']:>10}"
                 f"{rate(row['compliance']):>12}{rate(row['visible']):>10}"
-                f"{metres(row['closing']):>10}"
+                f"{metres(row['closing']):>10}{metres(row['closingVisible']):>13}"
             )
     return "\n".join(lines)
 

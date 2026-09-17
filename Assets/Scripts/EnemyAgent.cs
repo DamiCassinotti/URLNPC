@@ -87,6 +87,7 @@ public class EnemyAgent : Agent
     static readonly string[] complianceStatNames = BuildStatNames("Compliance");
     static readonly string[] visibleStatNames = BuildStatNames("Visible");
     static readonly string[] closingStatNames = BuildStatNames("Closing");
+    static readonly string[] closingVisibleStatNames = BuildStatNames("ClosingVisible");
 
     readonly float[] observations = new float[NpcBrainSpec.ObservationSize];
     NpcObservationInput inputs;
@@ -415,8 +416,13 @@ public class EnemyAgent : Agent
         visibility.Record(mode, inputs.targetVisible);
         // Sign flipped from closingDelta: the metric reports the change in
         // range, so a mode that charges reads negative and one that holds its
-        // distance reads near zero.
-        rangeDelta.Record(mode, -closingDelta);
+        // distance reads near zero. Recorded twice over, once against the whole
+        // episode and once against the steps the target was visible on: a
+        // pursuit closes most of its range walking to a remembered position with
+        // nobody in sight, so the visible half is in-contact positioning rather
+        // than the charge, and which of the two separates the modes is a
+        // question for the eval and not for this line.
+        rangeDelta.Record(mode, -closingDelta, inputs.targetVisible);
     }
 
     public override void OnEpisodeBegin()
@@ -503,6 +509,12 @@ public class EnemyAgent : Agent
                 // with the dwell schedule, so the episode total isn't comparable
                 // across runs. The total is on the JSONL line for that.
                 stats.Add(closingStatNames[(int)mode], rangeDelta.Mean(mode));
+                // A mode whose target was never visible has no in-contact range
+                // to report; a 0 would read as holding distance (#88's rule).
+                if (rangeDelta.EligibleSteps(mode) > 0)
+                {
+                    stats.Add(closingVisibleStatNames[(int)mode], rangeDelta.EligibleMean(mode));
+                }
             }
         }
         if (TelemetryLogger.Instance != null)

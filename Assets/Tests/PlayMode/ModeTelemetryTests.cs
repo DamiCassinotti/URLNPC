@@ -146,6 +146,10 @@ public class ModeTelemetryTests : PlayModeTestBase
         string line = LineOfType("mode_compliance");
         Assert.That(line, Does.Contain("\"closing\":{\"Hunt\":{\"steps\":2,\"total\":-2,"),
             $"expected two metres of range closed in:\n{line}");
+        // Nothing was visible on either step, and the range it closed still
+        // counts: a pursuit closes most of its range walking to a remembered
+        // position. The visible-only figure is reported beside it, not instead.
+        Assert.That(line, Does.Contain("\"eligible\":0,\"eligibleTotal\":0"));
     }
 
     [UnityTest]
