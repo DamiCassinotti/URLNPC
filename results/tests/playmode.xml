@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="120" result="Passed" total="120" passed="120" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:40:44Z" duration="47.3169105">
-  <test-suite type="TestSuite" id="1255" name="URLNPC" fullname="URLNPC" runstate="Runnable" testcasecount="199" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:40:44Z" duration="47.316911" total="120" passed="120" failed="0" inconclusive="0" skipped="0" asserts="0">
+<test-run id="2" testcasecount="121" result="Passed" total="121" passed="121" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:02:42Z" duration="47.4025404">
+  <test-suite type="TestSuite" id="1256" name="URLNPC" fullname="URLNPC" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:02:42Z" duration="47.402540" total="121" passed="121" failed="0" inconclusive="0" skipped="0" asserts="0">
     <properties>
       <property name="platform" value="PlayMode" />
     </properties>
-    <test-suite type="Assembly" id="1254" name="URLNPC.Tests.PlayMode.dll" fullname="/home/damian/repos/URLNPC/Library/ScriptAssemblies/URLNPC.Tests.PlayMode.dll" runstate="Runnable" testcasecount="120" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:40:44Z" duration="47.303746" total="120" passed="120" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <test-suite type="Assembly" id="1255" name="URLNPC.Tests.PlayMode.dll" fullname="/home/damian/repos/URLNPC/Library/ScriptAssemblies/URLNPC.Tests.PlayMode.dll" runstate="Runnable" testcasecount="121" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:02:42Z" duration="47.387289" total="121" passed="121" failed="0" inconclusive="0" skipped="0" asserts="0">
       <properties>
-        <property name="_PID" value="26290" />
+        <property name="_PID" value="31495" />
         <property name="_APPDOMAIN" value="Unity Child Domain" />
         <property name="platform" value="PlayMode" />
         <property name="EditorOnly" value="False" />
       </properties>
-      <test-suite type="TestFixture" id="1108" name="ArenaCoverTests" fullname="ArenaCoverTests" classname="ArenaCoverTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.351931" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1108" name="ArenaCoverTests" fullname="ArenaCoverTests" classname="ArenaCoverTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.411115" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1119" name="ALowStairStep_IsNotCover" fullname="ArenaCoverTests.ALowStairStep_IsNotCover" methodname="ALowStairStep_IsNotCover" classname="ArenaCoverTests" runstate="Runnable" seed="685497507" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.052914" asserts="0">
+        <test-case id="1119" name="ALowStairStep_IsNotCover" fullname="ArenaCoverTests.ALowStairStep_IsNotCover" methodname="ALowStairStep_IsNotCover" classname="ArenaCoverTests" runstate="Runnable" seed="586928801" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.060422" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -22,7 +22,7 @@
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
         </test-case>
-        <test-case id="1120" name="ALowStairStep_IsNotCover_FromAnywhereInTheArena" fullname="ArenaCoverTests.ALowStairStep_IsNotCover_FromAnywhereInTheArena" methodname="ALowStairStep_IsNotCover_FromAnywhereInTheArena" classname="ArenaCoverTests" runstate="Runnable" seed="1562455087" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.021863" asserts="0">
+        <test-case id="1120" name="ALowStairStep_IsNotCover_FromAnywhereInTheArena" fullname="ArenaCoverTests.ALowStairStep_IsNotCover_FromAnywhereInTheArena" methodname="ALowStairStep_IsNotCover_FromAnywhereInTheArena" classname="ArenaCoverTests" runstate="Runnable" seed="16074773" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.022549" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -31,9 +31,9 @@
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
         </test-case>
-        <test-suite type="ParameterizedMethod" id="1114" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.155298" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="ParameterizedMethod" id="1114" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.184131" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-case id="1109" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(0)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(0)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="470507256" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.025655" asserts="0">
+          <test-case id="1109" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(0)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(0)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="895289162" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.027844" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -42,7 +42,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
           </test-case>
-          <test-case id="1110" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(1)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(1)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="535024299" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.023210" asserts="0">
+          <test-case id="1110" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(1)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(1)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="241074176" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.029287" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -51,7 +51,7 @@
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
           </test-case>
-          <test-case id="1111" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(2)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(2)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="623523792" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.035402" asserts="0">
+          <test-case id="1111" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(2)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(2)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="1645433348" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.041543" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -60,7 +60,7 @@
 [ArenaManager] Built arena #2 "Twin Towers" (60x60).
 ]]></output>
           </test-case>
-          <test-case id="1112" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(3)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(3)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="1318184067" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.020987" asserts="0">
+          <test-case id="1112" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(3)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(3)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="1663301545" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.027490" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -69,7 +69,7 @@
 [ArenaManager] Built arena #3 "Maze" (44x44).
 ]]></output>
           </test-case>
-          <test-case id="1113" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(4)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(4)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="1348966158" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.046450" asserts="0">
+          <test-case id="1113" name="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(4)" fullname="ArenaCoverTests.EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo(4)" methodname="EveryLayout_ReturnsCoverThatIsHidden_AndWalkableTo" classname="ArenaCoverTests" runstate="Runnable" seed="1238170991" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.053909" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -79,7 +79,7 @@
 ]]></output>
           </test-case>
         </test-suite>
-        <test-case id="1121" name="EyeHeightTracksBaseOffset_ATallHeadClearsALowWall" fullname="ArenaCoverTests.EyeHeightTracksBaseOffset_ATallHeadClearsALowWall" methodname="EyeHeightTracksBaseOffset_ATallHeadClearsALowWall" classname="ArenaCoverTests" runstate="Runnable" seed="982279724" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.018551" asserts="0">
+        <test-case id="1121" name="EyeHeightTracksBaseOffset_ATallHeadClearsALowWall" fullname="ArenaCoverTests.EyeHeightTracksBaseOffset_ATallHeadClearsALowWall" methodname="EyeHeightTracksBaseOffset_ATallHeadClearsALowWall" classname="ArenaCoverTests" runstate="Runnable" seed="2115438033" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.020768" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -88,7 +88,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1118" name="GeometryOutsideTheSightMask_IsNotCover" fullname="ArenaCoverTests.GeometryOutsideTheSightMask_IsNotCover" methodname="GeometryOutsideTheSightMask_IsNotCover" classname="ArenaCoverTests" runstate="Runnable" seed="726117544" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.015969" asserts="0">
+        <test-case id="1118" name="GeometryOutsideTheSightMask_IsNotCover" fullname="ArenaCoverTests.GeometryOutsideTheSightMask_IsNotCover" methodname="GeometryOutsideTheSightMask_IsNotCover" classname="ArenaCoverTests" runstate="Runnable" seed="251439203" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.019558" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -97,7 +97,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1115" name="PicksTheNearestOfTheAvailableCoverPoints" fullname="ArenaCoverTests.PicksTheNearestOfTheAvailableCoverPoints" methodname="PicksTheNearestOfTheAvailableCoverPoints" classname="ArenaCoverTests" runstate="Runnable" seed="1302014839" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.018123" asserts="0">
+        <test-case id="1115" name="PicksTheNearestOfTheAvailableCoverPoints" fullname="ArenaCoverTests.PicksTheNearestOfTheAvailableCoverPoints" methodname="PicksTheNearestOfTheAvailableCoverPoints" classname="ArenaCoverTests" runstate="Runnable" seed="1303923467" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.019949" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -106,7 +106,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1116" name="ReportsNoCover_WhenTheLayoutHasNoneLeft" fullname="ArenaCoverTests.ReportsNoCover_WhenTheLayoutHasNoneLeft" methodname="ReportsNoCover_WhenTheLayoutHasNoneLeft" classname="ArenaCoverTests" runstate="Runnable" seed="1397492047" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.015682" asserts="0">
+        <test-case id="1116" name="ReportsNoCover_WhenTheLayoutHasNoneLeft" fullname="ArenaCoverTests.ReportsNoCover_WhenTheLayoutHasNoneLeft" methodname="ReportsNoCover_WhenTheLayoutHasNoneLeft" classname="ArenaCoverTests" runstate="Runnable" seed="634660617" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.018986" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -115,7 +115,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1122" name="TheAskersOwnBodyDoesNotCountAsCover" fullname="ArenaCoverTests.TheAskersOwnBodyDoesNotCountAsCover" methodname="TheAskersOwnBodyDoesNotCountAsCover" classname="ArenaCoverTests" runstate="Runnable" seed="661134716" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.017612" asserts="0">
+        <test-case id="1122" name="TheAskersOwnBodyDoesNotCountAsCover" fullname="ArenaCoverTests.TheAskersOwnBodyDoesNotCountAsCover" methodname="TheAskersOwnBodyDoesNotCountAsCover" classname="ArenaCoverTests" runstate="Runnable" seed="109900266" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.021048" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -124,7 +124,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1117" name="ThreatStandingOnACoverBox_SkipsItWithoutPoisoningTheResult" fullname="ArenaCoverTests.ThreatStandingOnACoverBox_SkipsItWithoutPoisoningTheResult" methodname="ThreatStandingOnACoverBox_SkipsItWithoutPoisoningTheResult" classname="ArenaCoverTests" runstate="Runnable" seed="342147684" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.016663" asserts="0">
+        <test-case id="1117" name="ThreatStandingOnACoverBox_SkipsItWithoutPoisoningTheResult" fullname="ArenaCoverTests.ThreatStandingOnACoverBox_SkipsItWithoutPoisoningTheResult" methodname="ThreatStandingOnACoverBox_SkipsItWithoutPoisoningTheResult" classname="ArenaCoverTests" runstate="Runnable" seed="1743477897" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:55Z" duration="0.019353" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -134,9 +134,9 @@
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1123" name="ArenaSeedingTests" fullname="ArenaSeedingTests" classname="ArenaSeedingTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.222245" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1123" name="ArenaSeedingTests" fullname="ArenaSeedingTests" classname="ArenaSeedingTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:56Z" duration="0.242367" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1126" name="DifferentSeeds_ProduceDifferentSpawns" fullname="ArenaSeedingTests.DifferentSeeds_ProduceDifferentSpawns" methodname="DifferentSeeds_ProduceDifferentSpawns" classname="ArenaSeedingTests" runstate="Runnable" seed="290343163" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.033656" asserts="0">
+        <test-case id="1126" name="DifferentSeeds_ProduceDifferentSpawns" fullname="ArenaSeedingTests.DifferentSeeds_ProduceDifferentSpawns" methodname="DifferentSeeds_ProduceDifferentSpawns" classname="ArenaSeedingTests" runstate="Runnable" seed="1109760402" result="Passed" start-time="2026-09-17 20:01:55Z" end-time="2026-09-17 20:01:56Z" duration="0.039677" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -147,7 +147,7 @@
 [ArenaManager] Built arena #3 "Maze" (44x44).
 ]]></output>
         </test-case>
-        <test-case id="1131" name="EnemySpawn_LandsOnNavMesh_AwayFromThePlayer" fullname="ArenaSeedingTests.EnemySpawn_LandsOnNavMesh_AwayFromThePlayer" methodname="EnemySpawn_LandsOnNavMesh_AwayFromThePlayer" classname="ArenaSeedingTests" runstate="Runnable" seed="102433277" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.032391" asserts="0">
+        <test-case id="1131" name="EnemySpawn_LandsOnNavMesh_AwayFromThePlayer" fullname="ArenaSeedingTests.EnemySpawn_LandsOnNavMesh_AwayFromThePlayer" methodname="EnemySpawn_LandsOnNavMesh_AwayFromThePlayer" classname="ArenaSeedingTests" runstate="Runnable" seed="280914096" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.035255" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -157,7 +157,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1127" name="ForcedArenaIndex_OverridesRandomSelection" fullname="ArenaSeedingTests.ForcedArenaIndex_OverridesRandomSelection" methodname="ForcedArenaIndex_OverridesRandomSelection" classname="ArenaSeedingTests" runstate="Runnable" seed="1489690480" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.025893" asserts="0">
+        <test-case id="1127" name="ForcedArenaIndex_OverridesRandomSelection" fullname="ArenaSeedingTests.ForcedArenaIndex_OverridesRandomSelection" methodname="ForcedArenaIndex_OverridesRandomSelection" classname="ArenaSeedingTests" runstate="Runnable" seed="1605691244" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.025870" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -166,7 +166,7 @@
 [ArenaManager] Built arena #3 "Maze" (44x44).
 ]]></output>
         </test-case>
-        <test-case id="1128" name="GroundPoints_LandOnTheBakedNavMesh_AtFloorLevel" fullname="ArenaSeedingTests.GroundPoints_LandOnTheBakedNavMesh_AtFloorLevel" methodname="GroundPoints_LandOnTheBakedNavMesh_AtFloorLevel" classname="ArenaSeedingTests" runstate="Runnable" seed="2049175706" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.017997" asserts="0">
+        <test-case id="1128" name="GroundPoints_LandOnTheBakedNavMesh_AtFloorLevel" fullname="ArenaSeedingTests.GroundPoints_LandOnTheBakedNavMesh_AtFloorLevel" methodname="GroundPoints_LandOnTheBakedNavMesh_AtFloorLevel" classname="ArenaSeedingTests" runstate="Runnable" seed="1228632431" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.020660" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -175,7 +175,7 @@
 [ArenaManager] Built arena #3 "Maze" (44x44).
 ]]></output>
         </test-case>
-        <test-case id="1130" name="RepositioningAHumanPlayer_StillLandsOnTheArena" fullname="ArenaSeedingTests.RepositioningAHumanPlayer_StillLandsOnTheArena" methodname="RepositioningAHumanPlayer_StillLandsOnTheArena" classname="ArenaSeedingTests" runstate="Runnable" seed="1093340598" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.020408" asserts="0">
+        <test-case id="1130" name="RepositioningAHumanPlayer_StillLandsOnTheArena" fullname="ArenaSeedingTests.RepositioningAHumanPlayer_StillLandsOnTheArena" methodname="RepositioningAHumanPlayer_StillLandsOnTheArena" classname="ArenaSeedingTests" runstate="Runnable" seed="1501774185" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.021039" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -185,7 +185,7 @@
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1129" name="RepositioningAnAgentDrivenPlayer_Sticks" fullname="ArenaSeedingTests.RepositioningAnAgentDrivenPlayer_Sticks" methodname="RepositioningAnAgentDrivenPlayer_Sticks" classname="ArenaSeedingTests" runstate="Runnable" seed="970689233" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.021054" asserts="0">
+        <test-case id="1129" name="RepositioningAnAgentDrivenPlayer_Sticks" fullname="ArenaSeedingTests.RepositioningAnAgentDrivenPlayer_Sticks" methodname="RepositioningAnAgentDrivenPlayer_Sticks" classname="ArenaSeedingTests" runstate="Runnable" seed="6627595" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.021713" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -196,7 +196,7 @@
 Failed to create agent because it is not close enough to the NavMesh
 ]]></output>
         </test-case>
-        <test-case id="1124" name="SameSeed_RebuildsSameArena_AndSameSpawnSequence" fullname="ArenaSeedingTests.SameSeed_RebuildsSameArena_AndSameSpawnSequence" methodname="SameSeed_RebuildsSameArena_AndSameSpawnSequence" classname="ArenaSeedingTests" runstate="Runnable" seed="1230022956" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.031194" asserts="0">
+        <test-case id="1124" name="SameSeed_RebuildsSameArena_AndSameSpawnSequence" fullname="ArenaSeedingTests.SameSeed_RebuildsSameArena_AndSameSpawnSequence" methodname="SameSeed_RebuildsSameArena_AndSameSpawnSequence" classname="ArenaSeedingTests" runstate="Runnable" seed="1128886970" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.034997" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -207,7 +207,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1125" name="SearchWaypointDraws_DoNotShiftTheSpawnSequence" fullname="ArenaSeedingTests.SearchWaypointDraws_DoNotShiftTheSpawnSequence" methodname="SearchWaypointDraws_DoNotShiftTheSpawnSequence" classname="ArenaSeedingTests" runstate="Runnable" seed="1053897742" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.036429" asserts="0">
+        <test-case id="1125" name="SearchWaypointDraws_DoNotShiftTheSpawnSequence" fullname="ArenaSeedingTests.SearchWaypointDraws_DoNotShiftTheSpawnSequence" methodname="SearchWaypointDraws_DoNotShiftTheSpawnSequence" classname="ArenaSeedingTests" runstate="Runnable" seed="486178003" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.038961" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -219,11 +219,11 @@ Failed to create agent because it is not close enough to the NavMesh
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1132" name="ArenaSpawnClearanceTests" fullname="ArenaSpawnClearanceTests" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:58Z" duration="0.553851" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1132" name="ArenaSpawnClearanceTests" fullname="ArenaSpawnClearanceTests" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.607707" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-suite type="ParameterizedMethod" id="1138" name="EveryLayout_SpawnsClearOfCover" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:58Z" duration="0.400472" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="ParameterizedMethod" id="1138" name="EveryLayout_SpawnsClearOfCover" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.454493" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-case id="1133" name="EveryLayout_SpawnsClearOfCover(0)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(0)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="2078505886" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.073455" asserts="0">
+          <test-case id="1133" name="EveryLayout_SpawnsClearOfCover(0)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(0)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1942731517" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.080872" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -232,7 +232,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
           </test-case>
-          <test-case id="1134" name="EveryLayout_SpawnsClearOfCover(1)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(1)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1726561723" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:57Z" duration="0.088079" asserts="0">
+          <test-case id="1134" name="EveryLayout_SpawnsClearOfCover(1)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(1)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1012147556" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.105956" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -241,7 +241,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
           </test-case>
-          <test-case id="1135" name="EveryLayout_SpawnsClearOfCover(2)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(2)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1780195817" result="Passed" start-time="2026-09-14 16:39:57Z" end-time="2026-09-14 16:39:58Z" duration="0.082346" asserts="0">
+          <test-case id="1135" name="EveryLayout_SpawnsClearOfCover(2)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(2)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1518031604" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.094256" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -250,7 +250,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #2 "Twin Towers" (60x60).
 ]]></output>
           </test-case>
-          <test-case id="1136" name="EveryLayout_SpawnsClearOfCover(3)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(3)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="765225592" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.055272" asserts="0">
+          <test-case id="1136" name="EveryLayout_SpawnsClearOfCover(3)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(3)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="937034368" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.060414" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -259,7 +259,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #3 "Maze" (44x44).
 ]]></output>
           </test-case>
-          <test-case id="1137" name="EveryLayout_SpawnsClearOfCover(4)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(4)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="80591064" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.099853" asserts="0">
+          <test-case id="1137" name="EveryLayout_SpawnsClearOfCover(4)" fullname="ArenaSpawnClearanceTests.EveryLayout_SpawnsClearOfCover(4)" methodname="EveryLayout_SpawnsClearOfCover" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="670781505" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.111596" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -269,7 +269,7 @@ Failed to create agent because it is not close enough to the NavMesh
 ]]></output>
           </test-case>
         </test-suite>
-        <test-case id="1148" name="FallsBackToAnOnMeshPoint_WhenNothingIsClear" fullname="ArenaSpawnClearanceTests.FallsBackToAnOnMeshPoint_WhenNothingIsClear" methodname="FallsBackToAnOnMeshPoint_WhenNothingIsClear" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="2121404444" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.013377" asserts="0">
+        <test-case id="1148" name="FallsBackToAnOnMeshPoint_WhenNothingIsClear" fullname="ArenaSpawnClearanceTests.FallsBackToAnOnMeshPoint_WhenNothingIsClear" methodname="FallsBackToAnOnMeshPoint_WhenNothingIsClear" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1413788553" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.013499" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
@@ -278,9 +278,9 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
         </test-case>
-        <test-suite type="ParameterizedMethod" id="1144" name="SpawnsStayOnTheNavMesh" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.103759" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="ParameterizedMethod" id="1144" name="SpawnsStayOnTheNavMesh" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.101364" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-case id="1139" name="SpawnsStayOnTheNavMesh(0)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(0)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1336658013" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.017406" asserts="0">
+          <test-case id="1139" name="SpawnsStayOnTheNavMesh(0)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(0)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="664742568" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.017122" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -289,7 +289,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
           </test-case>
-          <test-case id="1140" name="SpawnsStayOnTheNavMesh(1)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(1)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="2145157403" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.012293" asserts="0">
+          <test-case id="1140" name="SpawnsStayOnTheNavMesh(1)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(1)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="366508967" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.013523" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -298,7 +298,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
           </test-case>
-          <test-case id="1141" name="SpawnsStayOnTheNavMesh(2)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(2)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="805421448" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.029727" asserts="0">
+          <test-case id="1141" name="SpawnsStayOnTheNavMesh(2)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(2)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1750270" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.029376" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -307,7 +307,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #2 "Twin Towers" (60x60).
 ]]></output>
           </test-case>
-          <test-case id="1142" name="SpawnsStayOnTheNavMesh(3)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(3)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1745259729" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.016862" asserts="0">
+          <test-case id="1142" name="SpawnsStayOnTheNavMesh(3)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(3)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1074859080" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.017907" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -316,7 +316,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #3 "Maze" (44x44).
 ]]></output>
           </test-case>
-          <test-case id="1143" name="SpawnsStayOnTheNavMesh(4)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(4)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="787229269" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.025706" asserts="0">
+          <test-case id="1143" name="SpawnsStayOnTheNavMesh(4)" fullname="ArenaSpawnClearanceTests.SpawnsStayOnTheNavMesh(4)" methodname="SpawnsStayOnTheNavMesh" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="79818166" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.021717" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -326,9 +326,9 @@ Failed to create agent because it is not close enough to the NavMesh
 ]]></output>
           </test-case>
         </test-suite>
-        <test-suite type="ParameterizedMethod" id="1147" name="SpawnsStillSpreadAcrossTheArena" fullname="ArenaSpawnClearanceTests.SpawnsStillSpreadAcrossTheArena" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.034435" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="ParameterizedMethod" id="1147" name="SpawnsStillSpreadAcrossTheArena" fullname="ArenaSpawnClearanceTests.SpawnsStillSpreadAcrossTheArena" classname="ArenaSpawnClearanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.036413" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-case id="1145" name="SpawnsStillSpreadAcrossTheArena(1)" fullname="ArenaSpawnClearanceTests.SpawnsStillSpreadAcrossTheArena(1)" methodname="SpawnsStillSpreadAcrossTheArena" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1280504488" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.012199" asserts="0">
+          <test-case id="1145" name="SpawnsStillSpreadAcrossTheArena(1)" fullname="ArenaSpawnClearanceTests.SpawnsStillSpreadAcrossTheArena(1)" methodname="SpawnsStillSpreadAcrossTheArena" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="1244377187" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.014104" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -337,7 +337,7 @@ Failed to create agent because it is not close enough to the NavMesh
 [ArenaManager] Built arena #1 "The Pit" (28x28).
 ]]></output>
           </test-case>
-          <test-case id="1146" name="SpawnsStillSpreadAcrossTheArena(4)" fullname="ArenaSpawnClearanceTests.SpawnsStillSpreadAcrossTheArena(4)" methodname="SpawnsStillSpreadAcrossTheArena" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="77375084" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.021075" asserts="0">
+          <test-case id="1146" name="SpawnsStillSpreadAcrossTheArena(4)" fullname="ArenaSpawnClearanceTests.SpawnsStillSpreadAcrossTheArena(4)" methodname="SpawnsStillSpreadAcrossTheArena" classname="ArenaSpawnClearanceTests" runstate="Runnable" seed="20084974" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.021225" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -348,30 +348,30 @@ Failed to create agent because it is not close enough to the NavMesh
           </test-case>
         </test-suite>
       </test-suite>
-      <test-suite type="TestFixture" id="1149" name="BodyHeightTests" fullname="BodyHeightTests" classname="BodyHeightTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.033742" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1149" name="BodyHeightTests" fullname="BodyHeightTests" classname="BodyHeightTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.048499" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1150" name="FeetOriginBody_FiresFromMidBody_NotItsAnkles" fullname="BodyHeightTests.FeetOriginBody_FiresFromMidBody_NotItsAnkles" methodname="FeetOriginBody_FiresFromMidBody_NotItsAnkles" classname="BodyHeightTests" runstate="Runnable" seed="614081181" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.013728" asserts="0">
+        <test-case id="1150" name="FeetOriginBody_FiresFromMidBody_NotItsAnkles" fullname="BodyHeightTests.FeetOriginBody_FiresFromMidBody_NotItsAnkles" methodname="FeetOriginBody_FiresFromMidBody_NotItsAnkles" classname="BodyHeightTests" runstate="Runnable" seed="837907051" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.026926" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1151" name="LiftedOriginBody_MuzzleIsUnchanged" fullname="BodyHeightTests.LiftedOriginBody_MuzzleIsUnchanged" methodname="LiftedOriginBody_MuzzleIsUnchanged" classname="BodyHeightTests" runstate="Runnable" seed="842098287" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.009127" asserts="0">
+        <test-case id="1151" name="LiftedOriginBody_MuzzleIsUnchanged" fullname="BodyHeightTests.LiftedOriginBody_MuzzleIsUnchanged" methodname="LiftedOriginBody_MuzzleIsUnchanged" classname="BodyHeightTests" runstate="Runnable" seed="1982560383" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.012326" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1153" name="SightLine_AgreesWhicheverBodyIsLooking" fullname="BodyHeightTests.SightLine_AgreesWhicheverBodyIsLooking" methodname="SightLine_AgreesWhicheverBodyIsLooking" classname="BodyHeightTests" runstate="Runnable" seed="1208407158" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.004441" asserts="0">
+        <test-case id="1153" name="SightLine_AgreesWhicheverBodyIsLooking" fullname="BodyHeightTests.SightLine_AgreesWhicheverBodyIsLooking" methodname="SightLine_AgreesWhicheverBodyIsLooking" classname="BodyHeightTests" runstate="Runnable" seed="1034876347" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.003955" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1152" name="ThreatEye_ReadsTheTargetsOwnBaseOffset" fullname="BodyHeightTests.ThreatEye_ReadsTheTargetsOwnBaseOffset" methodname="ThreatEye_ReadsTheTargetsOwnBaseOffset" classname="BodyHeightTests" runstate="Runnable" seed="1596452816" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.003434" asserts="0">
+        <test-case id="1152" name="ThreatEye_ReadsTheTargetsOwnBaseOffset" fullname="BodyHeightTests.ThreatEye_ReadsTheTargetsOwnBaseOffset" methodname="ThreatEye_ReadsTheTargetsOwnBaseOffset" classname="BodyHeightTests" runstate="Runnable" seed="1862311768" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:56Z" duration="0.002962" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -379,9 +379,9 @@ Failed to create agent because it is not close enough to the NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1156" name="CombatantRigTests" fullname="CombatantRigTests" classname="CombatantRigTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.241290" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1156" name="CombatantRigTests" fullname="CombatantRigTests" classname="CombatantRigTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:57Z" duration="0.241596" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1159" name="AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc" fullname="CombatantRigTests.AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc" methodname="AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc" classname="CombatantRigTests" runstate="Runnable" seed="623749130" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.175901" asserts="0">
+        <test-case id="1159" name="AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc" fullname="CombatantRigTests.AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc" methodname="AgentDriver_InstallsTheEnemyCombatStackAimedAtTheNpc" classname="CombatantRigTests" runstate="Runnable" seed="1647058876" result="Passed" start-time="2026-09-17 20:01:56Z" end-time="2026-09-17 20:01:57Z" duration="0.182795" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -393,16 +393,16 @@ Failed to create agent because there is no valid NavMesh
 Registered Communicator in Agent.
 Couldn't connect to trainer on port 5004 using API version 1.5.0. Will perform inference instead.
 [CombatantRig] Player driver: Agent.
-[RunRng] Run seed: 33294463 (source: random). Replay with '-runSeed 33294463' or ArenaManager.runSeed = 33294463.
+[RunRng] Run seed: 39803630 (source: random). Replay with '-runSeed 39803630' or ArenaManager.runSeed = 39803630.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-21.39, 0.00, -13.10).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (52.42, 0.00, -39.17).
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-32.06, 0.00, -43.20).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (35.27, 0.00, 38.42).
 ]]></output>
         </test-case>
-        <test-case id="1157" name="AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout" fullname="CombatantRigTests.AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout" methodname="AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout" classname="CombatantRigTests" runstate="Runnable" seed="398772792" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.007569" asserts="0">
+        <test-case id="1157" name="AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout" fullname="CombatantRigTests.AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout" methodname="AgentDriver_LeavesMaxStepAtZeroSoTheRoundClockOwnsTimeout" classname="CombatantRigTests" runstate="Runnable" seed="1009040248" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.006284" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -411,17 +411,17 @@ Failed to create agent because there is no valid NavMesh
           <output><![CDATA[
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
-[RunRng] Run seed: 33294489 (source: random). Replay with '-runSeed 33294489' or ArenaManager.runSeed = 33294489.
+[RunRng] Run seed: 39803658 (source: random). Replay with '-runSeed 39803658' or ArenaManager.runSeed = 39803658.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (48.58, 0.00, -57.64).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (7.77, 0.00, -13.28).
 [CombatantRig] Player driver: Agent.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-11.21, 0.00, 22.74).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-16.13, 0.00, 35.59).
 ]]></output>
         </test-case>
-        <test-case id="1160" name="AgentDriver_MatchesTheEnemyPolicyContract" fullname="CombatantRigTests.AgentDriver_MatchesTheEnemyPolicyContract" methodname="AgentDriver_MatchesTheEnemyPolicyContract" classname="CombatantRigTests" runstate="Runnable" seed="381437322" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.006638" asserts="0">
+        <test-case id="1160" name="AgentDriver_MatchesTheEnemyPolicyContract" fullname="CombatantRigTests.AgentDriver_MatchesTheEnemyPolicyContract" methodname="AgentDriver_MatchesTheEnemyPolicyContract" classname="CombatantRigTests" runstate="Runnable" seed="1939456642" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.006698" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -430,17 +430,17 @@ Failed to create agent because there is no valid NavMesh
           <output><![CDATA[
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
-[RunRng] Run seed: 33294497 (source: random). Replay with '-runSeed 33294497' or ArenaManager.runSeed = 33294497.
+[RunRng] Run seed: 39803665 (source: random). Replay with '-runSeed 39803665' or ArenaManager.runSeed = 39803665.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-49.89, 0.00, -15.96).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-33.39, 0.00, -6.81).
 [CombatantRig] Player driver: Agent.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (59.82, 0.00, -12.35).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-28.98, 0.00, -25.12).
 ]]></output>
         </test-case>
-        <test-case id="1158" name="AgentDriver_SilencesEveryHumanInputPath" fullname="CombatantRigTests.AgentDriver_SilencesEveryHumanInputPath" methodname="AgentDriver_SilencesEveryHumanInputPath" classname="CombatantRigTests" runstate="Runnable" seed="2047673391" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.006534" asserts="0">
+        <test-case id="1158" name="AgentDriver_SilencesEveryHumanInputPath" fullname="CombatantRigTests.AgentDriver_SilencesEveryHumanInputPath" methodname="AgentDriver_SilencesEveryHumanInputPath" classname="CombatantRigTests" runstate="Runnable" seed="1479160944" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.006527" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -449,17 +449,17 @@ Failed to create agent because there is no valid NavMesh
           <output><![CDATA[
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
-[RunRng] Run seed: 33294504 (source: random). Replay with '-runSeed 33294504' or ArenaManager.runSeed = 33294504.
+[RunRng] Run seed: 39803671 (source: random). Replay with '-runSeed 39803671' or ArenaManager.runSeed = 39803671.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (28.94, 0.00, -9.48).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-17.25, 0.00, -35.55).
 [CombatantRig] Player driver: Agent.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (46.97, 0.00, 46.94).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-5.71, 0.00, 8.56).
 ]]></output>
         </test-case>
-        <test-case id="1163" name="Bootstrap_ComposesTheDriverOntoARigLessPlayerBody" fullname="CombatantRigTests.Bootstrap_ComposesTheDriverOntoARigLessPlayerBody" methodname="Bootstrap_ComposesTheDriverOntoARigLessPlayerBody" classname="CombatantRigTests" runstate="Runnable" seed="1527471555" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.006558" asserts="0">
+        <test-case id="1163" name="Bootstrap_ComposesTheDriverOntoARigLessPlayerBody" fullname="CombatantRigTests.Bootstrap_ComposesTheDriverOntoARigLessPlayerBody" methodname="Bootstrap_ComposesTheDriverOntoARigLessPlayerBody" classname="CombatantRigTests" runstate="Runnable" seed="1634400590" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.007524" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -468,28 +468,28 @@ Failed to create agent because there is no valid NavMesh
           <output><![CDATA[
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
-[RunRng] Run seed: 33294511 (source: random). Replay with '-runSeed 33294511' or ArenaManager.runSeed = 33294511.
+[RunRng] Run seed: 39803678 (source: random). Replay with '-runSeed 39803678' or ArenaManager.runSeed = 39803678.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-12.22, 0.00, -3.01).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-58.41, 0.00, -29.08).
 [CombatantRig] Player driver: Agent.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (34.12, 0.00, -13.77).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-18.56, 0.00, -52.15).
 ]]></output>
         </test-case>
-        <test-case id="1164" name="Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver" fullname="CombatantRigTests.Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver" methodname="Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver" classname="CombatantRigTests" runstate="Runnable" seed="993897159" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.022247" asserts="0">
+        <test-case id="1164" name="Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver" fullname="CombatantRigTests.Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver" methodname="Bootstrap_PullsTheArenaUpBeforeComposingTheAgentDriver" classname="CombatantRigTests" runstate="Runnable" seed="1948763504" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.015906" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
-          <output><![CDATA[[RunRng] Run seed: 33294516 (source: random). Replay with '-runSeed 33294516' or ArenaManager.runSeed = 33294516.
-[ArenaManager] Built arena #3 "Maze" (44x44).
+          <output><![CDATA[[RunRng] Run seed: 39803685 (source: random). Replay with '-runSeed 39803685' or ArenaManager.runSeed = 39803685.
+[ArenaManager] Built arena #1 "The Pit" (28x28).
 [CombatantRig] Player driver: Agent.
 ]]></output>
         </test-case>
-        <test-case id="1161" name="HumanDriver_LeavesTheBodyExactlyAsAuthored" fullname="CombatantRigTests.HumanDriver_LeavesTheBodyExactlyAsAuthored" methodname="HumanDriver_LeavesTheBodyExactlyAsAuthored" classname="CombatantRigTests" runstate="Runnable" seed="1338474446" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.005655" asserts="0">
+        <test-case id="1161" name="HumanDriver_LeavesTheBodyExactlyAsAuthored" fullname="CombatantRigTests.HumanDriver_LeavesTheBodyExactlyAsAuthored" methodname="HumanDriver_LeavesTheBodyExactlyAsAuthored" classname="CombatantRigTests" runstate="Runnable" seed="2091714829" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.005963" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -500,7 +500,7 @@ IgnoreFailingMessages:true
 [CombatantRig] Player driver: Human.
 ]]></output>
         </test-case>
-        <test-case id="1162" name="ResolvedDriver_IsReportedOnTheRig" fullname="CombatantRigTests.ResolvedDriver_IsReportedOnTheRig" methodname="ResolvedDriver_IsReportedOnTheRig" classname="CombatantRigTests" runstate="Runnable" seed="1795075407" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.007519" asserts="0">
+        <test-case id="1162" name="ResolvedDriver_IsReportedOnTheRig" fullname="CombatantRigTests.ResolvedDriver_IsReportedOnTheRig" methodname="ResolvedDriver_IsReportedOnTheRig" classname="CombatantRigTests" runstate="Runnable" seed="1248042900" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.007128" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -509,20 +509,20 @@ IgnoreFailingMessages:true
           <output><![CDATA[
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
-[RunRng] Run seed: 33294545 (source: random). Replay with '-runSeed 33294545' or ArenaManager.runSeed = 33294545.
+[RunRng] Run seed: 39803708 (source: random). Replay with '-runSeed 39803708' or ArenaManager.runSeed = 39803708.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-40.72, 0.00, -5.86).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (22.32, 0.00, -52.77).
 [CombatantRig] Player driver: Agent.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (5.99, 0.00, 17.08).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-22.21, 0.00, -3.75).
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1154" name="CombatBalanceForcingTests" fullname="CombatBalanceForcingTests" classname="CombatBalanceForcingTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.010894" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1154" name="CombatBalanceForcingTests" fullname="CombatBalanceForcingTests" classname="CombatBalanceForcingTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.012157" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1155" name="EnemyWeapon_DealsTheBalanceDamage" fullname="CombatBalanceForcingTests.EnemyWeapon_DealsTheBalanceDamage" methodname="EnemyWeapon_DealsTheBalanceDamage" classname="CombatBalanceForcingTests" runstate="Runnable" seed="1393555746" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.009872" asserts="0">
+        <test-case id="1155" name="EnemyWeapon_DealsTheBalanceDamage" fullname="CombatBalanceForcingTests.EnemyWeapon_DealsTheBalanceDamage" methodname="EnemyWeapon_DealsTheBalanceDamage" classname="CombatBalanceForcingTests" runstate="Runnable" seed="275671039" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.011027" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -530,23 +530,23 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1165" name="CoverFlagTests" fullname="CoverFlagTests" classname="CoverFlagTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.010777" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1165" name="CoverFlagTests" fullname="CoverFlagTests" classname="CoverFlagTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.010710" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1167" name="GeometryBetweenThem_IsCover" fullname="CoverFlagTests.GeometryBetweenThem_IsCover" methodname="GeometryBetweenThem_IsCover" classname="CoverFlagTests" runstate="Runnable" seed="351193627" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.003399" asserts="0">
+        <test-case id="1167" name="GeometryBetweenThem_IsCover" fullname="CoverFlagTests.GeometryBetweenThem_IsCover" methodname="GeometryBetweenThem_IsCover" classname="CoverFlagTests" runstate="Runnable" seed="550149586" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.003242" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1166" name="InTheOpen_NeitherBodyIsItsOwnCover" fullname="CoverFlagTests.InTheOpen_NeitherBodyIsItsOwnCover" methodname="InTheOpen_NeitherBodyIsItsOwnCover" classname="CoverFlagTests" runstate="Runnable" seed="1889267587" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.002759" asserts="0">
+        <test-case id="1166" name="InTheOpen_NeitherBodyIsItsOwnCover" fullname="CoverFlagTests.InTheOpen_NeitherBodyIsItsOwnCover" methodname="InTheOpen_NeitherBodyIsItsOwnCover" classname="CoverFlagTests" runstate="Runnable" seed="1593539778" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.003444" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1168" name="NoTarget_IsNotCover" fullname="CoverFlagTests.NoTarget_IsNotCover" methodname="NoTarget_IsNotCover" classname="CoverFlagTests" runstate="Runnable" seed="1513867832" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.003142" asserts="0">
+        <test-case id="1168" name="NoTarget_IsNotCover" fullname="CoverFlagTests.NoTarget_IsNotCover" methodname="NoTarget_IsNotCover" classname="CoverFlagTests" runstate="Runnable" seed="510055353" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.002320" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -554,30 +554,30 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1169" name="DamageMemoryTests" fullname="DamageMemoryTests" classname="DamageMemoryTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.015314" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1169" name="DamageMemoryTests" fullname="DamageMemoryTests" classname="DamageMemoryTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.016183" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1172" name="DamageWithNoShooter_SetsTheFlagWithoutADirection" fullname="DamageMemoryTests.DamageWithNoShooter_SetsTheFlagWithoutADirection" methodname="DamageWithNoShooter_SetsTheFlagWithoutADirection" classname="DamageMemoryTests" runstate="Runnable" seed="540261468" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.002601" asserts="0">
+        <test-case id="1172" name="DamageWithNoShooter_SetsTheFlagWithoutADirection" fullname="DamageMemoryTests.DamageWithNoShooter_SetsTheFlagWithoutADirection" methodname="DamageWithNoShooter_SetsTheFlagWithoutADirection" classname="DamageMemoryTests" runstate="Runnable" seed="1944541423" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.003109" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1173" name="Forget_WipesTheMemoryForTheNextEpisode" fullname="DamageMemoryTests.Forget_WipesTheMemoryForTheNextEpisode" methodname="Forget_WipesTheMemoryForTheNextEpisode" classname="DamageMemoryTests" runstate="Runnable" seed="1223084256" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.004161" asserts="0">
+        <test-case id="1173" name="Forget_WipesTheMemoryForTheNextEpisode" fullname="DamageMemoryTests.Forget_WipesTheMemoryForTheNextEpisode" methodname="Forget_WipesTheMemoryForTheNextEpisode" classname="DamageMemoryTests" runstate="Runnable" seed="154953322" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.005417" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1170" name="ShotFromBehind_IsRememberedAsBack" fullname="DamageMemoryTests.ShotFromBehind_IsRememberedAsBack" methodname="ShotFromBehind_IsRememberedAsBack" classname="DamageMemoryTests" runstate="Runnable" seed="750122949" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.003126" asserts="0">
+        <test-case id="1170" name="ShotFromBehind_IsRememberedAsBack" fullname="DamageMemoryTests.ShotFromBehind_IsRememberedAsBack" methodname="ShotFromBehind_IsRememberedAsBack" classname="DamageMemoryTests" runstate="Runnable" seed="1414805659" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.002862" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1171" name="TheBucketFollowsTheVictimsFacing" fullname="DamageMemoryTests.TheBucketFollowsTheVictimsFacing" methodname="TheBucketFollowsTheVictimsFacing" classname="DamageMemoryTests" runstate="Runnable" seed="37403413" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.003304" asserts="0">
+        <test-case id="1171" name="TheBucketFollowsTheVictimsFacing" fullname="DamageMemoryTests.TheBucketFollowsTheVictimsFacing" methodname="TheBucketFollowsTheVictimsFacing" classname="DamageMemoryTests" runstate="Runnable" seed="1021702681" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.002638" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -585,9 +585,9 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1174" name="EnemyAgentTests" fullname="EnemyAgentTests" classname="EnemyAgentTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.071551" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1174" name="EnemyAgentTests" fullname="EnemyAgentTests" classname="EnemyAgentTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.068302" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1177" name="ActionMask_FollowsTheCommandedMode" fullname="EnemyAgentTests.ActionMask_FollowsTheCommandedMode" methodname="ActionMask_FollowsTheCommandedMode" classname="EnemyAgentTests" runstate="Runnable" seed="1601450410" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.010719" asserts="0">
+        <test-case id="1177" name="ActionMask_FollowsTheCommandedMode" fullname="EnemyAgentTests.ActionMask_FollowsTheCommandedMode" methodname="ActionMask_FollowsTheCommandedMode" classname="EnemyAgentTests" runstate="Runnable" seed="1006854405" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.011264" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -595,12 +595,12 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294594 (source: random). Replay with '-runSeed 33294594' or ArenaManager.runSeed = 33294594.
+[RunRng] Run seed: 39803759 (source: random). Replay with '-runSeed 39803759' or ArenaManager.runSeed = 39803759.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (31.14, 0.00, 39.44).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-20.44, 0.00, -57.05).
 ]]></output>
         </test-case>
-        <test-case id="1182" name="EnemyPrefab_CarriesMlAgentsWiring_AndTheClockOwnsTimeout" fullname="EnemyAgentTests.EnemyPrefab_CarriesMlAgentsWiring_AndTheClockOwnsTimeout" methodname="EnemyPrefab_CarriesMlAgentsWiring_AndTheClockOwnsTimeout" classname="EnemyAgentTests" runstate="Runnable" seed="1447338379" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.021764" asserts="0">
+        <test-case id="1182" name="EnemyPrefab_CarriesMlAgentsWiring_AndTheClockOwnsTimeout" fullname="EnemyAgentTests.EnemyPrefab_CarriesMlAgentsWiring_AndTheClockOwnsTimeout" methodname="EnemyPrefab_CarriesMlAgentsWiring_AndTheClockOwnsTimeout" classname="EnemyAgentTests" runstate="Runnable" seed="1316955074" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.018085" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -609,16 +609,16 @@ Failed to create agent because there is no valid NavMesh
           <output><![CDATA[
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
-[RunRng] Run seed: 33294618 (source: random). Replay with '-runSeed 33294618' or ArenaManager.runSeed = 33294618.
+[RunRng] Run seed: 39803779 (source: random). Replay with '-runSeed 39803779' or ArenaManager.runSeed = 39803779.
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-24.28, 0.00, 44.48).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (33.39, 0.00, 47.16).
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (9.12, 0.00, -33.16).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (53.17, 0.00, 14.78).
 ]]></output>
         </test-case>
-        <test-case id="1175" name="HealthEvents_MapToTheDocumentedRewardShape" fullname="EnemyAgentTests.HealthEvents_MapToTheDocumentedRewardShape" methodname="HealthEvents_MapToTheDocumentedRewardShape" classname="EnemyAgentTests" runstate="Runnable" seed="1246408109" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.005635" asserts="0">
+        <test-case id="1175" name="HealthEvents_MapToTheDocumentedRewardShape" fullname="EnemyAgentTests.HealthEvents_MapToTheDocumentedRewardShape" methodname="HealthEvents_MapToTheDocumentedRewardShape" classname="EnemyAgentTests" runstate="Runnable" seed="1646744570" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.005071" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -626,12 +626,12 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294626 (source: random). Replay with '-runSeed 33294626' or ArenaManager.runSeed = 33294626.
+[RunRng] Run seed: 39803786 (source: random). Replay with '-runSeed 39803786' or ArenaManager.runSeed = 39803786.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-2.75, 0.00, -33.84).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-7.78, 0.00, 53.63).
 ]]></output>
         </test-case>
-        <test-case id="1176" name="HitRewards_FollowTheCommandedMode" fullname="EnemyAgentTests.HitRewards_FollowTheCommandedMode" methodname="HitRewards_FollowTheCommandedMode" classname="EnemyAgentTests" runstate="Runnable" seed="225723698" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.004146" asserts="0">
+        <test-case id="1176" name="HitRewards_FollowTheCommandedMode" fullname="EnemyAgentTests.HitRewards_FollowTheCommandedMode" methodname="HitRewards_FollowTheCommandedMode" classname="EnemyAgentTests" runstate="Runnable" seed="1782691578" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.005303" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -639,12 +639,12 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294631 (source: random). Replay with '-runSeed 33294631' or ArenaManager.runSeed = 33294631.
+[RunRng] Run seed: 39803792 (source: random). Replay with '-runSeed 39803792' or ArenaManager.runSeed = 39803792.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-49.29, 0.00, 22.22).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (8.37, 0.00, 24.89).
 ]]></output>
         </test-case>
-        <test-case id="1179" name="Observations_AreFedByTheRealMemories" fullname="EnemyAgentTests.Observations_AreFedByTheRealMemories" methodname="Observations_AreFedByTheRealMemories" classname="EnemyAgentTests" runstate="Runnable" seed="1255207991" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.005472" asserts="0">
+        <test-case id="1179" name="Observations_AreFedByTheRealMemories" fullname="EnemyAgentTests.Observations_AreFedByTheRealMemories" methodname="Observations_AreFedByTheRealMemories" classname="EnemyAgentTests" runstate="Runnable" seed="754905295" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.005652" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -652,12 +652,12 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294635 (source: random). Replay with '-runSeed 33294635' or ArenaManager.runSeed = 33294635.
+[RunRng] Run seed: 39803797 (source: random). Replay with '-runSeed 39803797' or ArenaManager.runSeed = 39803797.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-38.53, 0.00, 43.06).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-38.18, 0.00, -39.06).
 ]]></output>
         </test-case>
-        <test-case id="1180" name="RoundTimeout_EndsTheEpisode" fullname="EnemyAgentTests.RoundTimeout_EndsTheEpisode" methodname="RoundTimeout_EndsTheEpisode" classname="EnemyAgentTests" runstate="Runnable" seed="1258550761" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.007765" asserts="0">
+        <test-case id="1180" name="RoundTimeout_EndsTheEpisode" fullname="EnemyAgentTests.RoundTimeout_EndsTheEpisode" methodname="RoundTimeout_EndsTheEpisode" classname="EnemyAgentTests" runstate="Runnable" seed="1326950401" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.008039" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -665,17 +665,17 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294641 (source: random). Replay with '-runSeed 33294641' or ArenaManager.runSeed = 33294641.
+[RunRng] Run seed: 39803802 (source: random). Replay with '-runSeed 39803802' or ArenaManager.runSeed = 39803802.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-22.38, 0.00, 14.32).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (35.28, 0.00, 16.99).
 
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (18.33, 0.00, -44.06).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-57.62, 0.00, 3.88).
 ]]></output>
         </test-case>
-        <test-case id="1178" name="StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt" fullname="EnemyAgentTests.StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt" methodname="StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt" classname="EnemyAgentTests" runstate="Runnable" seed="11620298" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.006791" asserts="0">
+        <test-case id="1178" name="StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt" fullname="EnemyAgentTests.StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt" methodname="StaleSerializedBrainShape_IsCorrectedBeforeTheActuatorsAreBuilt" classname="EnemyAgentTests" runstate="Runnable" seed="403145567" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.005905" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -685,12 +685,12 @@ Failed to create agent because there is no valid NavMesh
 IgnoreFailingMessages:true
 [EnemyAgent] Overriding serialized observation shape 3x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [3] -> [7,2] (#43).
-[RunRng] Run seed: 33294649 (source: random). Replay with '-runSeed 33294649' or ArenaManager.runSeed = 33294649.
+[RunRng] Run seed: 39803812 (source: random). Replay with '-runSeed 39803812' or ArenaManager.runSeed = 39803812.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-0.86, 0.00, 56.00).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-57.81, 0.00, 9.10).
 ]]></output>
         </test-case>
-        <test-case id="1181" name="TargetDeath_EndsTheEpisode_AndResetsBothHealths" fullname="EnemyAgentTests.TargetDeath_EndsTheEpisode_AndResetsBothHealths" methodname="TargetDeath_EndsTheEpisode_AndResetsBothHealths" classname="EnemyAgentTests" runstate="Runnable" seed="1351475903" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.006066" asserts="0">
+        <test-case id="1181" name="TargetDeath_EndsTheEpisode_AndResetsBothHealths" fullname="EnemyAgentTests.TargetDeath_EndsTheEpisode_AndResetsBothHealths" methodname="TargetDeath_EndsTheEpisode_AndResetsBothHealths" classname="EnemyAgentTests" runstate="Runnable" seed="774928862" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.006074" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -698,117 +698,27 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294655 (source: random). Replay with '-runSeed 33294655' or ArenaManager.runSeed = 33294655.
+[RunRng] Run seed: 39803816 (source: random). Replay with '-runSeed 39803816' or ArenaManager.runSeed = 39803816.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (15.29, 0.00, 27.26).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-47.05, 0.00, 29.94).
 
 IgnoreFailingMessages:true
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-7.37, 0.00, -45.47).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (36.68, 0.00, 2.47).
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1183" name="GameManagerDeathTests" fullname="GameManagerDeathTests" classname="GameManagerDeathTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.228971" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1183" name="GameManagerDeathTests" fullname="GameManagerDeathTests" classname="GameManagerDeathTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.233357" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1184" name="NpcDeath_CountsUserWin_AndFinishesRound" fullname="GameManagerDeathTests.NpcDeath_CountsUserWin_AndFinishesRound" methodname="NpcDeath_CountsUserWin_AndFinishesRound" classname="GameManagerDeathTests" runstate="Runnable" seed="1218057665" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.224380" asserts="0">
+        <test-case id="1184" name="NpcDeath_CountsUserWin_AndFinishesRound" fullname="GameManagerDeathTests.NpcDeath_CountsUserWin_AndFinishesRound" methodname="NpcDeath_CountsUserWin_AndFinishesRound" classname="GameManagerDeathTests" runstate="Runnable" seed="644176866" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.228526" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1185" name="PlayerDeath_CountsNpcWin_AndFinishesRound" fullname="GameManagerDeathTests.PlayerDeath_CountsNpcWin_AndFinishesRound" methodname="PlayerDeath_CountsNpcWin_AndFinishesRound" classname="GameManagerDeathTests" runstate="Runnable" seed="46264228" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.003048" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-      </test-suite>
-      <test-suite type="TestFixture" id="1186" name="HeuristicOpponentTests" fullname="HeuristicOpponentTests" classname="HeuristicOpponentTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.028019" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
-        <properties />
-        <test-case id="1189" name="AHeuristicEpisode_ReportsNoPerModeRows" fullname="HeuristicOpponentTests.AHeuristicEpisode_ReportsNoPerModeRows" methodname="AHeuristicEpisode_ReportsNoPerModeRows" classname="HeuristicOpponentTests" runstate="Runnable" seed="1513405139" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.009820" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[
-IgnoreFailingMessages:true
-[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
-[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294894 (source: random). Replay with '-runSeed 33294894' or ArenaManager.runSeed = 33294894.
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-1.55, 0.00, 42.51).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-0.40, 0.00, -43.93).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-52.64, 0.00, -42.33).
-]]></output>
-        </test-case>
-        <test-case id="1188" name="InTraining_TheScheduledEpisodesRunTheHeuristic" fullname="HeuristicOpponentTests.InTraining_TheScheduledEpisodesRunTheHeuristic" methodname="InTraining_TheScheduledEpisodesRunTheHeuristic" classname="HeuristicOpponentTests" runstate="Runnable" seed="2068783735" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.009775" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[
-IgnoreFailingMessages:true
-[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
-[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294902 (source: random). Replay with '-runSeed 33294902' or ArenaManager.runSeed = 33294902.
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (19.98, 0.00, -35.81).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-49.37, 0.00, 40.98).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (20.79, 0.00, -43.39).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-1.56, 0.00, 55.80).
-]]></output>
-        </test-case>
-        <test-case id="1187" name="OutsideTraining_TheOpponentPolicyIsLeftAlone" fullname="HeuristicOpponentTests.OutsideTraining_TheOpponentPolicyIsLeftAlone" methodname="OutsideTraining_TheOpponentPolicyIsLeftAlone" classname="HeuristicOpponentTests" runstate="Runnable" seed="1378692271" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:58Z" duration="0.006468" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[
-IgnoreFailingMessages:true
-[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
-[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33294913 (source: random). Replay with '-runSeed 33294913' or ArenaManager.runSeed = 33294913.
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-10.42, 0.00, -8.50).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (33.30, 0.00, -37.28).
-]]></output>
-        </test-case>
-      </test-suite>
-      <test-suite type="TestFixture" id="1190" name="ModeDirectorGuardTests" fullname="ModeDirectorGuardTests" classname="ModeDirectorGuardTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:59Z" duration="0.084056" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
-        <properties />
-        <test-case id="1192" name="DirectorWritesWhenTrainingOnlyIsOff" fullname="ModeDirectorGuardTests.DirectorWritesWhenTrainingOnlyIsOff" methodname="DirectorWritesWhenTrainingOnlyIsOff" classname="ModeDirectorGuardTests" runstate="Runnable" seed="2017808135" result="Passed" start-time="2026-09-14 16:39:58Z" end-time="2026-09-14 16:39:59Z" duration="0.042338" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-        <test-case id="1193" name="ResetState_AlsoStandsDownOutsideTraining" fullname="ModeDirectorGuardTests.ResetState_AlsoStandsDownOutsideTraining" methodname="ResetState_AlsoStandsDownOutsideTraining" classname="ModeDirectorGuardTests" runstate="Runnable" seed="312137501" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.002003" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-        <test-case id="1191" name="TrainingOnlyDirector_DoesNotWriteWithoutACommunicator" fullname="ModeDirectorGuardTests.TrainingOnlyDirector_DoesNotWriteWithoutACommunicator" methodname="TrainingOnlyDirector_DoesNotWriteWithoutACommunicator" classname="ModeDirectorGuardTests" runstate="Runnable" seed="69477566" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.037449" asserts="0">
+        <test-case id="1185" name="PlayerDeath_CountsNpcWin_AndFinishesRound" fullname="GameManagerDeathTests.PlayerDeath_CountsNpcWin_AndFinishesRound" methodname="PlayerDeath_CountsNpcWin_AndFinishesRound" classname="GameManagerDeathTests" runstate="Runnable" seed="1437002253" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.003422" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -816,9 +726,9 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1194" name="ModeDirectorResetTests" fullname="ModeDirectorResetTests" classname="ModeDirectorResetTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.022183" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1186" name="HeuristicOpponentTests" fullname="HeuristicOpponentTests" classname="HeuristicOpponentTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.028554" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1195" name="EpisodeBegin_RedrawsTheCommandedMode" fullname="ModeDirectorResetTests.EpisodeBegin_RedrawsTheCommandedMode" methodname="EpisodeBegin_RedrawsTheCommandedMode" classname="ModeDirectorResetTests" runstate="Runnable" seed="60539503" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.009327" asserts="0">
+        <test-case id="1189" name="AHeuristicEpisode_ReportsNoPerModeRows" fullname="HeuristicOpponentTests.AHeuristicEpisode_ReportsNoPerModeRows" methodname="AHeuristicEpisode_ReportsNoPerModeRows" classname="HeuristicOpponentTests" runstate="Runnable" seed="1386058574" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.010834" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -828,15 +738,18 @@ Failed to create agent because there is no valid NavMesh
 IgnoreFailingMessages:true
 [EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33295006 (source: random). Replay with '-runSeed 33295006' or ArenaManager.runSeed = 33295006.
+[RunRng] Run seed: 39804059 (source: random). Replay with '-runSeed 39804059' or ArenaManager.runSeed = 39804059.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (59.84, 0.00, 26.05).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-53.12, 0.00, -53.98).
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (34.00, 0.00, -55.26).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (19.17, 0.00, -13.54).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-31.61, 0.00, -40.31).
 ]]></output>
         </test-case>
-        <test-case id="1196" name="EpisodeBegin_RestartsTheDwellEvenWhenTheModeIsUnchanged" fullname="ModeDirectorResetTests.EpisodeBegin_RestartsTheDwellEvenWhenTheModeIsUnchanged" methodname="EpisodeBegin_RestartsTheDwellEvenWhenTheModeIsUnchanged" classname="ModeDirectorResetTests" runstate="Runnable" seed="158623231" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.010599" asserts="0">
+        <test-case id="1188" name="InTraining_TheScheduledEpisodesRunTheHeuristic" fullname="HeuristicOpponentTests.InTraining_TheScheduledEpisodesRunTheHeuristic" methodname="InTraining_TheScheduledEpisodesRunTheHeuristic" classname="HeuristicOpponentTests" runstate="Runnable" seed="539706301" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.009574" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -846,18 +759,66 @@ Failed to create agent because there is no valid NavMesh
 IgnoreFailingMessages:true
 [EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33295015 (source: random). Replay with '-runSeed 33295015' or ArenaManager.runSeed = 33295015.
+[RunRng] Run seed: 39804069 (source: random). Replay with '-runSeed 39804069' or ArenaManager.runSeed = 39804069.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (24.06, 0.00, -17.05).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-26.21, 0.00, 58.13).
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-51.09, 0.00, 55.26).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (17.95, 0.00, 2.59).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (30.18, 0.00, 48.37).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-17.15, 0.00, 2.90).
+]]></output>
+        </test-case>
+        <test-case id="1187" name="OutsideTraining_TheOpponentPolicyIsLeftAlone" fullname="HeuristicOpponentTests.OutsideTraining_TheOpponentPolicyIsLeftAlone" methodname="OutsideTraining_TheOpponentPolicyIsLeftAlone" classname="HeuristicOpponentTests" runstate="Runnable" seed="1061602334" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.006549" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
+[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
+[RunRng] Run seed: 39804078 (source: random). Replay with '-runSeed 39804078' or ArenaManager.runSeed = 39804078.
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (58.01, 0.00, 15.02).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (52.86, 0.00, -6.89).
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1197" name="ModeTelemetryTests" fullname="ModeTelemetryTests" classname="ModeTelemetryTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.035139" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1190" name="ModeDirectorGuardTests" fullname="ModeDirectorGuardTests" classname="ModeDirectorGuardTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.080492" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1200" name="Compliance_IsReportedInTheEpisodeItDescribes" fullname="ModeTelemetryTests.Compliance_IsReportedInTheEpisodeItDescribes" methodname="Compliance_IsReportedInTheEpisodeItDescribes" classname="ModeTelemetryTests" runstate="Runnable" seed="1000390284" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.011857" asserts="0">
+        <test-case id="1192" name="DirectorWritesWhenTrainingOnlyIsOff" fullname="ModeDirectorGuardTests.DirectorWritesWhenTrainingOnlyIsOff" methodname="DirectorWritesWhenTrainingOnlyIsOff" classname="ModeDirectorGuardTests" runstate="Runnable" seed="172717274" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.039485" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1193" name="ResetState_AlsoStandsDownOutsideTraining" fullname="ModeDirectorGuardTests.ResetState_AlsoStandsDownOutsideTraining" methodname="ResetState_AlsoStandsDownOutsideTraining" classname="ModeDirectorGuardTests" runstate="Runnable" seed="493968964" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.002487" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1191" name="TrainingOnlyDirector_DoesNotWriteWithoutACommunicator" fullname="ModeDirectorGuardTests.TrainingOnlyDirector_DoesNotWriteWithoutACommunicator" methodname="TrainingOnlyDirector_DoesNotWriteWithoutACommunicator" classname="ModeDirectorGuardTests" runstate="Runnable" seed="1696207720" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.036653" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1194" name="ModeDirectorResetTests" fullname="ModeDirectorResetTests" classname="ModeDirectorResetTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.022859" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1195" name="EpisodeBegin_RedrawsTheCommandedMode" fullname="ModeDirectorResetTests.EpisodeBegin_RedrawsTheCommandedMode" methodname="EpisodeBegin_RedrawsTheCommandedMode" classname="ModeDirectorResetTests" runstate="Runnable" seed="1349995354" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.008731" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -867,15 +828,15 @@ Failed to create agent because there is no valid NavMesh
 IgnoreFailingMessages:true
 [EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33295029 (source: random). Replay with '-runSeed 33295029' or ArenaManager.runSeed = 33295029.
+[RunRng] Run seed: 39804168 (source: random). Replay with '-runSeed 39804168' or ArenaManager.runSeed = 39804168.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-58.26, 0.00, -4.11).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-59.80, 0.00, -56.06).
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (43.21, 0.00, 53.85).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (41.93, 0.00, 18.30).
 ]]></output>
         </test-case>
-        <test-case id="1199" name="EpisodeEnd_ReportsComplianceForTheModesItRan" fullname="ModeTelemetryTests.EpisodeEnd_ReportsComplianceForTheModesItRan" methodname="EpisodeEnd_ReportsComplianceForTheModesItRan" classname="ModeTelemetryTests" runstate="Runnable" seed="362673436" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.007150" asserts="0">
+        <test-case id="1196" name="EpisodeBegin_RestartsTheDwellEvenWhenTheModeIsUnchanged" fullname="ModeDirectorResetTests.EpisodeBegin_RestartsTheDwellEvenWhenTheModeIsUnchanged" methodname="EpisodeBegin_RestartsTheDwellEvenWhenTheModeIsUnchanged" classname="ModeDirectorResetTests" runstate="Runnable" seed="1030232097" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.012372" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -885,54 +846,111 @@ Failed to create agent because there is no valid NavMesh
 IgnoreFailingMessages:true
 [EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
 [EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33295041 (source: random). Replay with '-runSeed 33295041' or ArenaManager.runSeed = 33295041.
+[RunRng] Run seed: 39804177 (source: random). Replay with '-runSeed 39804177' or ArenaManager.runSeed = 39804177.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-25.97, 0.00, 58.41).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-30.25, 0.00, 1.20).
-]]></output>
-        </test-case>
-        <test-case id="1198" name="ModeChanges_AreLoggedAsTheyHappen" fullname="ModeTelemetryTests.ModeChanges_AreLoggedAsTheyHappen" methodname="ModeChanges_AreLoggedAsTheyHappen" classname="ModeTelemetryTests" runstate="Runnable" seed="1919413602" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.004179" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[
-IgnoreFailingMessages:true
-[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
-[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33295047 (source: random). Replay with '-runSeed 33295047' or ArenaManager.runSeed = 33295047.
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-9.82, 0.00, 29.67).
-]]></output>
-        </test-case>
-        <test-case id="1201" name="TheNextEpisode_StartsWithAnEmptyTally" fullname="ModeTelemetryTests.TheNextEpisode_StartsWithAnEmptyTally" methodname="TheNextEpisode_StartsWithAnEmptyTally" classname="ModeTelemetryTests" runstate="Runnable" seed="162047731" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:39:59Z" duration="0.008883" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[
-IgnoreFailingMessages:true
-[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
-[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
-[RunRng] Run seed: 33295053 (source: random). Replay with '-runSeed 33295053' or ArenaManager.runSeed = 33295053.
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (6.32, 0.00, 0.93).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (24.42, 0.00, 20.83).
 Failed to create agent because there is no valid NavMesh
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (16.29, 0.00, -51.44).
-Failed to create agent because there is no valid NavMesh
-Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (41.71, 0.00, -48.36).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-43.16, 0.00, 8.81).
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1202" name="MovementPrimitiveTests" fullname="MovementPrimitiveTests" classname="MovementPrimitiveTests" runstate="Runnable" testcasecount="21" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:40:40Z" duration="41.822987" total="21" passed="21" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1197" name="ModeTelemetryTests" fullname="ModeTelemetryTests" classname="ModeTelemetryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.044403" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1206" name="Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain" fullname="MovementPrimitiveTests.Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain" methodname="Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain" classname="MovementPrimitiveTests" runstate="Runnable" seed="1200190278" result="Passed" start-time="2026-09-14 16:39:59Z" end-time="2026-09-14 16:40:00Z" duration="1.540379" asserts="0">
+        <test-case id="1200" name="ClosingOnTheTarget_IsReportedAsNegativeRange" fullname="ModeTelemetryTests.ClosingOnTheTarget_IsReportedAsNegativeRange" methodname="ClosingOnTheTarget_IsReportedAsNegativeRange" classname="ModeTelemetryTests" runstate="Runnable" seed="772261990" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.010210" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
+[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
+[RunRng] Run seed: 39804192 (source: random). Replay with '-runSeed 39804192' or ArenaManager.runSeed = 39804192.
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (4.78, 0.00, -51.02).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (15.02, 0.00, 33.01).
+]]></output>
+        </test-case>
+        <test-case id="1201" name="Compliance_IsReportedInTheEpisodeItDescribes" fullname="ModeTelemetryTests.Compliance_IsReportedInTheEpisodeItDescribes" methodname="Compliance_IsReportedInTheEpisodeItDescribes" classname="ModeTelemetryTests" runstate="Runnable" seed="896765800" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.010720" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
+[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
+[RunRng] Run seed: 39804202 (source: random). Replay with '-runSeed 39804202' or ArenaManager.runSeed = 39804202.
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (31.69, 0.00, -58.91).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (13.80, 0.00, 49.14).
+]]></output>
+        </test-case>
+        <test-case id="1199" name="EpisodeEnd_ReportsComplianceForTheModesItRan" fullname="ModeTelemetryTests.EpisodeEnd_ReportsComplianceForTheModesItRan" methodname="EpisodeEnd_ReportsComplianceForTheModesItRan" classname="ModeTelemetryTests" runstate="Runnable" seed="1065351779" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.006681" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
+[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
+[RunRng] Run seed: 39804212 (source: random). Replay with '-runSeed 39804212' or ArenaManager.runSeed = 39804212.
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (58.60, 0.00, 53.19).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (12.59, 0.00, -54.73).
+]]></output>
+        </test-case>
+        <test-case id="1198" name="ModeChanges_AreLoggedAsTheyHappen" fullname="ModeTelemetryTests.ModeChanges_AreLoggedAsTheyHappen" methodname="ModeChanges_AreLoggedAsTheyHappen" classname="ModeTelemetryTests" runstate="Runnable" seed="2104882398" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.004851" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
+[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
+[RunRng] Run seed: 39804219 (source: random). Replay with '-runSeed 39804219' or ArenaManager.runSeed = 39804219.
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (17.44, 0.00, 59.66).
+]]></output>
+        </test-case>
+        <test-case id="1202" name="TheNextEpisode_StartsWithAnEmptyTally" fullname="ModeTelemetryTests.TheNextEpisode_StartsWithAnEmptyTally" methodname="TheNextEpisode_StartsWithAnEmptyTally" classname="ModeTelemetryTests" runstate="Runnable" seed="1519388420" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:57Z" duration="0.009213" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+[EnemyAgent] Overriding serialized observation shape 1x1 -> 18x1 (#43).
+[EnemyAgent] Overriding serialized action branches [] -> [7,2] (#43).
+[RunRng] Run seed: 39804225 (source: random). Replay with '-runSeed 39804225' or ArenaManager.runSeed = 39804225.
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (33.59, 0.00, 30.92).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (23.01, 0.00, 38.25).
+Failed to create agent because there is no valid NavMesh
+Failed to create agent because there is no valid NavMesh
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (-38.01, 0.00, -32.26).
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1203" name="MovementPrimitiveTests" fullname="MovementPrimitiveTests" classname="MovementPrimitiveTests" runstate="Runnable" testcasecount="21" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:02:39Z" duration="41.793218" total="21" passed="21" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1207" name="Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain" fullname="MovementPrimitiveTests.Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain" methodname="Advance_AfterReacquiringUnderAnotherPrimitive_ChasesAgain" classname="MovementPrimitiveTests" runstate="Runnable" seed="1573031161" result="Passed" start-time="2026-09-17 20:01:57Z" end-time="2026-09-17 20:01:59Z" duration="1.530190" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -942,7 +960,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1203" name="Advance_ClosesOnTheTarget" fullname="MovementPrimitiveTests.Advance_ClosesOnTheTarget" methodname="Advance_ClosesOnTheTarget" classname="MovementPrimitiveTests" runstate="Runnable" seed="2146887110" result="Passed" start-time="2026-09-14 16:40:00Z" end-time="2026-09-14 16:40:01Z" duration="1.039523" asserts="0">
+        <test-case id="1204" name="Advance_ClosesOnTheTarget" fullname="MovementPrimitiveTests.Advance_ClosesOnTheTarget" methodname="Advance_ClosesOnTheTarget" classname="MovementPrimitiveTests" runstate="Runnable" seed="1024592757" result="Passed" start-time="2026-09-17 20:01:59Z" end-time="2026-09-17 20:02:00Z" duration="1.039734" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -952,7 +970,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1204" name="Advance_HeadsForTheRememberedSpot_NotTheLiveOne" fullname="MovementPrimitiveTests.Advance_HeadsForTheRememberedSpot_NotTheLiveOne" methodname="Advance_HeadsForTheRememberedSpot_NotTheLiveOne" classname="MovementPrimitiveTests" runstate="Runnable" seed="501516891" result="Passed" start-time="2026-09-14 16:40:01Z" end-time="2026-09-14 16:40:02Z" duration="1.039919" asserts="0">
+        <test-case id="1205" name="Advance_HeadsForTheRememberedSpot_NotTheLiveOne" fullname="MovementPrimitiveTests.Advance_HeadsForTheRememberedSpot_NotTheLiveOne" methodname="Advance_HeadsForTheRememberedSpot_NotTheLiveOne" classname="MovementPrimitiveTests" runstate="Runnable" seed="178320362" result="Passed" start-time="2026-09-17 20:02:00Z" end-time="2026-09-17 20:02:01Z" duration="1.039942" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -962,7 +980,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1205" name="Advance_OnAnEmptyLastSeenPosition_SearchesOn" fullname="MovementPrimitiveTests.Advance_OnAnEmptyLastSeenPosition_SearchesOn" methodname="Advance_OnAnEmptyLastSeenPosition_SearchesOn" classname="MovementPrimitiveTests" runstate="Runnable" seed="165283110" result="Passed" start-time="2026-09-14 16:40:02Z" end-time="2026-09-14 16:40:07Z" duration="5.040116" asserts="0">
+        <test-case id="1206" name="Advance_OnAnEmptyLastSeenPosition_SearchesOn" fullname="MovementPrimitiveTests.Advance_OnAnEmptyLastSeenPosition_SearchesOn" methodname="Advance_OnAnEmptyLastSeenPosition_SearchesOn" classname="MovementPrimitiveTests" runstate="Runnable" seed="384777425" result="Passed" start-time="2026-09-17 20:02:01Z" end-time="2026-09-17 20:02:06Z" duration="5.059606" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -972,11 +990,11 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-suite type="ParameterizedMethod" id="1212" name="BlindMovingPrimitive_WandersInsteadOfWedging" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-14 16:40:07Z" end-time="2026-09-14 16:40:17Z" duration="10.159626" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="ParameterizedMethod" id="1213" name="BlindMovingPrimitive_WandersInsteadOfWedging" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-17 20:02:06Z" end-time="2026-09-17 20:02:16Z" duration="10.160243" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
           </properties>
-          <test-case id="1208" name="BlindMovingPrimitive_WandersInsteadOfWedging(Advance)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(Advance)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="1324639068" result="Passed" start-time="2026-09-14 16:40:07Z" end-time="2026-09-14 16:40:10Z" duration="2.538905" asserts="0">
+          <test-case id="1209" name="BlindMovingPrimitive_WandersInsteadOfWedging(Advance)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(Advance)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="536852581" result="Passed" start-time="2026-09-17 20:02:06Z" end-time="2026-09-17 20:02:08Z" duration="2.539593" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -985,7 +1003,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
           </test-case>
-          <test-case id="1209" name="BlindMovingPrimitive_WandersInsteadOfWedging(Retreat)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(Retreat)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="62846233" result="Passed" start-time="2026-09-14 16:40:10Z" end-time="2026-09-14 16:40:12Z" duration="2.539855" asserts="0">
+          <test-case id="1210" name="BlindMovingPrimitive_WandersInsteadOfWedging(Retreat)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(Retreat)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="1768451390" result="Passed" start-time="2026-09-17 20:02:08Z" end-time="2026-09-17 20:02:11Z" duration="2.539732" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -994,7 +1012,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
           </test-case>
-          <test-case id="1210" name="BlindMovingPrimitive_WandersInsteadOfWedging(StrafeLeft)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(StrafeLeft)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="2084375738" result="Passed" start-time="2026-09-14 16:40:12Z" end-time="2026-09-14 16:40:15Z" duration="2.540101" asserts="0">
+          <test-case id="1211" name="BlindMovingPrimitive_WandersInsteadOfWedging(StrafeLeft)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(StrafeLeft)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="271596143" result="Passed" start-time="2026-09-17 20:02:11Z" end-time="2026-09-17 20:02:13Z" duration="2.540209" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -1003,110 +1021,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
           </test-case>
-          <test-case id="1211" name="BlindMovingPrimitive_WandersInsteadOfWedging(StrafeRight)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(StrafeRight)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="225040790" result="Passed" start-time="2026-09-14 16:40:15Z" end-time="2026-09-14 16:40:17Z" duration="2.539423" asserts="0">
-            <properties>
-              <property name="retryIteration" value="0" />
-              <property name="repeatIteration" value="0" />
-            </properties>
-            <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-          </test-case>
-        </test-suite>
-        <test-case id="1219" name="Hold_StopsTheAgentAndKeepsWatching" fullname="MovementPrimitiveTests.Hold_StopsTheAgentAndKeepsWatching" methodname="Hold_StopsTheAgentAndKeepsWatching" classname="MovementPrimitiveTests" runstate="Runnable" seed="1556774802" result="Passed" start-time="2026-09-14 16:40:17Z" end-time="2026-09-14 16:40:19Z" duration="1.260144" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1223" name="MoveToCover_EndsWhereTheThreatCannotSeeIt" fullname="MovementPrimitiveTests.MoveToCover_EndsWhereTheThreatCannotSeeIt" methodname="MoveToCover_EndsWhereTheThreatCannotSeeIt" classname="MovementPrimitiveTests" runstate="Runnable" seed="932309871" result="Passed" start-time="2026-09-14 16:40:19Z" end-time="2026-09-14 16:40:21Z" duration="2.279678" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1225" name="MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover" fullname="MovementPrimitiveTests.MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover" methodname="MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover" classname="MovementPrimitiveTests" runstate="Runnable" seed="986440095" result="Passed" start-time="2026-09-14 16:40:21Z" end-time="2026-09-14 16:40:22Z" duration="1.039854" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1224" name="MoveToCover_QueriesTheFrameItFirstSeesTheThreat" fullname="MovementPrimitiveTests.MoveToCover_QueriesTheFrameItFirstSeesTheThreat" methodname="MoveToCover_QueriesTheFrameItFirstSeesTheThreat" classname="MovementPrimitiveTests" runstate="Runnable" seed="1998062299" result="Passed" start-time="2026-09-14 16:40:22Z" end-time="2026-09-14 16:40:22Z" duration="0.059909" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1214" name="Retreat_AgainstTheArenaEdge_StillBacksAway" fullname="MovementPrimitiveTests.Retreat_AgainstTheArenaEdge_StillBacksAway" methodname="Retreat_AgainstTheArenaEdge_StillBacksAway" classname="MovementPrimitiveTests" runstate="Runnable" seed="1146246946" result="Passed" start-time="2026-09-14 16:40:22Z" end-time="2026-09-14 16:40:24Z" duration="1.460677" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1215" name="Retreat_Cornered_DoesNotKeepRunningTheLastAdvance" fullname="MovementPrimitiveTests.Retreat_Cornered_DoesNotKeepRunningTheLastAdvance" methodname="Retreat_Cornered_DoesNotKeepRunningTheLastAdvance" classname="MovementPrimitiveTests" runstate="Runnable" seed="1608241031" result="Passed" start-time="2026-09-14 16:40:24Z" end-time="2026-09-14 16:40:24Z" duration="0.021102" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1207" name="Retreat_OpensDistanceFromTheTarget" fullname="MovementPrimitiveTests.Retreat_OpensDistanceFromTheTarget" methodname="Retreat_OpensDistanceFromTheTarget" classname="MovementPrimitiveTests" runstate="Runnable" seed="1676294215" result="Passed" start-time="2026-09-14 16:40:24Z" end-time="2026-09-14 16:40:25Z" duration="1.037981" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-case id="1213" name="SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh" fullname="MovementPrimitiveTests.SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh" methodname="SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh" classname="MovementPrimitiveTests" runstate="Runnable" seed="898703445" result="Passed" start-time="2026-09-14 16:40:25Z" end-time="2026-09-14 16:40:26Z" duration="1.439755" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-        </test-case>
-        <test-suite type="ParameterizedMethod" id="1218" name="Strafes_StepSidewaysWhileKeepingTheTargetInSight" fullname="MovementPrimitiveTests.Strafes_StepSidewaysWhileKeepingTheTargetInSight" classname="MovementPrimitiveTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-14 16:40:26Z" end-time="2026-09-14 16:40:28Z" duration="2.080168" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-          </properties>
-          <test-case id="1216" name="Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeLeft)" fullname="MovementPrimitiveTests.Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeLeft)" methodname="Strafes_StepSidewaysWhileKeepingTheTargetInSight" classname="MovementPrimitiveTests" runstate="Runnable" seed="656318337" result="Passed" start-time="2026-09-14 16:40:26Z" end-time="2026-09-14 16:40:27Z" duration="1.039634" asserts="0">
-            <properties>
-              <property name="retryIteration" value="0" />
-              <property name="repeatIteration" value="0" />
-            </properties>
-            <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
-[ArenaManager] Built arena #0 "Courtyard" (40x40).
-]]></output>
-          </test-case>
-          <test-case id="1217" name="Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeRight)" fullname="MovementPrimitiveTests.Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeRight)" methodname="Strafes_StepSidewaysWhileKeepingTheTargetInSight" classname="MovementPrimitiveTests" runstate="Runnable" seed="318172065" result="Passed" start-time="2026-09-14 16:40:27Z" end-time="2026-09-14 16:40:28Z" duration="1.039691" asserts="0">
+          <test-case id="1212" name="BlindMovingPrimitive_WandersInsteadOfWedging(StrafeRight)" fullname="MovementPrimitiveTests.BlindMovingPrimitive_WandersInsteadOfWedging(StrafeRight)" methodname="BlindMovingPrimitive_WandersInsteadOfWedging" classname="MovementPrimitiveTests" runstate="Runnable" seed="2069984954" result="Passed" start-time="2026-09-17 20:02:13Z" end-time="2026-09-17 20:02:16Z" duration="2.539683" asserts="0">
             <properties>
               <property name="retryIteration" value="0" />
               <property name="repeatIteration" value="0" />
@@ -1116,7 +1031,7 @@ Failed to create agent because there is no valid NavMesh
 ]]></output>
           </test-case>
         </test-suite>
-        <test-case id="1220" name="Wander_KeepsMovingWithoutASighting" fullname="MovementPrimitiveTests.Wander_KeepsMovingWithoutASighting" methodname="Wander_KeepsMovingWithoutASighting" classname="MovementPrimitiveTests" runstate="Runnable" seed="996557875" result="Passed" start-time="2026-09-14 16:40:28Z" end-time="2026-09-14 16:40:30Z" duration="2.040145" asserts="0">
+        <test-case id="1220" name="Hold_StopsTheAgentAndKeepsWatching" fullname="MovementPrimitiveTests.Hold_StopsTheAgentAndKeepsWatching" methodname="Hold_StopsTheAgentAndKeepsWatching" classname="MovementPrimitiveTests" runstate="Runnable" seed="134518099" result="Passed" start-time="2026-09-17 20:02:16Z" end-time="2026-09-17 20:02:17Z" duration="1.239734" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1126,7 +1041,7 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1222" name="Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel" fullname="MovementPrimitiveTests.Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel" methodname="Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel" classname="MovementPrimitiveTests" runstate="Runnable" seed="823496751" result="Passed" start-time="2026-09-14 16:40:30Z" end-time="2026-09-14 16:40:32Z" duration="2.239265" asserts="0">
+        <test-case id="1224" name="MoveToCover_EndsWhereTheThreatCannotSeeIt" fullname="MovementPrimitiveTests.MoveToCover_EndsWhereTheThreatCannotSeeIt" methodname="MoveToCover_EndsWhereTheThreatCannotSeeIt" classname="MovementPrimitiveTests" runstate="Runnable" seed="1864898439" result="Passed" start-time="2026-09-17 20:02:17Z" end-time="2026-09-17 20:02:19Z" duration="2.280145" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1136,7 +1051,110 @@ Failed to create agent because there is no valid NavMesh
 [ArenaManager] Built arena #0 "Courtyard" (40x40).
 ]]></output>
         </test-case>
-        <test-case id="1221" name="Wander_SweepsAcrossTheArena" fullname="MovementPrimitiveTests.Wander_SweepsAcrossTheArena" methodname="Wander_SweepsAcrossTheArena" classname="MovementPrimitiveTests" runstate="Runnable" seed="1581910743" result="Passed" start-time="2026-09-14 16:40:32Z" end-time="2026-09-14 16:40:40Z" duration="8.040138" asserts="0">
+        <test-case id="1226" name="MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover" fullname="MovementPrimitiveTests.MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover" methodname="MoveToCover_FallsBackToRetreat_WhenTheLayoutHasNoCover" classname="MovementPrimitiveTests" runstate="Runnable" seed="1503424800" result="Passed" start-time="2026-09-17 20:02:19Z" end-time="2026-09-17 20:02:21Z" duration="1.039766" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1225" name="MoveToCover_QueriesTheFrameItFirstSeesTheThreat" fullname="MovementPrimitiveTests.MoveToCover_QueriesTheFrameItFirstSeesTheThreat" methodname="MoveToCover_QueriesTheFrameItFirstSeesTheThreat" classname="MovementPrimitiveTests" runstate="Runnable" seed="641441893" result="Passed" start-time="2026-09-17 20:02:21Z" end-time="2026-09-17 20:02:21Z" duration="0.059755" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1215" name="Retreat_AgainstTheArenaEdge_StillBacksAway" fullname="MovementPrimitiveTests.Retreat_AgainstTheArenaEdge_StillBacksAway" methodname="Retreat_AgainstTheArenaEdge_StillBacksAway" classname="MovementPrimitiveTests" runstate="Runnable" seed="598276389" result="Passed" start-time="2026-09-17 20:02:21Z" end-time="2026-09-17 20:02:22Z" duration="1.440308" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1216" name="Retreat_Cornered_DoesNotKeepRunningTheLastAdvance" fullname="MovementPrimitiveTests.Retreat_Cornered_DoesNotKeepRunningTheLastAdvance" methodname="Retreat_Cornered_DoesNotKeepRunningTheLastAdvance" classname="MovementPrimitiveTests" runstate="Runnable" seed="1912420351" result="Passed" start-time="2026-09-17 20:02:22Z" end-time="2026-09-17 20:02:22Z" duration="0.019788" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1208" name="Retreat_OpensDistanceFromTheTarget" fullname="MovementPrimitiveTests.Retreat_OpensDistanceFromTheTarget" methodname="Retreat_OpensDistanceFromTheTarget" classname="MovementPrimitiveTests" runstate="Runnable" seed="151512530" result="Passed" start-time="2026-09-17 20:02:22Z" end-time="2026-09-17 20:02:23Z" duration="1.039623" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1214" name="SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh" fullname="MovementPrimitiveTests.SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh" methodname="SteppingPrimitive_TrimsCorrectlyWithTheBodyLiftedOffTheMesh" classname="MovementPrimitiveTests" runstate="Runnable" seed="438254275" result="Passed" start-time="2026-09-17 20:02:23Z" end-time="2026-09-17 20:02:25Z" duration="1.440186" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1219" name="Strafes_StepSidewaysWhileKeepingTheTargetInSight" fullname="MovementPrimitiveTests.Strafes_StepSidewaysWhileKeepingTheTargetInSight" classname="MovementPrimitiveTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-17 20:02:25Z" end-time="2026-09-17 20:02:27Z" duration="2.079869" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <test-case id="1217" name="Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeLeft)" fullname="MovementPrimitiveTests.Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeLeft)" methodname="Strafes_StepSidewaysWhileKeepingTheTargetInSight" classname="MovementPrimitiveTests" runstate="Runnable" seed="139819237" result="Passed" start-time="2026-09-17 20:02:25Z" end-time="2026-09-17 20:02:26Z" duration="1.038959" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+          </test-case>
+          <test-case id="1218" name="Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeRight)" fullname="MovementPrimitiveTests.Strafes_StepSidewaysWhileKeepingTheTargetInSight(StrafeRight)" methodname="Strafes_StepSidewaysWhileKeepingTheTargetInSight" classname="MovementPrimitiveTests" runstate="Runnable" seed="521843463" result="Passed" start-time="2026-09-17 20:02:26Z" end-time="2026-09-17 20:02:27Z" duration="1.040070" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+          </test-case>
+        </test-suite>
+        <test-case id="1221" name="Wander_KeepsMovingWithoutASighting" fullname="MovementPrimitiveTests.Wander_KeepsMovingWithoutASighting" methodname="Wander_KeepsMovingWithoutASighting" classname="MovementPrimitiveTests" runstate="Runnable" seed="1933988262" result="Passed" start-time="2026-09-17 20:02:27Z" end-time="2026-09-17 20:02:29Z" duration="2.043709" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1223" name="Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel" fullname="MovementPrimitiveTests.Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel" methodname="Wander_ResumesItsLegAfterAnotherPrimitiveTakesTheWheel" classname="MovementPrimitiveTests" runstate="Runnable" seed="1658325285" result="Passed" start-time="2026-09-17 20:02:29Z" end-time="2026-09-17 20:02:31Z" duration="2.235905" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[[RunRng] Run seed: 20260811 (source: inspector). Replay with '-runSeed 20260811' or ArenaManager.runSeed = 20260811.
+[ArenaManager] Built arena #0 "Courtyard" (40x40).
+]]></output>
+        </test-case>
+        <test-case id="1222" name="Wander_SweepsAcrossTheArena" fullname="MovementPrimitiveTests.Wander_SweepsAcrossTheArena" methodname="Wander_SweepsAcrossTheArena" classname="MovementPrimitiveTests" runstate="Runnable" seed="1869982459" result="Passed" start-time="2026-09-17 20:02:31Z" end-time="2026-09-17 20:02:39Z" duration="8.039992" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1147,23 +1165,23 @@ Failed to create agent because there is no valid NavMesh
 ]]></output>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1226" name="PerceptionContractTests" fullname="PerceptionContractTests" classname="PerceptionContractTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-14 16:40:40Z" end-time="2026-09-14 16:40:43Z" duration="2.180273" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1227" name="PerceptionContractTests" fullname="PerceptionContractTests" classname="PerceptionContractTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-17 20:02:39Z" end-time="2026-09-17 20:02:41Z" duration="2.179743" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1232" name="Firing_SurvivesTheGraceWindowThenStops" fullname="PerceptionContractTests.Firing_SurvivesTheGraceWindowThenStops" methodname="Firing_SurvivesTheGraceWindowThenStops" classname="PerceptionContractTests" runstate="Runnable" seed="390866623" result="Passed" start-time="2026-09-14 16:40:40Z" end-time="2026-09-14 16:40:42Z" duration="1.622263" asserts="0">
+        <test-case id="1233" name="Firing_SurvivesTheGraceWindowThenStops" fullname="PerceptionContractTests.Firing_SurvivesTheGraceWindowThenStops" methodname="Firing_SurvivesTheGraceWindowThenStops" classname="PerceptionContractTests" runstate="Runnable" seed="697953551" result="Passed" start-time="2026-09-17 20:02:39Z" end-time="2026-09-17 20:02:41Z" duration="1.618166" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1227" name="Memory_TracksWhileVisible_FreezesWhenSightBreaks" fullname="PerceptionContractTests.Memory_TracksWhileVisible_FreezesWhenSightBreaks" methodname="Memory_TracksWhileVisible_FreezesWhenSightBreaks" classname="PerceptionContractTests" runstate="Runnable" seed="952142312" result="Passed" start-time="2026-09-14 16:40:42Z" end-time="2026-09-14 16:40:42Z" duration="0.066157" asserts="0">
+        <test-case id="1228" name="Memory_TracksWhileVisible_FreezesWhenSightBreaks" fullname="PerceptionContractTests.Memory_TracksWhileVisible_FreezesWhenSightBreaks" methodname="Memory_TracksWhileVisible_FreezesWhenSightBreaks" classname="PerceptionContractTests" runstate="Runnable" seed="938005961" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.069472" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1233" name="ResetState_WipesMemoryAndShotFlag" fullname="PerceptionContractTests.ResetState_WipesMemoryAndShotFlag" methodname="ResetState_WipesMemoryAndShotFlag" classname="PerceptionContractTests" runstate="Runnable" seed="1551699642" result="Passed" start-time="2026-09-14 16:40:42Z" end-time="2026-09-14 16:40:42Z" duration="0.011442" asserts="0">
+        <test-case id="1234" name="ResetState_WipesMemoryAndShotFlag" fullname="PerceptionContractTests.ResetState_WipesMemoryAndShotFlag" methodname="ResetState_WipesMemoryAndShotFlag" classname="PerceptionContractTests" runstate="Runnable" seed="409694543" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.011727" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1171,64 +1189,33 @@ Failed to create agent because there is no valid NavMesh
           </properties>
           <output><![CDATA[
 IgnoreFailingMessages:true
-[RunRng] Run seed: 33338581 (source: random). Replay with '-runSeed 33338581' or ArenaManager.runSeed = 33338581.
+[RunRng] Run seed: 39847724 (source: random). Replay with '-runSeed 39847724' or ArenaManager.runSeed = 39847724.
 Failed to create agent because there is no valid NavMesh
-[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (21.81, 0.00, -7.99).
+[EnemyBehavior] Could not place the enemy on a NavMesh — parking it at (31.04, 0.00, -39.10).
 ]]></output>
         </test-case>
-        <test-case id="1231" name="SightingOlderThanTheHorizon_LapsesToNeverSeen" fullname="PerceptionContractTests.SightingOlderThanTheHorizon_LapsesToNeverSeen" methodname="SightingOlderThanTheHorizon_LapsesToNeverSeen" classname="PerceptionContractTests" runstate="Runnable" seed="1514444124" result="Passed" start-time="2026-09-14 16:40:42Z" end-time="2026-09-14 16:40:43Z" duration="0.417898" asserts="0">
+        <test-case id="1232" name="SightingOlderThanTheHorizon_LapsesToNeverSeen" fullname="PerceptionContractTests.SightingOlderThanTheHorizon_LapsesToNeverSeen" methodname="SightingOlderThanTheHorizon_LapsesToNeverSeen" classname="PerceptionContractTests" runstate="Runnable" seed="865923302" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.418232" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1230" name="TargetAcrossTheArena_IsVisible" fullname="PerceptionContractTests.TargetAcrossTheArena_IsVisible" methodname="TargetAcrossTheArena_IsVisible" classname="PerceptionContractTests" runstate="Runnable" seed="1165910707" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.019712" asserts="0">
+        <test-case id="1231" name="TargetAcrossTheArena_IsVisible" fullname="PerceptionContractTests.TargetAcrossTheArena_IsVisible" methodname="TargetAcrossTheArena_IsVisible" classname="PerceptionContractTests" runstate="Runnable" seed="1271306447" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.019540" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1229" name="TargetBeyondSightRange_IsNotVisible" fullname="PerceptionContractTests.TargetBeyondSightRange_IsNotVisible" methodname="TargetBeyondSightRange_IsNotVisible" classname="PerceptionContractTests" runstate="Runnable" seed="444067601" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.019540" asserts="0">
+        <test-case id="1230" name="TargetBeyondSightRange_IsNotVisible" fullname="PerceptionContractTests.TargetBeyondSightRange_IsNotVisible" methodname="TargetBeyondSightRange_IsNotVisible" classname="PerceptionContractTests" runstate="Runnable" seed="500884126" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.020047" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1228" name="TargetOutsideFov_IsNotVisible" fullname="PerceptionContractTests.TargetOutsideFov_IsNotVisible" methodname="TargetOutsideFov_IsNotVisible" classname="PerceptionContractTests" runstate="Runnable" seed="252814406" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.020084" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-      </test-suite>
-      <test-suite type="TestFixture" id="1234" name="RoundTimerTests" fullname="RoundTimerTests" classname="RoundTimerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.621717" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
-        <properties />
-        <test-case id="1235" name="Clock_CountsDownWhileRoundRuns" fullname="RoundTimerTests.Clock_CountsDownWhileRoundRuns" methodname="Clock_CountsDownWhileRoundRuns" classname="RoundTimerTests" runstate="Runnable" seed="381397880" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.005008" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-        <test-case id="1238" name="NonPositiveDuration_DisablesTheClock" fullname="RoundTimerTests.NonPositiveDuration_DisablesTheClock" methodname="NonPositiveDuration_DisablesTheClock" classname="RoundTimerTests" runstate="Runnable" seed="361547242" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.202545" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-        <test-case id="1236" name="ResetRoundClock_RearmsFullDuration" fullname="RoundTimerTests.ResetRoundClock_RearmsFullDuration" methodname="ResetRoundClock_RearmsFullDuration" classname="RoundTimerTests" runstate="Runnable" seed="887210593" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.103270" asserts="0">
-          <properties>
-            <property name="_JOINTYPE" value="UnityCombinatorial" />
-            <property name="retryIteration" value="0" />
-            <property name="repeatIteration" value="0" />
-          </properties>
-        </test-case>
-        <test-case id="1237" name="Timeout_RecordsSingleDraw_AndFreezesRound" fullname="RoundTimerTests.Timeout_RecordsSingleDraw_AndFreezesRound" methodname="Timeout_RecordsSingleDraw_AndFreezesRound" classname="RoundTimerTests" runstate="Runnable" seed="1068558915" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.307869" asserts="0">
+        <test-case id="1229" name="TargetOutsideFov_IsNotVisible" fullname="PerceptionContractTests.TargetOutsideFov_IsNotVisible" methodname="TargetOutsideFov_IsNotVisible" classname="PerceptionContractTests" runstate="Runnable" seed="2087322294" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.019961" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1236,30 +1223,30 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1239" name="TelemetryHooksTests" fullname="TelemetryHooksTests" classname="TelemetryHooksTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:44Z" duration="0.325858" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1235" name="RoundTimerTests" fullname="RoundTimerTests" classname="RoundTimerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:42Z" duration="0.613195" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1243" name="Death_ReportsRoundEndedWithTheWinner" fullname="TelemetryHooksTests.Death_ReportsRoundEndedWithTheWinner" methodname="Death_ReportsRoundEndedWithTheWinner" classname="TelemetryHooksTests" runstate="Runnable" seed="841676075" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.006972" asserts="0">
+        <test-case id="1236" name="Clock_CountsDownWhileRoundRuns" fullname="RoundTimerTests.Clock_CountsDownWhileRoundRuns" methodname="Clock_CountsDownWhileRoundRuns" classname="RoundTimerTests" runstate="Runnable" seed="1503587276" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.002594" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1240" name="LethalShot_IsAnnouncedBeforeTheDeathItCauses" fullname="TelemetryHooksTests.LethalShot_IsAnnouncedBeforeTheDeathItCauses" methodname="LethalShot_IsAnnouncedBeforeTheDeathItCauses" classname="TelemetryHooksTests" runstate="Runnable" seed="1779780712" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.005326" asserts="0">
+        <test-case id="1239" name="NonPositiveDuration_DisablesTheClock" fullname="RoundTimerTests.NonPositiveDuration_DisablesTheClock" methodname="NonPositiveDuration_DisablesTheClock" classname="RoundTimerTests" runstate="Runnable" seed="2143104333" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.201571" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1241" name="Miss_IsStillAnnounced" fullname="TelemetryHooksTests.Miss_IsStillAnnounced" methodname="Miss_IsStillAnnounced" classname="TelemetryHooksTests" runstate="Runnable" seed="261652677" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:43Z" duration="0.003469" asserts="0">
+        <test-case id="1237" name="ResetRoundClock_RearmsFullDuration" fullname="RoundTimerTests.ResetRoundClock_RearmsFullDuration" methodname="ResetRoundClock_RearmsFullDuration" classname="RoundTimerTests" runstate="Runnable" seed="625827835" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:41Z" duration="0.101960" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1242" name="Timeout_ReportsRoundEndedAsDraw" fullname="TelemetryHooksTests.Timeout_ReportsRoundEndedAsDraw" methodname="Timeout_ReportsRoundEndedAsDraw" classname="TelemetryHooksTests" runstate="Runnable" seed="428068113" result="Passed" start-time="2026-09-14 16:40:43Z" end-time="2026-09-14 16:40:44Z" duration="0.306416" asserts="0">
+        <test-case id="1238" name="Timeout_RecordsSingleDraw_AndFreezesRound" fullname="RoundTimerTests.Timeout_RecordsSingleDraw_AndFreezesRound" methodname="Timeout_RecordsSingleDraw_AndFreezesRound" classname="RoundTimerTests" runstate="Runnable" seed="798120849" result="Passed" start-time="2026-09-17 20:02:41Z" end-time="2026-09-17 20:02:42Z" duration="0.305044" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1267,9 +1254,40 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1244" name="TelemetryLoggerTests" fullname="TelemetryLoggerTests" classname="TelemetryLoggerTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.346107" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1240" name="TelemetryHooksTests" fullname="TelemetryHooksTests" classname="TelemetryHooksTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.315375" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1249" name="FailingWrites_DisableTelemetryInsteadOfWedgingTheRound" fullname="TelemetryLoggerTests.FailingWrites_DisableTelemetryInsteadOfWedgingTheRound" methodname="FailingWrites_DisableTelemetryInsteadOfWedgingTheRound" classname="TelemetryLoggerTests" runstate="Runnable" seed="925497392" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.012131" asserts="0">
+        <test-case id="1244" name="Death_ReportsRoundEndedWithTheWinner" fullname="TelemetryHooksTests.Death_ReportsRoundEndedWithTheWinner" methodname="Death_ReportsRoundEndedWithTheWinner" classname="TelemetryHooksTests" runstate="Runnable" seed="260174248" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.003663" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1241" name="LethalShot_IsAnnouncedBeforeTheDeathItCauses" fullname="TelemetryHooksTests.LethalShot_IsAnnouncedBeforeTheDeathItCauses" methodname="LethalShot_IsAnnouncedBeforeTheDeathItCauses" classname="TelemetryHooksTests" runstate="Runnable" seed="732892229" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.003204" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1242" name="Miss_IsStillAnnounced" fullname="TelemetryHooksTests.Miss_IsStillAnnounced" methodname="Miss_IsStillAnnounced" classname="TelemetryHooksTests" runstate="Runnable" seed="1541414566" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.002169" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1243" name="Timeout_ReportsRoundEndedAsDraw" fullname="TelemetryHooksTests.Timeout_ReportsRoundEndedAsDraw" methodname="Timeout_ReportsRoundEndedAsDraw" classname="TelemetryHooksTests" runstate="Runnable" seed="1422813392" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.304690" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1245" name="TelemetryLoggerTests" fullname="TelemetryLoggerTests" classname="TelemetryLoggerTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.321926" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1250" name="FailingWrites_DisableTelemetryInsteadOfWedgingTheRound" fullname="TelemetryLoggerTests.FailingWrites_DisableTelemetryInsteadOfWedgingTheRound" methodname="FailingWrites_DisableTelemetryInsteadOfWedgingTheRound" classname="TelemetryLoggerTests" runstate="Runnable" seed="1300880360" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.006399" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1278,27 +1296,27 @@ Failed to create agent because there is no valid NavMesh
           <output><![CDATA[[Telemetry] Write failed — telemetry disabled for this session: disk full
 ]]></output>
         </test-case>
-        <test-case id="1246" name="LethalShot_IsCountedInTheEpisodeItDecides" fullname="TelemetryLoggerTests.LethalShot_IsCountedInTheEpisodeItDecides" methodname="LethalShot_IsCountedInTheEpisodeItDecides" classname="TelemetryLoggerTests" runstate="Runnable" seed="1713654612" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.013459" asserts="0">
+        <test-case id="1247" name="LethalShot_IsCountedInTheEpisodeItDecides" fullname="TelemetryLoggerTests.LethalShot_IsCountedInTheEpisodeItDecides" methodname="LethalShot_IsCountedInTheEpisodeItDecides" classname="TelemetryLoggerTests" runstate="Runnable" seed="1672182011" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.005492" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1245" name="LogEvent_WritesOneJsonLinePerCall" fullname="TelemetryLoggerTests.LogEvent_WritesOneJsonLinePerCall" methodname="LogEvent_WritesOneJsonLinePerCall" classname="TelemetryLoggerTests" runstate="Runnable" seed="1562172732" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.001611" asserts="0">
+        <test-case id="1246" name="LogEvent_WritesOneJsonLinePerCall" fullname="TelemetryLoggerTests.LogEvent_WritesOneJsonLinePerCall" methodname="LogEvent_WritesOneJsonLinePerCall" classname="TelemetryLoggerTests" runstate="Runnable" seed="1872830876" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.000637" asserts="0">
           <properties>
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1247" name="NextEpisode_StartsCleanAfterARound" fullname="TelemetryLoggerTests.NextEpisode_StartsCleanAfterARound" methodname="NextEpisode_StartsCleanAfterARound" classname="TelemetryLoggerTests" runstate="Runnable" seed="46832021" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.006363" asserts="0">
+        <test-case id="1248" name="NextEpisode_StartsCleanAfterARound" fullname="TelemetryLoggerTests.NextEpisode_StartsCleanAfterARound" methodname="NextEpisode_StartsCleanAfterARound" classname="TelemetryLoggerTests" runstate="Runnable" seed="1293197069" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.002849" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1248" name="Timeout_WritesADrawSummary" fullname="TelemetryLoggerTests.Timeout_WritesADrawSummary" methodname="Timeout_WritesADrawSummary" classname="TelemetryLoggerTests" runstate="Runnable" seed="1011247595" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.306316" asserts="0">
+        <test-case id="1249" name="Timeout_WritesADrawSummary" fullname="TelemetryLoggerTests.Timeout_WritesADrawSummary" methodname="Timeout_WritesADrawSummary" classname="TelemetryLoggerTests" runstate="Runnable" seed="148320839" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.304783" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
@@ -1306,23 +1324,23 @@ Failed to create agent because there is no valid NavMesh
           </properties>
         </test-case>
       </test-suite>
-      <test-suite type="TestFixture" id="1250" name="WeaponRangeTests" fullname="WeaponRangeTests" classname="WeaponRangeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.091669" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="1251" name="WeaponRangeTests" fullname="WeaponRangeTests" classname="WeaponRangeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.090793" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-case id="1253" name="MissingShot_DrawsFiniteTracer" fullname="WeaponRangeTests.MissingShot_DrawsFiniteTracer" methodname="MissingShot_DrawsFiniteTracer" classname="WeaponRangeTests" runstate="Runnable" seed="1562431288" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.007660" asserts="0">
+        <test-case id="1254" name="MissingShot_DrawsFiniteTracer" fullname="WeaponRangeTests.MissingShot_DrawsFiniteTracer" methodname="MissingShot_DrawsFiniteTracer" classname="WeaponRangeTests" runstate="Runnable" seed="1578655248" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.009370" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1251" name="Shot_DamagesTarget_AtAnyDistance" fullname="WeaponRangeTests.Shot_DamagesTarget_AtAnyDistance" methodname="Shot_DamagesTarget_AtAnyDistance" classname="WeaponRangeTests" runstate="Runnable" seed="311321286" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.063312" asserts="0">
+        <test-case id="1252" name="Shot_DamagesTarget_AtAnyDistance" fullname="WeaponRangeTests.Shot_DamagesTarget_AtAnyDistance" methodname="Shot_DamagesTarget_AtAnyDistance" classname="WeaponRangeTests" runstate="Runnable" seed="60334961" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.059688" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />
             <property name="repeatIteration" value="0" />
           </properties>
         </test-case>
-        <test-case id="1252" name="Shot_IsBlockedByGeometry_NotByDistance" fullname="WeaponRangeTests.Shot_IsBlockedByGeometry_NotByDistance" methodname="Shot_IsBlockedByGeometry_NotByDistance" classname="WeaponRangeTests" runstate="Runnable" seed="767219323" result="Passed" start-time="2026-09-14 16:40:44Z" end-time="2026-09-14 16:40:44Z" duration="0.017489" asserts="0">
+        <test-case id="1253" name="Shot_IsBlockedByGeometry_NotByDistance" fullname="WeaponRangeTests.Shot_IsBlockedByGeometry_NotByDistance" methodname="Shot_IsBlockedByGeometry_NotByDistance" classname="WeaponRangeTests" runstate="Runnable" seed="1716098149" result="Passed" start-time="2026-09-17 20:02:42Z" end-time="2026-09-17 20:02:42Z" duration="0.019829" asserts="0">
           <properties>
             <property name="_JOINTYPE" value="UnityCombinatorial" />
             <property name="retryIteration" value="0" />

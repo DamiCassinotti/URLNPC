@@ -78,10 +78,15 @@ public class EnemyAgent : Agent
     // positional rewards are only earnable while it is, so a compliance rate is
     // only readable next to the fraction of steps the mode could act on.
     ModeTally visibility;
+    // Net metres of range each mode moved (#120), signed so that negative is
+    // closing: visible fraction and time-to-kill can't tell Hunt from Retreat,
+    // both of them engaging, but the range a mode nets does.
+    ModeMeanTally rangeDelta;
 
     // Built once: the stat name is per mode and the flush runs every episode.
     static readonly string[] complianceStatNames = BuildStatNames("Compliance");
     static readonly string[] visibleStatNames = BuildStatNames("Visible");
+    static readonly string[] closingStatNames = BuildStatNames("Closing");
 
     readonly float[] observations = new float[NpcBrainSpec.ObservationSize];
     NpcObservationInput inputs;
@@ -228,6 +233,7 @@ public class EnemyAgent : Agent
             patrolMovementMetres = patrolMovementMetres,
         };
         visibility = new ModeTally();
+        rangeDelta = new ModeMeanTally();
 
         selfHealth.OnDamaged += HandleSelfDamaged;
         selfHealth.OnDied += HandleSelfDied;
@@ -407,6 +413,10 @@ public class EnemyAgent : Agent
             timeSinceSeen = inputs.timeSinceSeen,
         });
         visibility.Record(mode, inputs.targetVisible);
+        // Sign flipped from closingDelta: the metric reports the change in
+        // range, so a mode that charges reads negative and one that holds its
+        // distance reads near zero.
+        rangeDelta.Record(mode, -closingDelta);
     }
 
     public override void OnEpisodeBegin()
@@ -420,6 +430,7 @@ public class EnemyAgent : Agent
         // be counted into the next one.
         if (compliance != null) compliance.Reset();
         if (visibility != null) visibility.Reset();
+        if (rangeDelta != null) rangeDelta.Reset();
         if (selfHealth != null) selfHealth.ResetHealth();
         if (targetHealth != null) targetHealth.ResetHealth();
         // Reposition the player BEFORE the enemy respawns so the enemy's
@@ -488,6 +499,10 @@ public class EnemyAgent : Agent
                     stats.Add(complianceStatNames[(int)mode], compliance.Rate(mode));
                 }
                 stats.Add(visibleStatNames[(int)mode], visibility.Rate(mode));
+                // Per step, not per episode: how many steps a mode gets varies
+                // with the dwell schedule, so the episode total isn't comparable
+                // across runs. The total is on the JSONL line for that.
+                stats.Add(closingStatNames[(int)mode], rangeDelta.Mean(mode));
             }
         }
         if (TelemetryLogger.Instance != null)
@@ -495,10 +510,12 @@ public class EnemyAgent : Agent
             TelemetryLogger.Instance.LogEvent("mode_compliance",
                 JsonLine.Field("entity", tag),
                 compliance.ComplianceJson(),
-                visibility.Json("visible", "visible_steps"));
+                visibility.Json("visible", "visible_steps"),
+                rangeDelta.Json("closing"));
         }
         compliance.Reset();
         visibility.Reset();
+        rangeDelta.Reset();
     }
 
     void HandleModeChanged(NpcMode previous, NpcMode current)
