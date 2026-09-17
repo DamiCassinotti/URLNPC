@@ -97,7 +97,8 @@ tensorboard --logdir results
   ignores the command and just fights. The denominator is the steps the mode could act on —
   Hunt only while the player is visible, Retreat while there is contact to break — so this
   reads as policy quality, not as how often the fight was joined. Patrol's rate reads low by
-  construction (a cell counts once) — compare between runs, not as a percentage.
+  construction (a cell counts once) — compare between runs, not as a percentage. As of Run 12
+  this is a **secondary** signal: see §8 for what to report mode differentiation on.
 - **`Visible/<Mode>`** — the fraction of each mode's steps the player was in sight for, i.e.
   how much of the round Hunt's and Retreat's rates were scored on. A mode that never saw the
   player logs no compliance rate that episode, and shows up here as a flat zero instead.
@@ -210,3 +211,32 @@ The model is copied into `Assets/Resources/EvalModels/` and the player rebuilt w
 changes: Inference Engine only imports ONNX in the editor, so the build has to carry it. Pass
 `--no-build` to reuse a build that already does. `scripts/eval_summary.py` runs standalone on
 any session JSONL, including one from a human-played round.
+
+## 8. Reporting mode differentiation
+
+**Report per-mode target-visible fraction and time-to-kill. Compliance is a diagnostic.**
+
+Compliance saturated once the modes started working. Measured against a self-play opponent
+that mostly stays hidden, the `--subject random` control reads ~80% on HoldCover and Retreat
+— a random walk rarely sees anyone either, so "kept the eye-line broken" comes nearly free.
+The rule still describes the right behavior, but with the floor that high there is no room
+left between a random walk and a policy, which is the separation the number exists to show.
+That is a property of the opponent, not a bug in the rule: the low-contact fights the policy
+now produces are exactly the ones the eligible-steps denominator (§3) makes cheap to satisfy.
+
+Visible% and TTK have no rule behind them to saturate — they are what the modes actually do
+differently. Run 12 reads HoldCover 2.8% visible / 57 s TTK, Retreat 5.0% / 40 s, Hunt 10.6%
+/ 17 s: one hides, one engages and breaks off, one rushes. Read them together with win rate,
+so a mode that merely stopped fighting doesn't look like a working defensive mode.
+
+How to report a run:
+
+- Per mode: visible fraction, TTK, win/loss/draw. All of it comes out of
+  `scripts/eval.sh --modes <Mode>` and the `summary.json` it writes.
+- **Always state the opponent.** `--opponent policy` is the standard — training is self-play,
+  so that is what the modes were shaped against; heuristic numbers are not comparable to it.
+- Run `--subject random`, `flee` and `heuristic` as anchors on the same opponent. They are
+  what says whether a spread between modes is real: random is the floor, flee the defensive
+  ceiling, heuristic the aggressive one.
+- Compliance and `Visible/<Mode>` in TensorBoard still tell you *why* a mode moved — keep
+  reading them during a run, just don't gate on compliance.
