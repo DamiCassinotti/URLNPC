@@ -34,9 +34,18 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Consecutive failed selections (timeout, exception, invalid answer) before the fallback selector takes the channel for the rest of the episode. Zero or less never fails over.")]
     [SerializeField] internal int failuresBeforeFallback = 3;
 
-    // The seam itself: the concrete selectors land with their own issues (#125
-    // the fixed/random/fsm baselines, #130 the LLM) and are assigned from
-    // code. An assigned instance runs whatever the kind resolved to.
+    [Header("Baseline selectors (#125)")]
+    [Tooltip("The mode the Fixed selector pins.")]
+    [SerializeField] internal NpcMode fixedSelectorMode = NpcMode.Hunt;
+
+    [Tooltip("Own-HP percent at or under which the FSM retreats.")]
+    [SerializeField] internal int fsmLowHealthPercent = 35;
+
+    [Tooltip("Seconds since the last sighting after which the FSM patrols instead of pursuing the memory.")]
+    [SerializeField] internal int fsmUnseenSecondsForPatrol = 6;
+
+    // The seam itself: an instance assigned from code (the way tests and
+    // EvalSession pick one) outranks whatever the kind would build.
     public IModeSelector Selector { get; set; }
 
     // Takes the channel after failuresBeforeFallback consecutive failures.
@@ -87,12 +96,47 @@ public class ModeSelectorDriver : MonoBehaviour
         }
     }
 
-    IModeSelector ActiveSelector => Selector ?? BuildSelector(ResolvedKind);
+    IModeSelector ActiveSelector => Selector ?? BuiltSelector;
 
-    // The kinds' own construction; #125 and #130 fill this in. Until then any
-    // kind but None resolves to nothing and the driver stays inert unless a
-    // selector was assigned from code.
-    static IModeSelector BuildSelector(ModeSelectorKind kind) => null;
+    IModeSelector built;
+    bool buildAttempted;
+
+    // Built once — the kind can't change mid-process and the random selector
+    // must keep one draw sequence, not restart per access.
+    IModeSelector BuiltSelector
+    {
+        get
+        {
+            if (!buildAttempted)
+            {
+                buildAttempted = true;
+                built = BuildSelector(ResolvedKind);
+            }
+            return built;
+        }
+    }
+
+    // The baselines construct here (#125); the LLM lands with #130. A kind
+    // this build can't construct resolves to nothing and the driver stays
+    // inert unless a selector was assigned from code.
+    IModeSelector BuildSelector(ModeSelectorKind kind)
+    {
+        switch (kind)
+        {
+            case ModeSelectorKind.Fixed:
+                return new FixedModeSelector(fixedSelectorMode);
+            case ModeSelectorKind.Random:
+                return new RandomModeSelector();
+            case ModeSelectorKind.Fsm:
+                return new HeuristicModeSelector
+                {
+                    LowHealthPercent = fsmLowHealthPercent,
+                    UnseenSecondsForPatrol = fsmUnseenSecondsForPatrol,
+                };
+            default:
+                return null;
+        }
+    }
 
     void FixedUpdate()
     {

@@ -23,10 +23,11 @@ public static class RunRng
         Wander = 2, // patrol/wander waypoints
         Mode = 3,   // commanded-mode sampling (ModeDirector)
         Action = 4, // the random-action control policy (eval --subject random)
+        Selector = 5, // the random baseline mode selector (#125)
     }
 
     const string CommandLineArg = "-runSeed";
-    const int StreamCount = 5;
+    const int StreamCount = 6;
 
     public static bool Initialized { get; private set; }
     public static int Seed { get; private set; }
