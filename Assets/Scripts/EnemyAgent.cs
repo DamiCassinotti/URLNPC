@@ -70,6 +70,7 @@ public class EnemyAgent : Agent
     Health targetHealth;
     ModeChannel modeChannel;
     ModeDirector director;
+    ModeSelectorDriver selectorDriver;
     GameManager gameManager;
     RewardComputer rewards;
     EpisodeProgress progress;
@@ -201,6 +202,9 @@ public class EnemyAgent : Agent
         // inherit the last one's dwell. Resolved here rather than off the
         // behavior so it holds even in fixtures that disable EnemyBehavior.
         director = GetComponent<ModeDirector>();
+        // Its async counterpart (#124), reset for the same reason: an answer
+        // still in flight from the last episode must not land in this one.
+        selectorDriver = GetComponent<ModeSelectorDriver>();
 
         // Snapshot taken once per play session, so these tunables only take
         // effect between runs. Built before the subscriptions below: the
@@ -451,6 +455,8 @@ public class EnemyAgent : Agent
         // episode keeps the mode (and the running dwell) the last one ended on.
         // ResetState stands the director down outside training on its own.
         if (director != null) director.ResetState();
+        // The async writer drops any in-flight answer and restarts its cadence.
+        if (selectorDriver != null) selectorDriver.ResetState();
         // Training episodes reset without a scene reload, so the clock has to
         // be rearmed here to give each one a full budget.
         if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();

@@ -129,6 +129,10 @@ public class EnemyBehavior : MonoBehaviour
         // After the channel: its RequireComponent(ModeChannel) would else add a
         // second one. Read back by EnemyAgent via its own GetComponent.
         if (GetComponent<ModeDirector>() == null) gameObject.AddComponent<ModeDirector>();
+        // The channel's other writer, the async selector loop (#124): inert
+        // until a run resolves a selector, and it stands down whenever the
+        // director holds the channel.
+        if (GetComponent<ModeSelectorDriver>() == null) gameObject.AddComponent<ModeSelectorDriver>();
     }
 
     void Start()
