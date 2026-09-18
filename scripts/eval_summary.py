@@ -6,7 +6,8 @@
 Reads the events TelemetryLogger writes -- episode_summary, death and
 mode_compliance -- and reports, for one side of the fight: win rate, damage
 dealt and taken, shot accuracy, time to kill, survival time, and the per-mode
-compliance, visibility and step counts. scripts/eval.sh calls it; it is also
+compliance, visibility, range delta and step counts. scripts/eval.sh calls it;
+it is also
 usable on any session file from a human-played or training run.
 """
 
@@ -69,6 +70,8 @@ def summarize(events, entity):
     for mode in MODES:
         steps = eligible = compliant = 0
         visible_eligible = visible_hits = 0
+        closing_steps = closing_seen_steps = 0
+        closing_total = closing_seen_total = 0.0
         for event in compliance_events:
             row = event.get("compliance", {}).get(mode)
             if row:
@@ -79,6 +82,12 @@ def summarize(events, entity):
             if seen:
                 visible_eligible += seen.get("eligible", 0)
                 visible_hits += seen.get("visible_steps", 0)
+            closed = event.get("closing", {}).get(mode)
+            if closed:
+                closing_steps += closed.get("steps", 0)
+                closing_total += closed.get("total", 0.0)
+                closing_seen_steps += closed.get("eligible", 0)
+                closing_seen_total += closed.get("eligibleTotal", 0.0)
         if steps == 0:
             continue
         modes[mode] = {
@@ -88,6 +97,15 @@ def summarize(events, entity):
             # distinction the per-episode stat makes (#88).
             "compliance": compliant / eligible if eligible else None,
             "visible": visible_hits / visible_eligible if visible_eligible else None,
+            # Signed metres of range per step, negative = closing (#120). Also
+            # None when missing, so a run recorded before the metric existed
+            # reports a dash instead of a flat zero.
+            "closing": closing_total / closing_steps if closing_steps else None,
+            # The same over the steps the target was visible on: in-contact
+            # positioning, where the whole-episode figure is mostly the walk in.
+            "closingVisible": (
+                closing_seen_total / closing_seen_steps if closing_seen_steps else None
+            ),
         }
 
     return {
@@ -116,6 +134,11 @@ def rate(value):
     return "     -" if value is None else f"{value * 100:5.1f}%"
 
 
+# Signed range change per step: negative closes, near zero holds range (#120).
+def metres(value):
+    return "     -" if value is None else f"{value:+.4f}"
+
+
 def seconds(value):
     return "-" if value is None else f"{value:.1f} s"
 
@@ -135,11 +158,15 @@ def render(summary):
     ]
     if summary["modes"]:
         lines.append("")
-        lines.append(f"{'mode':<10}{'steps':>9}{'eligible':>10}{'compliance':>12}{'visible':>10}")
+        lines.append(
+            f"{'mode':<10}{'steps':>9}{'eligible':>10}{'compliance':>12}{'visible':>10}"
+            f"{'m/step':>10}{'m/step seen':>13}"
+        )
         for mode, row in summary["modes"].items():
             lines.append(
                 f"{mode:<10}{row['steps']:>9}{row['eligible']:>10}"
                 f"{rate(row['compliance']):>12}{rate(row['visible']):>10}"
+                f"{metres(row['closing']):>10}{metres(row['closingVisible']):>13}"
             )
     return "\n".join(lines)
 

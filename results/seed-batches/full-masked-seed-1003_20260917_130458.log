@@ -1,0 +1,197 @@
+==> mlagents-learn config/URLNPC-selfplay.yaml --run-id=full-masked-seed-1003 --env=/home/damian/repos/URLNPC/Builds/Linux/URLNPC.x86_64 --no-graphics --seed=1003 --env-args -playerDriver agent -runSeed 1003 -heuristicOpponent 0.3
+
+            ┐  ╖
+        ╓╖╬│╡  ││╬╖╖
+    ╓╖╬│││││┘  ╬│││││╬╖
+ ╖╬│││││╬╜        ╙╬│││││╖╖                               ╗╗╗
+ ╬╬╬╬╖││╦╖        ╖╬││╗╣╣╣╬      ╟╣╣╬    ╟╣╣╣             ╜╜╜  ╟╣╣
+ ╬╬╬╬╬╬╬╬╖│╬╖╖╓╬╪│╓╣╣╣╣╣╣╣╬      ╟╣╣╬    ╟╣╣╣ ╒╣╣╖╗╣╣╣╗   ╣╣╣ ╣╣╣╣╣╣ ╟╣╣╖   ╣╣╣
+ ╬╬╬╬┐  ╙╬╬╬╬│╓╣╣╣╝╜  ╫╣╣╣╬      ╟╣╣╬    ╟╣╣╣ ╟╣╣╣╙ ╙╣╣╣  ╣╣╣ ╙╟╣╣╜╙  ╫╣╣  ╟╣╣
+ ╬╬╬╬┐     ╙╬╬╣╣      ╫╣╣╣╬      ╟╣╣╬    ╟╣╣╣ ╟╣╣╬   ╣╣╣  ╣╣╣  ╟╣╣     ╣╣╣┌╣╣╜
+ ╬╬╬╜       ╬╬╣╣      ╙╝╣╣╬      ╙╣╣╣╗╖╓╗╣╣╣╜ ╟╣╣╬   ╣╣╣  ╣╣╣  ╟╣╣╦╓    ╣╣╣╣╣
+ ╙   ╓╦╖    ╬╬╣╣   ╓╗╗╖            ╙╝╣╣╣╣╝╜   ╘╝╝╜   ╝╝╝  ╝╝╝   ╙╣╣╣    ╟╣╣╣
+   ╩╬╬╬╬╬╬╦╦╬╬╣╣╗╣╣╣╣╣╣╣╝                                             ╫╣╣╣╣
+      ╙╬╬╬╬╬╬╬╣╣╣╣╣╣╝╜
+          ╙╬╬╬╣╣╣╜
+             ╙
+        
+ Version information:
+  ml-agents: 1.1.0,
+  ml-agents-envs: 1.1.0,
+  Communicator API: 1.5.0,
+  PyTorch: 2.2.1+cu121
+[INFO] Connected to Unity environment with package version 3.0.0 and communication version 1.5.0
+[INFO] Connected new brain: URLNPC?team=0
+[INFO] Connected new brain: URLNPC?team=1
+[INFO] Hyperparameters for behavior name URLNPC: 
+	trainer_type:	ppo
+	hyperparameters:	
+	  batch_size:	1024
+	  buffer_size:	10240
+	  learning_rate:	0.0003
+	  beta:	0.005
+	  epsilon:	0.2
+	  lambd:	0.95
+	  num_epoch:	3
+	  shared_critic:	False
+	  learning_rate_schedule:	linear
+	  beta_schedule:	linear
+	  epsilon_schedule:	linear
+	checkpoint_interval:	50000
+	network_settings:	
+	  normalize:	False
+	  hidden_units:	128
+	  num_layers:	2
+	  vis_encode_type:	simple
+	  memory:	None
+	  goal_conditioning_type:	hyper
+	  deterministic:	False
+	reward_signals:	
+	  extrinsic:	
+	    gamma:	0.99
+	    strength:	1.0
+	    network_settings:	
+	      normalize:	False
+	      hidden_units:	128
+	      num_layers:	2
+	      vis_encode_type:	simple
+	      memory:	None
+	      goal_conditioning_type:	hyper
+	      deterministic:	False
+	init_path:	None
+	keep_checkpoints:	5
+	even_checkpoints:	False
+	max_steps:	1000000
+	time_horizon:	64
+	summary_freq:	10000
+	threaded:	True
+	self_play:	
+	  save_steps:	20000
+	  team_change:	100000
+	  swap_steps:	2000
+	  window:	10
+	  play_against_latest_model_ratio:	0.5
+	  initial_elo:	1200.0
+	behavioral_cloning:	None
+[INFO] URLNPC. Step: 10000. Time Elapsed: 85.129 s. Mean Reward: 16.566. Std of Reward: 11.914. Training. ELO: 1200.656.
+[INFO] URLNPC. Step: 20000. Time Elapsed: 183.330 s. Mean Reward: 11.234. Std of Reward: 10.648. Training. ELO: 1199.059.
+[INFO] URLNPC. Step: 30000. Time Elapsed: 280.147 s. Mean Reward: 9.261. Std of Reward: 12.539. Training. ELO: 1197.784.
+[INFO] URLNPC. Step: 40000. Time Elapsed: 376.297 s. Mean Reward: 11.685. Std of Reward: 14.932. Training. ELO: 1197.788.
+[INFO] URLNPC. Step: 50000. Time Elapsed: 472.457 s. Mean Reward: 9.044. Std of Reward: 12.391. Training. ELO: 1197.558.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-49991.onnx
+[INFO] URLNPC. Step: 60000. Time Elapsed: 573.437 s. Mean Reward: 13.101. Std of Reward: 14.499. Training. ELO: 1197.287.
+[INFO] URLNPC. Step: 70000. Time Elapsed: 675.138 s. Mean Reward: 17.132. Std of Reward: 14.569. Training. ELO: 1197.194.
+[INFO] URLNPC. Step: 80000. Time Elapsed: 771.686 s. Mean Reward: 16.517. Std of Reward: 18.527. Training. ELO: 1196.552.
+[INFO] URLNPC. Step: 90000. Time Elapsed: 876.317 s. Mean Reward: 11.832. Std of Reward: 13.757. Training. ELO: 1196.982.
+[INFO] URLNPC. Step: 100000. Time Elapsed: 973.953 s. Mean Reward: 13.269. Std of Reward: 15.166. Training. ELO: 1195.518.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-99952.onnx
+[INFO] URLNPC. Step: 110000. Time Elapsed: 1050.739 s. Mean Reward: 9.695. Std of Reward: 11.494. Training. ELO: 1193.494.
+[INFO] URLNPC. Step: 120000. Time Elapsed: 1129.326 s. Mean Reward: 13.622. Std of Reward: 15.150. Training. ELO: 1190.270.
+[INFO] URLNPC. Step: 130000. Time Elapsed: 1207.483 s. Mean Reward: 9.244. Std of Reward: 12.512. Training. ELO: 1187.006.
+[INFO] URLNPC. Step: 140000. Time Elapsed: 1286.685 s. Mean Reward: 8.508. Std of Reward: 14.887. Training. ELO: 1186.116.
+[INFO] URLNPC. Step: 150000. Time Elapsed: 1363.125 s. Mean Reward: 14.106. Std of Reward: 16.546. Training. ELO: 1187.839.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-149961.onnx
+[INFO] URLNPC. Step: 160000. Time Elapsed: 1440.812 s. Mean Reward: 10.193. Std of Reward: 13.591. Training. ELO: 1186.260.
+[INFO] URLNPC. Step: 170000. Time Elapsed: 1518.496 s. Mean Reward: 12.968. Std of Reward: 20.828. Training. ELO: 1185.312.
+[INFO] URLNPC. Step: 180000. Time Elapsed: 1593.628 s. Mean Reward: 8.508. Std of Reward: 14.272. Training. ELO: 1182.648.
+[INFO] URLNPC. Step: 190000. Time Elapsed: 1670.327 s. Mean Reward: 10.895. Std of Reward: 13.165. Training. ELO: 1181.313.
+[INFO] URLNPC. Step: 200000. Time Elapsed: 1753.763 s. Mean Reward: 13.323. Std of Reward: 13.630. Training. ELO: 1180.286.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-199941.onnx
+[INFO] URLNPC. Step: 210000. Time Elapsed: 1854.622 s. Mean Reward: 12.508. Std of Reward: 11.213. Training. ELO: 1179.797.
+[INFO] URLNPC. Step: 220000. Time Elapsed: 1950.074 s. Mean Reward: 10.641. Std of Reward: 10.693. Training. ELO: 1178.904.
+[INFO] URLNPC. Step: 230000. Time Elapsed: 2049.377 s. Mean Reward: 12.633. Std of Reward: 16.455. Training. ELO: 1174.336.
+[INFO] URLNPC. Step: 240000. Time Elapsed: 2152.791 s. Mean Reward: 13.813. Std of Reward: 14.093. Training. ELO: 1172.943.
+[INFO] URLNPC. Step: 250000. Time Elapsed: 2246.145 s. Mean Reward: 11.117. Std of Reward: 16.327. Training. ELO: 1173.241.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-249940.onnx
+[INFO] URLNPC. Step: 260000. Time Elapsed: 2332.695 s. Mean Reward: 16.169. Std of Reward: 18.488. Training. ELO: 1173.298.
+[INFO] URLNPC. Step: 270000. Time Elapsed: 2419.813 s. Mean Reward: 21.923. Std of Reward: 14.633. Training. ELO: 1171.271.
+[INFO] URLNPC. Step: 280000. Time Elapsed: 2519.896 s. Mean Reward: 14.535. Std of Reward: 12.606. Training. ELO: 1168.621.
+[INFO] URLNPC. Step: 290000. Time Elapsed: 2618.517 s. Mean Reward: 12.680. Std of Reward: 13.092. Training. ELO: 1167.433.
+[INFO] URLNPC. Step: 300000. Time Elapsed: 2711.435 s. Mean Reward: 13.584. Std of Reward: 16.143. Training. ELO: 1168.601.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-299994.onnx
+[INFO] URLNPC. Step: 310000. Time Elapsed: 2788.962 s. Mean Reward: 13.244. Std of Reward: 15.272. Training. ELO: 1167.793.
+[INFO] URLNPC. Step: 320000. Time Elapsed: 2865.125 s. Mean Reward: 7.392. Std of Reward: 12.374. Training. ELO: 1165.842.
+[INFO] URLNPC. Step: 330000. Time Elapsed: 2942.059 s. Mean Reward: 8.628. Std of Reward: 16.102. Training. ELO: 1164.364.
+[INFO] URLNPC. Step: 340000. Time Elapsed: 3019.902 s. Mean Reward: 14.227. Std of Reward: 16.221. Training. ELO: 1163.460.
+[INFO] URLNPC. Step: 350000. Time Elapsed: 3097.960 s. Mean Reward: 13.442. Std of Reward: 15.716. Training. ELO: 1162.315.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-349954.onnx
+[INFO] URLNPC. Step: 360000. Time Elapsed: 3174.204 s. Mean Reward: 14.426. Std of Reward: 13.212. Training. ELO: 1161.170.
+[INFO] URLNPC. Step: 370000. Time Elapsed: 3252.899 s. Mean Reward: 13.516. Std of Reward: 13.009. Training. ELO: 1160.000.
+[INFO] URLNPC. Step: 380000. Time Elapsed: 3332.132 s. Mean Reward: 14.749. Std of Reward: 14.512. Training. ELO: 1154.815.
+[INFO] URLNPC. Step: 390000. Time Elapsed: 3406.862 s. Mean Reward: 10.227. Std of Reward: 15.628. Training. ELO: 1152.293.
+[INFO] URLNPC. Step: 400000. Time Elapsed: 3482.405 s. Mean Reward: 14.286. Std of Reward: 17.015. Training. ELO: 1151.342.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-399995.onnx
+[INFO] URLNPC. Step: 410000. Time Elapsed: 3572.462 s. Mean Reward: 10.567. Std of Reward: 11.406. Training. ELO: 1150.658.
+[INFO] URLNPC. Step: 420000. Time Elapsed: 3676.762 s. Mean Reward: 15.677. Std of Reward: 16.395. Training. ELO: 1149.757.
+[INFO] URLNPC. Step: 430000. Time Elapsed: 3777.071 s. Mean Reward: 10.839. Std of Reward: 14.725. Training. ELO: 1148.827.
+[INFO] URLNPC. Step: 440000. Time Elapsed: 3872.766 s. Mean Reward: 17.623. Std of Reward: 16.466. Training. ELO: 1148.356.
+[INFO] URLNPC. Step: 450000. Time Elapsed: 3972.060 s. Mean Reward: 7.955. Std of Reward: 16.362. Training. ELO: 1147.956.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-449950.onnx
+[INFO] URLNPC. Step: 460000. Time Elapsed: 4069.349 s. Mean Reward: 14.204. Std of Reward: 13.824. Training. ELO: 1147.063.
+[INFO] URLNPC. Step: 470000. Time Elapsed: 4163.671 s. Mean Reward: 11.632. Std of Reward: 16.477. Training. ELO: 1146.430.
+[INFO] URLNPC. Step: 480000. Time Elapsed: 4258.785 s. Mean Reward: 21.280. Std of Reward: 19.769. Training. ELO: 1144.482.
+[INFO] URLNPC. Step: 490000. Time Elapsed: 4350.975 s. Mean Reward: 19.288. Std of Reward: 18.987. Training. ELO: 1143.078.
+[INFO] URLNPC. Step: 500000. Time Elapsed: 4437.424 s. Mean Reward: 17.590. Std of Reward: 18.321. Training. ELO: 1140.866.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-499937.onnx
+[INFO] URLNPC. Step: 510000. Time Elapsed: 4515.537 s. Mean Reward: 9.973. Std of Reward: 14.136. Training. ELO: 1138.649.
+[INFO] URLNPC. Step: 520000. Time Elapsed: 4594.460 s. Mean Reward: 15.445. Std of Reward: 18.838. Training. ELO: 1138.326.
+[INFO] URLNPC. Step: 530000. Time Elapsed: 4671.250 s. Mean Reward: 6.818. Std of Reward: 12.745. Training. ELO: 1137.530.
+[INFO] URLNPC. Step: 540000. Time Elapsed: 4747.960 s. Mean Reward: 12.280. Std of Reward: 14.323. Training. ELO: 1137.898.
+[INFO] URLNPC. Step: 550000. Time Elapsed: 4825.899 s. Mean Reward: 8.214. Std of Reward: 12.490. Training. ELO: 1138.063.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-549991.onnx
+[INFO] URLNPC. Step: 560000. Time Elapsed: 4901.085 s. Mean Reward: 8.338. Std of Reward: 10.847. Training. ELO: 1137.632.
+[INFO] URLNPC. Step: 570000. Time Elapsed: 4978.514 s. Mean Reward: 16.428. Std of Reward: 16.521. Training. ELO: 1137.183.
+[INFO] URLNPC. Step: 580000. Time Elapsed: 5056.143 s. Mean Reward: 10.076. Std of Reward: 14.138. Training. ELO: 1137.361.
+[INFO] URLNPC. Step: 590000. Time Elapsed: 5135.069 s. Mean Reward: 15.833. Std of Reward: 18.947. Training. ELO: 1137.493.
+[INFO] URLNPC. Step: 600000. Time Elapsed: 5212.297 s. Mean Reward: 15.242. Std of Reward: 14.535. Training. ELO: 1137.981.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-599992.onnx
+[INFO] URLNPC. Step: 610000. Time Elapsed: 5304.159 s. Mean Reward: 18.449. Std of Reward: 18.659. Training. ELO: 1138.839.
+[INFO] URLNPC. Step: 620000. Time Elapsed: 5400.752 s. Mean Reward: 19.181. Std of Reward: 15.064. Training. ELO: 1139.609.
+[INFO] URLNPC. Step: 630000. Time Elapsed: 5495.070 s. Mean Reward: 13.395. Std of Reward: 17.969. Training. ELO: 1139.193.
+[INFO] URLNPC. Step: 640000. Time Elapsed: 5583.136 s. Mean Reward: 21.222. Std of Reward: 18.539. Training. ELO: 1137.282.
+[INFO] URLNPC. Step: 650000. Time Elapsed: 5675.826 s. Mean Reward: 17.769. Std of Reward: 17.052. Training. ELO: 1137.019.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-649936.onnx
+[INFO] URLNPC. Step: 660000. Time Elapsed: 5766.208 s. Mean Reward: 11.634. Std of Reward: 14.775. Training. ELO: 1132.319.
+[INFO] URLNPC. Step: 670000. Time Elapsed: 5856.136 s. Mean Reward: 14.062. Std of Reward: 14.402. Training. ELO: 1129.195.
+[INFO] URLNPC. Step: 680000. Time Elapsed: 5955.816 s. Mean Reward: 19.580. Std of Reward: 16.599. Training. ELO: 1128.353.
+[INFO] URLNPC. Step: 690000. Time Elapsed: 6045.482 s. Mean Reward: 23.377. Std of Reward: 20.669. Training. ELO: 1127.435.
+[INFO] URLNPC. Step: 700000. Time Elapsed: 6144.025 s. Mean Reward: 14.654. Std of Reward: 14.335. Training. ELO: 1126.972.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-699997.onnx
+[INFO] URLNPC. Step: 710000. Time Elapsed: 6235.400 s. Mean Reward: 15.754. Std of Reward: 14.711. Training. ELO: 1126.246.
+[INFO] URLNPC. Step: 720000. Time Elapsed: 6314.379 s. Mean Reward: 15.951. Std of Reward: 19.059. Training. ELO: 1122.848.
+[INFO] URLNPC. Step: 730000. Time Elapsed: 6392.214 s. Mean Reward: 8.156. Std of Reward: 12.097. Training. ELO: 1120.457.
+[INFO] URLNPC. Step: 740000. Time Elapsed: 6468.955 s. Mean Reward: 13.314. Std of Reward: 10.786. Training. ELO: 1117.873.
+[INFO] URLNPC. Step: 750000. Time Elapsed: 6545.151 s. Mean Reward: 11.962. Std of Reward: 14.689. Training. ELO: 1116.366.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-749937.onnx
+[INFO] URLNPC. Step: 760000. Time Elapsed: 6624.115 s. Mean Reward: 14.694. Std of Reward: 19.170. Training. ELO: 1115.621.
+[INFO] URLNPC. Step: 770000. Time Elapsed: 6700.330 s. Mean Reward: 13.849. Std of Reward: 16.696. Training. ELO: 1113.028.
+[INFO] URLNPC. Step: 780000. Time Elapsed: 6779.666 s. Mean Reward: 12.221. Std of Reward: 14.944. Training. ELO: 1111.661.
+[INFO] URLNPC. Step: 790000. Time Elapsed: 6856.281 s. Mean Reward: 12.745. Std of Reward: 13.542. Training. ELO: 1109.164.
+[INFO] URLNPC. Step: 800000. Time Elapsed: 6931.044 s. Mean Reward: 11.869. Std of Reward: 13.867. Training. ELO: 1108.904.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-799964.onnx
+[INFO] URLNPC. Step: 810000. Time Elapsed: 7026.372 s. Mean Reward: 14.004. Std of Reward: 17.301. Training. ELO: 1105.360.
+[INFO] URLNPC. Step: 820000. Time Elapsed: 7114.169 s. Mean Reward: 19.709. Std of Reward: 12.519. Training. ELO: 1104.078.
+[INFO] URLNPC. Step: 830000. Time Elapsed: 7205.587 s. Mean Reward: 10.105. Std of Reward: 12.114. Training. ELO: 1104.466.
+[INFO] URLNPC. Step: 840000. Time Elapsed: 7299.614 s. Mean Reward: 20.062. Std of Reward: 16.113. Training. ELO: 1104.519.
+[INFO] URLNPC. Step: 850000. Time Elapsed: 7397.940 s. Mean Reward: 21.818. Std of Reward: 19.311. Training. ELO: 1103.443.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-849967.onnx
+[INFO] URLNPC. Step: 860000. Time Elapsed: 7500.774 s. Mean Reward: 10.715. Std of Reward: 13.448. Training. ELO: 1101.843.
+[INFO] URLNPC. Step: 870000. Time Elapsed: 7597.424 s. Mean Reward: 12.059. Std of Reward: 14.325. Training. ELO: 1099.348.
+[INFO] URLNPC. Step: 880000. Time Elapsed: 7691.056 s. Mean Reward: 22.089. Std of Reward: 17.426. Training. ELO: 1097.587.
+[INFO] URLNPC. Step: 890000. Time Elapsed: 7781.228 s. Mean Reward: 19.942. Std of Reward: 15.847. Training. ELO: 1095.197.
+[INFO] URLNPC. Step: 900000. Time Elapsed: 7877.319 s. Mean Reward: 14.515. Std of Reward: 14.839. Training. ELO: 1093.590.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-899952.onnx
+[INFO] URLNPC. Step: 910000. Time Elapsed: 7956.107 s. Mean Reward: 11.099. Std of Reward: 12.403. Training. ELO: 1092.939.
+[INFO] URLNPC. Step: 920000. Time Elapsed: 8032.331 s. Mean Reward: 11.475. Std of Reward: 16.567. Training. ELO: 1089.739.
+[INFO] URLNPC. Step: 930000. Time Elapsed: 8110.163 s. Mean Reward: 16.354. Std of Reward: 19.934. Training. ELO: 1089.459.
+[INFO] URLNPC. Step: 940000. Time Elapsed: 8186.071 s. Mean Reward: 12.473. Std of Reward: 13.799. Training. ELO: 1089.750.
+[INFO] URLNPC. Step: 950000. Time Elapsed: 8265.049 s. Mean Reward: 11.998. Std of Reward: 14.672. Training. ELO: 1087.213.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-949971.onnx
+[INFO] URLNPC. Step: 960000. Time Elapsed: 8342.729 s. Mean Reward: 10.829. Std of Reward: 14.614. Training. ELO: 1086.431.
+[INFO] URLNPC. Step: 970000. Time Elapsed: 8420.014 s. Mean Reward: 8.819. Std of Reward: 15.254. Training. ELO: 1085.815.
+[INFO] URLNPC. Step: 980000. Time Elapsed: 8497.154 s. Mean Reward: 5.639. Std of Reward: 9.853. Training. ELO: 1080.792.
+[INFO] URLNPC. Step: 990000. Time Elapsed: 8575.777 s. Mean Reward: 11.606. Std of Reward: 15.248. Training. ELO: 1077.787.
+[INFO] URLNPC. Step: 1000000. Time Elapsed: 8653.252 s. Mean Reward: 11.812. Std of Reward: 13.795. Training. ELO: 1077.028.
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-999954.onnx
+[INFO] Exported results/full-masked-seed-1003/URLNPC/URLNPC-1000018.onnx
+[INFO] Copied results/full-masked-seed-1003/URLNPC/URLNPC-1000018.onnx to results/full-masked-seed-1003/URLNPC.onnx.

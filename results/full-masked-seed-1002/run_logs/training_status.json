@@ -1,0 +1,66 @@
+{
+    "URLNPC": {
+        "checkpoints": [
+            {
+                "steps": 849958,
+                "file_path": "results/full-masked-seed-1002/URLNPC/URLNPC-849958.onnx",
+                "reward": 2.763025405920214,
+                "creation_time": 1789660156.3090343,
+                "auxillary_file_paths": [
+                    "results/full-masked-seed-1002/URLNPC/URLNPC-849958.pt"
+                ]
+            },
+            {
+                "steps": 899937,
+                "file_path": "results/full-masked-seed-1002/URLNPC/URLNPC-899937.onnx",
+                "reward": 6.850018915823764,
+                "creation_time": 1789660553.3679187,
+                "auxillary_file_paths": [
+                    "results/full-masked-seed-1002/URLNPC/URLNPC-899937.pt"
+                ]
+            },
+            {
+                "steps": 949942,
+                "file_path": "results/full-masked-seed-1002/URLNPC/URLNPC-949942.onnx",
+                "reward": 7.403987336158752,
+                "creation_time": 1789661003.7115726,
+                "auxillary_file_paths": [
+                    "results/full-masked-seed-1002/URLNPC/URLNPC-949942.pt"
+                ]
+            },
+            {
+                "steps": 999959,
+                "file_path": "results/full-masked-seed-1002/URLNPC/URLNPC-999959.onnx",
+                "reward": 9.170417758636177,
+                "creation_time": 1789661446.576323,
+                "auxillary_file_paths": [
+                    "results/full-masked-seed-1002/URLNPC/URLNPC-999959.pt"
+                ]
+            },
+            {
+                "steps": 1000003,
+                "file_path": "results/full-masked-seed-1002/URLNPC/URLNPC-1000003.onnx",
+                "reward": 7.489293551279439,
+                "creation_time": 1789661446.6274657,
+                "auxillary_file_paths": [
+                    "results/full-masked-seed-1002/URLNPC/URLNPC-1000003.pt"
+                ]
+            }
+        ],
+        "elo": 1088.5740808983028,
+        "final_checkpoint": {
+            "steps": 1000003,
+            "file_path": "results/full-masked-seed-1002/URLNPC.onnx",
+            "reward": 7.489293551279439,
+            "creation_time": 1789661446.6274657,
+            "auxillary_file_paths": [
+                "results/full-masked-seed-1002/URLNPC/URLNPC-1000003.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.1+cu121"
+    }
+}

@@ -1,0 +1,45 @@
+{
+  "entity": "NPC",
+  "episodes": 200,
+  "wins": 95,
+  "losses": 91,
+  "draws": 14,
+  "winRate": 0.475,
+  "damageDealtPerEpisode": 72.9,
+  "damageTakenPerEpisode": 76.8,
+  "shots": 1440,
+  "hits": 972,
+  "accuracy": 0.675,
+  "timeToKillSeconds": 31.653629032258063,
+  "survivalSeconds": 32.873758241758246,
+  "modes": {
+    "Hunt": {
+      "steps": 94774,
+      "eligible": 5948,
+      "compliance": 0.6955279085406859,
+      "visible": 0.06275982864498703,
+      "closing": -0.00933306603076793
+    },
+    "HoldCover": {
+      "steps": 92848,
+      "eligible": 21505,
+      "compliance": 0.7433155080213903,
+      "visible": 0.04798164742374634,
+      "closing": -0.005988745045666034
+    },
+    "Retreat": {
+      "steps": 95860,
+      "eligible": 22839,
+      "compliance": 0.6508165856648714,
+      "visible": 0.07095764656791154,
+      "closing": -0.011691393699144584
+    },
+    "Patrol": {
+      "steps": 95174,
+      "eligible": 95174,
+      "compliance": 0.24044381868997836,
+      "visible": 0.065669195368483,
+      "closing": -0.009531269044066659
+    }
+  }
+}

@@ -126,7 +126,30 @@ public class ModeTelemetryTests : PlayModeTestBase
         // Same line, same steps (#87): the compliance rate is only readable
         // against how often the mode had the target to act on.
         Assert.That(line, Does.Contain("\"visible\":{\"Retreat\":{\"steps\":2"));
+        // And the range delta (#120), fed from the same step.
+        Assert.That(line, Does.Contain("\"closing\":{\"Retreat\":{\"steps\":2"));
         Assert.That(line, Does.Not.Contain("Hunt"), "a mode the episode never ran has no rate");
+    }
+
+    [UnityTest]
+    public IEnumerator ClosingOnTheTarget_IsReportedAsNegativeRange()
+    {
+        yield return BuildAgentScene();
+
+        // First step only sets the baseline distance; the second is the one
+        // that closed two metres on the player standing at z = 10.
+        Step(MovementAction.Advance);
+        agent.transform.position = new Vector3(0f, 0f, 2f);
+        Step(MovementAction.Advance);
+        agent.OnRoundTimeout();
+
+        string line = LineOfType("mode_compliance");
+        Assert.That(line, Does.Contain("\"closing\":{\"Hunt\":{\"steps\":2,\"total\":-2,"),
+            $"expected two metres of range closed in:\n{line}");
+        // Nothing was visible on either step, and the range it closed still
+        // counts: a pursuit closes most of its range walking to a remembered
+        // position. The visible-only figure is reported beside it, not instead.
+        Assert.That(line, Does.Contain("\"eligible\":0,\"eligibleTotal\":0"));
     }
 
     [UnityTest]
