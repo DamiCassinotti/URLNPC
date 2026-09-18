@@ -48,10 +48,18 @@ public class ObservedTargetStats
                 movedMetres += moved.magnitude;
                 movedSeconds += deltaSeconds;
             }
+            lastPosition = targetPosition;
+            chained = true;
+        }
+        else if (!chained)
+        {
+            // A zero-delta sighting still anchors the speed chain; one landing
+            // mid-chain leaves the anchor alone, so the move folds into the
+            // next timed sample instead of vanishing with the empty interval.
+            lastPosition = targetPosition;
+            chained = true;
         }
         TargetVisible = true;
-        chained = true;
-        lastPosition = targetPosition;
     }
 
     // A shot attributed to the target. The gate lives here rather than in the

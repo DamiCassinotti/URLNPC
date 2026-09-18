@@ -119,6 +119,30 @@ public class ObservedTargetStatsTests
     }
 
     [Test]
+    public void ZeroDeltaSampleMidChain_DoesNotSwallowTheMove()
+    {
+        var stats = new ObservedTargetStats();
+        stats.Sample(true, new Vector3(0f, 0f, 0f), 10f, 1f);
+        // An empty interval must not move the chain's anchor: the 5 m crossed
+        // here has to fold into the next timed sample, not vanish.
+        stats.Sample(true, new Vector3(5f, 0f, 0f), 10f, 0f);
+        stats.Sample(true, new Vector3(6f, 0f, 0f), 10f, 1f);
+
+        Assert.That(stats.MeanSpeed, Is.EqualTo(6f).Within(1e-5f));
+    }
+
+    [Test]
+    public void ZeroDeltaFirstSighting_StillAnchorsTheSpeedChain()
+    {
+        var stats = new ObservedTargetStats();
+        stats.Sample(true, new Vector3(0f, 0f, 0f), 10f, 0f);
+        stats.Sample(true, new Vector3(2f, 0f, 0f), 10f, 1f);
+
+        Assert.That(stats.MeanSpeed, Is.EqualTo(2f).Within(1e-5f),
+            "the walk from the zero-delta sighting is a watched move");
+    }
+
+    [Test]
     public void Reset_StartsTheNextEpisodeBlank()
     {
         var stats = new ObservedTargetStats();

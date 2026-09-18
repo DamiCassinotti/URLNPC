@@ -173,9 +173,12 @@ public class ArenaManager : MonoBehaviour
 
     // Fraction of the floor occupied by cover footprints — the coarse "how much
     // cover does this layout offer" figure for the game-state snapshot (#123).
-    // Overlaps double-count and thin walls count their slab, so it compares
-    // layouts rather than measuring exact coverage. Lazy: collider bounds are
-    // not reliable in the same Awake that scaled the primitives.
+    // Overlaps double-count, thin walls count their slab, and the AABB footprint
+    // is only exact for the axis-aligned boxes the builder emits (the stairs are
+    // rotated in 90° steps, like IsClearOfCover assumes — an off-axis box would
+    // over-count) — so it compares layouts rather than measuring exact coverage.
+    // Lazy: collider bounds are not reliable in the same Awake that scaled the
+    // primitives.
     public float CoverDensity
     {
         get
