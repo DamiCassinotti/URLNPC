@@ -83,6 +83,10 @@ public class EnemyBehavior : MonoBehaviour
     // reason. Until a writer commands one it just reports its initial mode.
     public ModeChannel Mode { get; private set; }
 
+    // The LLM tier's state assembler (#123), auto-added like the memories so
+    // every AI body accumulates its observed-player stats from round start.
+    public GameStateSnapshotBuilder Snapshot { get; private set; }
+
     // What this combatant's sight ray can be blocked by. Cover queries must run
     // against the same mask (ArenaManager.NearestCoverPoint).
     public LayerMask SightObstacleMask => sightObstacleMask;
@@ -116,6 +120,8 @@ public class EnemyBehavior : MonoBehaviour
         if (Damage == null) Damage = gameObject.AddComponent<DamageMemory>();
         Mode = GetComponent<ModeChannel>();
         if (Mode == null) Mode = gameObject.AddComponent<ModeChannel>();
+        Snapshot = GetComponent<GameStateSnapshotBuilder>();
+        if (Snapshot == null) Snapshot = gameObject.AddComponent<GameStateSnapshotBuilder>();
         // The scripted writer that commands Mode during training, attached the
         // same way so every AI body has one and #65 can't recur on a new
         // combatant. Inert outside training (ModeDirector.trainingOnly), and the
@@ -544,6 +550,7 @@ public class EnemyBehavior : MonoBehaviour
         search.Reset();
         if (Perception != null) Perception.Forget();
         if (Damage != null) Damage.Forget();
+        if (Snapshot != null) Snapshot.ResetState();
         if (navMeshAgent != null)
         {
             // Hold/the strafes park it on manual rotation; the next episode

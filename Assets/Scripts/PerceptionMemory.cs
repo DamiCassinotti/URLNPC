@@ -28,6 +28,9 @@ public class PerceptionMemory : MonoBehaviour
 
     public bool HasEverSeen => state.HasEverSeen;
 
+    // The lapse horizon consumers score staleness against (#123).
+    public float MemorySeconds => memorySeconds;
+
     // Is the last sighting no older than the given window? The fire gate reads
     // this so the NPC can suppress a corner someone just ducked behind without
     // shooting at a memory for the rest of the round.
