@@ -183,6 +183,32 @@ public class ModeSelectorDriverTests
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.HoldCover));
     }
 
+    // The threshold can also be crossed by the timeout inside the issue path —
+    // a primary that simply never answers. The decision that crosses it must
+    // already be the fallback's, not one more call to the stuck primary.
+    [Test]
+    public void AThresholdCrossingTimeout_HandsTheSameDecisionToTheFallback()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        driver.failuresBeforeFallback = 2;
+        var fallback = new ScriptedSelector();
+        driver.Fallback = fallback;
+        ExpectWarning(); // timeout 1
+        ExpectWarning(); // timeout 2
+        ExpectWarning(); // the takeover notice
+
+        driver.Tick(0f);  // call 1 to the primary, never answered
+        driver.Tick(5f);  // timeout 1, call 2 to the primary
+        driver.Tick(10f); // timeout 2 crosses the threshold
+
+        Assert.That(selector.Calls, Is.EqualTo(2), "the stuck primary must not be asked a third time");
+        Assert.That(fallback.Calls, Is.EqualTo(1));
+
+        fallback.Pending[0].SetResult(NpcMode.Retreat);
+        driver.Tick(11f);
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat));
+    }
+
     // The mutual exclusion the shared channel depends on: the scripted
     // director outranks the driver, exactly as the director stands down
     // outside training.

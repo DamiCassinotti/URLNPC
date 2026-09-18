@@ -127,7 +127,7 @@ public class ModeSelectorDriver : MonoBehaviour
         ApplyCompletedAnswer();
         if (!schedule.ShouldIssue(now, TargetVisible, RecentlyDamaged, HealthFraction)) return;
 
-        Issue(now, schedule.FallbackActive && Fallback != null ? Fallback : primary);
+        Issue(now, primary);
     }
 
     // Episode resets, called by EnemyAgent alongside ModeDirector.ResetState:
@@ -195,7 +195,7 @@ public class ModeSelectorDriver : MonoBehaviour
         }
     }
 
-    void Issue(float now, IModeSelector selector)
+    void Issue(float now, IModeSelector primary)
     {
         if (inFlight != null)
         {
@@ -205,6 +205,10 @@ public class ModeSelectorDriver : MonoBehaviour
             AbandonInFlight();
         }
 
+        // Chosen after the timeout above is counted: when that timeout is the
+        // failure that crosses the threshold, this very decision is already
+        // the fallback's — not the next one, a full period later.
+        IModeSelector selector = schedule.FallbackActive && Fallback != null ? Fallback : primary;
         GameStateSnapshot snapshot = snapshotBuilder != null ? snapshotBuilder.BuildSnapshot() : null;
         var issued = new CancellationTokenSource();
         Task<NpcMode> task = null;
