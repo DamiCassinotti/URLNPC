@@ -80,6 +80,21 @@ public class ArenaCoverTests : PlayModeTestBase
         Assert.That(found, Is.GreaterThan(0), $"{manager.ActiveArenaName} never offered any cover");
     }
 
+    // The arena descriptor the game-state snapshot reports (#123): every layout
+    // ships cover boxes, none is wall-to-wall geometry, and the lazily cached
+    // figure must hold still between reads — the snapshot is built many times
+    // per round.
+    [Test]
+    public void EveryLayout_ReportsACoverDensityThatIsSomeOfTheFloor([Values(0, 1, 2, 3, 4)] int arenaIndex)
+    {
+        ArenaManager manager = CreateManager(arenaIndex);
+
+        float density = manager.CoverDensity;
+        Assert.That(density, Is.GreaterThan(0f), $"{manager.ActiveArenaName} has cover, so its density can't read 0");
+        Assert.That(density, Is.LessThan(0.5f), $"{manager.ActiveArenaName} is mostly open floor, not {density}");
+        Assert.That(manager.CoverDensity, Is.EqualTo(density), "the cached figure must not drift between reads");
+    }
+
     [Test]
     public void PicksTheNearestOfTheAvailableCoverPoints()
     {

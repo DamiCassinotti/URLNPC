@@ -171,6 +171,39 @@ public class ArenaManager : MonoBehaviour
     // How far apart two actors can realistically be in this arena.
     public float SpawnSeparationCap => Mathf.Min(HalfExtentX, HalfExtentZ) * 1.4f;
 
+    // Fraction of the floor occupied by cover footprints — the coarse "how much
+    // cover does this layout offer" figure for the game-state snapshot (#123).
+    // Overlaps double-count, thin walls count their slab, and the AABB footprint
+    // is only exact for the axis-aligned boxes the builder emits (the stairs are
+    // rotated in 90° steps, like IsClearOfCover assumes — an off-axis box would
+    // over-count) — so it compares layouts rather than measuring exact coverage.
+    // Lazy: collider bounds are not reliable in the same Awake that scaled the
+    // primitives.
+    public float CoverDensity
+    {
+        get
+        {
+            if (coverDensity < 0f) coverDensity = ComputeCoverDensity();
+            return coverDensity;
+        }
+    }
+
+    float coverDensity = -1f;
+
+    float ComputeCoverDensity()
+    {
+        float floorArea = HalfExtentX * 2f * HalfExtentZ * 2f;
+        if (floorArea <= 0f) return 0f;
+        float covered = 0f;
+        foreach (Collider cover in coverColliders)
+        {
+            if (cover == null) continue;
+            Bounds bounds = cover.bounds;
+            covered += bounds.size.x * bounds.size.z;
+        }
+        return Mathf.Clamp01(covered / floorArea);
+    }
+
     // ----------------------------------------------------------------- cover
 
     const float CoverStandOff = 1.2f;    // how far behind the cover face to stand
