@@ -18,6 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   ```
   `config` defaults to `config/URLNPC.yaml` (slice/full/self-play configs and the full walkthrough are in `docs/rl-runbook.md`). Trained models (`.onnx` files) are saved to `results/<run-id>/`.
 - **Score a model:** `scripts/eval.sh results/<run-id>/URLNPC.onnx --episodes 100 --seed 1001 --opponent heuristic` — headless rounds, no trainer, summary in `results/eval/`. See "Headless evaluation" below.
+- **What of a run is version-controlled (#140):** a training run commits `configuration.yaml`, the final `URLNPC.onnx` and the TensorBoard `events.out.tfevents.*`; an eval run commits `config.json`, `summary.json`/`summary.txt` and `telemetry.jsonl`. Everything else a run produces — console `.log` captures, mlagents' `run_logs/`, the PPO checkpoints (`*.pt`) and the step-numbered ONNX snapshots — is gitignored. The scripts still write all of it, and it stays on disk for local debugging and `--resume`; it just doesn't enter the repo.
 
 ## Tech Stack
 

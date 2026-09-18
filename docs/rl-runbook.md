@@ -82,6 +82,11 @@ Results land in `results/<run-id>/`; reuse a `<run-id>` only with `--resume` (co
 `--force` (overwrite). Trained model at `results/<run-id>/URLNPC.onnx`; the slice checkpoints
 every 25k steps, the full run every 50k (`checkpoint_interval`).
 
+Only three of the files a run leaves behind are version-controlled: `configuration.yaml`, the
+final `URLNPC.onnx` and the TensorBoard `events.out.tfevents.*`. The checkpoints under
+`URLNPC/` and `run_logs/` are gitignored — they stay on disk, where `--resume` needs them, but
+they don't enter the repo.
+
 ## 3. What to look for in TensorBoard
 
 ```bash
@@ -183,9 +188,11 @@ scripts/eval.sh results/full-03-seed-1001/URLNPC.onnx --episodes 100 --seed 1001
     --opponent heuristic
 ```
 
-Output lands in `results/eval/<model>_<subject>-vs-<opponent>_<stamp>/`: `unity.log`, the run's
-`telemetry.jsonl`, and `summary.txt`/`summary.json` — win/loss/draw, damage dealt and taken,
-accuracy, time to kill, survival time, and per-mode compliance, visibility and step counts.
+Output lands in `results/eval/<model>_<subject>-vs-<opponent>_<stamp>/`: `config.json` (what was
+scored), the run's `telemetry.jsonl`, and `summary.txt`/`summary.json` — win/loss/draw, damage
+dealt and taken, accuracy, time to kill, survival time, and per-mode compliance, visibility and
+step counts. The player's `unity.log` sits alongside them and is gitignored — `eval.sh` reads the
+telemetry path out of it and it is what a failed run leaves to diagnose, but it is local only.
 
 - `--opponent policy` keeps both sides on the model (self-play); `--opponent heuristic` puts
   the far side on the scripted heuristic, which is what the ≥70% win-rate gate is measured on.
