@@ -1,0 +1,14 @@
+entity            NPC
+episodes          200
+win / loss / draw 91 / 88 / 21   (win rate 45.5%)
+damage dealt      70.0 per episode
+damage taken      69.4 per episode
+accuracy          68.2%   (933/1369 shots)
+time to kill      31.9 s (decided rounds)
+survival          34.9 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible    m/step  m/step seen
+Hunt         100901      5130       78.4%      5.1%   -0.0093      -0.0323
+HoldCover     99943     19908       69.6%      4.3%   -0.0060      -0.0136
+Retreat      109841     27439       73.8%      6.2%   -0.0117      -0.0209
+Patrol       101415    101415       22.8%      6.3%   -0.0063      -0.0136
