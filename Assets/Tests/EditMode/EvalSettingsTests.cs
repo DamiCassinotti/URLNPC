@@ -94,6 +94,53 @@ public class EvalSettingsTests
         Assert.That(pinned.FixedMode, Is.EqualTo(NpcMode.HoldCover));
     }
 
+    // Issue #127: -modeSelector is the driver's flag, but an eval run gates it
+    // here — a selector implies nobody scripted writes the channel, and a typo
+    // must fail the run rather than score an uncommanded policy.
+    [Test]
+    public void ASelector_StandsTheDirectorDown()
+    {
+        EvalSettings settings = EvalSettings.Parse(MinimalRun("-modeSelector", "fsm"));
+        Assert.That(settings.Error, Is.Null);
+        Assert.That(settings.Selector, Is.EqualTo(ModeSelectorKind.Fsm));
+        Assert.That(settings.ModeSource, Is.EqualTo(EvalSettings.ModeSourceKind.None));
+    }
+
+    [Test]
+    public void ASelector_AcceptsAnExplicitModesNone()
+    {
+        EvalSettings settings = EvalSettings.Parse(
+            MinimalRun("-evalModes", "none", "-modeSelector", "fixed:retreat"));
+        Assert.That(settings.Error, Is.Null);
+        Assert.That(settings.Selector, Is.EqualTo(ModeSelectorKind.Fixed));
+        Assert.That(settings.ModeSource, Is.EqualTo(EvalSettings.ModeSourceKind.None));
+    }
+
+    [TestCase("scripted")]
+    [TestCase("hunt")]
+    public void ASelectorPlusAModeWriter_IsAnError(string modes)
+    {
+        EvalSettings settings = EvalSettings.Parse(
+            MinimalRun("-evalModes", modes, "-modeSelector", "random"));
+        Assert.That(settings.Error, Is.Not.Null,
+            "two writers on the mode channel is a condition mix-up, not a run");
+    }
+
+    [Test]
+    public void SelectorNone_LeavesTheScriptedDefaultAlone()
+    {
+        EvalSettings settings = EvalSettings.Parse(MinimalRun("-modeSelector", "none"));
+        Assert.That(settings.Error, Is.Null);
+        Assert.That(settings.ModeSource, Is.EqualTo(EvalSettings.ModeSourceKind.Scripted));
+    }
+
+    [Test]
+    public void BadSelector_IsAnError()
+    {
+        Assert.That(EvalSettings.Parse(MinimalRun("-modeSelector", "banana")).Error, Is.Not.Null);
+        Assert.That(EvalSettings.Parse(MinimalRun("-modeSelector", "fixed:banana")).Error, Is.Not.Null);
+    }
+
     [Test]
     public void TimeScale_IsParsedInvariantly()
     {

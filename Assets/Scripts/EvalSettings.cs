@@ -45,6 +45,11 @@ public class EvalSettings
     public OpponentKind Opponent = OpponentKind.Policy;
     public ModeSourceKind ModeSource = ModeSourceKind.Scripted;
     public NpcMode FixedMode = NpcMode.Hunt;
+    // Who commands the NPC's modes when it isn't the director: -modeSelector
+    // is the driver's own flag (issue #124), but an eval run validates it here
+    // so a typo fails the run instead of silently scoring an uncommanded
+    // policy. The driver still resolves the flag itself; this is the gate.
+    public ModeSelectorKind Selector = ModeSelectorKind.None;
     // Game time per rendered frame, in physics steps (EvalSession drives the
     // clock off captureDeltaTime). 1 is the most faithful; raising it trades
     // fidelity for speed the way the trainer's time_scale does.
@@ -61,6 +66,8 @@ public class EvalSettings
         var settings = new EvalSettings();
         if (args == null) return settings;
 
+        bool modesExplicit = false;
+        bool selectorParsed = false;
         for (int i = 0; i < args.Length - 1; i++) // one short: every flag takes a value
         {
             string value = args[i + 1];
@@ -96,10 +103,21 @@ public class EvalSettings
                     }
                     break;
                 case ModesArg:
+                    modesExplicit = true;
                     if (!ParseModeSource(settings, value))
                     {
                         return settings.Fail($"{ModesArg} takes scripted|none|<mode>, got '{value}'.");
                     }
+                    break;
+                case ModeSelectorChoice.CommandLineArg:
+                    if (!ModeSelectorChoice.TryParseSelection(value, out ModeSelectorSelection selection))
+                    {
+                        return settings.Fail($"{ModeSelectorChoice.CommandLineArg} takes none|fixed[:<mode>]|random|fsm|llm, got '{value}'.");
+                    }
+                    // First occurrence wins, matching the driver's own scan —
+                    // the recorded condition must be the one that ran.
+                    if (!selectorParsed) settings.Selector = selection.Kind;
+                    selectorParsed = true;
                     break;
                 case TimeScaleArg:
                     if (!float.TryParse(value, System.Globalization.NumberStyles.Float,
@@ -115,6 +133,19 @@ public class EvalSettings
         if (settings.Enabled && settings.Error == null && string.IsNullOrEmpty(settings.ModelResource))
         {
             settings.Fail($"{ModelArg} is required: an eval run has to say which policy it is scoring.");
+        }
+        if (settings.Enabled && settings.Error == null && settings.Selector != ModeSelectorKind.None)
+        {
+            // One writer at a time on the ModeChannel: a selector implies the
+            // director stands down, and asking for both is a mistake.
+            if (modesExplicit && settings.ModeSource != ModeSourceKind.None)
+            {
+                settings.Fail($"{ModeSelectorChoice.CommandLineArg} and {ModesArg} both command the mode channel — pass {ModesArg} none (or drop it) with a selector.");
+            }
+            else
+            {
+                settings.ModeSource = ModeSourceKind.None;
+            }
         }
         return settings;
     }
