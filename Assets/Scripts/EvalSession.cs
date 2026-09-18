@@ -64,7 +64,7 @@ public class EvalSession : MonoBehaviour
         GameManager.RoundEnded += HandleRoundEnded;
         SceneManager.sceneLoaded += HandleSceneLoaded;
         applyPending = true;
-        Debug.Log($"[Eval] {settings.Episodes} episodes, model {settings.ModelResource}, subject {settings.Subject}, opponent {settings.Opponent}, modes {settings.ModeSource}, timeScale {settings.TimeScale}.");
+        Debug.Log($"[Eval] {settings.Episodes} episodes, model {settings.ModelResource}, subject {settings.Subject}, opponent {settings.Opponent}, modes {settings.ModeSource}, selector {settings.Selector}, timeScale {settings.TimeScale}.");
     }
 
     void OnDestroy()
