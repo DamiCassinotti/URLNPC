@@ -59,6 +59,32 @@ public class TelemetryLoggerTests : PlayModeTestBase
         return line;
     }
 
+    // The prompt/response pair goes to the sibling decisions stream keyed by
+    // id (#126), never to the main line stream.
+    [Test]
+    public void LogDecisionDetail_WritesOneKeyedLineBesideTheMainStream()
+    {
+        var detail = new StringWriter();
+        TextWriter previous = logger.SwapDetailWriter(detail);
+        try
+        {
+            logger.LogDecisionDetail(3, "the prompt", "a \"raw\"\nresponse");
+
+            string[] lines = detail.ToString().Split('\n')
+                .Select(l => l.Trim()).Where(l => l.Length > 0).ToArray();
+            Assert.That(lines.Length, Is.EqualTo(1));
+            Assert.That(lines[0], Does.Contain("\"id\":3")
+                .And.Contain("\"prompt\":\"the prompt\"")
+                .And.Contain("\\\"raw\\\"\\nresponse"));
+            Assert.That(Lines(), Is.Empty, "nothing lands on the main stream");
+        }
+        finally
+        {
+            logger.SwapDetailWriter(previous);
+            detail.Dispose();
+        }
+    }
+
     [Test]
     public void LogEvent_WritesOneJsonLinePerCall()
     {

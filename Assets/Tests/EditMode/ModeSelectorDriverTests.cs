@@ -317,4 +317,170 @@ public class ModeSelectorDriverTests
         driver.Tick(1f);
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Hunt));
     }
+
+    // ---------------------------------------------- mode_decision records (#126)
+
+    List<ModeDecisionRecord> Recorded(ModeSelectorDriver driver)
+    {
+        var records = new List<ModeDecisionRecord>();
+        driver.onDecision = records.Add;
+        return records;
+    }
+
+    [Test]
+    public void AnAppliedAnswer_EmitsAnAppliedRecordBeforeTheModeChanges()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        List<ModeDecisionRecord> records = Recorded(driver);
+
+        driver.Tick(0f);
+        selector.Pending[0].SetResult(NpcMode.Retreat);
+        driver.Tick(1f);
+
+        Assert.That(records, Has.Count.EqualTo(1));
+        Assert.That(records[0].outcome, Is.EqualTo(ModeDecisionOutcome.Applied));
+        Assert.That(records[0].chosenMode, Is.EqualTo(NpcMode.Retreat));
+        Assert.That(records[0].fromMode, Is.EqualTo(NpcMode.Hunt), "from is the mode before the write");
+        Assert.That(records[0].parsed, Is.True);
+        Assert.That(records[0].fallback, Is.False);
+        Assert.That(records[0].selectorKind, Is.EqualTo("code"), "an assigned instance reports as code");
+    }
+
+    [Test]
+    public void ATimedOutCall_EmitsATimeoutRecordWithNoChosenMode()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        List<ModeDecisionRecord> records = Recorded(driver);
+        ExpectWarning();
+
+        driver.Tick(0f);
+        driver.Tick(5f); // next decision due: the stale call is the timeout
+
+        Assert.That(records, Has.Count.EqualTo(1));
+        Assert.That(records[0].outcome, Is.EqualTo(ModeDecisionOutcome.Timeout));
+        Assert.That(records[0].chosenMode, Is.Null);
+        Assert.That(records[0].parsed, Is.False);
+    }
+
+    [Test]
+    public void AnAnswerNamingNoMode_EmitsAnInvalidUnparsedRecord()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        List<ModeDecisionRecord> records = Recorded(driver);
+        ExpectWarning();
+
+        driver.Tick(0f);
+        selector.Pending[0].SetResult((NpcMode)99);
+        driver.Tick(1f);
+
+        Assert.That(records, Has.Count.EqualTo(1));
+        Assert.That(records[0].outcome, Is.EqualTo(ModeDecisionOutcome.Invalid));
+        Assert.That(records[0].parsed, Is.False);
+        Assert.That(records[0].chosenMode, Is.Null);
+    }
+
+    [Test]
+    public void AFaultedAnswer_EmitsAnErrorRecord()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        List<ModeDecisionRecord> records = Recorded(driver);
+        ExpectWarning();
+
+        driver.Tick(0f);
+        selector.Pending[0].SetException(new System.Exception("down"));
+        driver.Tick(1f);
+
+        Assert.That(records, Has.Count.EqualTo(1));
+        Assert.That(records[0].outcome, Is.EqualTo(ModeDecisionOutcome.Error));
+    }
+
+    [Test]
+    public void AFallbackAnswer_IsFlaggedAsTheFallbacks()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        driver.failuresBeforeFallback = 1;
+        var fallback = new ScriptedSelector();
+        driver.Fallback = fallback;
+        List<ModeDecisionRecord> records = Recorded(driver);
+        ExpectWarning(); // the failure
+        ExpectWarning(); // the takeover notice
+
+        driver.Tick(0f);
+        selector.Pending[0].SetException(new System.Exception("down"));
+        driver.Tick(5f); // failure counted, the fallback takes this decision
+        fallback.Pending[0].SetResult(NpcMode.HoldCover);
+        driver.Tick(6f);
+
+        ModeDecisionRecord applied = records.Find(r => r.outcome == ModeDecisionOutcome.Applied);
+        Assert.That(applied, Is.Not.Null);
+        Assert.That(applied.fallback, Is.True);
+        Assert.That(records.Find(r => r.outcome == ModeDecisionOutcome.Error).fallback, Is.False);
+    }
+
+    // Fills the report the way the LLM selector will (#130).
+    class ReportingSelector : IReportingModeSelector
+    {
+        public Task<NpcMode> SelectModeAsync(GameStateSnapshot snapshot, CancellationToken cancellation)
+        {
+            return Task.FromResult(NpcMode.Hunt);
+        }
+
+        public Task<NpcMode> SelectModeAsync(GameStateSnapshot snapshot, ModeDecisionReport report, CancellationToken cancellation)
+        {
+            report.ModelName = "test-model";
+            report.Reason = "because";
+            report.RetryUsed = true;
+            return Task.FromResult(NpcMode.Retreat);
+        }
+    }
+
+    [Test]
+    public void AReportingSelector_GetsTheReportOverloadAndItsFieldsLandOnTheRecord()
+    {
+        var go = new GameObject("ReportingSelectorTest");
+        spawned.Add(go);
+        ModeChannel channel = go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.Selector = new ReportingSelector();
+        List<ModeDecisionRecord> records = Recorded(driver);
+
+        driver.Tick(0f);
+        driver.Tick(1f);
+
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat), "the report overload answered");
+        Assert.That(records, Has.Count.EqualTo(1));
+        Assert.That(records[0].modelName, Is.EqualTo("test-model"));
+        Assert.That(records[0].reason, Is.EqualTo("because"));
+        Assert.That(records[0].retryUsed, Is.True);
+    }
+
+    [Test]
+    public void AnAbandonedCall_EmitsNoRecord()
+    {
+        ModeSelectorDriver driver = NewDriver(out ModeChannel channel, out ScriptedSelector selector);
+        List<ModeDecisionRecord> records = Recorded(driver);
+
+        driver.Tick(0f);
+        driver.ResetState(); // the answer stopped mattering — no verdict, no line
+
+        Assert.That(records, Is.Empty);
+    }
+
+    [Test]
+    public void DecisionIds_AreUniqueAcrossDrivers()
+    {
+        ModeSelectorDriver first = NewDriver(out _, out ScriptedSelector firstSelector);
+        ModeSelectorDriver second = NewDriver(out _, out ScriptedSelector secondSelector);
+        List<ModeDecisionRecord> firstRecords = Recorded(first);
+        List<ModeDecisionRecord> secondRecords = Recorded(second);
+
+        first.Tick(0f);
+        second.Tick(0f);
+        firstSelector.Pending[0].SetResult(NpcMode.Hunt);
+        secondSelector.Pending[0].SetResult(NpcMode.Hunt);
+        first.Tick(1f);
+        second.Tick(1f);
+
+        Assert.That(firstRecords[0].decisionId, Is.Not.EqualTo(secondRecords[0].decisionId));
+    }
 }
