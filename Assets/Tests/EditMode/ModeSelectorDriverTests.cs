@@ -247,6 +247,41 @@ public class ModeSelectorDriverTests
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Hunt));
     }
 
+    // The kinds construct their baselines now (#125): a driver left on a kind
+    // with no code-assigned selector builds and runs it.
+    [Test]
+    public void AKindWithABaseline_BuildsAndRunsIt()
+    {
+        var go = new GameObject("BuiltKindTest");
+        spawned.Add(go);
+        ModeChannel channel = go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Fixed;
+        driver.fixedSelectorMode = NpcMode.Patrol;
+
+        driver.Tick(0f);
+        driver.Tick(1f); // the answer lands on the tick after it completes
+
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Patrol));
+    }
+
+    [Test]
+    public void ACodeAssignedSelector_OutranksTheBuiltKind()
+    {
+        var go = new GameObject("AssignedOverBuiltTest");
+        spawned.Add(go);
+        ModeChannel channel = go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Fixed;
+        driver.fixedSelectorMode = NpcMode.Patrol;
+        driver.Selector = new FixedModeSelector(NpcMode.HoldCover);
+
+        driver.Tick(0f);
+        driver.Tick(1f);
+
+        Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.HoldCover));
+    }
+
     // '-modeSelector llm' on a build where only the seam exists: say so once,
     // keep the channel's mode.
     [Test]
