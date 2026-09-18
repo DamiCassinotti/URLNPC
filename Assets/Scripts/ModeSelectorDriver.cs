@@ -62,8 +62,29 @@ public class ModeSelectorDriver : MonoBehaviour
     GameStateSnapshotBuilder snapshotBuilder;
     bool componentsResolved;
 
-    Task<NpcMode> inFlight;
-    CancellationTokenSource cancellation;
+    // One selector call and everything its mode_decision line needs (#126):
+    // the report travels with the task, so a late answer from an abandoned
+    // call can't write over the next one's diagnostics.
+    class PendingDecision
+    {
+        public Task<NpcMode> Task;
+        public CancellationTokenSource Cancellation;
+        public ModeDecisionReport Report;
+        public GameStateSnapshot Snapshot;
+        public int Id;
+        public bool ByFallback;
+        // Wall clock, not game time: the latency of a real selector is IO.
+        public readonly System.Diagnostics.Stopwatch Clock = System.Diagnostics.Stopwatch.StartNew();
+    }
+
+    // Session-wide, not per driver: the sibling decisions file is keyed by id,
+    // and both self-play bodies write into the same session.
+    static int nextDecisionId;
+
+    // EditMode seam: lets a test observe the records without a TelemetryLogger.
+    internal System.Action<ModeDecisionRecord> onDecision;
+
+    PendingDecision pending;
     ModeSelectorKind? resolvedKind;
     bool warnedNoSelector;
 
@@ -211,40 +232,47 @@ public class ModeSelectorDriver : MonoBehaviour
 
     void ApplyCompletedAnswer()
     {
-        if (inFlight == null || !inFlight.IsCompleted) return;
-        Task<NpcMode> finished = inFlight;
-        inFlight = null;
-        DisposeCancellation();
+        if (pending == null || !pending.Task.IsCompleted) return;
+        PendingDecision finished = pending;
+        pending = null;
+        finished.Cancellation.Dispose();
 
-        if (finished.Status == TaskStatus.RanToCompletion)
+        if (finished.Task.Status == TaskStatus.RanToCompletion)
         {
-            NpcMode answer = finished.Result;
+            NpcMode answer = finished.Task.Result;
             if (System.Enum.IsDefined(typeof(NpcMode), answer))
             {
                 schedule.RecordSuccess();
+                // The line before the write, so its mode_change follows the
+                // decision that caused it on the timeline.
+                EmitDecision(finished, ModeDecisionOutcome.Applied, answer);
                 channel.SetMode(answer);
             }
             else
             {
+                EmitDecision(finished, ModeDecisionOutcome.Invalid, null);
                 Fail($"selector answered {(int)answer}, which is no mode");
             }
         }
-        else if (finished.Status == TaskStatus.Canceled)
+        else if (finished.Task.Status == TaskStatus.Canceled)
         {
+            EmitDecision(finished, ModeDecisionOutcome.Error, null);
             Fail("selector cancelled itself");
         }
         else
         {
-            Fail($"selector threw: {finished.Exception?.GetBaseException().Message}");
+            EmitDecision(finished, ModeDecisionOutcome.Error, null);
+            Fail($"selector threw: {finished.Task.Exception?.GetBaseException().Message}");
         }
     }
 
     void Issue(float now, IModeSelector primary)
     {
-        if (inFlight != null)
+        if (pending != null)
         {
             // Still unanswered when the next decision came due: cancelled, not
             // queued — this cancellation is the timeout of the failure rules.
+            EmitDecision(pending, ModeDecisionOutcome.Timeout, null);
             Fail("no answer by the next decision — cancelling the stale call");
             AbandonInFlight();
         }
@@ -252,14 +280,23 @@ public class ModeSelectorDriver : MonoBehaviour
         // Chosen after the timeout above is counted: when that timeout is the
         // failure that crosses the threshold, this very decision is already
         // the fallback's — not the next one, a full period later.
-        IModeSelector selector = schedule.FallbackActive && Fallback != null ? Fallback : primary;
-        GameStateSnapshot snapshot = snapshotBuilder != null ? snapshotBuilder.BuildSnapshot() : null;
-        var issued = new CancellationTokenSource();
+        bool byFallback = schedule.FallbackActive && Fallback != null;
+        IModeSelector selector = byFallback ? Fallback : primary;
+        var issued = new PendingDecision
+        {
+            Cancellation = new CancellationTokenSource(),
+            Report = new ModeDecisionReport(),
+            Snapshot = snapshotBuilder != null ? snapshotBuilder.BuildSnapshot() : null,
+            Id = ++nextDecisionId,
+            ByFallback = byFallback,
+        };
         Task<NpcMode> task = null;
         string failure = null;
         try
         {
-            task = selector.SelectModeAsync(snapshot, issued.Token);
+            task = selector is IReportingModeSelector reporting
+                ? reporting.SelectModeAsync(issued.Snapshot, issued.Report, issued.Cancellation.Token)
+                : selector.SelectModeAsync(issued.Snapshot, issued.Cancellation.Token);
         }
         catch (System.Exception e)
         {
@@ -267,13 +304,14 @@ public class ModeSelectorDriver : MonoBehaviour
         }
         if (task == null)
         {
-            issued.Dispose();
+            issued.Cancellation.Dispose();
+            EmitDecision(issued, ModeDecisionOutcome.Error, null);
             Fail(failure ?? "selector returned no task");
         }
         else
         {
-            inFlight = task;
-            cancellation = issued;
+            issued.Task = task;
+            pending = issued;
         }
         // Even a failed attempt was this decision's: retrying every tick would
         // hammer a broken selector at the physics rate.
@@ -295,25 +333,58 @@ public class ModeSelectorDriver : MonoBehaviour
         }
     }
 
+    // One mode_decision line per call that reached a verdict (#126); a call
+    // abandoned because its answer stopped mattering (episode reset, the
+    // director took the channel) gets none. The bulky prompt/response pair
+    // goes to the sibling decisions file keyed by the same id.
+    void EmitDecision(PendingDecision decision, ModeDecisionOutcome outcome, NpcMode? chosen)
+    {
+        ModeDecisionReport report = decision.Report;
+        var record = new ModeDecisionRecord
+        {
+            decisionId = decision.Id,
+            entity = tag,
+            // Named for whoever actually answered: a fallback-takeover line
+            // labelled with the primary's kind would point debugging at the
+            // wrong selector.
+            selectorKind = decision.ByFallback ? "fallback"
+                : Selector != null ? "code"
+                : ResolvedKind.ToString().ToLowerInvariant(),
+            modelName = report.ModelName,
+            snapshot = decision.Snapshot,
+            fromMode = channel.CurrentMode,
+            chosenMode = chosen,
+            reason = report.Reason,
+            latencyMs = (int)decision.Clock.ElapsedMilliseconds,
+            // Only an applied answer can claim its output parsed — and even
+            // then the selector may say no, having answered with its own
+            // default after unusable model output.
+            parsed = outcome == ModeDecisionOutcome.Applied && report.Parsed,
+            retryUsed = report.RetryUsed,
+            fallback = decision.ByFallback,
+            outcome = outcome,
+        };
+        onDecision?.Invoke(record);
+        if (TelemetryLogger.Instance == null) return;
+        TelemetryLogger.Instance.LogEvent("mode_decision", record.Fields());
+        if (report.Prompt.Length > 0 || report.RawResponse.Length > 0)
+        {
+            TelemetryLogger.Instance.LogDecisionDetail(decision.Id, report.Prompt, report.RawResponse);
+        }
+    }
+
     // Cancel and forget without judging: the answer stopped mattering (episode
     // reset, the director claimed the channel, teardown).
     void AbandonInFlight()
     {
-        if (inFlight == null) return;
-        cancellation.Cancel();
+        if (pending == null) return;
+        pending.Cancellation.Cancel();
         // The dropped task may still fault later; observe the exception so it
         // can't surface as unobserved-task noise.
-        inFlight.ContinueWith(t => { _ = t.Exception; },
+        pending.Task.ContinueWith(t => { _ = t.Exception; },
             CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-        inFlight = null;
-        DisposeCancellation();
-    }
-
-    void DisposeCancellation()
-    {
-        if (cancellation == null) return;
-        cancellation.Dispose();
-        cancellation = null;
+        pending.Cancellation.Dispose();
+        pending = null;
     }
 
     void WarnNoSelectorOnce()

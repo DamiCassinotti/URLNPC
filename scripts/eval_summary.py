@@ -3,16 +3,18 @@
 
     scripts/eval_summary.py <session.jsonl> [--entity NPC] [--json out.json]
 
-Reads the events TelemetryLogger writes -- episode_summary, death and
-mode_compliance -- and reports, for one side of the fight: win rate, damage
-dealt and taken, shot accuracy, time to kill, survival time, and the per-mode
-compliance, visibility, range delta and step counts. scripts/eval.sh calls it;
-it is also
-usable on any session file from a human-played or training run.
+Reads the events TelemetryLogger writes -- episode_summary, death,
+mode_compliance and mode_decision -- and reports, for one side of the fight:
+win rate, damage dealt and taken, shot accuracy, time to kill, survival time,
+the per-mode compliance, visibility, range delta and step counts, and the mode
+selector's decisions (rate, mode distribution, switch rate, latency, invalid
+and fallback rates). scripts/eval.sh calls it; it is also usable on any
+session file from a human-played or training run.
 """
 
 import argparse
 import json
+import math
 import statistics
 import sys
 
@@ -41,12 +43,58 @@ def mean(values):
     return statistics.fmean(values) if values else 0.0
 
 
+def percentile(values, fraction):
+    """Nearest-rank percentile; None on an empty list."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    rank = max(1, math.ceil(fraction * len(ordered)))
+    return ordered[rank - 1]
+
+
+def summarize_selector(decisions, episodes):
+    """The mode selector section (issue #126), from the mode_decision lines."""
+    if not decisions:
+        return None
+    applied = [d for d in decisions if d.get("outcome") == "applied"]
+    latencies = [d.get("latencyMs", 0) for d in decisions]
+    outcomes = {}
+    for decision in decisions:
+        outcome = decision.get("outcome", "unknown")
+        outcomes[outcome] = outcomes.get(outcome, 0) + 1
+    distribution = {}
+    for decision in applied:
+        mode = decision.get("chosen", "")
+        distribution[mode] = distribution.get(mode, 0) + 1
+    return {
+        "selector": decisions[0].get("selector", ""),
+        "model": decisions[0].get("model", ""),
+        "decisions": len(decisions),
+        "decisionsPerEpisode": len(decisions) / episodes if episodes else None,
+        "modeDistribution": distribution,
+        # Of the applied decisions, how many actually changed the mode.
+        "switchRate": (
+            sum(1 for d in applied if d.get("chosen") != d.get("from")) / len(applied)
+            if applied else None
+        ),
+        "latencyMsMean": mean(latencies),
+        "latencyMsP95": percentile(latencies, 0.95),
+        "invalidRate": outcomes.get("invalid", 0) / len(decisions),
+        "fallbackRate": sum(1 for d in decisions if d.get("fallback")) / len(decisions),
+        "outcomes": outcomes,
+    }
+
+
 def summarize(events, entity):
     rounds = [e for e in events if e.get("type") == "episode_summary"]
     deaths = [e for e in events if e.get("type") == "death"]
     compliance_events = [
         e for e in events
         if e.get("type") == "mode_compliance" and e.get("entity") == entity
+    ]
+    decision_events = [
+        e for e in events
+        if e.get("type") == "mode_decision" and e.get("entity") == entity
     ]
 
     wins = sum(1 for r in rounds if r.get("winner") == entity)
@@ -127,6 +175,7 @@ def summarize(events, entity):
         # would read as the opposite of what happened.
         "survivalSeconds": mean(own_deaths) if own_deaths else None,
         "modes": modes,
+        "selector": summarize_selector(decision_events, len(rounds)),
     }
 
 
@@ -168,6 +217,27 @@ def render(summary):
                 f"{rate(row['compliance']):>12}{rate(row['visible']):>10}"
                 f"{metres(row['closing']):>10}{metres(row['closingVisible']):>13}"
             )
+    selector = summary.get("selector")
+    if selector:
+        name = selector["selector"]
+        if selector["model"]:
+            name += f" ({selector['model']})"
+        applied = selector["outcomes"].get("applied", 0)
+        distribution = "  ".join(
+            f"{mode} {count / applied * 100:.1f}%"
+            for mode, count in sorted(selector["modeDistribution"].items())
+        ) if applied else "-"
+        lines += [
+            "",
+            f"selector          {name}",
+            f"decisions         {selector['decisions']}"
+            f"   ({selector['decisionsPerEpisode']:.1f} per episode)",
+            f"mode distribution {distribution}",
+            f"switch rate       {rate(selector['switchRate']).strip()} of applied decisions",
+            f"latency           mean {selector['latencyMsMean']:.0f} ms, p95 {selector['latencyMsP95']} ms",
+            f"invalid output    {rate(selector['invalidRate']).strip()}"
+            f"   fallback {rate(selector['fallbackRate']).strip()}",
+        ]
     return "\n".join(lines)
 
 

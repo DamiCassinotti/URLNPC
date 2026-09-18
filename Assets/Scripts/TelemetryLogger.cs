@@ -14,6 +14,13 @@ public class TelemetryLogger : MonoBehaviour
 
     TextWriter writer;
     string logPath;
+    // The mode decisions' prompt/response pairs (#126): kilobytes per entry,
+    // so they go to a sibling file keyed by decision id instead of bloating
+    // the lines the summary tooling scans. Opened on first use — a run with
+    // no LLM selector never creates it.
+    TextWriter detailWriter;
+    string detailPath;
+    bool detailFailed;
     readonly EpisodeLog episodes = new EpisodeLog();
     readonly HashSet<Health> subscribed = new HashSet<Health>();
 
@@ -91,11 +98,21 @@ public class TelemetryLogger : MonoBehaviour
 
     void CloseWriter()
     {
+        CloseDetailWriter();
         TextWriter w = writer;
         writer = null;
         if (w == null) return;
         try { w.Dispose(); }
         catch (IOException) { } // already broken, nothing left to salvage
+    }
+
+    void CloseDetailWriter()
+    {
+        TextWriter w = detailWriter;
+        detailWriter = null;
+        if (w == null) return;
+        try { w.Dispose(); }
+        catch (IOException) { }
     }
 
     // Public so future systems (NPC mode changes, LLM decisions) emit through
@@ -115,6 +132,46 @@ public class TelemetryLogger : MonoBehaviour
             // skip ProcessDeath and wedge the round for good.
             Debug.LogWarning($"[Telemetry] Write failed — telemetry disabled for this session: {e.Message}");
             CloseWriter();
+        }
+    }
+
+    // A mode decision's full prompt and raw response, one JSON line in the
+    // sibling decisions file. The id joins it to its mode_decision line.
+    public void LogDecisionDetail(int decisionId, string prompt, string response)
+    {
+        if (writer == null || detailFailed) return;
+        if (detailWriter == null && !OpenDetailFile()) return;
+        try
+        {
+            detailWriter.WriteLine("{" + JsonLine.Field("id", decisionId) + ","
+                + JsonLine.Field("prompt", prompt) + ","
+                + JsonLine.Field("response", response) + "}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[Telemetry] Decision-detail write failed — details disabled for this session: {e.Message}");
+            detailFailed = true;
+            CloseDetailWriter();
+        }
+    }
+
+    bool OpenDetailFile()
+    {
+        try
+        {
+            detailPath = logPath != null && logPath.EndsWith(".jsonl")
+                ? logPath.Substring(0, logPath.Length - ".jsonl".Length) + ".decisions.jsonl"
+                : logPath + ".decisions.jsonl";
+            detailWriter = new StreamWriter(detailPath, false, Encoding.UTF8) { AutoFlush = true };
+            Debug.Log($"[Telemetry] Decision details to {detailPath}");
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[Telemetry] Could not open the decisions file — details disabled: {e.Message}");
+            detailFailed = true;
+            detailWriter = null;
+            return false;
         }
     }
 
@@ -203,4 +260,13 @@ public class TelemetryLogger : MonoBehaviour
     // Health subscriptions are a scene-load-time scan; tests spawn their
     // combatants afterwards.
     internal void RescanHealths() => SubscribeHealths();
+
+    // Same as SwapWriter, for the decisions file: keeps a test's detail lines
+    // out of a real sibling file (and the lazy open from creating one).
+    internal TextWriter SwapDetailWriter(TextWriter replacement)
+    {
+        TextWriter previous = detailWriter;
+        detailWriter = replacement;
+        return previous;
+    }
 }
