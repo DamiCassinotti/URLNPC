@@ -127,6 +127,8 @@ You can quit the game and pick training back up later **on the same semi-trained
 
    `--resume` reloads the network weights, optimizer state, and step count from the last checkpoint. (To instead *fork* a finished model into a brand-new run, pass `--initialize-from=<source-run-id>` under a new `<run-id>`.)
 
+The checkpoints stay on disk for exactly this reason, but they are gitignored — only the `configuration.yaml`, the final `URLNPC.onnx` and the TensorBoard events are committed.
+
 The on-screen win/loss tally also survives quitting: `CounterData` persists the score to `PlayerPrefs`, so it carries across Editor Play sessions and standalone builds. Use the **Reset Score** button on the end-of-round canvas (or call `CounterData.ResetScores()`) to clear it.
 
 ### Reproducible evaluation runs
@@ -146,7 +148,7 @@ Unseeded runs draw a random seed and still log it (look for the `[RunRng] Run se
 scripts/eval.sh results/<run-id>/URLNPC.onnx --episodes 100 --seed 1001 --opponent heuristic
 ```
 
-`--opponent policy` puts both sides on the model (self-play), `--opponent heuristic` puts the far side on the scripted baseline. `--modes scripted|none|<Mode>` picks who commands the NPC's mode, and `--time-scale` trades fidelity for speed. `--seed` fixes arenas, spawns and the mode schedule, but not the fight itself — aim spread stays unseeded, so read a run as an average over episodes. Results land in `results/eval/<...>/` as `summary.txt`, `summary.json` and the raw `telemetry.jsonl`. The model is copied into the project and the player rebuilt when it changes — Inference Engine only imports ONNX in the editor, so the build has to carry it. See `docs/rl-runbook.md` §7.
+`--opponent policy` puts both sides on the model (self-play), `--opponent heuristic` puts the far side on the scripted baseline. `--modes scripted|none|<Mode>` picks who commands the NPC's mode, and `--time-scale` trades fidelity for speed. `--seed` fixes arenas, spawns and the mode schedule, but not the fight itself — aim spread stays unseeded, so read a run as an average over episodes. Results land in `results/eval/<...>/` as `config.json`, `summary.txt`, `summary.json` and the raw `telemetry.jsonl`; the player's `unity.log` is written alongside them but stays local (gitignored). The model is copied into the project and the player rebuilt when it changes — Inference Engine only imports ONNX in the editor, so the build has to carry it. See `docs/rl-runbook.md` §7.
 
 ### Reward shape
 
