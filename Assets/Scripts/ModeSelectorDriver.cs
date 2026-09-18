@@ -344,7 +344,12 @@ public class ModeSelectorDriver : MonoBehaviour
         {
             decisionId = decision.Id,
             entity = tag,
-            selectorKind = Selector != null ? "code" : ResolvedKind.ToString().ToLowerInvariant(),
+            // Named for whoever actually answered: a fallback-takeover line
+            // labelled with the primary's kind would point debugging at the
+            // wrong selector.
+            selectorKind = decision.ByFallback ? "fallback"
+                : Selector != null ? "code"
+                : ResolvedKind.ToString().ToLowerInvariant(),
             modelName = report.ModelName,
             snapshot = decision.Snapshot,
             fromMode = channel.CurrentMode,

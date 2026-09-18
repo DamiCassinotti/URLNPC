@@ -414,7 +414,10 @@ public class ModeSelectorDriverTests
         ModeDecisionRecord applied = records.Find(r => r.outcome == ModeDecisionOutcome.Applied);
         Assert.That(applied, Is.Not.Null);
         Assert.That(applied.fallback, Is.True);
-        Assert.That(records.Find(r => r.outcome == ModeDecisionOutcome.Error).fallback, Is.False);
+        Assert.That(applied.selectorKind, Is.EqualTo("fallback"), "named for who actually answered");
+        ModeDecisionRecord failed = records.Find(r => r.outcome == ModeDecisionOutcome.Error);
+        Assert.That(failed.fallback, Is.False);
+        Assert.That(failed.selectorKind, Is.EqualTo("code"));
     }
 
     // Fills the report the way the LLM selector will (#130).

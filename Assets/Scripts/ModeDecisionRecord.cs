@@ -19,8 +19,8 @@ public class ModeDecisionRecord
 {
     public int decisionId;
     public string entity = "";
-    // The resolved kind ("fsm", "llm", ...), or "code" for an assigned
-    // instance; the fallback flag below says who actually answered.
+    // Who answered: the resolved kind ("fsm", "llm", ...), "code" for an
+    // assigned instance, or "fallback" once the fallback holds the channel.
     public string selectorKind = "";
     public string modelName = "";
     // As sent — null on a body without a snapshot builder.
