@@ -4,7 +4,7 @@
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
 #                   [--subject policy|heuristic|random|flee]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
-#                   [--selector none|fixed:<Mode>|random|fsm]
+#                   [--selector none|fixed:<Mode>|random|fsm|llm]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
 #
@@ -26,9 +26,11 @@
 #   --modes               who commands the NPC's mode: the scripted director,
 #                         nobody, or one mode pinned for the whole run
 #   --selector            a mode selector commands the modes instead (#127):
-#                         the FSM, uniform random draws, or one pinned mode.
-#                         Exactly one writer: a selector forces --modes none,
-#                         and naming both is an error
+#                         the FSM, uniform random draws, one pinned mode, or the
+#                         LLM (#130 — its model, endpoint and temperature come
+#                         from the -llm* launch arguments). Exactly one writer:
+#                         a selector forces --modes none, and naming both is an
+#                         error
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
@@ -100,7 +102,7 @@ case "$SUBJECT" in policy|heuristic|random|flee) ;; *) echo "error: --subject ta
 case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy|heuristic" >&2; exit 1 ;; esac
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
 SELECTOR="${SELECTOR,,}"
-case "$SELECTOR" in none|random|fsm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm" >&2; exit 1 ;; esac
+case "$SELECTOR" in none|random|fsm|llm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm|llm" >&2; exit 1 ;; esac
 # One writer on the mode channel: a selector run stands the scripted director
 # down. Naming both is a condition mix-up, not a run.
 if [[ "$SELECTOR" != "none" ]]; then
