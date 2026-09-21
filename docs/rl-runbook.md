@@ -247,3 +247,37 @@ How to report a run:
   ceiling, heuristic the aggressive one.
 - Compliance and `Visible/<Mode>` in TensorBoard still tell you *why* a mode moved — keep
   reading them during a run, just don't gate on compliance.
+
+## 9. Iterate the selector offline (the battery)
+
+A live match costs about a minute and can't be time-scaled with an LLM in the loop, so
+prompt iteration happens offline against a fixed set of states rather than in-game.
+
+`battery/snapshots.json` is 40 `GameStateSnapshot`s harvested from real match telemetry
+(`scripts/battery_harvest.py` pulls and dedupes them off the `mode_decision` lines, then
+they are labelled by hand), each with the acceptable mode(s) for that state and a one-line
+rationale. Acceptable is a *set*: "25% HP, target at mid, cover near" is defensibly Retreat
+or HoldCover, and scoring it as one answer would punish the right one. Eight of the 40 are
+marked `ambiguous` — kept apart because they have more than one defensible answer, so they
+measure consistency, not accuracy. Coverage is by construction: every mode is the right
+answer several times, plus the never-seen, just-lost-sight, low-HP with and without contact,
+and clock-about-to-run-out cases.
+
+```bash
+scripts/battery.py --selector fsm         # the FSM baseline
+scripts/battery.py --selector random      # the sanity floor
+scripts/battery.py --selector llm --repeats 5 --temps 0.0,0.7   # once #130 lands
+```
+
+It reports, per temperature: accuracy over the non-ambiguous snapshots, self-consistency
+over K repeats, invalid-output rate and the latency distribution. The FSM scores 100% and
+random ~38% — that gap is the check that the labels discriminate and aren't broken; the FSM
+topping out is expected of a fair baseline, not a target the LLM has to clear on the battery.
+
+**FSM and random run as Python twins, not the Unity build.** The battery has to run any
+selector, including the two baselines. Driving the standalone build in `-batchmode` for each
+would drag the arena, NavMesh and Academy into what is a pure function of the snapshot, and
+couple offline prompt iteration to a rebuild. The baselines are a handful of rules
+(`HeuristicModeSelector`, `RandomModeSelector`), so `scripts/battery.py` carries a direct
+twin of each — `fsm_decide` mirrors `HeuristicModeSelector.Decide` rule for rule, thresholds
+and all. Keep the twin in step if those rules change.
