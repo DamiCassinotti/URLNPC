@@ -175,12 +175,12 @@ public class ModeSelectorDriver : MonoBehaviour
             case ModeSelectorKind.Random:
                 return new RandomModeSelector();
             case ModeSelectorKind.Fsm:
-                return new HeuristicModeSelector
-                {
-                    LowHealthPercent = fsmLowHealthPercent,
-                    UnseenSecondsForPatrol = fsmUnseenSecondsForPatrol,
-                };
+                return Fsm();
             case ModeSelectorKind.Llm:
+                // An unreachable model would otherwise leave the channel stuck
+                // on initialMode for the rest of the episode: the failover ladder
+                // exists but nothing outside the tests ever filled the slot.
+                if (Fallback == null) Fallback = Fsm();
                 LlmSelectorConfig config = LlmConfig;
                 Debug.Log($"[ModeSelector] LLM selector on {config.Model} at {config.Endpoint} " +
                     $"(temp {config.Temperature}, seed {config.Seed}, timeout {config.TimeoutSeconds:0.##} s, " +
@@ -189,6 +189,15 @@ public class ModeSelectorDriver : MonoBehaviour
             default:
                 return null;
         }
+    }
+
+    HeuristicModeSelector Fsm()
+    {
+        return new HeuristicModeSelector
+        {
+            LowHealthPercent = fsmLowHealthPercent,
+            UnseenSecondsForPatrol = fsmUnseenSecondsForPatrol,
+        };
     }
 
     // Serialized defaults, then the launch arguments on top — the batch runs

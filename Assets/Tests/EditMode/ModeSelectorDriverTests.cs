@@ -327,6 +327,40 @@ public class ModeSelectorDriverTests
         Assert.That(config.Seed, Is.EqualTo(11));
     }
 
+    // Without this the failover ladder had nothing to hand the channel to
+    // outside the tests, so an unreachable model left it on initialMode.
+    [Test]
+    public void TheLlmSelector_TakesTheFsmAsItsFallback()
+    {
+        var go = new GameObject("LlmFallbackTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Llm;
+        driver.fsmLowHealthPercent = 40;
+
+        Assert.That(driver.IsWriter, Is.True, "the LLM kind has to build a selector");
+
+        Assert.That(driver.Fallback, Is.InstanceOf<HeuristicModeSelector>());
+        Assert.That(((HeuristicModeSelector)driver.Fallback).LowHealthPercent, Is.EqualTo(40));
+    }
+
+    [Test]
+    public void AnAssignedFallback_IsNotReplacedByTheLlmDefault()
+    {
+        var go = new GameObject("LlmFallbackOverrideTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Llm;
+        var mine = new FixedModeSelector(NpcMode.Patrol);
+        driver.Fallback = mine;
+
+        Assert.That(driver.IsWriter, Is.True);
+
+        Assert.That(driver.Fallback, Is.SameAs(mine));
+    }
+
     [Test]
     public void ResetState_DropsTheInFlightCallAndIssuesAfresh()
     {

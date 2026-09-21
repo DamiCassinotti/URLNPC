@@ -49,21 +49,22 @@ public struct LlmModeResponse
     }
 
     // No usable "mode" key: a bare name, or an object truncated inside the
-    // value. First mode name in the text wins.
+    // value. Only when exactly one mode is named — free-text reasoning that
+    // mentions two of them ("not Retreat, so Hunt") has no reading the order of
+    // the words can be trusted for, and a wrong mode would be committed with
+    // nothing to detect it by. Naming none is the same failure, and both are
+    // worth a retry.
     static bool TryScanForMode(string text, out NpcMode mode)
     {
         mode = default;
-        int best = int.MaxValue;
+        int found = 0;
         foreach (NpcMode candidate in NpcModes.All)
         {
-            int at = text.IndexOf(candidate.ToString(), System.StringComparison.OrdinalIgnoreCase);
-            if (at >= 0 && at < best)
-            {
-                best = at;
-                mode = candidate;
-            }
+            if (text.IndexOf(candidate.ToString(), System.StringComparison.OrdinalIgnoreCase) < 0) continue;
+            mode = candidate;
+            found++;
         }
-        return best != int.MaxValue;
+        return found == 1;
     }
 
     // "<key>" ... : ... "<value>", with JSON escapes undone. Deliberately not a
@@ -101,6 +102,18 @@ public struct LlmModeResponse
                     case 'n': sb.Append('\n'); break;
                     case 'r': sb.Append('\r'); break;
                     case 't': sb.Append('\t'); break;
+                    case 'b': sb.Append('\b'); break;
+                    case 'f': sb.Append('\f'); break;
+                    // A model writing prose reaches for an em-dash or an accent
+                    // often enough, and the mangled text would land in the
+                    // decisions file this exists to be debugged from.
+                    case 'u' when i + 4 < text.Length
+                        && ushort.TryParse(text.Substring(i + 1, 4),
+                            System.Globalization.NumberStyles.HexNumber,
+                            System.Globalization.CultureInfo.InvariantCulture, out ushort code):
+                        sb.Append((char)code);
+                        i += 4;
+                        break;
                     default: sb.Append(next); break;
                 }
                 continue;

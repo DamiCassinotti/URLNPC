@@ -74,6 +74,22 @@ public class LlmModeResponseTests
         Assert.That(parsed.Mode, Is.EqualTo(NpcMode.Hunt));
     }
 
+    [Test]
+    public void ProseNamingTwoModes_Fails_RatherThanGuessingByWordOrder()
+    {
+        // No "mode" key to trust, and "the target is retreating, so Hunt" reads
+        // the opposite way round to a first-name-wins scan.
+        Assert.That(Parse("The target is Retreat-ing from me, so I should Hunt.", out _), Is.False);
+    }
+
+    [Test]
+    public void AUnicodeEscapeInTheReason_IsDecoded()
+    {
+        Assert.That(Parse("{\"mode\":\"Hunt\",\"reason\":\"close in \\u2014 he is hurt\"}",
+            out LlmModeResponse parsed), Is.True);
+        Assert.That(parsed.Reason, Is.EqualTo("close in — he is hurt"));
+    }
+
     [TestCase("")]
     [TestCase("   \n ")]
     [TestCase(null)]

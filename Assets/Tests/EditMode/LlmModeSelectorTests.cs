@@ -199,6 +199,8 @@ public class LlmModeSelectorTests
             Assert.That(prompt, Does.Contain(mode.ToString()), $"{mode} is not offered");
         }
         Assert.That(prompt, Does.Contain("\"hpPercent\":40"));
+        Assert.That(prompt, Does.Not.Contain("\"snapshot\""),
+            "the state goes in as the flat object the prompt describes");
         Assert.That(prompt, Does.Contain("Courtyard"));
     }
 

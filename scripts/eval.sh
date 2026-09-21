@@ -28,9 +28,10 @@
 #   --selector            a mode selector commands the modes instead (#127):
 #                         the FSM, uniform random draws, one pinned mode, or the
 #                         LLM (#130 — its model, endpoint and temperature come
-#                         from the -llm* launch arguments). Exactly one writer:
-#                         a selector forces --modes none, and naming both is an
-#                         error
+#                         from the -llm* launch arguments, and the run ignores
+#                         --time-scale: a model call takes wall-clock seconds).
+#                         Exactly one writer: a selector forces --modes none, and
+#                         naming both is an error
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average

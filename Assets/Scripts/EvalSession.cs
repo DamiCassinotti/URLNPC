@@ -113,6 +113,16 @@ public class EvalSession : MonoBehaviour
     void ApplyClock()
     {
         Time.timeScale = 1f;
+        if (settings.Selector == ModeSelectorKind.Llm)
+        {
+            // The LLM arm is the one condition that can't be time-compressed: a
+            // model call takes wall-clock seconds while the driver's decision
+            // period is game time, so a captured clock cancels every call before
+            // it lands and the run scores an uncommanded policy. Real time here,
+            // whatever --time-scale asked for.
+            Time.captureDeltaTime = 0f;
+            return;
+        }
         Time.captureDeltaTime = Time.fixedDeltaTime * settings.TimeScale;
     }
 

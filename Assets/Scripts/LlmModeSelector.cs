@@ -133,9 +133,9 @@ public class LlmModeSelector : IReportingModeSelector
           .Append("Hunt closes on the target and fights. HoldCover stays behind cover out of the ")
           .Append("target's line of sight. Retreat breaks contact and opens distance. Patrol ")
           .Append("searches unexplored ground for a target it cannot find.\n")
-          .Append("State (the NPC knows nothing about the target beyond what is here):\n{")
-          .Append(ModeDecisionRecord.SnapshotJson(snapshot))
-          .Append("}\n")
+          .Append("State (the NPC knows nothing about the target beyond what is here):\n")
+          .Append(ModeDecisionRecord.SnapshotObject(snapshot))
+          .Append('\n')
           .Append("Answer with JSON only: {\"mode\": \"<one of the modes>\", \"reason\": \"<short>\"}");
         return sb.ToString();
     }
