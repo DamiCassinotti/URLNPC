@@ -4,6 +4,7 @@
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
 #                   [--subject policy|heuristic|random|flee]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
+#                   [--selector none|fixed:<Mode>|random|fsm]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
 #
@@ -24,6 +25,10 @@
 #                         baseline the ≥70% win-rate gate (#50) is measured on
 #   --modes               who commands the NPC's mode: the scripted director,
 #                         nobody, or one mode pinned for the whole run
+#   --selector            a mode selector commands the modes instead (#127):
+#                         the FSM, uniform random draws, or one pinned mode.
+#                         Exactly one writer: a selector forces --modes none,
+#                         and naming both is an error
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
@@ -46,7 +51,7 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    sed -n '2,38p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,43p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -61,6 +66,8 @@ SEED=1001
 SUBJECT="policy"
 OPPONENT="policy"
 MODES="scripted"
+MODES_SET=0
+SELECTOR="none"
 TIME_SCALE=1
 OUT=""
 BUILD=1
@@ -72,7 +79,8 @@ while [[ $# -ge 1 ]]; do
         --seed) SEED="$2"; shift 2 ;;
         --subject) SUBJECT="$2"; shift 2 ;;
         --opponent) OPPONENT="$2"; shift 2 ;;
-        --modes) MODES="$2"; shift 2 ;;
+        --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
+        --selector) SELECTOR="$2"; shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;
@@ -91,6 +99,17 @@ OPPONENT="${OPPONENT,,}"
 case "$SUBJECT" in policy|heuristic|random|flee) ;; *) echo "error: --subject takes policy|heuristic|random|flee" >&2; exit 1 ;; esac
 case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy|heuristic" >&2; exit 1 ;; esac
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
+SELECTOR="${SELECTOR,,}"
+case "$SELECTOR" in none|random|fsm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm" >&2; exit 1 ;; esac
+# One writer on the mode channel: a selector run stands the scripted director
+# down. Naming both is a condition mix-up, not a run.
+if [[ "$SELECTOR" != "none" ]]; then
+    if [[ $MODES_SET -eq 1 && "${MODES,,}" != "none" ]]; then
+        echo "error: --selector and --modes both command the mode channel — drop one" >&2
+        exit 1
+    fi
+    MODES="none"
+fi
 [[ "$EPISODES" =~ ^[1-9][0-9]*$ ]] || { echo "error: --episodes takes a positive integer" >&2; exit 1; }
 [[ "$SEED" =~ ^-?[0-9]+$ ]] || { echo "error: --seed takes an integer" >&2; exit 1; }
 
@@ -107,6 +126,7 @@ cat > "$OUT/config.json" <<JSON
   "subject": "$SUBJECT",
   "opponent": "$OPPONENT",
   "modes": "$MODES",
+  "selector": "$SELECTOR",
   "timeScale": $TIME_SCALE,
   "commit": "$(git -C "$PROJECT_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)",
   "startedUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -141,7 +161,7 @@ UNITY_LOG="$OUT/unity.log"
 # to real time, so this is a loose wall-clock bound, not the expected duration;
 # --timeout 0 disables the guard.
 TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
-echo "==> $EPISODES episodes, seed $SEED, subject $SUBJECT, opponent $OPPONENT, modes $MODES, timeScale $TIME_SCALE"
+echo "==> $EPISODES episodes, seed $SEED, subject $SUBJECT, opponent $OPPONENT, modes $MODES, selector $SELECTOR, timeScale $TIME_SCALE"
 echo "    log: $UNITY_LOG"
 set +e
 timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
@@ -152,6 +172,7 @@ timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
     -evalSubject "$SUBJECT" \
     -evalOpponent "$OPPONENT" \
     -evalModes "$MODES" \
+    -modeSelector "$SELECTOR" \
     -evalTimeScale "$TIME_SCALE"
 RC=$?
 set -e

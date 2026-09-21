@@ -69,4 +69,41 @@ public class ModeSelectorChoiceTests
         Assert.That(ModeSelectorChoice.Resolve(args, null, ModeSelectorKind.Random),
             Is.EqualTo(ModeSelectorKind.Random));
     }
+
+    // "fixed:<Mode>" (issue #127): the command line names the pinned mode
+    // along with the kind, since a launch argument can't reach the driver's
+    // serialized default.
+    [TestCase("fixed:hunt", NpcMode.Hunt)]
+    [TestCase("fixed:HoldCover", NpcMode.HoldCover)]
+    [TestCase("FIXED:RETREAT", NpcMode.Retreat)] // case is the shell's, not ours
+    [TestCase("fixed:patrol", NpcMode.Patrol)]
+    public void FixedWithAMode_CarriesThePin(string value, NpcMode expected)
+    {
+        ModeSelectorSelection selection = ModeSelectorChoice.ResolveSelection(
+            new[] { "-modeSelector", value }, null, ModeSelectorKind.None);
+        Assert.That(selection.Kind, Is.EqualTo(ModeSelectorKind.Fixed));
+        Assert.That(selection.FixedMode, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void PlainFixed_LeavesThePinToTheDriverDefault()
+    {
+        ModeSelectorSelection selection = ModeSelectorChoice.ResolveSelection(
+            new[] { "-modeSelector", "fixed" }, null, ModeSelectorKind.None);
+        Assert.That(selection.Kind, Is.EqualTo(ModeSelectorKind.Fixed));
+        Assert.That(selection.FixedMode, Is.Null);
+    }
+
+    // A typo must not quietly pin the wrong mode, and TryParse alone would
+    // accept any integer as an NpcMode.
+    [TestCase("fixed:banana")]
+    [TestCase("fixed:7")]
+    [TestCase("fsm:hunt")] // only Fixed takes a suffix
+    public void ABadSuffix_FailsTheWholeValue(string value)
+    {
+        Assert.That(ModeSelectorChoice.Resolve(new[] { "-modeSelector", value },
+                null, ModeSelectorKind.Random),
+            Is.EqualTo(ModeSelectorKind.Random),
+            "a half-valid value must fall through to the next source");
+    }
 }

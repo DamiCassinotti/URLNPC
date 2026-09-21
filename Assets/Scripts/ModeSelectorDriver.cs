@@ -19,7 +19,7 @@ public class ModeSelectorDriver : MonoBehaviour
     // by the command line.
     public static ModeSelectorKind? KindOverride;
 
-    [Tooltip("Which selector commands modes this run. Overridden by '-modeSelector <none|fixed|random|fsm|llm>' on the command line, or KindOverride from code.")]
+    [Tooltip("Which selector commands modes this run. Overridden by '-modeSelector <none|fixed[:<Mode>]|random|fsm|llm>' on the command line, or KindOverride from code.")]
     [SerializeField] internal ModeSelectorKind selectorKind = ModeSelectorKind.None;
 
     [Tooltip("Seconds between periodic decisions. Kept at ModeDirector.minDwellSeconds — the switch rate the policy was trained on.")]
@@ -88,23 +88,25 @@ public class ModeSelectorDriver : MonoBehaviour
     internal System.Action<ModeDecisionRecord> onDecision;
 
     PendingDecision pending;
-    ModeSelectorKind? resolvedKind;
+    ModeSelectorSelection? resolvedSelection;
     bool warnedNoSelector;
 
     // Command line > code override > Inspector, resolved once — the argument
     // can't change mid-process.
-    public ModeSelectorKind ResolvedKind
+    ModeSelectorSelection ResolvedSelection
     {
         get
         {
-            if (!resolvedKind.HasValue)
+            if (!resolvedSelection.HasValue)
             {
-                resolvedKind = ModeSelectorChoice.Resolve(
+                resolvedSelection = ModeSelectorChoice.ResolveSelection(
                     System.Environment.GetCommandLineArgs(), KindOverride, selectorKind);
             }
-            return resolvedKind.Value;
+            return resolvedSelection.Value;
         }
     }
+
+    public ModeSelectorKind ResolvedKind => ResolvedSelection.Kind;
 
     // One writer at a time (see ModeChannel): the scripted director outranks
     // this driver — during training always, and whenever an eval or the
@@ -148,7 +150,9 @@ public class ModeSelectorDriver : MonoBehaviour
         switch (kind)
         {
             case ModeSelectorKind.Fixed:
-                return new FixedModeSelector(fixedSelectorMode);
+                // "-modeSelector fixed:<Mode>" names the pin; plain "fixed"
+                // falls back to the serialized default.
+                return new FixedModeSelector(ResolvedSelection.FixedMode ?? fixedSelectorMode);
             case ModeSelectorKind.Random:
                 return new RandomModeSelector();
             case ModeSelectorKind.Fsm:
