@@ -29,10 +29,15 @@ public class LlmModeSelectorTests
             return this;
         }
 
+        // Burns wall clock inside the call — the budget is a stopwatch, and a
+        // fake that answers instantly can never spend it.
+        public int DelayMs;
+
         public Task<LlmCompletion> CompleteAsync(LlmRequest request, CancellationToken cancellation)
         {
             Requests.Add(request);
             Tokens.Add(cancellation);
+            if (DelayMs > 0) Thread.Sleep(DelayMs);
             return Task.FromResult(Answers.Count > 0 ? Answers.Dequeue() : LlmCompletion.Answer(""));
         }
     }
@@ -162,6 +167,26 @@ public class LlmModeSelectorTests
         Assert.That(endpoint.Requests.Count, Is.EqualTo(1));
     }
 
+    // The retry shares the decision's budget rather than getting a fresh one:
+    // two full timeouts would outlive the driver's decision period, which
+    // cancels the call and reports a timeout over the verdict it was reaching.
+    [Test]
+    public void AnUnusableAnswerThatSpentTheBudget_IsNotRetried()
+    {
+        // Slow enough to spend the whole budget, and answers synchronously, so
+        // the attempt itself never trips the timeout.
+        var endpoint = new FakeEndpoint { DelayMs = 120 }
+            .Answering("no idea", "{\"mode\":\"Hunt\",\"reason\":\"\"}");
+        LlmSelectorConfig config = Config(retries: 1);
+        config.TimeoutSeconds = 0.1f;
+
+        NpcMode mode = Select(new LlmModeSelector(endpoint, config), new ModeDecisionReport());
+
+        Assert.That(endpoint.Requests.Count, Is.EqualTo(1),
+            "a retry the driver would cancel mid-flight is not worth issuing");
+        Assert.That(mode, Is.EqualTo(LlmModeSelector.NoMode));
+    }
+
     [Test]
     public void ATransportFailure_Throws_AndIsNotRetried()
     {
@@ -218,6 +243,7 @@ public class LlmModeSelectorTests
 
         Assert.That(body, Does.Contain("\"format\":{\"type\":\"object\""));
         Assert.That(body, Does.Contain("\"stream\":false"));
+        Assert.That(body, Does.Contain("\"keep_alive\""), "a model unloaded between episodes costs a decision");
         Assert.That(body, Does.Contain("\"temperature\":0.7"));
         Assert.That(body, Does.Contain("\"seed\":5"));
         Assert.That(body, Does.Contain("pick a mode\\nnow"), "the prompt's newline must not split the body");

@@ -17,6 +17,9 @@ public class LlmModeSelector : IReportingModeSelector
     // into an Invalid mode_decision line: the mode is kept, the failure counts.
     internal const NpcMode NoMode = (NpcMode)(-1);
 
+    // Too little of the budget left for a retry to be worth issuing.
+    internal const float MinimumAttemptSeconds = 0.25f;
+
     readonly ILlmEndpoint endpoint;
 
     public LlmSelectorConfig Config;
@@ -45,13 +48,20 @@ public class LlmModeSelector : IReportingModeSelector
         string prompt = BuildPrompt(snapshot);
         report.Prompt = prompt;
 
-        // Each attempt gets the full timeout; the driver's own cancellation at
-        // the next decision is what bounds the whole call.
+        // TimeoutSeconds is the budget for the whole call, retries included —
+        // per attempt it would let (Retries + 1) attempts outlive the decision
+        // period, and the driver cancelling a retry mid-flight reports a
+        // timeout where the ladder had actually reached a verdict.
+        var budget = System.Diagnostics.Stopwatch.StartNew();
         int attempts = Config.Retries + 1;
         for (int attempt = 0; attempt < attempts; attempt++)
         {
+            float remaining = Config.TimeoutSeconds - (float)budget.Elapsed.TotalSeconds;
+            // Nothing useful left to ask in: the answer would land after the
+            // driver had given up on it anyway.
+            if (attempt > 0 && remaining < MinimumAttemptSeconds) break;
             if (attempt > 0) report.RetryUsed = true;
-            string text = await Complete(prompt, cancellation);
+            string text = await Complete(prompt, remaining, cancellation);
             report.RawResponse = attempt == 0 ? text : report.RawResponse + "\n--- retry ---\n" + text;
 
             if (LlmModeResponse.TryParse(text, out LlmModeResponse parsed))
@@ -68,7 +78,7 @@ public class LlmModeSelector : IReportingModeSelector
 
     // One attempt. Throws rather than answering: a dead server or a model too
     // slow to be useful is not a mode.
-    async Task<string> Complete(string prompt, CancellationToken cancellation)
+    async Task<string> Complete(string prompt, float timeoutSeconds, CancellationToken cancellation)
     {
         var request = new LlmRequest
         {
@@ -77,13 +87,13 @@ public class LlmModeSelector : IReportingModeSelector
             Temperature = Config.Temperature,
             Seed = Config.Seed,
             JsonSchema = LlmModeResponse.Schema(),
-            TimeoutSeconds = (int)System.Math.Ceiling(Config.TimeoutSeconds),
+            TimeoutSeconds = (int)System.Math.Ceiling(timeoutSeconds),
         };
 
         using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellation))
         {
             Task<LlmCompletion> call = endpoint.CompleteAsync(request, linked.Token);
-            int timeoutMs = (int)(Config.TimeoutSeconds * 1000f);
+            int timeoutMs = (int)(timeoutSeconds * 1000f);
             // The timeout is enforced here as well as signalled through the
             // token: an endpoint that ignores cancellation must not be able to
             // hold the decision open past its budget.
@@ -93,7 +103,8 @@ public class LlmModeSelector : IReportingModeSelector
                 linked.Cancel();
                 Observe(call);
                 throw new System.TimeoutException(
-                    $"{Config.Model} did not answer within {Config.TimeoutSeconds:0.##} s");
+                    $"{Config.Model} did not answer within {timeoutSeconds:0.##} s " +
+                    $"of the call's {Config.TimeoutSeconds:0.##} s budget");
             }
 
             LlmCompletion completion = await call;

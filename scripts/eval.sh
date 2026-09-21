@@ -37,7 +37,10 @@
 #                         differ — run enough episodes for the average
 #   --time-scale          game time per rendered frame, in physics steps; 1 is
 #                         the most faithful, higher is faster and coarser. The
-#                         run is never throttled to real time either way.
+#                         run is never throttled to real time either way —
+#                         except under --selector llm, which ignores this and
+#                         runs at wall clock, since a model call costs real
+#                         seconds
 #   --rebuild             rebuild the player even if it already has this model
 #
 # The model is baked into the player: Inference Engine only imports ONNX in the
@@ -160,10 +163,15 @@ fi
 
 UNITY_LOG="$OUT/unity.log"
 # Rounds always end (the clock is a draw), so the only way the player runs
-# forever is a startup failure that never starts one. The run is not throttled
-# to real time, so this is a loose wall-clock bound, not the expected duration;
-# --timeout 0 disables the guard.
-TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
+# forever is a startup failure that never starts one. This is a loose wall-clock
+# bound, not the expected duration; --timeout 0 disables the guard. An LLM run
+# is the one that actually spends real time per episode — up to a full round
+# each — so it gets a budget built on the round length instead.
+if [[ "$SELECTOR" == "llm" ]]; then
+    TIMEOUT="${TIMEOUT:-$((EPISODES * 180 + 300))}"
+else
+    TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
+fi
 echo "==> $EPISODES episodes, seed $SEED, subject $SUBJECT, opponent $OPPONENT, modes $MODES, selector $SELECTOR, timeScale $TIME_SCALE"
 echo "    log: $UNITY_LOG"
 set +e

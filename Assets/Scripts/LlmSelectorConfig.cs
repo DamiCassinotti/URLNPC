@@ -16,9 +16,9 @@ public struct LlmSelectorConfig
 
     public string Endpoint;
     public string Model;
-    // Per attempt, not per decision. Kept under the driver's decision period:
-    // the driver cancels an unanswered call when the next decision comes due,
-    // and a timeout that outlives the period would never be the one to fire.
+    // The budget for one decision, retries included — kept under the driver's
+    // decision period, which is when the driver cancels an unanswered call and
+    // reports a timeout over whatever the ladder was doing.
     public float TimeoutSeconds;
     // Extra attempts after unusable output, not after a transport failure — a
     // dead server is a failure to report, not something to retry inside one
@@ -29,14 +29,14 @@ public struct LlmSelectorConfig
     // repeatable. The consistency metric is what the temp 0.7 runs are for.
     public int Seed;
 
+    // What Sanitized falls back to for a blank value. Only the two text fields
+    // can be blank, so this deliberately doesn't restate the numbers — the
+    // driver's serialized fields own those, and a second copy here would drift
+    // from the Inspector without anything reading it.
     public static LlmSelectorConfig Defaults => new LlmSelectorConfig
     {
         Endpoint = "http://localhost:11434",
         Model = "llama3.1:8b",
-        TimeoutSeconds = 4f,
-        Retries = 1,
-        Temperature = 0f,
-        Seed = 1,
     };
 
     // Command line over serialized, field by field: a run that only names a

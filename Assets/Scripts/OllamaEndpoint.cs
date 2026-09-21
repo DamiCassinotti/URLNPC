@@ -119,7 +119,11 @@ public class OllamaEndpoint : ILlmEndpoint
         sb.Append('{')
           .Append(JsonLine.Field("model", request.Model)).Append(',')
           .Append(JsonLine.Field("prompt", request.Prompt)).Append(',')
-          .Append("\"stream\":false,");
+          .Append("\"stream\":false,")
+          // A cold load costs seconds the decision budget doesn't have, and
+          // Ollama's default unloads after 5 minutes idle — long enough for a
+          // scene reload between eval episodes to land on a cold model.
+          .Append("\"keep_alive\":\"30m\",");
         if (!string.IsNullOrEmpty(request.JsonSchema))
         {
             sb.Append("\"format\":").Append(request.JsonSchema).Append(',');
