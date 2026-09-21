@@ -44,6 +44,9 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Seconds since the last sighting after which the FSM patrols instead of pursuing the memory.")]
     [SerializeField] internal int fsmUnseenSecondsForPatrol = 6;
 
+    [Tooltip("Log one line to the console per decision (transition plus the snapshot fields the FSM reads), for watching a match live. Only fires while a selector is running, so training and plain human play stay quiet. Telemetry records every decision regardless.")]
+    [SerializeField] internal bool logDecisions = true;
+
     // The seam itself: an instance assigned from code (the way tests and
     // EvalSession pick one) outranks whatever the kind would build.
     public IModeSelector Selector { get; set; }
@@ -365,12 +368,28 @@ public class ModeSelectorDriver : MonoBehaviour
             outcome = outcome,
         };
         onDecision?.Invoke(record);
+        if (logDecisions) LogDecisionToConsole(record, outcome, chosen);
         if (TelemetryLogger.Instance == null) return;
         TelemetryLogger.Instance.LogEvent("mode_decision", record.Fields());
         if (report.Prompt.Length > 0 || report.RawResponse.Length > 0)
         {
             TelemetryLogger.Instance.LogDecisionDetail(decision.Id, report.Prompt, report.RawResponse);
         }
+    }
+
+    // A per-decision console line for watching a match live: the transition
+    // plus the snapshot fields the FSM keys on, so the chosen mode can be
+    // checked against the rule that produced it. Telemetry keeps the full
+    // record; this is the eyeball view.
+    void LogDecisionToConsole(ModeDecisionRecord record, ModeDecisionOutcome outcome, NpcMode? chosen)
+    {
+        string to = chosen.HasValue ? chosen.Value.ToString() : "(kept)";
+        GameStateSnapshot s = record.snapshot;
+        string ctx = s != null
+            ? $"hp {s.hpPercent}% · vis {s.targetVisible} · dist {s.targetDistance} · seen {s.secondsSinceSeen}s · dmg {s.recentlyDamaged}"
+            : "no snapshot";
+        Debug.Log($"[ModeDecision] {record.entity} {record.fromMode}→{to} " +
+            $"({record.selectorKind}, {outcome}) — {ctx}", this);
     }
 
     // Cancel and forget without judging: the answer stopped mattering (episode

@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 210935821}
   - component: {fileID: 210935830}
   - component: {fileID: 210935831}
+  - component: {fileID: 2109358310}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: NPC
@@ -288,6 +289,27 @@ MonoBehaviour:
   trainingOnly: 1
   useForcedMode: 0
   forcedMode: 0
+--- !u!114 &2109358310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418224769242456080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e7e89185a74d43b02e101fec3ad605, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  selectorKind: 0
+  decisionPeriodSeconds: 5
+  minEventDwellSeconds: 2
+  lowHealthFraction: 0.35
+  failuresBeforeFallback: 3
+  fixedSelectorMode: 0
+  fsmLowHealthPercent: 35
+  fsmUnseenSecondsForPatrol: 6
+  logDecisions: 1
 --- !u!1 &3846806824030858784
 GameObject:
   m_ObjectHideFlags: 0
