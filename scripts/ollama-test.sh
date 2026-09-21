@@ -31,7 +31,14 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-command -v curl >/dev/null || { echo "error: curl is required" >&2; exit 1; }
+for tool in curl python3; do
+    command -v "$tool" >/dev/null || { echo "error: $tool is required" >&2; exit 1; }
+done
+
+# Seconds since a start stamp, and a float comparison — awk rather than bc,
+# which plenty of minimal installs don't ship.
+since() { awk -v start="$1" -v now="$(date +%s.%N)" 'BEGIN { printf "%.1f", now - start }'; }
+over()  { awk -v a="$1" -v b="$2" 'BEGIN { exit !(a > b) }'; }
 
 STARTED_SERVER=""
 cleanup() {
@@ -82,22 +89,22 @@ JSON
 START=$(date +%s.%N)
 REPLY=$(curl -fsS -m 120 "$ENDPOINT/api/generate" -d "$REQUEST") || {
     echo "error: the probe call failed — see /tmp/ollama-serve.log" >&2; exit 1; }
-ELAPSED=$(echo "$(date +%s.%N) - $START" | bc)
+COLD=$(since "$START")
 
 # Unloaded weights make the first call much slower than the steady state, so the
 # budget is judged on a second one.
 START=$(date +%s.%N)
 REPLY=$(curl -fsS -m 120 "$ENDPOINT/api/generate" -d "$REQUEST")
-WARM=$(echo "$(date +%s.%N) - $START" | bc)
+WARM=$(since "$START")
 
 ANSWER=$(echo "$REPLY" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("response",""))')
 printf '    answer: %s\n' "$ANSWER"
-printf '    latency: %.1fs cold, %.1fs warm (budget %ss)\n' "$ELAPSED" "$WARM" "$BUDGET_SECONDS"
+printf '    latency: %ss cold, %ss warm (budget %ss)\n' "$COLD" "$WARM" "$BUDGET_SECONDS"
 
 if ! echo "$ANSWER" | grep -qE '"mode"[[:space:]]*:[[:space:]]*"(Hunt|HoldCover|Retreat|Patrol)"'; then
     echo "warning: the answer names no mode — the selector would retry, then hand over to its fallback" >&2
 fi
-if (( $(echo "$WARM > $BUDGET_SECONDS" | bc -l) )); then
+if over "$WARM" "$BUDGET_SECONDS"; then
     echo "warning: $MODEL is slower than the ${BUDGET_SECONDS}s decision budget — every call would time out." >&2
     echo "         Try a smaller model, or raise -llmTimeout and the driver's decisionPeriodSeconds together." >&2
 fi

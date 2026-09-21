@@ -53,6 +53,7 @@ public class LlmModeSelector : IReportingModeSelector
         // period, and the driver cancelling a retry mid-flight reports a
         // timeout where the ladder had actually reached a verdict.
         var budget = System.Diagnostics.Stopwatch.StartNew();
+        string lastText = "";
         int attempts = Config.Retries + 1;
         for (int attempt = 0; attempt < attempts; attempt++)
         {
@@ -61,8 +62,14 @@ public class LlmModeSelector : IReportingModeSelector
             // driver had given up on it anyway.
             if (attempt > 0 && remaining < MinimumAttemptSeconds) break;
             if (attempt > 0) report.RetryUsed = true;
-            string text = await Complete(prompt, remaining, cancellation);
+            // The retry has to ask something different. At temperature 0 the
+            // decode is greedy, so the same prompt returns the same unusable
+            // text however the seed moves — a retry that changed only the seed
+            // would spend the budget reproducing the first answer.
+            string attemptPrompt = attempt == 0 ? prompt : prompt + RetryNote(lastText);
+            string text = await Complete(attemptPrompt, attempt, remaining, cancellation);
             report.RawResponse = attempt == 0 ? text : report.RawResponse + "\n--- retry ---\n" + text;
+            lastText = text;
 
             if (LlmModeResponse.TryParse(text, out LlmModeResponse parsed))
             {
@@ -78,14 +85,17 @@ public class LlmModeSelector : IReportingModeSelector
 
     // One attempt. Throws rather than answering: a dead server or a model too
     // slow to be useful is not a mode.
-    async Task<string> Complete(string prompt, float timeoutSeconds, CancellationToken cancellation)
+    async Task<string> Complete(string prompt, int attempt, float timeoutSeconds, CancellationToken cancellation)
     {
         var request = new LlmRequest
         {
             Model = Config.Model,
             Prompt = prompt,
             Temperature = Config.Temperature,
-            Seed = Config.Seed,
+            // Moves with the attempt so a sampling backend doesn't repeat
+            // itself either; a run still replays, the attempt count being a
+            // function of the answers.
+            Seed = Config.Seed + attempt,
             JsonSchema = LlmModeResponse.Schema(),
             TimeoutSeconds = (int)System.Math.Ceiling(timeoutSeconds),
         };
@@ -123,6 +133,17 @@ public class LlmModeSelector : IReportingModeSelector
     {
         task.ContinueWith(t => { _ = t.Exception; },
             CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+    }
+
+    // What the retry adds: the answer that could not be read, and what was
+    // wrong with it. Kept short — the state above it hasn't changed.
+    static string RetryNote(string unusable)
+    {
+        const int Excerpt = 200;
+        string quoted = unusable == null ? "" :
+            unusable.Length > Excerpt ? unusable.Substring(0, Excerpt) : unusable;
+        return "\nYour previous answer named no mode and could not be read: \"" + quoted.Replace("\"", "'") +
+            "\"\nAnswer again with JSON only, and with \"mode\" set to one of the modes listed above.";
     }
 
     // Prompt v0: enough to get a real answer out of a real model, deliberately

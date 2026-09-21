@@ -170,6 +170,21 @@ public class LlmModeSelectorTests
     // The retry shares the decision's budget rather than getting a fresh one:
     // two full timeouts would outlive the driver's decision period, which
     // cancels the call and reports a timeout over the verdict it was reaching.
+    // At temperature 0 the decode is greedy, so an identical prompt returns the
+    // identical unusable text and the retry would only spend budget.
+    [Test]
+    public void TheRetry_AsksSomethingDifferent()
+    {
+        var endpoint = new FakeEndpoint().Answering("I'd rather not.", "{\"mode\":\"Hunt\",\"reason\":\"\"}");
+
+        Select(new LlmModeSelector(endpoint, Config(retries: 1)), new ModeDecisionReport());
+
+        Assert.That(endpoint.Requests[1].Prompt, Is.Not.EqualTo(endpoint.Requests[0].Prompt));
+        Assert.That(endpoint.Requests[1].Prompt, Does.Contain("rather not"),
+            "the retry says what was wrong with the last answer");
+        Assert.That(endpoint.Requests[1].Seed, Is.Not.EqualTo(endpoint.Requests[0].Seed));
+    }
+
     [Test]
     public void AnUnusableAnswerThatSpentTheBudget_IsNotRetried()
     {

@@ -82,6 +82,15 @@ public class LlmModeResponseTests
         Assert.That(Parse("The target is Retreat-ing from me, so I should Hunt.", out _), Is.False);
     }
 
+    // Both are single-mode texts the scan would otherwise commit.
+    [TestCase("I should not Patrol, the target is right there.")]
+    [TestCase("The Hunter class would love this.")]
+    [TestCase("Anything rather than Retreat.")]
+    public void AScannedModeThatIsNegatedOrAFragment_IsNotAnAnswer(string text)
+    {
+        Assert.That(Parse(text, out _), Is.False);
+    }
+
     [Test]
     public void AUnicodeEscapeInTheReason_IsDecoded()
     {

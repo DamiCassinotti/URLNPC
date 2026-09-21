@@ -57,14 +57,47 @@ public struct LlmModeResponse
     static bool TryScanForMode(string text, out NpcMode mode)
     {
         mode = default;
+        // "I should not Patrol" names exactly one mode and means the opposite.
+        // The scan can't read a sentence, so it declines to try: refusing costs
+        // a retry and then the fallback selector, while a wrong mode is
+        // committed with nothing downstream able to tell.
+        if (IsNegated(text)) return false;
+
         int found = 0;
         foreach (NpcMode candidate in NpcModes.All)
         {
-            if (text.IndexOf(candidate.ToString(), System.StringComparison.OrdinalIgnoreCase) < 0) continue;
+            if (!NamesMode(text, candidate.ToString())) continue;
             mode = candidate;
             found++;
         }
         return found == 1;
+    }
+
+    static readonly string[] Negations = { "not ", "n't", "never", "avoid", "instead", "rather than" };
+
+    static bool IsNegated(string text)
+    {
+        foreach (string negation in Negations)
+        {
+            if (text.IndexOf(negation, System.StringComparison.OrdinalIgnoreCase) >= 0) return true;
+        }
+        return false;
+    }
+
+    // The name as a word, not as a fragment: "the Hunter class" is not a vote
+    // for Hunt.
+    static bool NamesMode(string text, string name)
+    {
+        int at = 0;
+        while ((at = text.IndexOf(name, at, System.StringComparison.OrdinalIgnoreCase)) >= 0)
+        {
+            bool beforeOk = at == 0 || !char.IsLetterOrDigit(text[at - 1]);
+            int after = at + name.Length;
+            bool afterOk = after >= text.Length || !char.IsLetterOrDigit(text[after]);
+            if (beforeOk && afterOk) return true;
+            at = after;
+        }
+        return false;
     }
 
     // "<key>" ... : ... "<value>", with JSON escapes undone. Deliberately not a

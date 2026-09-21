@@ -27,11 +27,15 @@
 #                         nobody, or one mode pinned for the whole run
 #   --selector            a mode selector commands the modes instead (#127):
 #                         the FSM, uniform random draws, one pinned mode, or the
-#                         LLM (#130 — its model, endpoint and temperature come
-#                         from the -llm* launch arguments, and the run ignores
-#                         --time-scale: a model call takes wall-clock seconds).
-#                         Exactly one writer: a selector forces --modes none, and
-#                         naming both is an error
+#                         LLM (#130 — the run ignores --time-scale: a model call
+#                         takes wall-clock seconds). Exactly one writer: a
+#                         selector forces --modes none, and naming both is an
+#                         error
+#   --llm-model           which model answers, plus --llm-endpoint,
+#                         --llm-temperature, --llm-timeout, --llm-retries and
+#                         --llm-seed: forwarded to the player as -llm*, so a
+#                         batch sweeps models or temperatures off one build.
+#                         Only with --selector llm
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
@@ -79,6 +83,7 @@ OUT=""
 BUILD=1
 TIMEOUT=""
 REBUILD=0
+LLM_ARGS=()
 while [[ $# -ge 1 ]]; do
     case "$1" in
         --episodes) EPISODES="$2"; shift 2 ;;
@@ -87,6 +92,12 @@ while [[ $# -ge 1 ]]; do
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
         --selector) SELECTOR="$2"; shift 2 ;;
+        --llm-endpoint)    LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
+        --llm-model)       LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
+        --llm-timeout)     LLM_ARGS+=(-llmTimeout "$2"); shift 2 ;;
+        --llm-retries)     LLM_ARGS+=(-llmRetries "$2"); shift 2 ;;
+        --llm-temperature) LLM_ARGS+=(-llmTemperature "$2"); shift 2 ;;
+        --llm-seed)        LLM_ARGS+=(-llmSeed "$2"); shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;
@@ -107,6 +118,10 @@ case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
 SELECTOR="${SELECTOR,,}"
 case "$SELECTOR" in none|random|fsm|llm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm|llm" >&2; exit 1 ;; esac
+if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
+    echo "error: the --llm-* knobs need --selector llm" >&2
+    exit 1
+fi
 # One writer on the mode channel: a selector run stands the scripted director
 # down. Naming both is a condition mix-up, not a run.
 if [[ "$SELECTOR" != "none" ]]; then
@@ -133,6 +148,7 @@ cat > "$OUT/config.json" <<JSON
   "opponent": "$OPPONENT",
   "modes": "$MODES",
   "selector": "$SELECTOR",
+  "llmArgs": "${LLM_ARGS[*]-}",
   "timeScale": $TIME_SCALE,
   "commit": "$(git -C "$PROJECT_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)",
   "startedUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -184,7 +200,8 @@ timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
     -evalOpponent "$OPPONENT" \
     -evalModes "$MODES" \
     -modeSelector "$SELECTOR" \
-    -evalTimeScale "$TIME_SCALE"
+    -evalTimeScale "$TIME_SCALE" \
+    ${LLM_ARGS[@]+"${LLM_ARGS[@]}"}
 RC=$?
 set -e
 if [[ $RC -eq 124 ]]; then
