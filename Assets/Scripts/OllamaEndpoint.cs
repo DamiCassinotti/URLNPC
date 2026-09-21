@@ -57,23 +57,34 @@ public class OllamaEndpoint : ILlmEndpoint
             if (!web.isDone) web.Abort();
         });
 
-        web.SendWebRequest().completed += operation =>
+        try
         {
+            web.SendWebRequest().completed += operation =>
+            {
+                registration.Dispose();
+                try
+                {
+                    if (cancellation.IsCancellationRequested) completion.TrySetCanceled();
+                    else completion.TrySetResult(Interpret(web));
+                }
+                catch (System.Exception e)
+                {
+                    completion.TrySetException(e);
+                }
+                finally
+                {
+                    web.Dispose();
+                }
+            };
+        }
+        catch (System.Exception e)
+        {
+            // A malformed endpoint is the likely one, and it would otherwise
+            // leak a request and a registration per decision.
             registration.Dispose();
-            try
-            {
-                if (cancellation.IsCancellationRequested) completion.TrySetCanceled();
-                else completion.TrySetResult(Interpret(web));
-            }
-            catch (System.Exception e)
-            {
-                completion.TrySetException(e);
-            }
-            finally
-            {
-                web.Dispose();
-            }
-        };
+            web.Dispose();
+            completion.TrySetResult(LlmCompletion.Failure($"could not send to {url}: {e.Message}"));
+        }
 
         return completion.Task;
     }
