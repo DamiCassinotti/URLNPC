@@ -1,0 +1,19 @@
+selector      llm (llama3.1:8b, prompt v2, bank-v1 x12)
+snapshots     40  (8 ambiguous, 32 scored for accuracy)
+
+ temp   accuracy  consistency  ambig-consist  invalid  lat.mean  lat.p95
+  0.0      62.5%       100.0%         100.0%     0.0%  40174.3m 48928.5
+
+misses at temp 0.0:
+  hunt-visible-near-hurt           chose HoldCover, acceptable ['Hunt']
+  hunt-lostsight-near-fresh        chose Patrol, acceptable ['Hunt']
+  hunt-lostsight-mid-fresh         chose Patrol, acceptable ['Hunt']
+  holdcover-unseen-damaged         chose Retreat, acceptable ['HoldCover']
+  retreat-lowhp-visible-mid        chose Hunt, acceptable ['Retreat']
+  retreat-lowhp-visible-near       chose Hunt, acceptable ['Retreat']
+  retreat-lowhp-lostsight          chose Hunt, acceptable ['HoldCover', 'Retreat']
+  visible-near-lowhp               chose HoldCover, acceptable ['Hunt', 'Retreat']
+  lostsight-mid-freshish           chose Patrol, acceptable ['Hunt']
+  hunt-visible-near-highhp         chose Retreat, acceptable ['Hunt']
+  hunt-lostsight-mid-instant       chose Patrol, acceptable ['Hunt']
+  hunt-visible-far-damaged         chose Retreat, acceptable ['Hunt', 'Patrol']

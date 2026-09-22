@@ -23,17 +23,31 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
     readonly ILlmEndpoint endpoint;
     readonly ModePrompt prompt;
 
+    // The few-shot block, rendered once (#132): the bank and the shot count are
+    // fixed for a run, so the examples are the same text on every call. Empty
+    // is the zero-shot arm, which collapses the prompt's slot.
+    readonly string exemplars;
+    // The prompt id plus the bank and shot count that filled it — one field, so
+    // a mode_decision line still names the whole text it was answered from.
+    readonly string promptLabel;
+
     // The last few decisions, which is what lets the model read a trend across
     // calls instead of answering each one from scratch (issue #131).
     readonly ModePromptHistory history = new ModePromptHistory();
 
     public LlmSelectorConfig Config;
 
-    public LlmModeSelector(ILlmEndpoint endpoint, LlmSelectorConfig config, ModePrompt prompt)
+    public LlmModeSelector(ILlmEndpoint endpoint, LlmSelectorConfig config, ModePrompt prompt,
+        ModeExemplars bank = null)
     {
         this.endpoint = endpoint;
         this.prompt = prompt;
         Config = config.Sanitized();
+        exemplars = bank == null ? "" : bank.Render(Config.Shots);
+        int shots = bank == null ? 0 : bank.Take(Config.Shots).Count;
+        promptLabel = prompt == null ? ""
+            : shots == 0 ? prompt.Id
+            : $"{prompt.Id}+{bank.Id}x{shots}";
     }
 
     // Per episode, from the driver: the previous round's decisions describe a
@@ -49,7 +63,7 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
         GameStateSnapshot snapshot, ModeDecisionReport report, CancellationToken cancellation)
     {
         report.ModelName = Config.Model;
-        report.PromptId = prompt != null ? prompt.Id : "";
+        report.PromptId = promptLabel;
         if (snapshot == null)
         {
             throw new System.InvalidOperationException(
@@ -61,7 +75,7 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
                 "no prompt variant to render — see ModePromptLibrary");
         }
 
-        string rendered = prompt.Render(snapshot, history.Turns);
+        string rendered = prompt.Render(snapshot, history.Turns, exemplars);
         report.Prompt = rendered;
 
         // TimeoutSeconds is the budget for the whole call, retries included —

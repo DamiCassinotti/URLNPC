@@ -10,15 +10,26 @@ using System.Text;
 //
 // A variant that drops {{HISTORY}} is the memoryless ablation: the history is
 // simply not shown. {{STATE}} is mandatory — a prompt without the current
-// snapshot is not asking about anything.
+// snapshot is not asking about anything. {{EXEMPLARS}} is the few-shot slot
+// (#132), filled from ModeExemplars or collapsed for the zero-shot arm.
 public class ModePrompt
 {
-    // The variant shipped as Resources/Prompts/v1.txt, and what every LLM run
-    // uses unless -llmPrompt names another.
+    // The base variant, Resources/Prompts/v1.txt: the text without the few-shot
+    // slot, and what a blank -llmPrompt falls back to.
     public const string DefaultId = "v1";
+
+    // v1 plus the {{EXEMPLARS}} slot and nothing else, so it renders as v1 with
+    // no bank behind it. What the selector ships on, the few-shot arm having
+    // won the battery ablation (#132).
+    public const string FewShotId = "v2";
 
     public const string HistoryToken = "{{HISTORY}}";
     public const string StateToken = "{{STATE}}";
+    // The few-shot slot (#132). With no examples to show it takes its own line
+    // with it, so the zero-shot arm of the ablation is the text the variant
+    // would have had without the slot at all — the arms differ by the examples
+    // and by nothing else.
+    public const string ExemplarsToken = "{{EXEMPLARS}}";
 
     // What renders in place of the history before the first decision of a
     // round, so the model never sees an empty section it has to interpret.
@@ -37,14 +48,46 @@ public class ModePrompt
     // the variant's business.
     public bool IsUsable => Template.Contains(StateToken);
 
+    // Whether this variant has anywhere to put exemplars. A bank named against
+    // a variant without the slot would be a few-shot run that is silently
+    // zero-shot, so the caller refuses that pairing.
+    public bool ShowsExemplars => Template.Contains(ExemplarsToken);
+
     public string Render(GameStateSnapshot current, IList<ModePromptTurn> history)
+    {
+        return Render(current, history, "");
+    }
+
+    public string Render(GameStateSnapshot current, IList<ModePromptTurn> history, string exemplars)
     {
         string rendered = Template.Replace(StateToken, ModeDecisionRecord.SnapshotObject(current));
         if (rendered.Contains(HistoryToken))
         {
             rendered = rendered.Replace(HistoryToken, RenderHistory(history));
         }
+        rendered = string.IsNullOrEmpty(exemplars)
+            ? DropSlot(rendered, ExemplarsToken)
+            : rendered.Replace(ExemplarsToken, exemplars);
         return rendered;
+    }
+
+    // Removes the token and the blank line it sat on, so what is left is the
+    // template as it reads without the slot.
+    static string DropSlot(string text, string token)
+    {
+        int at;
+        while ((at = text.IndexOf(token, System.StringComparison.Ordinal)) >= 0)
+        {
+            int end = at + token.Length;
+            for (int breaks = 0; breaks < 2 && end < text.Length; breaks++)
+            {
+                if (text[end] == '\r' && end + 1 < text.Length && text[end + 1] == '\n') end += 2;
+                else if (text[end] == '\n') end++;
+                else break;
+            }
+            text = text.Remove(at, end - at);
+        }
+        return text;
     }
 
     // Deliberately not the full snapshot JSON per turn: three of those would

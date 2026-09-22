@@ -2,6 +2,7 @@
 """Run a mode selector over the labeled snapshot battery (issue #128).
 
     scripts/battery.py [--selector fsm|random|llm] [--snapshots battery/snapshots.json]
+                       [--prompt v1] [--exemplars none|<bank>] [--shots N]
                        [--repeats K] [--temps 0.0,0.7] [--seed S] [--json out.json]
 
 The offline inner loop for prompt iteration: a real-time match costs a minute
@@ -24,6 +25,13 @@ rendered here with an empty history — a battery snapshot is a single decision)
 to Ollama. One attempt per call, no retry: the retry ladder is the game's
 robustness, while what the battery measures is how often the raw answer is
 usable.
+
+`--exemplars <bank>` fills the prompt's {{EXEMPLARS}} slot from
+Assets/Resources/Exemplars/<bank>.txt and `--shots N` caps how many are shown;
+the two arms of the few-shot ablation (issue #132) are the same prompt with and
+without them. The bank has to be disjoint from the battery on the fields a mode
+decision turns on, and this refuses to run otherwise: an exemplar that is also a
+battery item is an answer the model was handed.
 """
 
 import argparse
@@ -63,9 +71,17 @@ def random_decide(s, rng, temp):
     return rng.choice(MODES)
 
 
-PROMPT_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "Assets", "Resources", "Prompts")
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROMPT_DIR = os.path.join(REPO_ROOT, "Assets", "Resources", "Prompts")
+EXEMPLAR_DIR = os.path.join(REPO_ROOT, "Assets", "Resources", "Exemplars")
+
+# The subset of snapshot fields a mode decision turns on — battery_harvest.py
+# dedupes on it, and disjointness between bank and battery is defined on it too:
+# two states differing only in the arena name are the same decision problem.
+KEY_FIELDS = (
+    "hpPercent", "targetVisible", "targetDistance", "secondsSinceSeen",
+    "recentlyDamaged", "damagedFrom",
+)
 
 # ModeDecisionRecord.SnapshotObject's field order, which is what the game sends
 # and therefore what the prompt has to carry here too.
@@ -118,6 +134,84 @@ def load_prompt(prompt_id):
     return template
 
 
+# Twin of ModeExemplars (Assets/Scripts/ModeExemplars.cs), like fsm_decide is of
+# HeuristicModeSelector: same file, same three-line entries, same round-robin
+# and the same rendering, so the offline arm sends what the game would.
+EXEMPLARS_HEADING = ("Worked examples — states of the kind below and the answer "
+                     "each should get:")
+
+
+def load_exemplars(bank_id):
+    path = os.path.join(EXEMPLAR_DIR, bank_id + ".txt")
+    with open(path, encoding="utf-8") as handle:
+        lines = [line.strip() for line in handle]
+
+    entries = []
+    pending = []
+    for line in lines:
+        if not line or line.startswith("#"):
+            continue
+        if not line.startswith("{"):
+            if pending:
+                raise ValueError(f"bank {bank_id}: exemplar {pending[0]!r} is incomplete")
+            pending = [line]
+            continue
+        if not pending:
+            raise ValueError(f"bank {bank_id}: a JSON line with no exemplar id above it")
+        pending.append(line)
+        if len(pending) == 3:
+            mode = parse_mode(pending[2])
+            if mode is None:
+                raise ValueError(f"bank {bank_id}: exemplar {pending[0]!r} names no mode")
+            entries.append({"id": pending[0], "state": pending[1],
+                            "answer": pending[2], "mode": mode})
+            pending = []
+    if pending:
+        raise ValueError(f"bank {bank_id}: exemplar {pending[0]!r} is incomplete")
+    if not entries:
+        raise ValueError(f"bank {bank_id} holds no exemplars")
+    return entries
+
+
+def take_exemplars(entries, shots):
+    """Round-robin over the modes in NpcModes order, each mode's entries in
+    curated order — so four shots is one of each, not four Hunts."""
+    by_mode = [[e for e in entries if e["mode"] == mode] for mode in MODES]
+    wanted = len(entries) if shots <= 0 else min(shots, len(entries))
+    picked = []
+    for round_index in range(max((len(row) for row in by_mode), default=0)):
+        for row in by_mode:
+            if round_index < len(row) and len(picked) < wanted:
+                picked.append(row[round_index])
+    return picked
+
+
+def render_exemplars(entries, shots):
+    picked = take_exemplars(entries, shots)
+    if not picked:
+        return ""
+    blocks = "".join(f"\n\nState: {e['state']}\nAnswer: {e['answer']}" for e in picked)
+    return EXEMPLARS_HEADING + blocks
+
+
+def fill_exemplars(template, block):
+    """ModePrompt.Render's handling of the slot: filled, or dropped along with
+    the blank line it sat on so the zero-shot arm is the text without it."""
+    if block:
+        return template.replace("{{EXEMPLARS}}", block)
+    return re.sub(r"\{\{EXEMPLARS\}\}(\r?\n){0,2}", "", template)
+
+
+def check_disjoint(entries, battery):
+    """An exemplar that is also a battery item makes the accuracy number
+    meaningless, so an overlap stops the run rather than footnoting it."""
+    battery_keys = {tuple(e["snapshot"][f] for f in KEY_FIELDS) for e in battery}
+    overlap = [e["id"] for e in entries
+               if tuple(json.loads(e["state"])[f] for f in KEY_FIELDS) in battery_keys]
+    if overlap:
+        raise ValueError("exemplars also in the battery: " + ", ".join(overlap))
+
+
 def parse_mode(text):
     """The readable part of LlmModeResponse.TryParse: the "mode" key when there
     is one, otherwise a whole-word scan that answers only when exactly one mode
@@ -133,10 +227,10 @@ def parse_mode(text):
     return found[0] if len(found) == 1 else None
 
 
-def make_llm_decide(endpoint, model, prompt_id, seed, timeout):
+def make_llm_decide(endpoint, model, prompt_id, seed, timeout, exemplars=""):
     """The in-game side is LlmModeSelector (#130) with prompt v1 (#131); this
     shares the prompt text with it rather than restating it."""
-    template = load_prompt(prompt_id)
+    template = fill_exemplars(load_prompt(prompt_id), exemplars)
     url = endpoint.rstrip("/") + "/api/generate"
 
     def decide(s, rng, temp):
@@ -164,13 +258,28 @@ def make_llm_decide(endpoint, model, prompt_id, seed, timeout):
 SELECTORS = ("fsm", "random", "llm")
 
 
-def build_selector(name, args):
+def build_selector(name, args, battery):
+    """Returns the decide function and how many exemplars it shows, the shot
+    count being part of what a result is labelled with."""
     if name == "fsm":
-        return fsm_decide
+        return fsm_decide, 0
     if name == "random":
-        return random_decide
+        return random_decide, 0
+    block = ""
+    shots = 0
+    if args.exemplars and args.exemplars.strip().lower() != "none":
+        entries = load_exemplars(args.exemplars)
+        check_disjoint(entries, battery)
+        if "{{EXEMPLARS}}" not in load_prompt(args.prompt):
+            # A few-shot run silently scored as the zero-shot arm it is being
+            # compared against would be the one result worth nothing.
+            raise ValueError(f"prompt {args.prompt} has no {{{{EXEMPLARS}}}} slot, "
+                             f"so bank {args.exemplars} would never be shown")
+        picked = take_exemplars(entries, args.shots)
+        shots = len(picked)
+        block = render_exemplars(entries, args.shots)
     return make_llm_decide(args.endpoint, args.model, args.prompt,
-                           args.decode_seed, args.timeout)
+                           args.decode_seed, args.timeout, block), shots
 
 
 def load_battery(path):
@@ -292,6 +401,11 @@ def main():
                         help="which selector to score (default fsm)")
     parser.add_argument("--prompt", default="v1",
                         help="prompt variant under Assets/Resources/Prompts (default v1)")
+    parser.add_argument("--exemplars", default="none",
+                        help="few-shot bank under Assets/Resources/Exemplars, "
+                             "or 'none' for the zero-shot arm (default none)")
+    parser.add_argument("--shots", type=int, default=0,
+                        help="how many of the bank's exemplars to show; 0 is all")
     parser.add_argument("--model", default="llama3.1:8b", help="Ollama model tag")
     parser.add_argument("--endpoint", default="http://localhost:11434",
                         help="Ollama base URL")
@@ -312,7 +426,7 @@ def main():
 
     entries = load_battery(args.snapshots)
     try:
-        decide = build_selector(args.selector, args)
+        decide, shots = build_selector(args.selector, args, entries)
     except (OSError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
@@ -326,7 +440,8 @@ def main():
         return 1
     label = args.selector
     if args.selector == "llm":
-        label = f"{args.selector} ({args.model}, prompt {args.prompt})"
+        shown = f"{args.exemplars} x{shots}" if shots else "zero-shot"
+        label = f"{args.selector} ({args.model}, prompt {args.prompt}, {shown})"
     print(render(label, entries, results))
 
     if args.json:
@@ -334,7 +449,9 @@ def main():
                    "snapshots": len(entries), "results": results}
         if args.selector == "llm":
             payload.update({"model": args.model, "prompt": args.prompt,
-                            "endpoint": args.endpoint})
+                            "endpoint": args.endpoint,
+                            "exemplars": args.exemplars if shots else "none",
+                            "shots": shots})
         with open(args.json, "w", encoding="utf-8") as handle:
             json.dump(payload, handle, indent=2)
     return 0

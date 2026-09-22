@@ -57,10 +57,28 @@ public class LlmModeSelectorTests
 
     // A stand-in variant: the shipped v1 text is ModePromptTests'. What matters
     // here is that both moving parts reach the model.
+    static ModePrompt Prompt()
+    {
+        return new ModePrompt("test-v0", "Modes: Hunt, HoldCover, Retreat, Patrol.\n\n" +
+            "{{EXEMPLARS}}\n\nRecent: {{HISTORY}}\nNow: {{STATE}}\nJSON only.");
+    }
+
     static LlmModeSelector Make(FakeEndpoint endpoint, LlmSelectorConfig config)
     {
-        return new LlmModeSelector(endpoint, config, new ModePrompt("test-v0",
-            "Modes: Hunt, HoldCover, Retreat, Patrol.\nRecent: {{HISTORY}}\nNow: {{STATE}}\nJSON only."));
+        return new LlmModeSelector(endpoint, config, Prompt());
+    }
+
+    // The same selector with a bank behind the prompt's exemplar slot (#132).
+    static LlmModeSelector MakeFewShot(FakeEndpoint endpoint, LlmSelectorConfig config, int shots)
+    {
+        const string bankText =
+            "one\n{\"hpPercent\":100}\n{\"mode\":\"Hunt\",\"reason\":\"press\"}\n\n" +
+            "two\n{\"hpPercent\":20}\n{\"mode\":\"Retreat\",\"reason\":\"hurt\"}\n\n" +
+            "three\n{\"hpPercent\":50}\n{\"mode\":\"Patrol\",\"reason\":\"lost them\"}";
+        Assert.That(ModeExemplars.TryParse("test-bank", bankText, out ModeExemplars bank, out string error),
+            Is.True, error);
+        config.Shots = shots;
+        return new LlmModeSelector(endpoint, config, Prompt(), bank);
     }
 
     static GameStateSnapshot Snapshot()
@@ -250,6 +268,36 @@ public class LlmModeSelectorTests
             "the state goes in as the flat object the prompt describes");
         Assert.That(report.Prompt, Does.Contain("Courtyard"));
         Assert.That(report.Prompt, Does.Not.Contain(ModePrompt.StateToken), "the template was not rendered");
+    }
+
+    // The few-shot arm (#132): the examples reach the model, and the decision
+    // line says which bank and how many shots were shown — a few-shot run
+    // labelled as the zero-shot one it is compared against would be worthless.
+    [Test]
+    public void WithABank_TheExamplesGoIntoThePrompt_AndTheLabelSaysSo()
+    {
+        var endpoint = new FakeEndpoint().Answering("{\"mode\":\"Hunt\",\"reason\":\"\"}");
+        var report = new ModeDecisionReport();
+
+        Select(MakeFewShot(endpoint, Config(), shots: 2), report);
+
+        Assert.That(report.Prompt, Does.Contain(ModeExemplars.Heading));
+        Assert.That(report.Prompt, Does.Contain("\"hpPercent\":100"), "the example state is shown");
+        Assert.That(report.Prompt, Does.Not.Contain(ModePrompt.ExemplarsToken));
+        Assert.That(report.PromptId, Is.EqualTo("test-v0+test-bankx2"));
+    }
+
+    [Test]
+    public void WithNoBank_TheSlotCollapses_AndTheLabelIsThePromptAlone()
+    {
+        var endpoint = new FakeEndpoint().Answering("{\"mode\":\"Hunt\",\"reason\":\"\"}");
+        var report = new ModeDecisionReport();
+
+        Select(Make(endpoint, Config()), report);
+
+        Assert.That(report.Prompt, Does.Not.Contain(ModeExemplars.Heading));
+        Assert.That(report.Prompt, Does.Not.Contain(ModePrompt.ExemplarsToken));
+        Assert.That(report.PromptId, Is.EqualTo("test-v0"));
     }
 
     // The history is the whole basis for reading a trend across calls (#131):

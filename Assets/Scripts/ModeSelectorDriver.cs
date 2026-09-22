@@ -64,7 +64,15 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal int llmSeed = 1;
 
     [Tooltip("Which prompt variant is sent — the id of a text asset under Resources/Prompts. Overridable with '-llmPrompt <id>'.")]
-    [SerializeField] internal string llmPromptId = ModePrompt.DefaultId;
+    [SerializeField] internal string llmPromptId = ModePrompt.FewShotId;
+
+    [Tooltip("Which exemplar bank fills the prompt's {{EXEMPLARS}} slot — the id of a text asset under Resources/Exemplars. Empty, or '-llmExemplars none', is the zero-shot arm.")]
+    [SerializeField] internal string llmExemplarsId = ModeExemplars.DefaultId;
+
+    // Eight shots is what won the battery ablation (#132): 65.6% against
+    // zero-shot's 56.2%, and past it twelve gave the accuracy back.
+    [Tooltip("How many of the bank's exemplars are shown; 0 is all of them. Overridable with '-llmShots <n>'.")]
+    [SerializeField] internal int llmShots = ModeExemplars.DefaultShots;
 
     [Tooltip("Log one line to the console per decision (transition plus the snapshot fields the FSM reads), for watching a match live. Only fires while a selector is running, so training and plain human play stay quiet. Telemetry records every decision regardless.")]
     [SerializeField] internal bool logDecisions = true;
@@ -194,10 +202,31 @@ public class ModeSelectorDriver : MonoBehaviour
                         $"Resources/{ModePromptLibrary.ResourceFolder} — the LLM selector stays inert.", this);
                     return null;
                 }
+                // Same rule for the exemplar bank (#132): a named bank that
+                // can't be shown would be a few-shot run silently scored as the
+                // zero-shot arm it is being compared against.
+                ModeExemplars bank = null;
+                if (config.ExemplarsId.Length > 0)
+                {
+                    if (!ModeExemplarLibrary.TryLoad(config.ExemplarsId, out bank, out string error))
+                    {
+                        Debug.LogError($"[ModeSelector] exemplar bank '{config.ExemplarsId}': {error} " +
+                            "— the LLM selector stays inert.", this);
+                        return null;
+                    }
+                    if (!prompt.ShowsExemplars)
+                    {
+                        Debug.LogError($"[ModeSelector] prompt '{prompt.Id}' has no " +
+                            $"{ModePrompt.ExemplarsToken} slot, so bank '{bank.Id}' would never be shown " +
+                            "— the LLM selector stays inert.", this);
+                        return null;
+                    }
+                }
                 Debug.Log($"[ModeSelector] LLM selector on {config.Model} at {config.Endpoint} " +
-                    $"(prompt {prompt.Id}, temp {config.Temperature}, seed {config.Seed}, " +
+                    $"(prompt {prompt.Id}, {(bank == null ? "zero-shot" : bank.Id + " x" + bank.Take(config.Shots).Count)}, " +
+                    $"temp {config.Temperature}, seed {config.Seed}, " +
                     $"timeout {config.TimeoutSeconds:0.##} s, {config.Retries} retries).", this);
-                return new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config, prompt);
+                return new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config, prompt, bank);
             default:
                 return null;
         }
@@ -223,6 +252,8 @@ public class ModeSelectorDriver : MonoBehaviour
         Temperature = llmTemperature,
         Seed = llmSeed,
         PromptId = llmPromptId,
+        ExemplarsId = llmExemplarsId,
+        Shots = llmShots,
     }.WithCommandLine(System.Environment.GetCommandLineArgs());
 
     void FixedUpdate()

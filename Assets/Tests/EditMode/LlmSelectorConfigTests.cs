@@ -58,6 +58,8 @@ public class LlmSelectorConfigTests
             LlmSelectorConfig.TemperatureArg, "0.7",
             LlmSelectorConfig.SeedArg, "99",
             LlmSelectorConfig.PromptArg, "v2",
+            LlmSelectorConfig.ExemplarsArg, "bank-v1",
+            LlmSelectorConfig.ShotsArg, "8",
         });
 
         Assert.That(config.Endpoint, Is.EqualTo("http://other:11434"));
@@ -67,6 +69,25 @@ public class LlmSelectorConfigTests
         Assert.That(config.Temperature, Is.EqualTo(0.7f).Within(1e-4f));
         Assert.That(config.Seed, Is.EqualTo(99));
         Assert.That(config.PromptId, Is.EqualTo("v2"));
+        Assert.That(config.ExemplarsId, Is.EqualTo("bank-v1"));
+        Assert.That(config.Shots, Is.EqualTo(8));
+    }
+
+    // "" is what means zero-shot, and an argument can't carry it (#132).
+    [Test]
+    public void TheZeroShotArm_IsNameableFromTheCommandLine()
+    {
+        LlmSelectorConfig few = Serialized().WithCommandLine(new[]
+        {
+            LlmSelectorConfig.ExemplarsArg, "bank-v1",
+        });
+        LlmSelectorConfig zero = few.WithCommandLine(new[]
+        {
+            LlmSelectorConfig.ExemplarsArg, LlmSelectorConfig.NoExemplars,
+        });
+
+        Assert.That(few.ExemplarsId, Is.EqualTo("bank-v1"));
+        Assert.That(zero.ExemplarsId, Is.Empty);
     }
 
     [Test]
@@ -104,6 +125,8 @@ public class LlmSelectorConfigTests
             Retries = -2,
             Temperature = -1f,
             PromptId = " ",
+            ExemplarsId = " bank-v1 ",
+            Shots = -3,
         }.Sanitized();
 
         Assert.That(config.Endpoint, Is.EqualTo(LlmSelectorConfig.Defaults.Endpoint));
@@ -112,5 +135,7 @@ public class LlmSelectorConfigTests
         Assert.That(config.Retries, Is.EqualTo(0));
         Assert.That(config.Temperature, Is.EqualTo(0f));
         Assert.That(config.PromptId, Is.EqualTo(ModePrompt.DefaultId));
+        Assert.That(config.ExemplarsId, Is.EqualTo("bank-v1"));
+        Assert.That(config.Shots, Is.EqualTo(0), "a negative shot count is the whole bank, not a crash");
     }
 }

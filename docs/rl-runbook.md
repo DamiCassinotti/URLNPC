@@ -290,3 +290,66 @@ couple offline prompt iteration to a rebuild. The baselines are a handful of rul
 (`HeuristicModeSelector`, `RandomModeSelector`), so `scripts/battery.py` carries a direct
 twin of each — `fsm_decide` mirrors `HeuristicModeSelector.Decide` rule for rule, thresholds
 and all. Keep the twin in step if those rules change.
+
+## 10. The few-shot exemplar bank and the zero-shot ablation
+
+No weights move in the LLM tier, so the only thing there is to tune is what the model is
+shown. `Assets/Resources/Exemplars/bank-v1.txt` is that artifact: twelve curated
+state -> answer pairs, three per mode, each state a real snapshot harvested from match
+telemetry and written in the serialization the prompt's state slot carries. It is versioned
+like a prompt and **disjoint** from `battery/snapshots.json` — `scripts/battery.py` compares
+the two on the fields a decision turns on and refuses to run on an overlap.
+
+Prompt `v2` is `v1` with a `{{EXEMPLARS}}` slot added and nothing else changed; rendered with
+an empty bank it is `v1` byte for byte (`ModePromptTests.TheShippedV2_IsV1PlusTheExemplarSlot`
+holds it there), so the two arms of the ablation differ by the examples alone.
+
+```bash
+scripts/battery.py --selector llm --prompt v2 --exemplars none              --repeats 1 --temps 0.0
+scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1 --shots 4 --repeats 1 --temps 0.0
+scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1 --shots 8 --repeats 1 --temps 0.0
+scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1           --repeats 1 --temps 0.0   # all 12
+```
+
+`battery.py` still defaults to the base prompt with no bank, so each arm names itself
+rather than inheriting whatever the game ships. `--shots N` takes the bank round-robin over
+the modes, so four shots is one of each rather than four Hunts. One repeat is enough at temperature 0: the decode is greedy and a fixed
+seed reproduces the answer, so repeats only buy something at 0.7, where they measure
+consistency. Live, the same knobs are `scripts/eval.sh --llm-prompt v2 --llm-exemplars
+bank-v1 --llm-shots N`, and every `mode_decision` line records the pair as
+`prompt: "v2+bank-v1x4"` — a few-shot run can't be read back as the zero-shot one.
+
+### The ablation
+
+llama3.1:8b, prompt v2, one greedy pass over the 40-snapshot battery per arm (temperature 0
+with a fixed seed, so repeats would only reproduce the answer). Accuracy is over the 32
+non-ambiguous snapshots; the FSM scores 100% and random ~38% on the same set.
+
+| shots | accuracy | invalid | latency mean | p95 |
+|---|---|---|---|---|
+| 0 (zero-shot) | 56.2% | 0% | 30.3 s | 43.2 s |
+| 4 | 62.5% | 0% | 38.2 s | 43.3 s |
+| **8** | **65.6%** | 0% | 37.8 s | 44.1 s |
+| 12 (whole bank) | 62.5% | 0% | 40.2 s | 48.9 s |
+
+Eight shots wins and is what the selector ships on (`ModeSelectorDriver`'s serialized
+defaults and `Enemy.prefab`: prompt `v2`, bank `bank-v1`, 8 shots). Read the gaps as what
+they are — 32 items, so each one is 3.1 points, and 8 shots is three items clear of
+zero-shot. The shape is the usual one: examples help, and past a point the extra tokens
+dilute more than they teach. What every arm gets wrong is the same thing, and few-shot
+doesn't fix it: the model disengages when the labels say press (`hunt-visible-near-hurt`,
+`hunt-lostsight-*`) and presses when they say break off (`retreat-lowhp-visible-*`) — the
+mode catalog's "Retreat will not win a fight" seems to read as advice against retreating.
+That is a prompt problem, not an exemplar-count one.
+
+The latency column is the offline loop's, not the game's: this box runs the 8B on CPU at
+tens of seconds per call, far over the 5 s decision period. What it is good for is the
+relative cost, and that is the point of the sweep — 8 shots is about 25% slower per call
+than zero-shot, so on hardware where the budget is tight the arm to give up is the shots,
+not the state.
+
+Retrieval (nearest exemplars by feature distance) is deliberately not implemented: it adds
+per-call latency and a second thing to tune, and the issue's own rule was to reach for it
+only if the fixed set underperforms.
+
+Raw results are in `results/battery/ablation-132/`.

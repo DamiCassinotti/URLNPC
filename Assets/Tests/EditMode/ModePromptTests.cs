@@ -130,6 +130,54 @@ public class ModePromptTests
     }
 
     [Test]
+    public void Render_FillsTheExemplarSlot()
+    {
+        string rendered = Template("{{EXEMPLARS}}\n\nS: {{STATE}}")
+            .Render(Snapshot(), new ModePromptHistory().Turns, "examples here");
+
+        Assert.That(rendered, Does.StartWith("examples here\n\nS: {"));
+        Assert.That(rendered, Does.Not.Contain(ModePrompt.ExemplarsToken));
+    }
+
+    // The zero-shot arm of the few-shot ablation (#132) has to be the text the
+    // variant reads as without the slot at all — the arms differ by the
+    // examples and by nothing else, whitespace included.
+    [Test]
+    public void WithNoExemplars_TheSlotTakesItsOwnLineWithIt()
+    {
+        var history = new ModePromptHistory();
+
+        string zeroShot = Template("guide.\n\n{{EXEMPLARS}}\n\nS: {{STATE}}")
+            .Render(Snapshot(), history.Turns, "");
+
+        Assert.That(zeroShot, Is.EqualTo(Template("guide.\n\nS: {{STATE}}").Render(Snapshot(), history.Turns)));
+    }
+
+    [Test]
+    public void ShowsExemplars_IsWhetherTheVariantHasTheSlot()
+    {
+        Assert.That(Template("{{STATE}}").ShowsExemplars, Is.False);
+        Assert.That(Template("{{EXEMPLARS}} {{STATE}}").ShowsExemplars, Is.True);
+    }
+
+    // The shipped pair: v2 is v1 with the slot added, so the ablation's
+    // zero-shot arm is literally the text the v1 runs were scored on.
+    [Test]
+    public void TheShippedV2_IsV1PlusTheExemplarSlot()
+    {
+        ModePromptLibrary.ClearCache();
+
+        Assert.That(ModePromptLibrary.TryLoad(ModePrompt.FewShotId, out ModePrompt fewShot), Is.True,
+            $"Resources/{ModePromptLibrary.ResourceFolder}{ModePrompt.FewShotId}.txt is missing");
+        ModePromptLibrary.TryLoad(ModePrompt.DefaultId, out ModePrompt zeroShot);
+
+        Assert.That(fewShot.ShowsExemplars, Is.True);
+        var history = new ModePromptHistory();
+        Assert.That(fewShot.Render(Snapshot(), history.Turns, ""),
+            Is.EqualTo(zeroShot.Render(Snapshot(), history.Turns)));
+    }
+
+    [Test]
     public void AMissingVariant_FailsRatherThanFallingBackToAnotherPrompt()
     {
         ModePromptLibrary.ClearCache();

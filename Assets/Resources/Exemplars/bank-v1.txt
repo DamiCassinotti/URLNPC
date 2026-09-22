@@ -1,0 +1,61 @@
+# Few-shot exemplar bank v1 (issue #132) - curated state -> answer pairs the LLM
+# selector shows the model ahead of the state it decides on. Three per mode, in
+# preference order within each mode: the shot sweep takes them round-robin, so
+# four shots is one of each.
+#
+# Every state is a real GameStateSnapshot harvested from match telemetry, in the
+# serialization the prompt's state slot carries, and every answer is one
+# LlmModeResponse can read. The bank is disjoint from battery/snapshots.json on
+# the fields a mode decision turns on - scripts/battery.py refuses to score a
+# bank that overlaps it, an exemplar that is also a battery item being an answer
+# handed to the model rather than one it found.
+#
+# id / state / answer, three lines per exemplar.
+
+hunt-visible-near-healthy
+{"hpPercent":70,"targetVisible":true,"targetDistance":"Near","secondsSinceSeen":0,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":113,"playerWins":9128,"npcWins":8161,"draws":1259,"arenaIndex":0,"arenaName":"Courtyard","coverDensity":0.01,"observedSeconds":0.8,"meanEngagementDistanceMetres":21,"shotsHeardPer10Seconds":13.2,"observedMeanSpeed":0.6,"mode":"HoldCover","secondsInMode":5}
+{"mode":"Hunt","reason":"Target in sight at close range and health still good - press the attack."}
+
+hunt-visible-mid-healthy
+{"hpPercent":85,"targetVisible":true,"targetDistance":"Mid","secondsSinceSeen":0,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":112,"playerWins":9160,"npcWins":8183,"draws":1260,"arenaIndex":4,"arenaName":"Ramparts","coverDensity":0.01,"observedSeconds":0,"meanEngagementDistanceMetres":12,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"HoldCover","secondsInMode":4}
+{"mode":"Hunt","reason":"Healthy with the target visible at mid range - close and fight."}
+
+hunt-justlost-near-full
+{"hpPercent":100,"targetVisible":false,"targetDistance":"Near","secondsSinceSeen":0,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":107,"playerWins":9152,"npcWins":8181,"draws":1260,"arenaIndex":3,"arenaName":"Maze","coverDensity":0.01,"observedSeconds":2.7,"meanEngagementDistanceMetres":9,"shotsHeardPer10Seconds":0,"observedMeanSpeed":1.5,"mode":"Patrol","secondsInMode":4}
+{"mode":"Hunt","reason":"Full health and the sighting is a moment old at close range - push onto the last known spot."}
+
+holdcover-justlost-under-fire
+{"hpPercent":55,"targetVisible":false,"targetDistance":"Mid","secondsSinceSeen":0,"recentlyDamaged":true,"damagedFrom":"Front","roundSecondsRemaining":118,"playerWins":9158,"npcWins":8181,"draws":1260,"arenaIndex":0,"arenaName":"Courtyard","coverDensity":0.01,"observedSeconds":1.9,"meanEngagementDistanceMetres":26,"shotsHeardPer10Seconds":20.6,"observedMeanSpeed":2.2,"mode":"Patrol","secondsInMode":2}
+{"mode":"HoldCover","reason":"Taking fire from a target that just broke line of sight - shoot back from cover."}
+
+holdcover-unseen-shooter
+{"hpPercent":70,"targetVisible":false,"targetDistance":"None","secondsSinceSeen":-1,"recentlyDamaged":true,"damagedFrom":"Front","roundSecondsRemaining":112,"playerWins":9140,"npcWins":8174,"draws":1260,"arenaIndex":4,"arenaName":"Ramparts","coverDensity":0.01,"observedSeconds":0,"meanEngagementDistanceMetres":0,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"Patrol","secondsInMode":9}
+{"mode":"HoldCover","reason":"Hit by a shooter never seen - break their line of sight instead of walking into the open."}
+
+holdcover-stale-hit-flank
+{"hpPercent":85,"targetVisible":false,"targetDistance":"Mid","secondsSinceSeen":5,"recentlyDamaged":true,"damagedFrom":"Left","roundSecondsRemaining":116,"playerWins":9130,"npcWins":8162,"draws":1259,"arenaIndex":3,"arenaName":"Maze","coverDensity":0.01,"observedSeconds":0,"meanEngagementDistanceMetres":0,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"Patrol","secondsInMode":5}
+{"mode":"HoldCover","reason":"Hit from the left with the sighting going stale - stay behind cover and hold that flank."}
+
+retreat-critical-contact
+{"hpPercent":10,"targetVisible":false,"targetDistance":"Mid","secondsSinceSeen":0,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":93,"playerWins":9160,"npcWins":8182,"draws":1260,"arenaIndex":2,"arenaName":"Twin Towers","coverDensity":0,"observedSeconds":2.8,"meanEngagementDistanceMetres":16,"shotsHeardPer10Seconds":0,"observedMeanSpeed":1.3,"mode":"Retreat","secondsInMode":25}
+{"mode":"Retreat","reason":"Ten percent health with contact still live - break off, no trade here is worth it."}
+
+retreat-low-under-fire
+{"hpPercent":25,"targetVisible":false,"targetDistance":"None","secondsSinceSeen":-1,"recentlyDamaged":true,"damagedFrom":"Left","roundSecondsRemaining":110,"playerWins":9127,"npcWins":8160,"draws":1259,"arenaIndex":1,"arenaName":"The Pit","coverDensity":0.03,"observedSeconds":0,"meanEngagementDistanceMetres":0,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"HoldCover","secondsInMode":3}
+{"mode":"Retreat","reason":"A quarter health and under fire from an unseen shooter - open the distance."}
+
+retreat-low-visible-near
+{"hpPercent":25,"targetVisible":true,"targetDistance":"Near","secondsSinceSeen":0,"recentlyDamaged":true,"damagedFrom":"Front","roundSecondsRemaining":111,"playerWins":9119,"npcWins":8156,"draws":1259,"arenaIndex":2,"arenaName":"Twin Towers","coverDensity":0,"observedSeconds":2.1,"meanEngagementDistanceMetres":9,"shotsHeardPer10Seconds":23.4,"observedMeanSpeed":1.2,"mode":"Hunt","secondsInMode":4}
+{"mode":"Retreat","reason":"A quarter health with the target at knife range - disengage, this fight is lost."}
+
+patrol-never-seen-healthy
+{"hpPercent":85,"targetVisible":false,"targetDistance":"None","secondsSinceSeen":-1,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":116,"playerWins":9140,"npcWins":8174,"draws":1260,"arenaIndex":4,"arenaName":"Ramparts","coverDensity":0.01,"observedSeconds":0,"meanEngagementDistanceMetres":0,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"Patrol","secondsInMode":5}
+{"mode":"Patrol","reason":"Healthy and no sighting at all - sweep ground not covered yet to find them."}
+
+patrol-stale-far
+{"hpPercent":100,"targetVisible":false,"targetDistance":"Far","secondsSinceSeen":10,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":111,"playerWins":9133,"npcWins":8166,"draws":1259,"arenaIndex":1,"arenaName":"The Pit","coverDensity":0.03,"observedSeconds":0,"meanEngagementDistanceMetres":0,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"Hunt","secondsInMode":5}
+{"mode":"Patrol","reason":"The only sighting is ten seconds old and far off - that spot is stale, search instead."}
+
+patrol-stale-mid
+{"hpPercent":100,"targetVisible":false,"targetDistance":"Mid","secondsSinceSeen":10,"recentlyDamaged":false,"damagedFrom":"None","roundSecondsRemaining":111,"playerWins":9150,"npcWins":8181,"draws":1260,"arenaIndex":2,"arenaName":"Twin Towers","coverDensity":0,"observedSeconds":0,"meanEngagementDistanceMetres":0,"shotsHeardPer10Seconds":0,"observedMeanSpeed":0,"mode":"Hunt","secondsInMode":5}
+{"mode":"Patrol","reason":"Nothing seen for ten seconds - the remembered position is worthless now, keep searching."}

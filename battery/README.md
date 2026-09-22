@@ -20,3 +20,10 @@ The snapshots are harvested from real match telemetry, not invented:
 `mode_decision` snapshots into coverage categories; the sampled candidates are then labelled
 by hand into this file. Regenerate the candidate pool the same way when new telemetry is
 worth drawing from.
+
+The few-shot exemplar bank (`Assets/Resources/Exemplars/bank-v1.txt`, issue #132) is drawn
+from the same telemetry and must stay **disjoint** from this file: `scripts/battery.py`
+compares the two on the fields a mode decision turns on (HP, visibility, distance bucket,
+staleness, damage and its direction — `battery_harvest.py`'s dedupe key) and refuses to run
+on an overlap, an exemplar that is also a battery item being an answer the model was handed
+rather than one it found. Add a state here and it is no longer available as an exemplar.
