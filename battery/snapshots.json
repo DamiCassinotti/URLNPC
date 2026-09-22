@@ -6,7 +6,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Full HP, target in sight at knife range — press the attack.",
+    "rationale": "Full HP, target in sight at knife range \u2014 press the attack.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": true,
@@ -36,7 +36,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Still healthy at 70%, target visible and close — keep pressing.",
+    "rationale": "Still healthy at 70%, target visible and close \u2014 keep pressing.",
     "snapshot": {
       "hpPercent": 70,
       "targetVisible": true,
@@ -66,7 +66,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Full HP, target visible at mid range, no incoming fire — close in.",
+    "rationale": "Full HP, target visible at mid range, no incoming fire \u2014 close in.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": true,
@@ -96,7 +96,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Lost sight 4 s ago at close range, unhurt — Advance to the last-seen spot.",
+    "rationale": "Lost sight 4 s ago at close range, unhurt \u2014 Advance to the last-seen spot.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -126,7 +126,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Lost sight 5 s ago at mid range, full HP — pursue the memory.",
+    "rationale": "Lost sight 5 s ago at mid range, full HP \u2014 pursue the memory.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -157,7 +157,7 @@
       "Hunt",
       "Patrol"
     ],
-    "rationale": "Full HP, target spotted far off — Hunt to close, or Patrol toward it; both engage.",
+    "rationale": "Full HP, target spotted far off \u2014 Hunt to close, or Patrol toward it; both engage.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": true,
@@ -187,7 +187,7 @@
     "acceptable": [
       "HoldCover"
     ],
-    "rationale": "70% HP, shot from the left by someone never seen — break line of sight.",
+    "rationale": "70% HP, shot from the left by someone never seen \u2014 break line of sight.",
     "snapshot": {
       "hpPercent": 70,
       "targetVisible": false,
@@ -218,7 +218,7 @@
       "HoldCover",
       "Hunt"
     ],
-    "rationale": "55% HP, hit from the right, target seen 5 s ago at mid — cover up or re-press.",
+    "rationale": "55% HP, hit from the right, target seen 5 s ago at mid \u2014 cover up or re-press.",
     "snapshot": {
       "hpPercent": 55,
       "targetVisible": false,
@@ -249,7 +249,7 @@
       "HoldCover",
       "Retreat"
     ],
-    "rationale": "10% HP, shot from an unseen attacker — cover, or open distance to survive.",
+    "rationale": "10% HP, shot from an unseen attacker \u2014 cover, or open distance to survive.",
     "snapshot": {
       "hpPercent": 10,
       "targetVisible": false,
@@ -279,7 +279,7 @@
     "acceptable": [
       "Retreat"
     ],
-    "rationale": "10% HP with the target in sight at mid range — one more hit is death, disengage.",
+    "rationale": "10% HP with the target in sight at mid range \u2014 one more hit is death, disengage.",
     "snapshot": {
       "hpPercent": 10,
       "targetVisible": true,
@@ -309,7 +309,7 @@
     "acceptable": [
       "Retreat"
     ],
-    "rationale": "25% HP, target visible and closing at mid — break off.",
+    "rationale": "25% HP, target visible and closing at mid \u2014 break off.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": true,
@@ -340,7 +340,7 @@
       "Retreat",
       "HoldCover"
     ],
-    "rationale": "10% HP, target seen 5 s ago at mid — retreat, or hold cover while it's out of view.",
+    "rationale": "10% HP, target seen 5 s ago at mid \u2014 retreat, or hold cover while it's out of view.",
     "snapshot": {
       "hpPercent": 10,
       "targetVisible": false,
@@ -370,7 +370,7 @@
     "acceptable": [
       "Patrol"
     ],
-    "rationale": "Full HP, never sighted the target, clock fresh — sweep the arena.",
+    "rationale": "Full HP, never sighted the target, clock fresh \u2014 sweep the arena.",
     "snapshot": {
       "hpPercent": 70,
       "targetVisible": false,
@@ -400,7 +400,7 @@
     "acceptable": [
       "Patrol"
     ],
-    "rationale": "55% HP, no sighting, unhurt — keep searching.",
+    "rationale": "55% HP, no sighting, unhurt \u2014 keep searching.",
     "snapshot": {
       "hpPercent": 55,
       "targetVisible": false,
@@ -431,7 +431,7 @@
       "Patrol",
       "Hunt"
     ],
-    "rationale": "Full HP, target seen 9 s ago at mid — memory nearly stale, search or make one last pass.",
+    "rationale": "Full HP, target seen 9 s ago at mid \u2014 memory nearly stale, search or make one last pass.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -461,7 +461,7 @@
     "acceptable": [
       "Patrol"
     ],
-    "rationale": "6 s left, full HP, never seen the target — force contact before the draw.",
+    "rationale": "6 s left, full HP, never seen the target \u2014 force contact before the draw.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -491,7 +491,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "6 s left, target in sight at mid, full HP — rush it for the kill before time.",
+    "rationale": "6 s left, target in sight at mid, full HP \u2014 rush it for the kill before time.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": true,
@@ -522,7 +522,7 @@
       "HoldCover",
       "Retreat"
     ],
-    "rationale": "3 s left, 25% HP, just shot from behind, no sighting — survive the clock.",
+    "rationale": "3 s left, 25% HP, just shot from behind, no sighting \u2014 survive the clock.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": false,
@@ -553,7 +553,7 @@
       "Retreat",
       "Patrol"
     ],
-    "rationale": "25% HP, no contact at all — recover distance, or patrol since nobody is near.",
+    "rationale": "25% HP, no contact at all \u2014 recover distance, or patrol since nobody is near.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": false,
@@ -583,7 +583,7 @@
     "acceptable": [
       "Retreat"
     ],
-    "rationale": "10% HP, no contact — stay defensive, one hit ends it.",
+    "rationale": "10% HP, no contact \u2014 stay defensive, one hit ends it.",
     "snapshot": {
       "hpPercent": 10,
       "targetVisible": false,
@@ -614,7 +614,7 @@
       "Hunt",
       "HoldCover"
     ],
-    "rationale": "70% HP, target visible at mid and trading fire — press or break contact.",
+    "rationale": "70% HP, target visible at mid and trading fire \u2014 press or break contact.",
     "snapshot": {
       "hpPercent": 70,
       "targetVisible": true,
@@ -645,7 +645,7 @@
       "Retreat",
       "Hunt"
     ],
-    "rationale": "40% HP, target visible and close — finish it or break off; a coin toss on nerve.",
+    "rationale": "40% HP, target visible and close \u2014 finish it or break off; a coin toss on nerve.",
     "snapshot": {
       "hpPercent": 40,
       "targetVisible": true,
@@ -676,7 +676,7 @@
       "HoldCover",
       "Patrol"
     ],
-    "rationale": "55% HP, shot from an unseen attacker — cover up, or sweep to find them.",
+    "rationale": "55% HP, shot from an unseen attacker \u2014 cover up, or sweep to find them.",
     "snapshot": {
       "hpPercent": 55,
       "targetVisible": false,
@@ -707,7 +707,7 @@
       "HoldCover",
       "Patrol"
     ],
-    "rationale": "85% HP, one hit from the right by nobody seen — cover or search.",
+    "rationale": "85% HP, one hit from the right by nobody seen \u2014 cover or search.",
     "snapshot": {
       "hpPercent": 85,
       "targetVisible": false,
@@ -737,7 +737,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Full HP, target seen 5 s ago at mid, unhurt — pursue while the memory holds.",
+    "rationale": "Full HP, target seen 5 s ago at mid, unhurt \u2014 pursue while the memory holds.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -767,7 +767,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "85% HP, target in sight and close, shot from the front — trade and press.",
+    "rationale": "85% HP, target in sight and close, shot from the front \u2014 trade and press.",
     "snapshot": {
       "hpPercent": 85,
       "targetVisible": true,
@@ -797,7 +797,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "55% HP, target visible at mid, no incoming fire — close the gap.",
+    "rationale": "55% HP, target visible at mid, no incoming fire \u2014 close the gap.",
     "snapshot": {
       "hpPercent": 55,
       "targetVisible": true,
@@ -827,7 +827,7 @@
     "acceptable": [
       "Hunt"
     ],
-    "rationale": "Full HP, lost sight this instant at mid — the memory is fresh, Advance on it.",
+    "rationale": "Full HP, lost sight this instant at mid \u2014 the memory is fresh, Advance on it.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -858,7 +858,7 @@
       "Retreat",
       "HoldCover"
     ],
-    "rationale": "25% HP, target seen 9 s ago close by — stay off it: retreat or hold cover.",
+    "rationale": "25% HP, target seen 9 s ago close by \u2014 stay off it: retreat or hold cover.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": false,
@@ -888,7 +888,7 @@
     "acceptable": [
       "Patrol"
     ],
-    "rationale": "40% HP but no contact at all — nobody in sight, sweep for them.",
+    "rationale": "40% HP but no contact at all \u2014 nobody in sight, sweep for them.",
     "snapshot": {
       "hpPercent": 40,
       "targetVisible": false,
@@ -919,7 +919,7 @@
       "Patrol",
       "Hunt"
     ],
-    "rationale": "Full HP, target seen 8 s ago close by — memory going stale, resume the search.",
+    "rationale": "Full HP, target seen 8 s ago close by \u2014 memory going stale, resume the search.",
     "snapshot": {
       "hpPercent": 100,
       "targetVisible": false,
@@ -950,7 +950,7 @@
       "Hunt",
       "Patrol"
     ],
-    "rationale": "85% HP, target spotted far and firing — close in or push toward it.",
+    "rationale": "85% HP, target spotted far and firing \u2014 close in or push toward it.",
     "snapshot": {
       "hpPercent": 85,
       "targetVisible": true,
@@ -981,7 +981,7 @@
       "Retreat",
       "HoldCover"
     ],
-    "rationale": "25% HP, target in sight at mid — disengage, or take the cover that's near. Two right answers.",
+    "rationale": "25% HP, target in sight at mid \u2014 disengage, or take the cover that's near. Two right answers.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": true,
@@ -1012,7 +1012,7 @@
       "Hunt",
       "HoldCover"
     ],
-    "rationale": "85% HP, target visible at mid, shot from the front — press or duck. Defensible both ways.",
+    "rationale": "85% HP, target visible at mid, shot from the front \u2014 press or duck. Defensible both ways.",
     "snapshot": {
       "hpPercent": 85,
       "targetVisible": true,
@@ -1044,7 +1044,7 @@
       "HoldCover",
       "Patrol"
     ],
-    "rationale": "85% HP, hit from the left, target seen 9 s ago — re-press, cover, or search.",
+    "rationale": "85% HP, hit from the left, target seen 9 s ago \u2014 re-press, cover, or search.",
     "snapshot": {
       "hpPercent": 85,
       "targetVisible": false,
@@ -1075,7 +1075,7 @@
       "Retreat",
       "HoldCover"
     ],
-    "rationale": "25% HP, target visible but far, shot from the left — open distance or break sight.",
+    "rationale": "25% HP, target visible but far, shot from the left \u2014 open distance or break sight.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": true,
@@ -1106,7 +1106,7 @@
       "HoldCover",
       "Retreat"
     ],
-    "rationale": "40% HP, hit from the front, target seen this instant at mid — cover or fall back.",
+    "rationale": "40% HP, hit from the front, target seen this instant at mid \u2014 cover or fall back.",
     "snapshot": {
       "hpPercent": 40,
       "targetVisible": false,
@@ -1137,7 +1137,7 @@
       "Hunt",
       "Patrol"
     ],
-    "rationale": "70% HP, target spotted far off, unhurt — close in or keep sweeping toward it.",
+    "rationale": "70% HP, target spotted far off, unhurt \u2014 close in or keep sweeping toward it.",
     "snapshot": {
       "hpPercent": 70,
       "targetVisible": true,
@@ -1168,7 +1168,7 @@
       "Retreat",
       "Patrol"
     ],
-    "rationale": "25% HP, no sighting, shot from the front a moment ago — retreat or search out the threat.",
+    "rationale": "25% HP, no sighting, shot from the front a moment ago \u2014 retreat or search out the threat.",
     "snapshot": {
       "hpPercent": 25,
       "targetVisible": false,
@@ -1199,7 +1199,7 @@
       "HoldCover",
       "Hunt"
     ],
-    "rationale": "85% HP, target seen 9 s ago at mid, shot from the left — hold or re-engage.",
+    "rationale": "85% HP, target seen 9 s ago at mid, shot from the left \u2014 hold or re-engage.",
     "snapshot": {
       "hpPercent": 85,
       "targetVisible": false,
@@ -1220,6 +1220,1403 @@
       "observedMeanSpeed": 0,
       "mode": "Hunt",
       "secondsInMode": 4
+    }
+  },
+  {
+    "id": "crit-visible-near-clean",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat"
+    ],
+    "rationale": "10% HP with the target at knife range: any trade loses, and a draw is worth more than a death.",
+    "snapshot": {
+      "hpPercent": 10,
+      "targetVisible": true,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 114,
+      "playerWins": 80,
+      "npcWins": 54,
+      "draws": 5,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 3.1,
+      "meanEngagementDistanceMetres": 16,
+      "shotsHeardPer10Seconds": 19.6,
+      "observedMeanSpeed": 3.7,
+      "mode": "Retreat",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "crit-visible-near-under-fire",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat"
+    ],
+    "rationale": "10% HP and taking fire from a visible target \u2014 break contact, there is nothing to win here.",
+    "snapshot": {
+      "hpPercent": 10,
+      "targetVisible": true,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 111,
+      "playerWins": 25,
+      "npcWins": 19,
+      "draws": 1,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0.6,
+      "meanEngagementDistanceMetres": 10,
+      "shotsHeardPer10Seconds": 15.6,
+      "observedMeanSpeed": 2.5,
+      "mode": "HoldCover",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "crit-visible-far-under-fire",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat"
+    ],
+    "rationale": "25% HP and shot at from long range: break the engagement rather than close it.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": true,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Front",
+      "roundSecondsRemaining": 114,
+      "playerWins": 9166,
+      "npcWins": 8188,
+      "draws": 1260,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 2.6,
+      "meanEngagementDistanceMetres": 39,
+      "shotsHeardPer10Seconds": 23.1,
+      "observedMeanSpeed": 2.6,
+      "mode": "Hunt",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "crit-visible-near-flanked",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat"
+    ],
+    "rationale": "25% HP with the target close and hitting from the side \u2014 disengage.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": true,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 113,
+      "playerWins": 9151,
+      "npcWins": 8181,
+      "draws": 1260,
+      "arenaIndex": 3,
+      "arenaName": "Maze",
+      "coverDensity": 0.01,
+      "observedSeconds": 2.1,
+      "meanEngagementDistanceMetres": 3,
+      "shotsHeardPer10Seconds": 23.8,
+      "observedMeanSpeed": 1.6,
+      "mode": "Hunt",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "crit-memory-near-clean",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat",
+      "HoldCover"
+    ],
+    "rationale": "10% HP and the target was close moments ago; avoid the reunion, from cover or by leaving.",
+    "snapshot": {
+      "hpPercent": 10,
+      "targetVisible": false,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 4,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 113,
+      "playerWins": 85,
+      "npcWins": 57,
+      "draws": 5,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 2.7,
+      "meanEngagementDistanceMetres": 17,
+      "shotsHeardPer10Seconds": 18.4,
+      "observedMeanSpeed": 1.8,
+      "mode": "Retreat",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "crit-memory-lapsing",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover",
+      "Retreat"
+    ],
+    "rationale": "25% HP, the sighting is at the memory horizon and nothing is shooting \u2014 stay unfound.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 10,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 108,
+      "playerWins": 5,
+      "npcWins": 5,
+      "draws": 0,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 1.3,
+      "meanEngagementDistanceMetres": 16,
+      "shotsHeardPer10Seconds": 23.8,
+      "observedMeanSpeed": 2.3,
+      "mode": "HoldCover",
+      "secondsInMode": 10
+    }
+  },
+  {
+    "id": "crit-memory-far-hit-behind",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat"
+    ],
+    "rationale": "25% HP, hit from behind with the only sighting far off \u2014 open the distance.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 2,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 109,
+      "playerWins": 115,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0.2,
+      "meanEngagementDistanceMetres": 42,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 3.3,
+      "mode": "Hunt",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "crit-memory-mid-under-fire",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat",
+      "HoldCover"
+    ],
+    "rationale": "25% HP under fire with a fresh sighting: survive it, from cover or by breaking off.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 3,
+      "recentlyDamaged": true,
+      "damagedFrom": "Left",
+      "roundSecondsRemaining": 117,
+      "playerWins": 139,
+      "npcWins": 73,
+      "draws": 9,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "crit-memory-stale-under-fire",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover",
+      "Retreat"
+    ],
+    "rationale": "25% HP, being hit from a direction the stale sighting does not explain \u2014 deny the line of sight.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 7,
+      "recentlyDamaged": true,
+      "damagedFrom": "Front",
+      "roundSecondsRemaining": 114,
+      "playerWins": 17,
+      "npcWins": 12,
+      "draws": 1,
+      "arenaIndex": 4,
+      "arenaName": "Ramparts",
+      "coverDensity": 0.01,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "HoldCover",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "crit-neverseen-hit-behind",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat",
+      "HoldCover"
+    ],
+    "rationale": "10% HP and shot from behind by something never seen: the next hit is fatal.",
+    "snapshot": {
+      "hpPercent": 10,
+      "targetVisible": false,
+      "targetDistance": "None",
+      "secondsSinceSeen": -1,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 100,
+      "playerWins": 9163,
+      "npcWins": 8186,
+      "draws": 1260,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Retreat",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "crit-neverseen-hit-flank",
+    "category": "lowhp-contact",
+    "ambiguous": false,
+    "acceptable": [
+      "Retreat",
+      "HoldCover"
+    ],
+    "rationale": "25% HP, hit from a flank with no sighting at all \u2014 break contact instead of hunting a ghost.",
+    "snapshot": {
+      "hpPercent": 25,
+      "targetVisible": false,
+      "targetDistance": "None",
+      "secondsSinceSeen": -1,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 118,
+      "playerWins": 110,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "contested-visible-mid-clean",
+    "category": "visible-mid",
+    "ambiguous": true,
+    "acceptable": [
+      "Hunt",
+      "HoldCover"
+    ],
+    "rationale": "40% HP against a visible target at mid range \u2014 pressing and trading from cover are both defensible.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": true,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 108,
+      "playerWins": 97,
+      "npcWins": 65,
+      "draws": 5,
+      "arenaIndex": 4,
+      "arenaName": "Ramparts",
+      "coverDensity": 0.01,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 13,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "contested-visible-mid-under-fire",
+    "category": "visible-mid",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover",
+      "Retreat"
+    ],
+    "rationale": "40% HP is three hits from death and the target's health is unknown: trade from cover or break off, do not charge.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": true,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 118,
+      "playerWins": 124,
+      "npcWins": 73,
+      "draws": 7,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0.9,
+      "meanEngagementDistanceMetres": 24,
+      "shotsHeardPer10Seconds": 22.2,
+      "observedMeanSpeed": 1,
+      "mode": "Patrol",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "contested-visible-far-hit-behind",
+    "category": "visible-far",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover",
+      "Retreat"
+    ],
+    "rationale": "40% HP, hit from behind while the target is far \u2014 closing would cross open ground under fire.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": true,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 99,
+      "playerWins": 62,
+      "npcWins": 40,
+      "draws": 4,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 33,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "HoldCover",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "contested-memory-fresh-clean",
+    "category": "just-lost-sight",
+    "ambiguous": true,
+    "acceptable": [
+      "Hunt",
+      "HoldCover"
+    ],
+    "rationale": "40% HP with a three-second-old sighting and no incoming fire: pursue or set up, both read.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 3,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 116,
+      "playerWins": 63,
+      "npcWins": 43,
+      "draws": 4,
+      "arenaIndex": 4,
+      "arenaName": "Ramparts",
+      "coverDensity": 0.01,
+      "observedSeconds": 1.6,
+      "meanEngagementDistanceMetres": 26,
+      "shotsHeardPer10Seconds": 25.6,
+      "observedMeanSpeed": 4,
+      "mode": "Patrol",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "contested-memory-under-fire",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "40% HP taking fire with the target out of sight \u2014 break the line of sight before anything else.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 4,
+      "recentlyDamaged": true,
+      "damagedFrom": "Left",
+      "roundSecondsRemaining": 105,
+      "playerWins": 5,
+      "npcWins": 5,
+      "draws": 0,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 2.4,
+      "meanEngagementDistanceMetres": 12,
+      "shotsHeardPer10Seconds": 12.7,
+      "observedMeanSpeed": 4,
+      "mode": "Hunt",
+      "secondsInMode": 8
+    }
+  },
+  {
+    "id": "contested-memory-stale-under-fire",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "40% HP, hit from behind and the sighting is stale: cover, not a walk to an old position.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 7,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 82,
+      "playerWins": 138,
+      "npcWins": 73,
+      "draws": 9,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0.5,
+      "meanEngagementDistanceMetres": 13,
+      "shotsHeardPer10Seconds": 21.7,
+      "observedMeanSpeed": 0.6,
+      "mode": "Hunt",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "contested-memory-near-under-fire",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover",
+      "Retreat"
+    ],
+    "rationale": "40% HP, just lost sight of a target at close range that is still hitting \u2014 get out of the line.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": false,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Front",
+      "roundSecondsRemaining": 81,
+      "playerWins": 114,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 3,
+      "arenaName": "Maze",
+      "coverDensity": 0.01,
+      "observedSeconds": 2.6,
+      "meanEngagementDistanceMetres": 3,
+      "shotsHeardPer10Seconds": 15.6,
+      "observedMeanSpeed": 1.6,
+      "mode": "Patrol",
+      "secondsInMode": 7
+    }
+  },
+  {
+    "id": "contested-memory-far-stale-hit",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "40% HP, hit from behind with a nine-second-old far sighting \u2014 hold cover, the memory is worthless.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 9,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 79,
+      "playerWins": 125,
+      "npcWins": 73,
+      "draws": 7,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 1,
+      "meanEngagementDistanceMetres": 26,
+      "shotsHeardPer10Seconds": 20.8,
+      "observedMeanSpeed": 1.4,
+      "mode": "Hunt",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "contested-neverseen-hit-behind",
+    "category": "never-seen",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "40% HP, shot from behind with no sighting: cover first, searching would walk into it.",
+    "snapshot": {
+      "hpPercent": 40,
+      "targetVisible": false,
+      "targetDistance": "None",
+      "secondsSinceSeen": -1,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 91,
+      "playerWins": 9150,
+      "npcWins": 8181,
+      "draws": 1260,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 12
+    }
+  },
+  {
+    "id": "healthy-visible-near-clean",
+    "category": "visible-near",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "55% HP with the target close and no incoming fire \u2014 press, Hunt is the only mode that wins a round.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": true,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 113,
+      "playerWins": 113,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0.9,
+      "meanEngagementDistanceMetres": 20,
+      "shotsHeardPer10Seconds": 10.9,
+      "observedMeanSpeed": 0.9,
+      "mode": "Hunt",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "healthy-visible-mid-under-fire",
+    "category": "visible-mid",
+    "ambiguous": true,
+    "acceptable": [
+      "Hunt",
+      "HoldCover"
+    ],
+    "rationale": "55% HP trading at mid range: pressing and shooting from cover are both defensible.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": true,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Front",
+      "roundSecondsRemaining": 113,
+      "playerWins": 83,
+      "npcWins": 55,
+      "draws": 5,
+      "arenaIndex": 4,
+      "arenaName": "Ramparts",
+      "coverDensity": 0.01,
+      "observedSeconds": 1.9,
+      "meanEngagementDistanceMetres": 26,
+      "shotsHeardPer10Seconds": 20.6,
+      "observedMeanSpeed": 2.2,
+      "mode": "Hunt",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "healthy-visible-near-under-fire",
+    "category": "visible-near",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt",
+      "HoldCover"
+    ],
+    "rationale": "55% HP with the target at close range: at this distance backing off gives a free shot.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": true,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Front",
+      "roundSecondsRemaining": 111,
+      "playerWins": 25,
+      "npcWins": 19,
+      "draws": 1,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 2.4,
+      "meanEngagementDistanceMetres": 2,
+      "shotsHeardPer10Seconds": 8.2,
+      "observedMeanSpeed": 1.1,
+      "mode": "Hunt",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "healthy-visible-mid-clean",
+    "category": "visible-mid",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "70% HP, target visible at mid range and nothing incoming \u2014 close and fight.",
+    "snapshot": {
+      "hpPercent": 70,
+      "targetVisible": true,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 117,
+      "playerWins": 9165,
+      "npcWins": 8186,
+      "draws": 1260,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 1.3,
+      "meanEngagementDistanceMetres": 24,
+      "shotsHeardPer10Seconds": 15.4,
+      "observedMeanSpeed": 3.4,
+      "mode": "Patrol",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "healthy-visible-hit-behind",
+    "category": "visible-mid",
+    "ambiguous": true,
+    "acceptable": [
+      "Hunt",
+      "HoldCover"
+    ],
+    "rationale": "70% HP with the target visible but the hit coming from behind \u2014 press or re-cover, both read.",
+    "snapshot": {
+      "hpPercent": 70,
+      "targetVisible": true,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 88,
+      "playerWins": 97,
+      "npcWins": 64,
+      "draws": 5,
+      "arenaIndex": 3,
+      "arenaName": "Maze",
+      "coverDensity": 0.01,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 21,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 33
+    }
+  },
+  {
+    "id": "healthy-justlost-near-under-fire",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt",
+      "HoldCover"
+    ],
+    "rationale": "55% HP, lost sight of a close target that is still shooting \u2014 push onto it or take the cover.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": false,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Front",
+      "roundSecondsRemaining": 113,
+      "playerWins": 27,
+      "npcWins": 19,
+      "draws": 1,
+      "arenaIndex": 3,
+      "arenaName": "Maze",
+      "coverDensity": 0.01,
+      "observedSeconds": 1.4,
+      "meanEngagementDistanceMetres": 3,
+      "shotsHeardPer10Seconds": 22.1,
+      "observedMeanSpeed": 3.6,
+      "mode": "Hunt",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "healthy-memory-fresh-clean",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "55% HP with a four-second-old sighting and no contact \u2014 walk it down while the memory is good.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 4,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 86,
+      "playerWins": 138,
+      "npcWins": 73,
+      "draws": 9,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0.5,
+      "meanEngagementDistanceMetres": 13,
+      "shotsHeardPer10Seconds": 21.7,
+      "observedMeanSpeed": 0.6,
+      "mode": "Patrol",
+      "secondsInMode": 35
+    }
+  },
+  {
+    "id": "healthy-memory-stale-hit-behind",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "55% HP, hit from behind with an eight-second-old sighting: the memory is not where the shooter is.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 8,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 108,
+      "playerWins": 136,
+      "npcWins": 73,
+      "draws": 8,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 0.4,
+      "meanEngagementDistanceMetres": 12,
+      "shotsHeardPer10Seconds": 25,
+      "observedMeanSpeed": 0.3,
+      "mode": "Hunt",
+      "secondsInMode": 9
+    }
+  },
+  {
+    "id": "healthy-memory-mid-fresh",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "70% HP and the sighting is four seconds old \u2014 pursue it before it goes stale.",
+    "snapshot": {
+      "hpPercent": 70,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 4,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 110,
+      "playerWins": 122,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 0.3,
+      "meanEngagementDistanceMetres": 15,
+      "shotsHeardPer10Seconds": 33.3,
+      "observedMeanSpeed": 1.2,
+      "mode": "Patrol",
+      "secondsInMode": 10
+    }
+  },
+  {
+    "id": "healthy-memory-mid-stale",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Patrol"
+    ],
+    "rationale": "70% HP and nothing seen for nine seconds: the remembered spot is worthless, sweep new ground.",
+    "snapshot": {
+      "hpPercent": 70,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 9,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 105,
+      "playerWins": 122,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 0.3,
+      "meanEngagementDistanceMetres": 15,
+      "shotsHeardPer10Seconds": 33.3,
+      "observedMeanSpeed": 1.2,
+      "mode": "Hunt",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "healthy-memory-near-fresh-hit",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "70% HP, hit from the side with a three-second-old close sighting \u2014 the target is right there.",
+    "snapshot": {
+      "hpPercent": 70,
+      "targetVisible": false,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 3,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 113,
+      "playerWins": 25,
+      "npcWins": 19,
+      "draws": 1,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0.6,
+      "meanEngagementDistanceMetres": 10,
+      "shotsHeardPer10Seconds": 16.1,
+      "observedMeanSpeed": 2.5,
+      "mode": "Hunt",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "healthy-neverseen-hit-flank",
+    "category": "never-seen",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "55% HP, hit from a flank with no sighting \u2014 break the line of sight rather than walk into the open.",
+    "snapshot": {
+      "hpPercent": 55,
+      "targetVisible": false,
+      "targetDistance": "None",
+      "secondsSinceSeen": -1,
+      "recentlyDamaged": true,
+      "damagedFrom": "Left",
+      "roundSecondsRemaining": 108,
+      "playerWins": 144,
+      "npcWins": 73,
+      "draws": 10,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "HoldCover",
+      "secondsInMode": 3
+    }
+  },
+  {
+    "id": "healthy-neverseen-hit-behind",
+    "category": "never-seen",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "70% HP, shot from behind by something never seen: cover before searching.",
+    "snapshot": {
+      "hpPercent": 70,
+      "targetVisible": false,
+      "targetDistance": "None",
+      "secondsSinceSeen": -1,
+      "recentlyDamaged": true,
+      "damagedFrom": "Back",
+      "roundSecondsRemaining": 114,
+      "playerWins": 18,
+      "npcWins": 14,
+      "draws": 1,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "HoldCover",
+      "secondsInMode": 2
+    }
+  },
+  {
+    "id": "high-visible-near-clean",
+    "category": "visible-near",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "85% HP with the target close and nothing incoming \u2014 press.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": true,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 116,
+      "playerWins": 19,
+      "npcWins": 14,
+      "draws": 1,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 9,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "high-visible-far-clean",
+    "category": "visible-far",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "85% HP with the target visible far off \u2014 close the distance while it is still in sight.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": true,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 111,
+      "playerWins": 115,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 42,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Patrol",
+      "secondsInMode": 9
+    }
+  },
+  {
+    "id": "high-visible-mid-under-fire",
+    "category": "visible-mid",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "85% HP trading at mid range: health is ahead of the exchange, keep pressing.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": true,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 83,
+      "playerWins": 131,
+      "npcWins": 73,
+      "draws": 8,
+      "arenaIndex": 3,
+      "arenaName": "Maze",
+      "coverDensity": 0.01,
+      "observedSeconds": 2.3,
+      "meanEngagementDistanceMetres": 22,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 1.2,
+      "mode": "Hunt",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "high-memory-far-fresh",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "85% HP with a four-second-old far sighting \u2014 pursue it.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 4,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 116,
+      "playerWins": 132,
+      "npcWins": 73,
+      "draws": 8,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 1,
+      "meanEngagementDistanceMetres": 35,
+      "shotsHeardPer10Seconds": 10.4,
+      "observedMeanSpeed": 2.9,
+      "mode": "Patrol",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "high-memory-far-stale",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Patrol"
+    ],
+    "rationale": "85% HP and nothing seen for nine seconds \u2014 search rather than walk to a cold spot.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 9,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 111,
+      "playerWins": 132,
+      "npcWins": 73,
+      "draws": 8,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 1,
+      "meanEngagementDistanceMetres": 35,
+      "shotsHeardPer10Seconds": 10.4,
+      "observedMeanSpeed": 2.9,
+      "mode": "Hunt",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "high-memory-near-horizon",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Patrol"
+    ],
+    "rationale": "Full HP and the close sighting is ten seconds old: at the memory horizon it could be anywhere.",
+    "snapshot": {
+      "hpPercent": 100,
+      "targetVisible": false,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 10,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 111,
+      "playerWins": 140,
+      "npcWins": 73,
+      "draws": 9,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 0.3,
+      "meanEngagementDistanceMetres": 20,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0.8,
+      "mode": "Hunt",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "high-memory-mid-fresh",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Hunt"
+    ],
+    "rationale": "Full HP with a three-second-old mid sighting \u2014 pursue.",
+    "snapshot": {
+      "hpPercent": 100,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 3,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 110,
+      "playerWins": 122,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 1,
+      "meanEngagementDistanceMetres": 14,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 1.9,
+      "mode": "Hunt",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "high-memory-mid-stale",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Patrol"
+    ],
+    "rationale": "Full HP, nothing seen for eight seconds \u2014 sweep unvisited ground.",
+    "snapshot": {
+      "hpPercent": 100,
+      "targetVisible": false,
+      "targetDistance": "Mid",
+      "secondsSinceSeen": 8,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 108,
+      "playerWins": 126,
+      "npcWins": 73,
+      "draws": 7,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 1.6,
+      "meanEngagementDistanceMetres": 17,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 1.3,
+      "mode": "Hunt",
+      "secondsInMode": 10
+    }
+  },
+  {
+    "id": "high-justlost-far",
+    "category": "just-lost-sight",
+    "ambiguous": true,
+    "acceptable": [
+      "Hunt",
+      "Patrol"
+    ],
+    "rationale": "Full HP having just lost sight at long range: walking it down and searching are both defensible.",
+    "snapshot": {
+      "hpPercent": 100,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 0,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 88,
+      "playerWins": 125,
+      "npcWins": 73,
+      "draws": 7,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 1.6,
+      "meanEngagementDistanceMetres": 27,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 2.4,
+      "mode": "Patrol",
+      "secondsInMode": 33
+    }
+  },
+  {
+    "id": "high-memory-far-stale-full",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "Patrol"
+    ],
+    "rationale": "Full HP and a nine-second-old far sighting \u2014 the spot is cold, search.",
+    "snapshot": {
+      "hpPercent": 100,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 9,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 95,
+      "playerWins": 129,
+      "npcWins": 73,
+      "draws": 8,
+      "arenaIndex": 2,
+      "arenaName": "Twin Towers",
+      "coverDensity": 0,
+      "observedSeconds": 1.9,
+      "meanEngagementDistanceMetres": 27,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 1.2,
+      "mode": "Hunt",
+      "secondsInMode": 10
+    }
+  },
+  {
+    "id": "high-memory-horizon-under-fire",
+    "category": "just-lost-sight",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "85% HP, being hit while the only sighting is at the memory horizon \u2014 cover, not pursuit.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": false,
+      "targetDistance": "Far",
+      "secondsSinceSeen": 10,
+      "recentlyDamaged": true,
+      "damagedFrom": "Right",
+      "roundSecondsRemaining": 111,
+      "playerWins": 9123,
+      "npcWins": 8158,
+      "draws": 1259,
+      "arenaIndex": 3,
+      "arenaName": "Maze",
+      "coverDensity": 0.01,
+      "observedSeconds": 0,
+      "meanEngagementDistanceMetres": 0,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0,
+      "mode": "Hunt",
+      "secondsInMode": 5
+    }
+  },
+  {
+    "id": "high-neverseen-hit-flank",
+    "category": "never-seen",
+    "ambiguous": false,
+    "acceptable": [
+      "HoldCover"
+    ],
+    "rationale": "85% HP, hit from a flank with nothing ever seen \u2014 deny the line of sight.",
+    "snapshot": {
+      "hpPercent": 85,
+      "targetVisible": false,
+      "targetDistance": "None",
+      "secondsSinceSeen": -1,
+      "recentlyDamaged": true,
+      "damagedFrom": "Left",
+      "roundSecondsRemaining": 104,
+      "playerWins": 120,
+      "npcWins": 73,
+      "draws": 6,
+      "arenaIndex": 0,
+      "arenaName": "Courtyard",
+      "coverDensity": 0.01,
+      "observedSeconds": 0.8,
+      "meanEngagementDistanceMetres": 24,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 0.9,
+      "mode": "Patrol",
+      "secondsInMode": 4
+    }
+  },
+  {
+    "id": "clocklow-memory-near",
+    "category": "clock-low",
+    "ambiguous": true,
+    "acceptable": [
+      "Hunt",
+      "Patrol"
+    ],
+    "rationale": "Twenty seconds left at full HP with a nine-second-old close sighting: press for the win or sweep, both read.",
+    "snapshot": {
+      "hpPercent": 100,
+      "targetVisible": false,
+      "targetDistance": "Near",
+      "secondsSinceSeen": 9,
+      "recentlyDamaged": false,
+      "damagedFrom": "None",
+      "roundSecondsRemaining": 20,
+      "playerWins": 126,
+      "npcWins": 73,
+      "draws": 7,
+      "arenaIndex": 1,
+      "arenaName": "The Pit",
+      "coverDensity": 0.03,
+      "observedSeconds": 12.9,
+      "meanEngagementDistanceMetres": 14,
+      "shotsHeardPer10Seconds": 0,
+      "observedMeanSpeed": 1.6,
+      "mode": "Hunt",
+      "secondsInMode": 5
     }
   }
 ]

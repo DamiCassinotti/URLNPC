@@ -253,11 +253,11 @@ How to report a run:
 A live match costs about a minute and can't be time-scaled with an LLM in the loop, so
 prompt iteration happens offline against a fixed set of states rather than in-game.
 
-`battery/snapshots.json` is 40 `GameStateSnapshot`s harvested from real match telemetry
+`battery/snapshots.json` is 86 `GameStateSnapshot`s harvested from real match telemetry
 (`scripts/battery_harvest.py` pulls and dedupes them off the `mode_decision` lines, then
 they are labelled by hand), each with the acceptable mode(s) for that state and a one-line
 rationale. Acceptable is a *set*: "25% HP, target at mid, cover near" is defensibly Retreat
-or HoldCover, and scoring it as one answer would punish the right one. Eight of the 40 are
+or HoldCover, and scoring it as one answer would punish the right one. Fourteen of the 86 are
 marked `ambiguous` — kept apart because they have more than one defensible answer, so they
 measure consistency, not accuracy. Coverage is by construction: every mode is the right
 answer several times, plus the never-seen, just-lost-sight, low-HP with and without contact,
@@ -270,9 +270,12 @@ scripts/battery.py --selector llm --model llama3.1:8b --prompt v1 --repeats 5 --
 ```
 
 It reports, per temperature: accuracy over the non-ambiguous snapshots, self-consistency
-over K repeats, invalid-output rate and the latency distribution. The FSM scores 100% and
-random ~38% — that gap is the check that the labels discriminate and aren't broken; the FSM
-topping out is expected of a fair baseline, not a target the LLM has to clear on the battery.
+over K repeats, invalid-output rate and the latency distribution. The FSM scores 95.8% and
+random ~35% — that gap is the check that the labels discriminate and aren't broken. The FSM
+is not perfect by construction and must not be made so (#153): its three misses are where
+its rule ordering is too coarse — it hunts at 40% HP because its low-HP threshold is 35, and
+its damage rule fires ahead of its pursuit rule. A battery whose labels always contain the
+FSM's answer would make "beat the FSM" mean "score 100%".
 
 The `llm` selector sends the same prompt the game sends: `--prompt <id>` names a text asset
 under `Assets/Resources/Prompts/`, which `battery.py` reads directly and `ModePromptLibrary`
@@ -321,9 +324,10 @@ bank-v1 --llm-shots N`, and every `mode_decision` line records the pair as
 
 ### The ablation
 
-llama3.1:8b, prompt v2, one greedy pass over the 40-snapshot battery per arm (temperature 0
-with a fixed seed, so repeats would only reproduce the answer). Accuracy is over the 32
-non-ambiguous snapshots; the FSM scores 100% and random ~38% on the same set.
+llama3.1:8b, prompt v2, one greedy pass per arm (temperature 0 with a fixed seed, so repeats
+would only reproduce the answer). **Measured on the 40-snapshot battery as it stood before
+#153**, i.e. over 32 non-ambiguous items; the numbers are not comparable to a run against
+the expanded set, and re-running the sweep is #133's job.
 
 | shots | accuracy | invalid | latency mean | p95 |
 |---|---|---|---|---|
