@@ -1,18 +1,18 @@
 {
   "selector": "random",
-  "repeats": 5,
-  "snapshots": 40,
+  "repeats": 20,
+  "snapshots": 86,
   "results": [
     {
       "temp": 0.0,
-      "accuracy": 0.35,
-      "consistency": 0.46875,
-      "ambiguousConsistency": 0.475,
+      "accuracy": 0.35138888888888886,
+      "consistency": 0.3638888888888889,
+      "ambiguousConsistency": 0.3964285714285714,
       "invalidRate": 0.0,
-      "latencyMsMean": 0.001350610127701657,
-      "latencyMsP50": 0.0012500022421590984,
-      "latencyMsP95": 0.0019340004655532539,
-      "latencyMsMax": 0.010858999303309247,
+      "latencyMsMean": 0.0004598790732162279,
+      "latencyMsP50": 0.0004260000423528254,
+      "latencyMsP95": 0.0005679994501406327,
+      "latencyMsMax": 0.009127999874181114,
       "perSnapshot": [
         {
           "id": "hunt-visible-near-full",
@@ -21,9 +21,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "modal": "Retreat",
+          "consistency": 0.35,
+          "accuracy": 0.2
         },
         {
           "id": "hunt-visible-near-hurt",
@@ -33,8 +33,8 @@
             "Hunt"
           ],
           "modal": "Patrol",
-          "consistency": 0.4,
-          "accuracy": 0.2
+          "consistency": 0.3,
+          "accuracy": 0.3
         },
         {
           "id": "hunt-visible-mid-full",
@@ -43,9 +43,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "modal": "Retreat",
+          "consistency": 0.3,
+          "accuracy": 0.25
         },
         {
           "id": "hunt-lostsight-near-fresh",
@@ -54,9 +54,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "modal": "HoldCover",
+          "consistency": 0.35,
+          "accuracy": 0.25
         },
         {
           "id": "hunt-lostsight-mid-fresh",
@@ -65,9 +65,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Patrol",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "modal": "Retreat",
+          "consistency": 0.3,
+          "accuracy": 0.3
         },
         {
           "id": "hunt-visible-far-full",
@@ -77,9 +77,9 @@
             "Hunt",
             "Patrol"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "modal": "Hunt",
+          "consistency": 0.6,
+          "accuracy": 0.7
         },
         {
           "id": "holdcover-unseen-damaged",
@@ -89,7 +89,7 @@
             "HoldCover"
           ],
           "modal": "Hunt",
-          "consistency": 0.4,
+          "consistency": 0.3,
           "accuracy": 0.2
         },
         {
@@ -101,8 +101,8 @@
             "Hunt"
           ],
           "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.8
+          "consistency": 0.25,
+          "accuracy": 0.5
         },
         {
           "id": "holdcover-lowhp-unseen-damaged",
@@ -112,9 +112,9 @@
             "HoldCover",
             "Retreat"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "modal": "Retreat",
+          "consistency": 0.35,
+          "accuracy": 0.7
         },
         {
           "id": "retreat-lowhp-visible-mid",
@@ -123,9 +123,9 @@
           "acceptable": [
             "Retreat"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.2
+          "modal": "Patrol",
+          "consistency": 0.5,
+          "accuracy": 0.15
         },
         {
           "id": "retreat-lowhp-visible-near",
@@ -134,9 +134,9 @@
           "acceptable": [
             "Retreat"
           ],
-          "modal": "Patrol",
+          "modal": "Hunt",
           "consistency": 0.4,
-          "accuracy": 0.2
+          "accuracy": 0.15
         },
         {
           "id": "retreat-lowhp-lostsight",
@@ -146,9 +146,9 @@
             "HoldCover",
             "Retreat"
           ],
-          "modal": "HoldCover",
+          "modal": "Hunt",
           "consistency": 0.4,
-          "accuracy": 0.6
+          "accuracy": 0.45
         },
         {
           "id": "patrol-never-seen-full",
@@ -157,9 +157,9 @@
           "acceptable": [
             "Patrol"
           ],
-          "modal": "Hunt",
-          "consistency": 0.6,
-          "accuracy": 0.0
+          "modal": "Retreat",
+          "consistency": 0.4,
+          "accuracy": 0.2
         },
         {
           "id": "patrol-never-seen-mid",
@@ -168,9 +168,9 @@
           "acceptable": [
             "Patrol"
           ],
-          "modal": "Hunt",
+          "modal": "Retreat",
           "consistency": 0.4,
-          "accuracy": 0.2
+          "accuracy": 0.15
         },
         {
           "id": "patrol-lostsight-stale-full",
@@ -180,9 +180,9 @@
             "Hunt",
             "Patrol"
           ],
-          "modal": "Retreat",
-          "consistency": 0.4,
-          "accuracy": 0.6
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.7
         },
         {
           "id": "clock-low-never-seen",
@@ -191,9 +191,9 @@
           "acceptable": [
             "Patrol"
           ],
-          "modal": "Retreat",
-          "consistency": 0.6,
-          "accuracy": 0.4
+          "modal": "HoldCover",
+          "consistency": 0.3,
+          "accuracy": 0.3
         },
         {
           "id": "clock-low-visible-mid",
@@ -202,9 +202,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Retreat",
-          "consistency": 0.4,
-          "accuracy": 0.2
+          "modal": "Hunt",
+          "consistency": 0.3,
+          "accuracy": 0.3
         },
         {
           "id": "clock-low-lowhp-damaged",
@@ -214,9 +214,9 @@
             "HoldCover",
             "Retreat"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.8
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.5
         },
         {
           "id": "lowhp-nocontact-25",
@@ -227,8 +227,8 @@
             "Retreat"
           ],
           "modal": "Hunt",
-          "consistency": 1.0,
-          "accuracy": 0.0
+          "consistency": 0.4,
+          "accuracy": 0.4
         },
         {
           "id": "lowhp-nocontact-10",
@@ -237,9 +237,9 @@
           "acceptable": [
             "Retreat"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.0
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.3
         },
         {
           "id": "visible-mid-damaged-hurt",
@@ -249,9 +249,9 @@
             "HoldCover",
             "Hunt"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.6
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.5
         },
         {
           "id": "visible-near-lowhp",
@@ -262,7 +262,7 @@
             "Retreat"
           ],
           "modal": "Hunt",
-          "consistency": 0.6,
+          "consistency": 0.4,
           "accuracy": 0.6
         },
         {
@@ -273,9 +273,9 @@
             "HoldCover",
             "Patrol"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.8
+          "modal": "Hunt",
+          "consistency": 0.3,
+          "accuracy": 0.5
         },
         {
           "id": "never-seen-damaged-high-hp",
@@ -285,9 +285,9 @@
             "HoldCover",
             "Patrol"
           ],
-          "modal": "Retreat",
-          "consistency": 0.6,
-          "accuracy": 0.2
+          "modal": "Patrol",
+          "consistency": 0.45,
+          "accuracy": 0.55
         },
         {
           "id": "lostsight-mid-freshish",
@@ -296,9 +296,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Patrol",
+          "modal": "Hunt",
           "consistency": 0.4,
-          "accuracy": 0.2
+          "accuracy": 0.4
         },
         {
           "id": "hunt-visible-near-highhp",
@@ -307,7 +307,7 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Patrol",
+          "modal": "Retreat",
           "consistency": 0.4,
           "accuracy": 0.2
         },
@@ -318,8 +318,8 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "Retreat",
-          "consistency": 0.4,
+          "modal": "HoldCover",
+          "consistency": 0.45,
           "accuracy": 0.2
         },
         {
@@ -329,9 +329,9 @@
           "acceptable": [
             "Hunt"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.0
+          "modal": "Patrol",
+          "consistency": 0.4,
+          "accuracy": 0.25
         },
         {
           "id": "retreat-lowhp-lostsight-stale",
@@ -341,9 +341,9 @@
             "HoldCover",
             "Retreat"
           ],
-          "modal": "Retreat",
-          "consistency": 0.4,
-          "accuracy": 0.6
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.5
         },
         {
           "id": "patrol-never-seen-lowmidhp",
@@ -352,9 +352,9 @@
           "acceptable": [
             "Patrol"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.2
+          "modal": "Patrol",
+          "consistency": 0.3,
+          "accuracy": 0.3
         },
         {
           "id": "patrol-lostsight-near-stale",
@@ -364,8 +364,8 @@
             "Hunt",
             "Patrol"
           ],
-          "modal": "Retreat",
-          "consistency": 0.4,
+          "modal": "Hunt",
+          "consistency": 0.35,
           "accuracy": 0.6
         },
         {
@@ -376,9 +376,9 @@
             "Hunt",
             "Patrol"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.2
+          "modal": "Retreat",
+          "consistency": 0.4,
+          "accuracy": 0.4
         },
         {
           "id": "ambig-lowhp-cover",
@@ -388,8 +388,8 @@
             "HoldCover",
             "Retreat"
           ],
-          "modal": "Retreat",
-          "consistency": 0.4,
+          "modal": "Patrol",
+          "consistency": 0.45,
           "accuracy": null
         },
         {
@@ -401,7 +401,7 @@
             "Hunt"
           ],
           "modal": "Hunt",
-          "consistency": 0.4,
+          "consistency": 0.45,
           "accuracy": null
         },
         {
@@ -425,8 +425,8 @@
             "HoldCover",
             "Retreat"
           ],
-          "modal": "Patrol",
-          "consistency": 0.6,
+          "modal": "HoldCover",
+          "consistency": 0.35,
           "accuracy": null
         },
         {
@@ -438,7 +438,7 @@
             "Retreat"
           ],
           "modal": "Hunt",
-          "consistency": 0.6,
+          "consistency": 0.3,
           "accuracy": null
         },
         {
@@ -449,8 +449,8 @@
             "Hunt",
             "Patrol"
           ],
-          "modal": "Hunt",
-          "consistency": 0.4,
+          "modal": "Retreat",
+          "consistency": 0.3,
           "accuracy": null
         },
         {
@@ -461,8 +461,8 @@
             "Patrol",
             "Retreat"
           ],
-          "modal": "Hunt",
-          "consistency": 0.6,
+          "modal": "Retreat",
+          "consistency": 0.4,
           "accuracy": null
         },
         {
@@ -473,484 +473,531 @@
             "HoldCover",
             "Hunt"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
+          "modal": "Patrol",
+          "consistency": 0.5,
           "accuracy": null
-        }
-      ]
-    },
-    {
-      "temp": 0.7,
-      "accuracy": 0.45625,
-      "consistency": 0.5,
-      "ambiguousConsistency": 0.45,
-      "invalidRate": 0.0,
-      "latencyMsMean": 0.001191125138575444,
-      "latencyMsP50": 0.001248998160008341,
-      "latencyMsP95": 0.0018430000636726618,
-      "latencyMsMax": 0.002377997589064762,
-      "perSnapshot": [
+        },
         {
-          "id": "hunt-visible-near-full",
-          "category": "visible-near",
+          "id": "crit-visible-near-clean",
+          "category": "lowhp-contact",
           "ambiguous": false,
           "acceptable": [
-            "Hunt"
+            "Retreat"
           ],
           "modal": "Retreat",
-          "consistency": 0.4,
+          "consistency": 0.35,
+          "accuracy": 0.35
+        },
+        {
+          "id": "crit-visible-near-under-fire",
+          "category": "lowhp-contact",
+          "ambiguous": false,
+          "acceptable": [
+            "Retreat"
+          ],
+          "modal": "Hunt",
+          "consistency": 0.3,
+          "accuracy": 0.25
+        },
+        {
+          "id": "crit-visible-far-under-fire",
+          "category": "lowhp-contact",
+          "ambiguous": false,
+          "acceptable": [
+            "Retreat"
+          ],
+          "modal": "HoldCover",
+          "consistency": 0.45,
+          "accuracy": 0.25
+        },
+        {
+          "id": "crit-visible-near-flanked",
+          "category": "lowhp-contact",
+          "ambiguous": false,
+          "acceptable": [
+            "Retreat"
+          ],
+          "modal": "HoldCover",
+          "consistency": 0.3,
           "accuracy": 0.2
         },
         {
-          "id": "hunt-visible-near-hurt",
-          "category": "visible-near",
+          "id": "crit-memory-near-clean",
+          "category": "lowhp-contact",
           "ambiguous": false,
           "acceptable": [
-            "Hunt"
+            "HoldCover",
+            "Retreat"
           ],
           "modal": "Retreat",
           "consistency": 0.4,
-          "accuracy": 0.0
+          "accuracy": 0.7
         },
         {
-          "id": "hunt-visible-mid-full",
-          "category": "visible-mid",
+          "id": "crit-memory-lapsing",
+          "category": "lowhp-contact",
           "ambiguous": false,
           "acceptable": [
-            "Hunt"
+            "HoldCover",
+            "Retreat"
           ],
           "modal": "Hunt",
           "consistency": 0.4,
-          "accuracy": 0.4
+          "accuracy": 0.45
         },
         {
-          "id": "hunt-lostsight-near-fresh",
-          "category": "just-lost-sight",
+          "id": "crit-memory-far-hit-behind",
+          "category": "lowhp-contact",
           "ambiguous": false,
           "acceptable": [
-            "Hunt"
+            "Retreat"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.2
+        },
+        {
+          "id": "crit-memory-mid-under-fire",
+          "category": "lowhp-contact",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover",
+            "Retreat"
           ],
           "modal": "Hunt",
+          "consistency": 0.35,
+          "accuracy": 0.45
+        },
+        {
+          "id": "crit-memory-stale-under-fire",
+          "category": "lowhp-contact",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover",
+            "Retreat"
+          ],
+          "modal": "Retreat",
           "consistency": 0.4,
-          "accuracy": 0.4
+          "accuracy": 0.55
         },
         {
-          "id": "hunt-lostsight-mid-fresh",
-          "category": "just-lost-sight",
+          "id": "crit-neverseen-hit-behind",
+          "category": "lowhp-contact",
           "ambiguous": false,
           "acceptable": [
-            "Hunt"
+            "HoldCover",
+            "Retreat"
           ],
-          "modal": "Hunt",
-          "consistency": 0.6,
+          "modal": "Retreat",
+          "consistency": 0.35,
+          "accuracy": 0.5
+        },
+        {
+          "id": "crit-neverseen-hit-flank",
+          "category": "lowhp-contact",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover",
+            "Retreat"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.35,
           "accuracy": 0.6
         },
         {
-          "id": "hunt-visible-far-full",
+          "id": "contested-visible-mid-clean",
+          "category": "visible-mid",
+          "ambiguous": true,
+          "acceptable": [
+            "HoldCover",
+            "Hunt"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.3,
+          "accuracy": null
+        },
+        {
+          "id": "contested-visible-mid-under-fire",
+          "category": "visible-mid",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover",
+            "Retreat"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.3,
+          "accuracy": 0.6
+        },
+        {
+          "id": "contested-visible-far-hit-behind",
           "category": "visible-far",
           "ambiguous": false,
           "acceptable": [
-            "Hunt",
-            "Patrol"
+            "HoldCover",
+            "Retreat"
           ],
           "modal": "Patrol",
-          "consistency": 0.6,
-          "accuracy": 0.8
+          "consistency": 0.35,
+          "accuracy": 0.45
         },
         {
-          "id": "holdcover-unseen-damaged",
-          "category": "never-seen",
+          "id": "contested-memory-fresh-clean",
+          "category": "just-lost-sight",
+          "ambiguous": true,
+          "acceptable": [
+            "HoldCover",
+            "Hunt"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.35,
+          "accuracy": null
+        },
+        {
+          "id": "contested-memory-under-fire",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover"
+          ],
+          "modal": "Hunt",
+          "consistency": 0.4,
+          "accuracy": 0.15
+        },
+        {
+          "id": "contested-memory-stale-under-fire",
+          "category": "just-lost-sight",
           "ambiguous": false,
           "acceptable": [
             "HoldCover"
           ],
           "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.6
+          "consistency": 0.35,
+          "accuracy": 0.35
         },
         {
-          "id": "holdcover-lostsight-damaged",
+          "id": "contested-memory-near-under-fire",
           "category": "just-lost-sight",
-          "ambiguous": false,
-          "acceptable": [
-            "HoldCover",
-            "Hunt"
-          ],
-          "modal": "Retreat",
-          "consistency": 0.4,
-          "accuracy": 0.4
-        },
-        {
-          "id": "holdcover-lowhp-unseen-damaged",
-          "category": "lowhp-contact",
           "ambiguous": false,
           "acceptable": [
             "HoldCover",
             "Retreat"
           ],
           "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.6
+          "consistency": 0.35,
+          "accuracy": 0.65
         },
         {
-          "id": "retreat-lowhp-visible-mid",
-          "category": "lowhp-contact",
-          "ambiguous": false,
-          "acceptable": [
-            "Retreat"
-          ],
-          "modal": "Retreat",
-          "consistency": 0.6,
-          "accuracy": 0.6
-        },
-        {
-          "id": "retreat-lowhp-visible-near",
-          "category": "lowhp-contact",
-          "ambiguous": false,
-          "acceptable": [
-            "Retreat"
-          ],
-          "modal": "Patrol",
-          "consistency": 0.4,
-          "accuracy": 0.2
-        },
-        {
-          "id": "retreat-lowhp-lostsight",
-          "category": "lowhp-contact",
-          "ambiguous": false,
-          "acceptable": [
-            "HoldCover",
-            "Retreat"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.2
-        },
-        {
-          "id": "patrol-never-seen-full",
-          "category": "never-seen",
-          "ambiguous": false,
-          "acceptable": [
-            "Patrol"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.4
-        },
-        {
-          "id": "patrol-never-seen-mid",
-          "category": "never-seen",
-          "ambiguous": false,
-          "acceptable": [
-            "Patrol"
-          ],
-          "modal": "Patrol",
-          "consistency": 0.6,
-          "accuracy": 0.6
-        },
-        {
-          "id": "patrol-lostsight-stale-full",
+          "id": "contested-memory-far-stale-hit",
           "category": "just-lost-sight",
           "ambiguous": false,
           "acceptable": [
-            "Hunt",
-            "Patrol"
+            "HoldCover"
           ],
-          "modal": "Patrol",
-          "consistency": 1.0,
-          "accuracy": 1.0
-        },
-        {
-          "id": "clock-low-never-seen",
-          "category": "clock-low",
-          "ambiguous": false,
-          "acceptable": [
-            "Patrol"
-          ],
-          "modal": "Patrol",
-          "consistency": 0.4,
-          "accuracy": 0.4
-        },
-        {
-          "id": "clock-low-visible-mid",
-          "category": "clock-low",
-          "ambiguous": false,
-          "acceptable": [
-            "Hunt"
-          ],
-          "modal": "Retreat",
-          "consistency": 0.4,
+          "modal": "Hunt",
+          "consistency": 0.35,
           "accuracy": 0.2
         },
         {
-          "id": "clock-low-lowhp-damaged",
-          "category": "clock-low",
-          "ambiguous": false,
-          "acceptable": [
-            "HoldCover",
-            "Retreat"
-          ],
-          "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.8
-        },
-        {
-          "id": "lowhp-nocontact-25",
-          "category": "lowhp-nocontact",
-          "ambiguous": false,
-          "acceptable": [
-            "Patrol",
-            "Retreat"
-          ],
-          "modal": "Patrol",
-          "consistency": 0.4,
-          "accuracy": 0.6
-        },
-        {
-          "id": "lowhp-nocontact-10",
-          "category": "lowhp-nocontact",
-          "ambiguous": false,
-          "acceptable": [
-            "Retreat"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.2
-        },
-        {
-          "id": "visible-mid-damaged-hurt",
-          "category": "visible-mid",
-          "ambiguous": false,
-          "acceptable": [
-            "HoldCover",
-            "Hunt"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.6,
-          "accuracy": 0.8
-        },
-        {
-          "id": "visible-near-lowhp",
-          "category": "visible-near",
-          "ambiguous": false,
-          "acceptable": [
-            "Hunt",
-            "Retreat"
-          ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.6
-        },
-        {
-          "id": "never-seen-damaged-mid-hp",
+          "id": "contested-neverseen-hit-behind",
           "category": "never-seen",
           "ambiguous": false,
           "acceptable": [
-            "HoldCover",
-            "Patrol"
-          ],
-          "modal": "Retreat",
-          "consistency": 0.4,
-          "accuracy": 0.4
-        },
-        {
-          "id": "never-seen-damaged-high-hp",
-          "category": "never-seen",
-          "ambiguous": false,
-          "acceptable": [
-            "HoldCover",
-            "Patrol"
+            "HoldCover"
           ],
           "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.6
+          "consistency": 0.3,
+          "accuracy": 0.1
         },
         {
-          "id": "lostsight-mid-freshish",
-          "category": "just-lost-sight",
-          "ambiguous": false,
-          "acceptable": [
-            "Hunt"
-          ],
-          "modal": "Patrol",
-          "consistency": 0.8,
-          "accuracy": 0.0
-        },
-        {
-          "id": "hunt-visible-near-highhp",
+          "id": "healthy-visible-near-clean",
           "category": "visible-near",
           "ambiguous": false,
           "acceptable": [
             "Hunt"
           ],
-          "modal": "HoldCover",
-          "consistency": 0.6,
-          "accuracy": 0.2
+          "modal": "Hunt",
+          "consistency": 0.35,
+          "accuracy": 0.35
         },
         {
-          "id": "hunt-visible-mid-midhp",
+          "id": "healthy-visible-mid-under-fire",
+          "category": "visible-mid",
+          "ambiguous": true,
+          "acceptable": [
+            "HoldCover",
+            "Hunt"
+          ],
+          "modal": "Hunt",
+          "consistency": 0.45,
+          "accuracy": null
+        },
+        {
+          "id": "healthy-visible-near-under-fire",
+          "category": "visible-near",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover",
+            "Hunt"
+          ],
+          "modal": "HoldCover",
+          "consistency": 0.5,
+          "accuracy": 0.6
+        },
+        {
+          "id": "healthy-visible-mid-clean",
           "category": "visible-mid",
           "ambiguous": false,
           "acceptable": [
             "Hunt"
           ],
           "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": 0.4
+          "consistency": 0.45,
+          "accuracy": 0.45
         },
         {
-          "id": "hunt-lostsight-mid-instant",
+          "id": "healthy-visible-hit-behind",
+          "category": "visible-mid",
+          "ambiguous": true,
+          "acceptable": [
+            "HoldCover",
+            "Hunt"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.45,
+          "accuracy": null
+        },
+        {
+          "id": "healthy-justlost-near-under-fire",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover",
+            "Hunt"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.3,
+          "accuracy": 0.45
+        },
+        {
+          "id": "healthy-memory-fresh-clean",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.15
+        },
+        {
+          "id": "healthy-memory-stale-hit-behind",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.35,
+          "accuracy": 0.25
+        },
+        {
+          "id": "healthy-memory-mid-fresh",
           "category": "just-lost-sight",
           "ambiguous": false,
           "acceptable": [
             "Hunt"
           ],
           "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": 0.0
-        },
-        {
-          "id": "retreat-lowhp-lostsight-stale",
-          "category": "lowhp-contact",
-          "ambiguous": false,
-          "acceptable": [
-            "HoldCover",
-            "Retreat"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.6,
+          "consistency": 0.35,
           "accuracy": 0.2
         },
         {
-          "id": "patrol-never-seen-lowmidhp",
+          "id": "healthy-memory-mid-stale",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Patrol"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.3,
+          "accuracy": 0.3
+        },
+        {
+          "id": "healthy-memory-near-fresh-hit",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Hunt",
+          "consistency": 0.35,
+          "accuracy": 0.35
+        },
+        {
+          "id": "healthy-neverseen-hit-flank",
           "category": "never-seen",
           "ambiguous": false,
           "acceptable": [
+            "HoldCover"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.4,
+          "accuracy": 0.3
+        },
+        {
+          "id": "healthy-neverseen-hit-behind",
+          "category": "never-seen",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.4,
+          "accuracy": 0.2
+        },
+        {
+          "id": "high-visible-near-clean",
+          "category": "visible-near",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Hunt",
+          "consistency": 0.35,
+          "accuracy": 0.35
+        },
+        {
+          "id": "high-visible-far-clean",
+          "category": "visible-far",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.35,
+          "accuracy": 0.25
+        },
+        {
+          "id": "high-visible-mid-under-fire",
+          "category": "visible-mid",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Retreat",
+          "consistency": 0.4,
+          "accuracy": 0.05
+        },
+        {
+          "id": "high-memory-far-fresh",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.4,
+          "accuracy": 0.15
+        },
+        {
+          "id": "high-memory-far-stale",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Patrol"
+          ],
+          "modal": "Hunt",
+          "consistency": 0.3,
+          "accuracy": 0.25
+        },
+        {
+          "id": "high-memory-near-horizon",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Patrol"
+          ],
+          "modal": "HoldCover",
+          "consistency": 0.4,
+          "accuracy": 0.15
+        },
+        {
+          "id": "high-memory-mid-fresh",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Hunt"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.3,
+          "accuracy": 0.3
+        },
+        {
+          "id": "high-memory-mid-stale",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
             "Patrol"
           ],
           "modal": "Patrol",
+          "consistency": 0.35,
+          "accuracy": 0.35
+        },
+        {
+          "id": "high-justlost-far",
+          "category": "just-lost-sight",
+          "ambiguous": true,
+          "acceptable": [
+            "Hunt",
+            "Patrol"
+          ],
+          "modal": "Patrol",
+          "consistency": 0.5,
+          "accuracy": null
+        },
+        {
+          "id": "high-memory-far-stale-full",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "Patrol"
+          ],
+          "modal": "HoldCover",
+          "consistency": 0.35,
+          "accuracy": 0.2
+        },
+        {
+          "id": "high-memory-horizon-under-fire",
+          "category": "just-lost-sight",
+          "ambiguous": false,
+          "acceptable": [
+            "HoldCover"
+          ],
+          "modal": "HoldCover",
           "consistency": 0.4,
           "accuracy": 0.4
         },
         {
-          "id": "patrol-lostsight-near-stale",
-          "category": "just-lost-sight",
+          "id": "high-neverseen-hit-flank",
+          "category": "never-seen",
           "ambiguous": false,
           "acceptable": [
-            "Hunt",
-            "Patrol"
+            "HoldCover"
           ],
           "modal": "Patrol",
-          "consistency": 0.6,
-          "accuracy": 0.8
+          "consistency": 0.3,
+          "accuracy": 0.25
         },
         {
-          "id": "hunt-visible-far-damaged",
-          "category": "visible-far",
-          "ambiguous": false,
-          "acceptable": [
-            "Hunt",
-            "Patrol"
-          ],
-          "modal": "Patrol",
-          "consistency": 0.6,
-          "accuracy": 1.0
-        },
-        {
-          "id": "ambig-lowhp-cover",
-          "category": "lowhp-contact",
-          "ambiguous": true,
-          "acceptable": [
-            "HoldCover",
-            "Retreat"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-visible-mid-hurt",
-          "category": "visible-mid",
-          "ambiguous": true,
-          "acceptable": [
-            "HoldCover",
-            "Hunt"
-          ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-lostsight-mid-hurt",
-          "category": "just-lost-sight",
-          "ambiguous": true,
-          "acceptable": [
-            "HoldCover",
-            "Hunt",
-            "Patrol"
-          ],
-          "modal": "Retreat",
-          "consistency": 0.4,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-lowhp-visible-far",
-          "category": "lowhp-contact",
-          "ambiguous": true,
-          "acceptable": [
-            "HoldCover",
-            "Retreat"
-          ],
-          "modal": "Retreat",
-          "consistency": 0.6,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-lostsight-mid-damaged",
-          "category": "just-lost-sight",
-          "ambiguous": true,
-          "acceptable": [
-            "HoldCover",
-            "Retreat"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.4,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-visible-far-healthy",
-          "category": "visible-far",
+          "id": "clocklow-memory-near",
+          "category": "clock-low",
           "ambiguous": true,
           "acceptable": [
             "Hunt",
             "Patrol"
           ],
           "modal": "HoldCover",
-          "consistency": 0.4,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-lowhp-unseen-fresh",
-          "category": "lowhp-contact",
-          "ambiguous": true,
-          "acceptable": [
-            "Patrol",
-            "Retreat"
-          ],
-          "modal": "Hunt",
-          "consistency": 0.6,
-          "accuracy": null
-        },
-        {
-          "id": "ambig-holdcover-lostsight",
-          "category": "just-lost-sight",
-          "ambiguous": true,
-          "acceptable": [
-            "HoldCover",
-            "Hunt"
-          ],
-          "modal": "HoldCover",
-          "consistency": 0.4,
+          "consistency": 0.35,
           "accuracy": null
         }
       ]

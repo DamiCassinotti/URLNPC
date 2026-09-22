@@ -1,8 +1,8 @@
 # Selector battery
 
-`snapshots.json` — 40 `GameStateSnapshot`s for scoring a mode selector offline, so prompt
-iteration doesn't need a live match (see `docs/rl-runbook.md` §9). Run it with
-`scripts/battery.py`.
+`snapshots.json` — 86 `GameStateSnapshot`s (72 scored, 14 ambiguous) for scoring a mode
+selector offline, so prompt iteration doesn't need a live match (see `docs/rl-runbook.md`
+§9). Run it with `scripts/battery.py`.
 
 Each entry:
 
@@ -27,3 +27,25 @@ compares the two on the fields a mode decision turns on (HP, visibility, distanc
 staleness, damage and its direction — `battery_harvest.py`'s dedupe key) and refuses to run
 on an overlap, an exemplar that is also a battery item being an answer the model was handed
 rather than one it found. Add a state here and it is no longer available as an exemplar.
+
+## Labelling rules (#153)
+
+Labels come from the game's payoffs, **not** from what `HeuristicModeSelector` would answer:
+a battery whose `acceptable` sets always contain the FSM's choice scores it 100% and makes
+"beat the FSM" mean "be perfect". It sits at 95.8% here, and the three misses are real.
+
+The payoffs a label is argued from: a kill wins the round, a timeout is a draw, a death is
+the worst outcome, there is no health regen, and Hunt is the only mode that can win. So:
+
+- **Visible and healthy** → Hunt; it is the only mode that closes a round out.
+- **Visible at 40% HP or less** → HoldCover or Retreat. Three hits kill, and the target's
+  health is not observable, so pressing is a gamble on information the NPC does not have.
+- **Hit from a direction with no sighting to explain it** → HoldCover; searching walks into
+  the shooter.
+- **A sighting under ~5 s old** → Hunt, the remembered position is still worth walking to.
+  **Past ~8 s** → Patrol; the spot is cold, and at 10 s the memory lapses anyway.
+- **No sighting at all and healthy** → Patrol. **At critical HP** → HoldCover or Retreat:
+  there is nobody to retreat from, but seeking a fight you cannot win throws away the draw.
+
+`ambiguous` is for states where two answers are genuinely equal, not for states that are
+merely hard — those get a multi-entry `acceptable` and are still scored.

@@ -1,0 +1,70 @@
+{
+  "entity": "NPC",
+  "episodes": 60,
+  "wins": 24,
+  "losses": 34,
+  "draws": 2,
+  "winRate": 0.4,
+  "damageDealtPerEpisode": 68.0,
+  "damageTakenPerEpisode": 82.5,
+  "shots": 335,
+  "hits": 272,
+  "accuracy": 0.8119402985074626,
+  "timeToKillSeconds": 12.416896551724138,
+  "survivalSeconds": 9.22235294117647,
+  "modes": {
+    "Hunt": {
+      "steps": 7430,
+      "eligible": 2859,
+      "compliance": 0.962574326687653,
+      "visible": 0.3847913862718708,
+      "closing": -0.03697187079407806,
+      "closingVisible": -0.06129485834207766
+    },
+    "HoldCover": {
+      "steps": 1875,
+      "eligible": 664,
+      "compliance": 0.0,
+      "visible": 0.055466666666666664,
+      "closing": -0.042779199999999996,
+      "closingVisible": 0.01639423076923077
+    },
+    "Retreat": {
+      "steps": 2764,
+      "eligible": 1776,
+      "compliance": 0.06418918918918919,
+      "visible": 0.42149059334298117,
+      "closing": -0.033529305354558614,
+      "closingVisible": -0.06090557939914163
+    },
+    "Patrol": {
+      "steps": 36033,
+      "eligible": 36033,
+      "compliance": 0.28793050814531124,
+      "visible": 0.07001914911331279,
+      "closing": -0.027094191435628443,
+      "closingVisible": -0.06109591755846215
+    }
+  },
+  "selector": {
+    "selector": "fsm",
+    "model": "",
+    "prompts": [],
+    "decisions": 273,
+    "decisionsPerEpisode": 4.55,
+    "modeDistribution": {
+      "Patrol": 165,
+      "Retreat": 46,
+      "HoldCover": 16,
+      "Hunt": 46
+    },
+    "switchRate": 0.34798534798534797,
+    "latencyMsMean": 0.8315018315018315,
+    "latencyMsP95": 1,
+    "invalidRate": 0.0,
+    "fallbackRate": 0.0,
+    "outcomes": {
+      "applied": 273
+    }
+  }
+}
