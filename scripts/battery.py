@@ -102,7 +102,9 @@ def snapshot_json(s):
         elif isinstance(value, int):
             rendered = str(value)
         else:
-            rendered = json.dumps(str(value))
+            # ensure_ascii off: JsonLine leaves non-ASCII as-is, and a prompt
+            # that differs from the game's is a different prompt.
+            rendered = json.dumps(str(value), ensure_ascii=False)
         parts.append(f'"{key}":{rendered}')
     return "{" + ",".join(parts) + "}"
 
