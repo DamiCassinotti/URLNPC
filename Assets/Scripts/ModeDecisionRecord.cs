@@ -23,6 +23,9 @@ public class ModeDecisionRecord
     // assigned instance, or "fallback" once the fallback holds the channel.
     public string selectorKind = "";
     public string modelName = "";
+    // The prompt variant that produced the answer (#131); empty for a selector
+    // that sends no prompt, which is how a table is traced to its text.
+    public string promptId = "";
     // As sent — null on a body without a snapshot builder.
     public GameStateSnapshot snapshot;
     // The channel's mode when the decision landed: chosen != from is a switch,
@@ -46,6 +49,7 @@ public class ModeDecisionRecord
             JsonLine.Field("id", decisionId),
             JsonLine.Field("selector", selectorKind),
             JsonLine.Field("model", modelName),
+            JsonLine.Field("prompt", promptId),
             SnapshotJson(snapshot),
             JsonLine.Field("from", fromMode.ToString()),
             JsonLine.Field("chosen", chosenMode.HasValue ? chosenMode.Value.ToString() : ""),

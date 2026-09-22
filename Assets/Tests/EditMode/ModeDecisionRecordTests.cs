@@ -13,6 +13,7 @@ public class ModeDecisionRecordTests
             entity = "NPC",
             selectorKind = "llm",
             modelName = "llama3.1:8b",
+            promptId = "v1",
             snapshot = new GameStateSnapshot
             {
                 hpPercent = 65,
@@ -55,6 +56,7 @@ public class ModeDecisionRecordTests
         Assert.That(line, Does.Contain("\"id\":7"));
         Assert.That(line, Does.Contain("\"selector\":\"llm\""));
         Assert.That(line, Does.Contain("\"model\":\"llama3.1:8b\""));
+        Assert.That(line, Does.Contain("\"prompt\":\"v1\""), "a table has to be traceable to the prompt behind it");
         Assert.That(line, Does.Contain("\"from\":\"Patrol\""));
         Assert.That(line, Does.Contain("\"chosen\":\"Hunt\""));
         Assert.That(line, Does.Contain("\"reason\":\"target visible at mid range\""));

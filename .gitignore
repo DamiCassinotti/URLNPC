@@ -93,3 +93,6 @@ mono_crash.*.json
 /results/*/run_logs/
 /results/*/*/*.pt
 /results/*/*/*-[0-9]*.onnx
+
+# Python bytecode from the eval/battery scripts
+__pycache__/

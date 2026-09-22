@@ -11,6 +11,11 @@ public class ModeDecisionReport
     // e.g. "llama3.1:8b"; empty for a selector with no model.
     public string ModelName = "";
 
+    // Which prompt variant produced this decision (issue #131), so the table a
+    // run produced can be traced back to the text that produced it. Empty for a
+    // selector that sends no prompt.
+    public string PromptId = "";
+
     // The model's stated reason for its choice; empty when there is none.
     public string Reason = "";
 

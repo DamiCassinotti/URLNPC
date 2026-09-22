@@ -266,13 +266,22 @@ and clock-about-to-run-out cases.
 ```bash
 scripts/battery.py --selector fsm         # the FSM baseline
 scripts/battery.py --selector random      # the sanity floor
-scripts/battery.py --selector llm --repeats 5 --temps 0.0,0.7   # once #131 lands
+scripts/battery.py --selector llm --model llama3.1:8b --prompt v1 --repeats 5 --temps 0.0,0.7
 ```
 
 It reports, per temperature: accuracy over the non-ambiguous snapshots, self-consistency
 over K repeats, invalid-output rate and the latency distribution. The FSM scores 100% and
 random ~38% — that gap is the check that the labels discriminate and aren't broken; the FSM
 topping out is expected of a fair baseline, not a target the LLM has to clear on the battery.
+
+The `llm` selector sends the same prompt the game sends: `--prompt <id>` names a text asset
+under `Assets/Resources/Prompts/`, which `battery.py` reads directly and `ModePromptLibrary`
+loads at runtime — one text, so an offline comparison of two variants says something about
+the in-game run. A battery snapshot stands alone, so the history section renders empty;
+`--llm-prompt <id>` on `scripts/eval.sh` is the same knob for a live run, and every
+`mode_decision` line records the id it used. The twin sends one attempt per call and no
+retry: the game's retry is robustness, while the battery's invalid rate is about how often
+the raw answer is usable.
 
 **FSM and random run as Python twins, not the Unity build.** The battery has to run any
 selector, including the two baselines. Driving the standalone build in `-batchmode` for each

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 // so the driver keeps the channel's mode and counts a failure toward its
 // fallback selector. A transport failure or a timeout throws instead — the
 // driver records it the same way and never blocks on any of it.
-public class LlmModeSelector : IReportingModeSelector
+public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
 {
     // An answer that is no mode. The driver's Enum.IsDefined check turns this
     // into an Invalid mode_decision line: the mode is kept, the failure counts.
@@ -21,14 +21,24 @@ public class LlmModeSelector : IReportingModeSelector
     internal const float MinimumAttemptSeconds = 0.25f;
 
     readonly ILlmEndpoint endpoint;
+    readonly ModePrompt prompt;
+
+    // The last few decisions, which is what lets the model read a trend across
+    // calls instead of answering each one from scratch (issue #131).
+    readonly ModePromptHistory history = new ModePromptHistory();
 
     public LlmSelectorConfig Config;
 
-    public LlmModeSelector(ILlmEndpoint endpoint, LlmSelectorConfig config)
+    public LlmModeSelector(ILlmEndpoint endpoint, LlmSelectorConfig config, ModePrompt prompt)
     {
         this.endpoint = endpoint;
+        this.prompt = prompt;
         Config = config.Sanitized();
     }
+
+    // Per episode, from the driver: the previous round's decisions describe a
+    // fight that is over.
+    public void ResetState() => history.Clear();
 
     public Task<NpcMode> SelectModeAsync(GameStateSnapshot snapshot, CancellationToken cancellation)
     {
@@ -39,14 +49,20 @@ public class LlmModeSelector : IReportingModeSelector
         GameStateSnapshot snapshot, ModeDecisionReport report, CancellationToken cancellation)
     {
         report.ModelName = Config.Model;
+        report.PromptId = prompt != null ? prompt.Id : "";
         if (snapshot == null)
         {
             throw new System.InvalidOperationException(
                 "no game-state snapshot to send — the body carries no GameStateSnapshotBuilder");
         }
+        if (prompt == null)
+        {
+            throw new System.InvalidOperationException(
+                "no prompt variant to render — see ModePromptLibrary");
+        }
 
-        string prompt = BuildPrompt(snapshot);
-        report.Prompt = prompt;
+        string rendered = prompt.Render(snapshot, history.Turns);
+        report.Prompt = rendered;
 
         // TimeoutSeconds is the budget for the whole call, retries included —
         // per attempt it would let (Retries + 1) attempts outlive the decision
@@ -66,7 +82,7 @@ public class LlmModeSelector : IReportingModeSelector
             // decode is greedy, so the same prompt returns the same unusable
             // text however the seed moves — a retry that changed only the seed
             // would spend the budget reproducing the first answer.
-            string attemptPrompt = attempt == 0 ? prompt : prompt + RetryNote(lastText);
+            string attemptPrompt = attempt == 0 ? rendered : rendered + RetryNote(lastText);
             string text = await Complete(attemptPrompt, attempt, remaining, cancellation);
             report.RawResponse = attempt == 0 ? text : report.RawResponse + "\n--- retry ---\n" + text;
             lastText = text;
@@ -75,6 +91,10 @@ public class LlmModeSelector : IReportingModeSelector
             {
                 report.Parsed = true;
                 report.Reason = parsed.Reason;
+                // Only an answer that still matters joins the history: a call
+                // the driver gave up on was never commanded, and recording it
+                // would tell the next prompt about a decision that never ran.
+                if (!cancellation.IsCancellationRequested) history.Add(snapshot, parsed.Mode);
                 return parsed.Mode;
             }
         }
@@ -146,29 +166,4 @@ public class LlmModeSelector : IReportingModeSelector
             "\"\nAnswer again with JSON only, and with \"mode\" set to one of the modes listed above.";
     }
 
-    // Prompt v0: enough to get a real answer out of a real model, deliberately
-    // minimal. The system prompt, the mode catalog and the snapshot history are
-    // #131's, and the snapshot JSON here is telemetry's serialization rather
-    // than a second formatter to keep in step with it.
-    internal static string BuildPrompt(GameStateSnapshot snapshot)
-    {
-        var sb = new System.Text.StringBuilder(512);
-        sb.Append("You are the tactical commander of an NPC in a first-person shooter duel. ")
-          .Append("Pick the mode it should be in right now.\n")
-          .Append("Modes: ");
-        for (int i = 0; i < NpcModes.All.Length; i++)
-        {
-            if (i > 0) sb.Append(", ");
-            sb.Append(NpcModes.All[i]);
-        }
-        sb.Append(".\n")
-          .Append("Hunt closes on the target and fights. HoldCover stays behind cover out of the ")
-          .Append("target's line of sight. Retreat breaks contact and opens distance. Patrol ")
-          .Append("searches unexplored ground for a target it cannot find.\n")
-          .Append("State (the NPC knows nothing about the target beyond what is here):\n")
-          .Append(ModeDecisionRecord.SnapshotObject(snapshot))
-          .Append('\n')
-          .Append("Answer with JSON only: {\"mode\": \"<one of the modes>\", \"reason\": \"<short>\"}");
-        return sb.ToString();
-    }
 }
