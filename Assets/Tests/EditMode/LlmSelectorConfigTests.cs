@@ -16,6 +16,7 @@ public class LlmSelectorConfigTests
             Retries = 1,
             Temperature = 0f,
             Seed = 7,
+            PromptId = "v1",
         };
     }
 
@@ -56,6 +57,7 @@ public class LlmSelectorConfigTests
             LlmSelectorConfig.RetriesArg, "0",
             LlmSelectorConfig.TemperatureArg, "0.7",
             LlmSelectorConfig.SeedArg, "99",
+            LlmSelectorConfig.PromptArg, "v2",
         });
 
         Assert.That(config.Endpoint, Is.EqualTo("http://other:11434"));
@@ -64,6 +66,7 @@ public class LlmSelectorConfigTests
         Assert.That(config.Retries, Is.EqualTo(0));
         Assert.That(config.Temperature, Is.EqualTo(0.7f).Within(1e-4f));
         Assert.That(config.Seed, Is.EqualTo(99));
+        Assert.That(config.PromptId, Is.EqualTo("v2"));
     }
 
     [Test]
@@ -100,6 +103,7 @@ public class LlmSelectorConfigTests
             TimeoutSeconds = -5f,
             Retries = -2,
             Temperature = -1f,
+            PromptId = " ",
         }.Sanitized();
 
         Assert.That(config.Endpoint, Is.EqualTo(LlmSelectorConfig.Defaults.Endpoint));
@@ -107,5 +111,6 @@ public class LlmSelectorConfigTests
         Assert.That(config.TimeoutSeconds, Is.GreaterThan(0f));
         Assert.That(config.Retries, Is.EqualTo(0));
         Assert.That(config.Temperature, Is.EqualTo(0f));
+        Assert.That(config.PromptId, Is.EqualTo(ModePrompt.DefaultId));
     }
 }

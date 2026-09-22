@@ -361,6 +361,36 @@ public class ModeSelectorDriverTests
         Assert.That(driver.Fallback, Is.SameAs(mine));
     }
 
+    class StatefulSelector : IStatefulModeSelector
+    {
+        public int Resets;
+
+        public Task<NpcMode> SelectModeAsync(GameStateSnapshot snapshot, CancellationToken cancellation) =>
+            Task.FromResult(NpcMode.Hunt);
+
+        public void ResetState() => Resets++;
+    }
+
+    // The LLM selector's snapshot history belongs to one episode (#131), so a
+    // reset has to reach the selector and its fallback, not just the cadence.
+    [Test]
+    public void ResetState_ReachesAStatefulSelectorAndItsFallback()
+    {
+        var go = new GameObject("StatefulSelectorTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        var primary = new StatefulSelector();
+        var fallback = new StatefulSelector();
+        driver.Selector = primary;
+        driver.Fallback = fallback;
+
+        driver.ResetState();
+
+        Assert.That(primary.Resets, Is.EqualTo(1));
+        Assert.That(fallback.Resets, Is.EqualTo(1));
+    }
+
     [Test]
     public void ResetState_DropsTheInFlightCallAndIssuesAfresh()
     {
@@ -492,6 +522,7 @@ public class ModeSelectorDriverTests
         public Task<NpcMode> SelectModeAsync(GameStateSnapshot snapshot, ModeDecisionReport report, CancellationToken cancellation)
         {
             report.ModelName = "test-model";
+            report.PromptId = "test-v0";
             report.Reason = "because";
             report.RetryUsed = true;
             return Task.FromResult(NpcMode.Retreat);
@@ -514,6 +545,7 @@ public class ModeSelectorDriverTests
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Retreat), "the report overload answered");
         Assert.That(records, Has.Count.EqualTo(1));
         Assert.That(records[0].modelName, Is.EqualTo("test-model"));
+        Assert.That(records[0].promptId, Is.EqualTo("test-v0"));
         Assert.That(records[0].reason, Is.EqualTo("because"));
         Assert.That(records[0].retryUsed, Is.True);
     }

@@ -55,6 +55,14 @@ public class LlmModeSelectorTests
         };
     }
 
+    // A stand-in variant: the shipped v1 text is ModePromptTests'. What matters
+    // here is that both moving parts reach the model.
+    static LlmModeSelector Make(FakeEndpoint endpoint, LlmSelectorConfig config)
+    {
+        return new LlmModeSelector(endpoint, config, new ModePrompt("test-v0",
+            "Modes: Hunt, HoldCover, Retreat, Patrol.\nRecent: {{HISTORY}}\nNow: {{STATE}}\nJSON only."));
+    }
+
     static GameStateSnapshot Snapshot()
     {
         return new GameStateSnapshot
@@ -83,7 +91,7 @@ public class LlmModeSelectorTests
         var endpoint = new FakeEndpoint().Answering("{\"mode\":\"Retreat\",\"reason\":\"badly hurt\"}");
         var report = new ModeDecisionReport();
 
-        NpcMode mode = Select(new LlmModeSelector(endpoint, Config()), report);
+        NpcMode mode = Select(Make(endpoint, Config()), report);
 
         Assert.That(mode, Is.EqualTo(NpcMode.Retreat));
         Assert.That(report.Parsed, Is.True);
@@ -92,6 +100,7 @@ public class LlmModeSelectorTests
         Assert.That(report.ModelName, Is.EqualTo("test-model"));
         Assert.That(report.RawResponse, Does.Contain("Retreat"));
         Assert.That(report.Prompt, Does.Contain("hpPercent"), "the snapshot has to reach the prompt");
+        Assert.That(report.PromptId, Is.EqualTo("test-v0"), "the decision has to say which prompt produced it");
     }
 
     [Test]
@@ -100,7 +109,7 @@ public class LlmModeSelectorTests
         var endpoint = new FakeEndpoint().Answering("{\"mode\":\"Hunt\",\"reason\":\"\"}");
         var cancellation = new CancellationTokenSource();
 
-        new LlmModeSelector(endpoint, Config()).SelectModeAsync(Snapshot(), cancellation.Token).Wait();
+        Make(endpoint, Config()).SelectModeAsync(Snapshot(), cancellation.Token).Wait();
 
         LlmRequest request = endpoint.Requests[0];
         Assert.That(request.Model, Is.EqualTo("test-model"));
@@ -118,7 +127,7 @@ public class LlmModeSelectorTests
         var endpoint = new FakeEndpoint().Answering("I'd rather not.", "{\"mode\":\"Patrol\",\"reason\":\"no contact\"}");
         var report = new ModeDecisionReport();
 
-        NpcMode mode = Select(new LlmModeSelector(endpoint, Config(retries: 1)), report);
+        NpcMode mode = Select(Make(endpoint, Config(retries: 1)), report);
 
         Assert.That(mode, Is.EqualTo(NpcMode.Patrol));
         Assert.That(endpoint.Requests.Count, Is.EqualTo(2));
@@ -134,7 +143,7 @@ public class LlmModeSelectorTests
         var endpoint = new FakeEndpoint().Answering("no idea", "still no idea");
         var report = new ModeDecisionReport();
 
-        NpcMode mode = Select(new LlmModeSelector(endpoint, Config(retries: 1)), report);
+        NpcMode mode = Select(Make(endpoint, Config(retries: 1)), report);
 
         Assert.That(System.Enum.IsDefined(typeof(NpcMode), mode), Is.False,
             "the driver reads an undefined mode as an invalid decision");
@@ -150,7 +159,7 @@ public class LlmModeSelectorTests
         var endpoint = new FakeEndpoint().Answering("{\"mode\":\"Flank\",\"reason\":\"\"}",
             "{\"mode\":\"HoldCover\",\"reason\":\"\"}");
 
-        NpcMode mode = Select(new LlmModeSelector(endpoint, Config(retries: 1)), new ModeDecisionReport());
+        NpcMode mode = Select(Make(endpoint, Config(retries: 1)), new ModeDecisionReport());
 
         Assert.That(mode, Is.EqualTo(NpcMode.HoldCover));
         Assert.That(endpoint.Requests.Count, Is.EqualTo(2));
@@ -161,7 +170,7 @@ public class LlmModeSelectorTests
     {
         var endpoint = new FakeEndpoint().Answering("no idea");
 
-        NpcMode mode = Select(new LlmModeSelector(endpoint, Config(retries: 0)), new ModeDecisionReport());
+        NpcMode mode = Select(Make(endpoint, Config(retries: 0)), new ModeDecisionReport());
 
         Assert.That(mode, Is.EqualTo(LlmModeSelector.NoMode));
         Assert.That(endpoint.Requests.Count, Is.EqualTo(1));
@@ -177,7 +186,7 @@ public class LlmModeSelectorTests
     {
         var endpoint = new FakeEndpoint().Answering("I'd rather not.", "{\"mode\":\"Hunt\",\"reason\":\"\"}");
 
-        Select(new LlmModeSelector(endpoint, Config(retries: 1)), new ModeDecisionReport());
+        Select(Make(endpoint, Config(retries: 1)), new ModeDecisionReport());
 
         Assert.That(endpoint.Requests[1].Prompt, Is.Not.EqualTo(endpoint.Requests[0].Prompt));
         Assert.That(endpoint.Requests[1].Prompt, Does.Contain("rather not"),
@@ -195,7 +204,7 @@ public class LlmModeSelectorTests
         LlmSelectorConfig config = Config(retries: 1);
         config.TimeoutSeconds = 0.1f;
 
-        NpcMode mode = Select(new LlmModeSelector(endpoint, config), new ModeDecisionReport());
+        NpcMode mode = Select(Make(endpoint, config), new ModeDecisionReport());
 
         Assert.That(endpoint.Requests.Count, Is.EqualTo(1),
             "a retry the driver would cancel mid-flight is not worth issuing");
@@ -208,7 +217,7 @@ public class LlmModeSelectorTests
         var endpoint = new FakeEndpoint().Failing("connection refused");
         var report = new ModeDecisionReport();
 
-        Task<NpcMode> task = new LlmModeSelector(endpoint, Config(retries: 1))
+        Task<NpcMode> task = Make(endpoint, Config(retries: 1))
             .SelectModeAsync(Snapshot(), report, CancellationToken.None);
 
         Assert.That(task.IsFaulted, Is.True, "a dead server is a failure to report, not a mode");
@@ -222,7 +231,7 @@ public class LlmModeSelectorTests
     {
         var endpoint = new FakeEndpoint().Answering("{\"mode\":\"Hunt\",\"reason\":\"\"}");
 
-        Task<NpcMode> task = new LlmModeSelector(endpoint, Config())
+        Task<NpcMode> task = Make(endpoint, Config())
             .SelectModeAsync(null, new ModeDecisionReport(), CancellationToken.None);
 
         Assert.That(task.IsFaulted, Is.True);
@@ -230,18 +239,67 @@ public class LlmModeSelectorTests
     }
 
     [Test]
-    public void ThePrompt_NamesEveryModeAndTheStateItIsDecidingOn()
+    public void ThePrompt_CarriesTheStateItIsDecidingOn()
     {
-        string prompt = LlmModeSelector.BuildPrompt(Snapshot());
+        var report = new ModeDecisionReport();
 
-        foreach (NpcMode mode in NpcModes.All)
-        {
-            Assert.That(prompt, Does.Contain(mode.ToString()), $"{mode} is not offered");
-        }
-        Assert.That(prompt, Does.Contain("\"hpPercent\":40"));
-        Assert.That(prompt, Does.Not.Contain("\"snapshot\""),
+        Select(Make(new FakeEndpoint().Answering("{\"mode\":\"Hunt\",\"reason\":\"\"}"), Config()), report);
+
+        Assert.That(report.Prompt, Does.Contain("\"hpPercent\":40"));
+        Assert.That(report.Prompt, Does.Not.Contain("\"snapshot\""),
             "the state goes in as the flat object the prompt describes");
-        Assert.That(prompt, Does.Contain("Courtyard"));
+        Assert.That(report.Prompt, Does.Contain("Courtyard"));
+        Assert.That(report.Prompt, Does.Not.Contain(ModePrompt.StateToken), "the template was not rendered");
+    }
+
+    // The history is the whole basis for reading a trend across calls (#131):
+    // the mode a call chose has to show up in the next call's prompt.
+    [Test]
+    public void EachAnswer_JoinsTheHistoryTheNextPromptCarries()
+    {
+        var endpoint = new FakeEndpoint().Answering(
+            "{\"mode\":\"Retreat\",\"reason\":\"hurt\"}",
+            "{\"mode\":\"Hunt\",\"reason\":\"healthy\"}");
+        LlmModeSelector selector = Make(endpoint, Config());
+
+        Select(selector, new ModeDecisionReport());
+        Select(selector, new ModeDecisionReport());
+
+        Assert.That(endpoint.Requests[0].Prompt, Does.Contain(ModePrompt.NoHistory),
+            "the first decision of a round has no history to show");
+        Assert.That(endpoint.Requests[1].Prompt, Does.Contain("-> Retreat"));
+        Assert.That(endpoint.Requests[1].Prompt, Does.Not.Contain(ModePrompt.NoHistory));
+    }
+
+    [Test]
+    public void ResetState_DropsTheHistory_SoARoundDoesNotInheritTheLastOne()
+    {
+        var endpoint = new FakeEndpoint().Answering(
+            "{\"mode\":\"Retreat\",\"reason\":\"\"}", "{\"mode\":\"Hunt\",\"reason\":\"\"}");
+        LlmModeSelector selector = Make(endpoint, Config());
+
+        Select(selector, new ModeDecisionReport());
+        selector.ResetState();
+        Select(selector, new ModeDecisionReport());
+
+        Assert.That(endpoint.Requests[1].Prompt, Does.Contain(ModePrompt.NoHistory));
+    }
+
+    // An answer the driver stopped waiting for was never commanded; telling the
+    // next prompt about it would describe a decision that never happened.
+    [Test]
+    public void AnAnswerToACancelledCall_StaysOutOfTheHistory()
+    {
+        var endpoint = new FakeEndpoint().Answering(
+            "{\"mode\":\"Retreat\",\"reason\":\"\"}", "{\"mode\":\"Hunt\",\"reason\":\"\"}");
+        LlmModeSelector selector = Make(endpoint, Config());
+        var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+
+        selector.SelectModeAsync(Snapshot(), new ModeDecisionReport(), cancelled.Token).Wait();
+        Select(selector, new ModeDecisionReport());
+
+        Assert.That(endpoint.Requests[1].Prompt, Does.Contain(ModePrompt.NoHistory));
     }
 
     [Test]

@@ -63,6 +63,9 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Decode seed. Overridable with '-llmSeed <n>'.")]
     [SerializeField] internal int llmSeed = 1;
 
+    [Tooltip("Which prompt variant is sent — the id of a text asset under Resources/Prompts. Overridable with '-llmPrompt <id>'.")]
+    [SerializeField] internal string llmPromptId = ModePrompt.DefaultId;
+
     [Tooltip("Log one line to the console per decision (transition plus the snapshot fields the FSM reads), for watching a match live. Only fires while a selector is running, so training and plain human play stay quiet. Telemetry records every decision regardless.")]
     [SerializeField] internal bool logDecisions = true;
 
@@ -182,10 +185,19 @@ public class ModeSelectorDriver : MonoBehaviour
                 // exists but nothing outside the tests ever filled the slot.
                 if (Fallback == null) Fallback = Fsm();
                 LlmSelectorConfig config = LlmConfig;
+                if (!ModePromptLibrary.TryLoad(config.PromptId, out ModePrompt prompt))
+                {
+                    // Inert rather than prompted with something else: a run
+                    // scored against a prompt other than the one it names
+                    // would be an LLM condition nobody can reproduce.
+                    Debug.LogError($"[ModeSelector] no usable prompt '{config.PromptId}' under " +
+                        $"Resources/{ModePromptLibrary.ResourceFolder} — the LLM selector stays inert.", this);
+                    return null;
+                }
                 Debug.Log($"[ModeSelector] LLM selector on {config.Model} at {config.Endpoint} " +
-                    $"(temp {config.Temperature}, seed {config.Seed}, timeout {config.TimeoutSeconds:0.##} s, " +
-                    $"{config.Retries} retries).", this);
-                return new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config);
+                    $"(prompt {prompt.Id}, temp {config.Temperature}, seed {config.Seed}, " +
+                    $"timeout {config.TimeoutSeconds:0.##} s, {config.Retries} retries).", this);
+                return new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config, prompt);
             default:
                 return null;
         }
@@ -210,6 +222,7 @@ public class ModeSelectorDriver : MonoBehaviour
         Retries = llmRetries,
         Temperature = llmTemperature,
         Seed = llmSeed,
+        PromptId = llmPromptId,
     }.WithCommandLine(System.Environment.GetCommandLineArgs());
 
     void FixedUpdate()
@@ -256,6 +269,13 @@ public class ModeSelectorDriver : MonoBehaviour
     {
         AbandonInFlight();
         schedule.Reset();
+        // Whatever a stateful selector carries across calls (the LLM tier's
+        // snapshot history) belonged to the episode that just ended. Read off
+        // the built field rather than the property, so resetting a driver that
+        // never ran doesn't construct a selector.
+        (Selector as IStatefulModeSelector)?.ResetState();
+        (built as IStatefulModeSelector)?.ResetState();
+        (Fallback as IStatefulModeSelector)?.ResetState();
     }
 
     void OnDestroy()
@@ -404,6 +424,7 @@ public class ModeSelectorDriver : MonoBehaviour
                 : Selector != null ? "code"
                 : ResolvedKind.ToString().ToLowerInvariant(),
             modelName = report.ModelName,
+            promptId = report.PromptId,
             snapshot = decision.Snapshot,
             fromMode = channel.CurrentMode,
             chosenMode = chosen,

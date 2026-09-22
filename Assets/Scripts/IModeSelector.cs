@@ -14,3 +14,12 @@ public interface IModeSelector
 {
     Task<NpcMode> SelectModeAsync(GameStateSnapshot snapshot, CancellationToken cancellation);
 }
+
+// Optional extension: a selector that carries state across calls — the LLM
+// tier's snapshot history (issue #131) — clears it here when the episode
+// restarts. The driver calls it from its own ResetState; the stateless
+// baselines don't implement it.
+public interface IStatefulModeSelector : IModeSelector
+{
+    void ResetState();
+}

@@ -13,9 +13,14 @@ public struct LlmSelectorConfig
     public const string RetriesArg = "-llmRetries";
     public const string TemperatureArg = "-llmTemperature";
     public const string SeedArg = "-llmSeed";
+    public const string PromptArg = "-llmPrompt";
 
     public string Endpoint;
     public string Model;
+    // Which prompt variant is sent (issue #131): the id of a text asset under
+    // Resources/Prompts. Sweeping it is how two prompts are compared over the
+    // same run.
+    public string PromptId;
     // The budget for one decision, retries included — kept under the driver's
     // decision period, which is when the driver cancels an unanswered call and
     // reports a timeout over whatever the ladder was doing.
@@ -29,7 +34,7 @@ public struct LlmSelectorConfig
     // repeatable. The consistency metric is what the temp 0.7 runs are for.
     public int Seed;
 
-    // What Sanitized falls back to for a blank value. Only the two text fields
+    // What Sanitized falls back to for a blank value. Only the text fields
     // can be blank, so this deliberately doesn't restate the numbers — the
     // driver's serialized fields own those, and a second copy here would drift
     // from the Inspector without anything reading it.
@@ -37,6 +42,7 @@ public struct LlmSelectorConfig
     {
         Endpoint = "http://localhost:11434",
         Model = "llama3.1:8b",
+        PromptId = ModePrompt.DefaultId,
     };
 
     // Command line over serialized, field by field: a run that only names a
@@ -50,6 +56,7 @@ public struct LlmSelectorConfig
         if (CommandLineArgs.TryRead(args, RetriesArg, TryReadInt, out int retries)) resolved.Retries = retries;
         if (CommandLineArgs.TryRead(args, TemperatureArg, TryReadFloat, out float temperature)) resolved.Temperature = temperature;
         if (CommandLineArgs.TryRead(args, SeedArg, TryReadInt, out int seed)) resolved.Seed = seed;
+        if (CommandLineArgs.TryRead(args, PromptArg, TryReadText, out string prompt)) resolved.PromptId = prompt;
         return resolved.Sanitized();
     }
 
@@ -62,6 +69,8 @@ public struct LlmSelectorConfig
         else clean.Endpoint = clean.Endpoint.Trim().TrimEnd('/');
         if (string.IsNullOrWhiteSpace(clean.Model)) clean.Model = Defaults.Model;
         else clean.Model = clean.Model.Trim();
+        if (string.IsNullOrWhiteSpace(clean.PromptId)) clean.PromptId = Defaults.PromptId;
+        else clean.PromptId = clean.PromptId.Trim();
         if (clean.TimeoutSeconds < 0.1f) clean.TimeoutSeconds = 0.1f;
         if (clean.Retries < 0) clean.Retries = 0;
         if (clean.Retries > 3) clean.Retries = 3;

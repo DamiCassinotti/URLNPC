@@ -69,6 +69,9 @@ def summarize_selector(decisions, episodes):
     return {
         "selector": decisions[0].get("selector", ""),
         "model": decisions[0].get("model", ""),
+        # The prompt variant behind the numbers (#131). A list, so a run that
+        # somehow mixed two of them says so instead of naming the first.
+        "prompts": sorted({d.get("prompt", "") for d in decisions} - {""}),
         "decisions": len(decisions),
         "decisionsPerEpisode": len(decisions) / episodes if episodes else None,
         "modeDistribution": distribution,
@@ -222,6 +225,8 @@ def render(summary):
         name = selector["selector"]
         if selector["model"]:
             name += f" ({selector['model']})"
+        if selector["prompts"]:
+            name += f" prompt {'+'.join(selector['prompts'])}"
         applied = selector["outcomes"].get("applied", 0)
         distribution = "  ".join(
             f"{mode} {count / applied * 100:.1f}%"

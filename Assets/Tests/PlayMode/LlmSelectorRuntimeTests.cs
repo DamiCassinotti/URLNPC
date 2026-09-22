@@ -49,6 +49,13 @@ public class LlmSelectorRuntimeTests : PlayModeTestBase
         });
     }
 
+    static ModePrompt Prompt()
+    {
+        Assert.That(ModePromptLibrary.TryLoad(ModePrompt.DefaultId, out ModePrompt prompt), Is.True,
+            $"Resources/{ModePromptLibrary.ResourceFolder}{ModePrompt.DefaultId} is missing from the build");
+        return prompt;
+    }
+
     static IEnumerator WaitFor(Task task, float seconds)
     {
         float deadline = Time.realtimeSinceStartup + seconds;
@@ -61,7 +68,7 @@ public class LlmSelectorRuntimeTests : PlayModeTestBase
         var endpoint = new HungEndpoint();
         LlmSelectorConfig config = LlmSelectorConfig.Defaults;
         config.TimeoutSeconds = 0.2f;
-        var selector = new LlmModeSelector(endpoint, config);
+        var selector = new LlmModeSelector(endpoint, config, Prompt());
 
         Task<NpcMode> task = selector.SelectModeAsync(Snapshot(), new ModeDecisionReport(), CancellationToken.None);
         Assert.That(task.IsCompleted, Is.False, "the call must not resolve before its timeout");
@@ -92,7 +99,9 @@ public class LlmSelectorRuntimeTests : PlayModeTestBase
         config = config.Sanitized();
 
         var report = new ModeDecisionReport();
-        var selector = new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config);
+        // The shipped variant, not a stand-in: what this check is for is the
+        // prompt a real model actually has to answer.
+        var selector = new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config, Prompt());
         Task<NpcMode> task = selector.SelectModeAsync(Snapshot(), report, CancellationToken.None);
 
         yield return WaitFor(task, 90f);

@@ -19,16 +19,24 @@ per state). Reports, per temperature:
 
 The FSM and random baselines run as Python twins of the C# selectors (see the
 runbook for why a twin rather than driving the Unity build); the `llm` selector
-is the seam the prompt (#131) plugs its Ollama call into.
+sends the same prompt asset the game sends (Assets/Resources/Prompts/<id>.txt,
+rendered here with an empty history — a battery snapshot is a single decision)
+to Ollama. One attempt per call, no retry: the retry ladder is the game's
+robustness, while what the battery measures is how often the raw answer is
+usable.
 """
 
 import argparse
 import json
 import math
+import os
 import random
+import re
 import statistics
 import sys
 import time
+import urllib.error
+import urllib.request
 
 MODES = ("Hunt", "HoldCover", "Retreat", "Patrol")
 
@@ -55,21 +63,114 @@ def random_decide(s, rng, temp):
     return rng.choice(MODES)
 
 
-def llm_decide(s, rng, temp):
-    """The LLM selector plugs in here: build the prompt from the snapshot, call
-    Ollama at the given temperature, parse a mode from the reply. The in-game
-    side is LlmModeSelector (#130); this twin waits for the prompt it has to
-    share (#131) rather than drifting from it from the first run."""
-    raise NotImplementedError(
-        "llm selector arrives with the prompt (#131); "
-        "run --selector fsm or random for now")
+PROMPT_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "Assets", "Resources", "Prompts")
 
+# ModeDecisionRecord.SnapshotObject's field order, which is what the game sends
+# and therefore what the prompt has to carry here too.
+SNAPSHOT_FIELDS = (
+    "hpPercent", "targetVisible", "targetDistance", "secondsSinceSeen",
+    "recentlyDamaged", "damagedFrom", "roundSecondsRemaining",
+    "playerWins", "npcWins", "draws", "arenaIndex", "arenaName",
+    "coverDensity", "observedSeconds", "meanEngagementDistanceMetres",
+    "shotsHeardPer10Seconds", "observedMeanSpeed", "mode", "secondsInMode",
+)
 
-SELECTORS = {
-    "fsm": fsm_decide,
-    "random": random_decide,
-    "llm": llm_decide,
+# LlmModeResponse.Schema()
+SCHEMA = {
+    "type": "object",
+    "properties": {
+        "mode": {"type": "string", "enum": list(MODES)},
+        "reason": {"type": "string"},
+    },
+    "required": ["mode", "reason"],
 }
+
+
+def snapshot_json(s):
+    """JsonLine's formatting, field for field: floats to three decimals with the
+    trailing zeros dropped, bools lower-case. A prompt that differs from the
+    game's by whitespace is a different prompt."""
+    parts = []
+    for key in SNAPSHOT_FIELDS:
+        value = s[key]
+        if isinstance(value, bool):
+            rendered = "true" if value else "false"
+        elif isinstance(value, float):
+            rendered = f"{value:.3f}".rstrip("0").rstrip(".") or "0"
+        elif isinstance(value, int):
+            rendered = str(value)
+        else:
+            # ensure_ascii off: JsonLine leaves non-ASCII as-is, and a prompt
+            # that differs from the game's is a different prompt.
+            rendered = json.dumps(str(value), ensure_ascii=False)
+        parts.append(f'"{key}":{rendered}')
+    return "{" + ",".join(parts) + "}"
+
+
+def load_prompt(prompt_id):
+    path = os.path.join(PROMPT_DIR, prompt_id + ".txt")
+    with open(path, encoding="utf-8") as handle:
+        template = handle.read()
+    if "{{STATE}}" not in template:
+        raise ValueError(f"prompt {prompt_id} has no {{{{STATE}}}} placeholder")
+    return template
+
+
+def parse_mode(text):
+    """The readable part of LlmModeResponse.TryParse: the "mode" key when there
+    is one, otherwise a whole-word scan that answers only when exactly one mode
+    is named and nothing is negated."""
+    match = re.search(r'"mode"\s*:\s*"([^"]*)"', text)
+    if match:
+        named = match.group(1).strip().lower()
+        return next((m for m in MODES if m.lower() == named), None)
+    if re.search(r"\bnot\b|n't|\bnever\b|\bavoid\b|\binstead\b|rather than",
+                 text, re.IGNORECASE):
+        return None
+    found = [m for m in MODES if re.search(rf"\b{m}\b", text, re.IGNORECASE)]
+    return found[0] if len(found) == 1 else None
+
+
+def make_llm_decide(endpoint, model, prompt_id, seed, timeout):
+    """The in-game side is LlmModeSelector (#130) with prompt v1 (#131); this
+    shares the prompt text with it rather than restating it."""
+    template = load_prompt(prompt_id)
+    url = endpoint.rstrip("/") + "/api/generate"
+
+    def decide(s, rng, temp):
+        prompt = template.replace("{{STATE}}", snapshot_json(s))
+        # A battery snapshot stands alone, so there is no history to show.
+        prompt = prompt.replace(
+            "{{HISTORY}}", "(none — this is the first decision of the round)")
+        body = json.dumps({
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+            "format": SCHEMA,
+            "keep_alive": "30m",
+            "options": {"temperature": temp, "seed": seed},
+        }).encode("utf-8")
+        request = urllib.request.Request(
+            url, data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            payload = json.load(response)
+        return parse_mode(payload.get("response", "") or "")
+
+    return decide
+
+
+SELECTORS = ("fsm", "random", "llm")
+
+
+def build_selector(name, args):
+    if name == "fsm":
+        return fsm_decide
+    if name == "random":
+        return random_decide
+    return make_llm_decide(args.endpoint, args.model, args.prompt,
+                           args.decode_seed, args.timeout)
 
 
 def load_battery(path):
@@ -189,6 +290,16 @@ def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--selector", default="fsm", choices=sorted(SELECTORS),
                         help="which selector to score (default fsm)")
+    parser.add_argument("--prompt", default="v1",
+                        help="prompt variant under Assets/Resources/Prompts (default v1)")
+    parser.add_argument("--model", default="llama3.1:8b", help="Ollama model tag")
+    parser.add_argument("--endpoint", default="http://localhost:11434",
+                        help="Ollama base URL")
+    parser.add_argument("--decode-seed", type=int, default=1,
+                        help="decode seed sent to the model (LlmSelectorConfig.Seed)")
+    parser.add_argument("--timeout", type=float, default=120.0,
+                        help="seconds per call; generous on purpose — this is the "
+                             "offline loop, and the first call pays a cold model load")
     parser.add_argument("--snapshots", default="battery/snapshots.json",
                         help="labeled battery JSON")
     parser.add_argument("--repeats", type=int, default=5,
@@ -200,20 +311,30 @@ def main():
     args = parser.parse_args()
 
     entries = load_battery(args.snapshots)
-    decide = SELECTORS[args.selector]
+    try:
+        decide = build_selector(args.selector, args)
+    except (OSError, ValueError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
     temps = [float(t) for t in args.temps.split(",") if t.strip() != ""]
     rng = random.Random(args.seed)
 
     try:
         results = [run_temp(decide, entries, args.repeats, temp, rng) for temp in temps]
-    except NotImplementedError as error:
-        print(f"error: {error}", file=sys.stderr)
+    except (urllib.error.URLError, OSError) as error:
+        print(f"error: {args.endpoint} unreachable: {error}", file=sys.stderr)
         return 1
-    print(render(args.selector, entries, results))
+    label = args.selector
+    if args.selector == "llm":
+        label = f"{args.selector} ({args.model}, prompt {args.prompt})"
+    print(render(label, entries, results))
 
     if args.json:
         payload = {"selector": args.selector, "repeats": args.repeats,
                    "snapshots": len(entries), "results": results}
+        if args.selector == "llm":
+            payload.update({"model": args.model, "prompt": args.prompt,
+                            "endpoint": args.endpoint})
         with open(args.json, "w", encoding="utf-8") as handle:
             json.dump(payload, handle, indent=2)
     return 0
