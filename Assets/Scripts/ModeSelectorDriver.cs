@@ -64,13 +64,15 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal int llmSeed = 1;
 
     [Tooltip("Which prompt variant is sent — the id of a text asset under Resources/Prompts. Overridable with '-llmPrompt <id>'.")]
-    [SerializeField] internal string llmPromptId = ModePrompt.DefaultId;
+    [SerializeField] internal string llmPromptId = ModePrompt.FewShotId;
 
     [Tooltip("Which exemplar bank fills the prompt's {{EXEMPLARS}} slot — the id of a text asset under Resources/Exemplars. Empty, or '-llmExemplars none', is the zero-shot arm.")]
-    [SerializeField] internal string llmExemplarsId = "";
+    [SerializeField] internal string llmExemplarsId = ModeExemplars.DefaultId;
 
+    // Eight shots is what won the battery ablation (#132): 65.6% against
+    // zero-shot's 56.2%, and past it twelve gave the accuracy back.
     [Tooltip("How many of the bank's exemplars are shown; 0 is all of them. Overridable with '-llmShots <n>'.")]
-    [SerializeField] internal int llmShots = 0;
+    [SerializeField] internal int llmShots = ModeExemplars.DefaultShots;
 
     [Tooltip("Log one line to the console per decision (transition plus the snapshot fields the FSM reads), for watching a match live. Only fires while a selector is running, so training and plain human play stay quiet. Telemetry records every decision regardless.")]
     [SerializeField] internal bool logDecisions = true;

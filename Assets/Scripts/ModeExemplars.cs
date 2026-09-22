@@ -17,6 +17,10 @@ public class ModeExemplars
     // The bank shipped as Resources/Exemplars/bank-v1.txt.
     public const string DefaultId = "bank-v1";
 
+    // How many of it the selector ships showing: the arm that won the battery
+    // ablation (65.6% against zero-shot's 56.2%, twelve shots giving it back).
+    public const int DefaultShots = 8;
+
     // The block carries its own heading, so a prompt whose bank is empty has no
     // dangling section left behind (ModePrompt drops the slot entirely).
     public const string Heading =

@@ -148,6 +148,22 @@ public class ModeExemplarsTests
         }
     }
 
+    // The arm the ablation shipped has to be a pairing that actually runs: the
+    // prompt with the slot, a bank that loads, and enough of it for the shots.
+    [Test]
+    public void TheShippedDefaults_AreARunnablePairing()
+    {
+        ModePromptLibrary.ClearCache();
+        ModeExemplarLibrary.ClearCache();
+
+        Assert.That(ModePromptLibrary.TryLoad(ModePrompt.FewShotId, out ModePrompt prompt), Is.True);
+        Assert.That(prompt.ShowsExemplars, Is.True);
+        Assert.That(ModeExemplarLibrary.TryLoad(ModeExemplars.DefaultId, out ModeExemplars bank, out string error),
+            Is.True, error);
+        Assert.That(bank.Take(ModeExemplars.DefaultShots).Count, Is.EqualTo(ModeExemplars.DefaultShots),
+            "the bank has to hold as many exemplars as the shipped shot count shows");
+    }
+
     [Test]
     public void AMissingBank_FailsRatherThanRunningZeroShot()
     {

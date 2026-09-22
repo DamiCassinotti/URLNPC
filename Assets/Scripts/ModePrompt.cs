@@ -14,9 +14,14 @@ using System.Text;
 // (#132), filled from ModeExemplars or collapsed for the zero-shot arm.
 public class ModePrompt
 {
-    // The variant shipped as Resources/Prompts/v1.txt, and what every LLM run
-    // uses unless -llmPrompt names another.
+    // The base variant, Resources/Prompts/v1.txt: the text without the few-shot
+    // slot, and what a blank -llmPrompt falls back to.
     public const string DefaultId = "v1";
+
+    // v1 plus the {{EXEMPLARS}} slot and nothing else, so it renders as v1 with
+    // no bank behind it. What the selector ships on, the few-shot arm having
+    // won the battery ablation (#132).
+    public const string FewShotId = "v2";
 
     public const string HistoryToken = "{{HISTORY}}";
     public const string StateToken = "{{STATE}}";

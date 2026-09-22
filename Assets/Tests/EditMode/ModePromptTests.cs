@@ -22,9 +22,6 @@ public class ModePromptTests
 
     static ModePrompt Template(string text) => new ModePrompt("test", text);
 
-    // The shipped variant carrying the few-shot slot (#132).
-    const string FewShotId = "v2";
-
     [Test]
     public void Render_SubstitutesBothTokens()
     {
@@ -170,8 +167,8 @@ public class ModePromptTests
     {
         ModePromptLibrary.ClearCache();
 
-        Assert.That(ModePromptLibrary.TryLoad(FewShotId, out ModePrompt fewShot), Is.True,
-            $"Resources/{ModePromptLibrary.ResourceFolder}{FewShotId}.txt is missing");
+        Assert.That(ModePromptLibrary.TryLoad(ModePrompt.FewShotId, out ModePrompt fewShot), Is.True,
+            $"Resources/{ModePromptLibrary.ResourceFolder}{ModePrompt.FewShotId}.txt is missing");
         ModePromptLibrary.TryLoad(ModePrompt.DefaultId, out ModePrompt zeroShot);
 
         Assert.That(fewShot.ShowsExemplars, Is.True);
