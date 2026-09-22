@@ -4,7 +4,8 @@
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
 #                   [--subject policy|heuristic|random|flee]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
-#                   [--selector none|fixed:<Mode>|random|fsm|llm] [--llm-prompt ID]
+#                   [--selector none|fixed:<Mode>|random|fsm|llm]
+#                   [--llm-prompt ID] [--llm-exemplars BANK] [--llm-shots N]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
 #
@@ -33,9 +34,11 @@
 #                         error
 #   --llm-model           which model answers, plus --llm-endpoint,
 #                         --llm-temperature, --llm-timeout, --llm-retries,
-#                         --llm-seed and --llm-prompt (the prompt variant, an
-#                         id under Assets/Resources/Prompts): forwarded as
-#                         -llm*, so a
+#                         --llm-seed, --llm-prompt (the prompt variant, an
+#                         id under Assets/Resources/Prompts) and
+#                         --llm-exemplars/--llm-shots (the few-shot bank under
+#                         Assets/Resources/Exemplars and how many of it to show;
+#                         no bank is the zero-shot arm): forwarded as -llm*, so a
 #                         batch sweeps models or temperatures off one build.
 #                         Only with --selector llm
 #   --seed                fixes arenas, spawns and the mode schedule; aim
@@ -101,6 +104,8 @@ while [[ $# -ge 1 ]]; do
         --llm-temperature) LLM_ARGS+=(-llmTemperature "$2"); shift 2 ;;
         --llm-seed)        LLM_ARGS+=(-llmSeed "$2"); shift 2 ;;
         --llm-prompt)      LLM_ARGS+=(-llmPrompt "$2"); shift 2 ;;
+        --llm-exemplars)   LLM_ARGS+=(-llmExemplars "$2"); shift 2 ;;
+        --llm-shots)       LLM_ARGS+=(-llmShots "$2"); shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;

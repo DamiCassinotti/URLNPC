@@ -345,6 +345,38 @@ public class ModeSelectorDriverTests
         Assert.That(((HeuristicModeSelector)driver.Fallback).LowHealthPercent, Is.EqualTo(40));
     }
 
+    // A bank that can't be shown would be a few-shot run scored as the
+    // zero-shot arm it is being compared against (#132), so the selector stays
+    // inert instead — the same rule a missing prompt gets.
+    [Test]
+    public void ABankAgainstAPromptWithoutTheSlot_LeavesTheSelectorInert()
+    {
+        var go = new GameObject("LlmExemplarSlotTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Llm;
+        driver.llmPromptId = ModePrompt.DefaultId;
+        driver.llmExemplarsId = ModeExemplars.DefaultId;
+        LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex("slot"));
+
+        Assert.That(driver.IsWriter, Is.False, "nothing may command modes from a mislabelled condition");
+    }
+
+    [Test]
+    public void AMissingBank_LeavesTheSelectorInert()
+    {
+        var go = new GameObject("LlmMissingBankTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Llm;
+        driver.llmExemplarsId = "no-such-bank";
+        LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex("no-such-bank"));
+
+        Assert.That(driver.IsWriter, Is.False);
+    }
+
     [Test]
     public void AnAssignedFallback_IsNotReplacedByTheLlmDefault()
     {

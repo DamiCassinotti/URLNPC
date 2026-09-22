@@ -14,6 +14,12 @@ public struct LlmSelectorConfig
     public const string TemperatureArg = "-llmTemperature";
     public const string SeedArg = "-llmSeed";
     public const string PromptArg = "-llmPrompt";
+    public const string ExemplarsArg = "-llmExemplars";
+    public const string ShotsArg = "-llmShots";
+
+    // What names the zero-shot arm on a command line, "" being a value an
+    // argument can't carry.
+    public const string NoExemplars = "none";
 
     public string Endpoint;
     public string Model;
@@ -21,6 +27,14 @@ public struct LlmSelectorConfig
     // Resources/Prompts. Sweeping it is how two prompts are compared over the
     // same run.
     public string PromptId;
+    // Which exemplar bank fills the prompt's {{EXEMPLARS}} slot (issue #132),
+    // empty for the zero-shot arm. The bank is the tuned artifact of this tier,
+    // so which one ran is as much a part of a result as the model is.
+    public string ExemplarsId;
+    // How many of the bank's exemplars are shown; 0 or less is the whole bank.
+    // Exemplars cost tokens and tokens cost latency against a 5 s period, which
+    // is what the bank-size sweep measures.
+    public int Shots;
     // The budget for one decision, retries included — kept under the driver's
     // decision period, which is when the driver cancels an unanswered call and
     // reports a timeout over whatever the ladder was doing.
@@ -57,6 +71,8 @@ public struct LlmSelectorConfig
         if (CommandLineArgs.TryRead(args, TemperatureArg, TryReadFloat, out float temperature)) resolved.Temperature = temperature;
         if (CommandLineArgs.TryRead(args, SeedArg, TryReadInt, out int seed)) resolved.Seed = seed;
         if (CommandLineArgs.TryRead(args, PromptArg, TryReadText, out string prompt)) resolved.PromptId = prompt;
+        if (CommandLineArgs.TryRead(args, ExemplarsArg, TryReadText, out string bank)) resolved.ExemplarsId = bank;
+        if (CommandLineArgs.TryRead(args, ShotsArg, TryReadInt, out int shots)) resolved.Shots = shots;
         return resolved.Sanitized();
     }
 
@@ -71,6 +87,12 @@ public struct LlmSelectorConfig
         else clean.Model = clean.Model.Trim();
         if (string.IsNullOrWhiteSpace(clean.PromptId)) clean.PromptId = Defaults.PromptId;
         else clean.PromptId = clean.PromptId.Trim();
+        clean.ExemplarsId = string.IsNullOrWhiteSpace(clean.ExemplarsId) ? "" : clean.ExemplarsId.Trim();
+        if (string.Equals(clean.ExemplarsId, NoExemplars, System.StringComparison.OrdinalIgnoreCase))
+        {
+            clean.ExemplarsId = "";
+        }
+        if (clean.Shots < 0) clean.Shots = 0;
         if (clean.TimeoutSeconds < 0.1f) clean.TimeoutSeconds = 0.1f;
         if (clean.Retries < 0) clean.Retries = 0;
         if (clean.Retries > 3) clean.Retries = 3;

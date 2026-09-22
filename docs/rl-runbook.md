@@ -290,3 +290,34 @@ couple offline prompt iteration to a rebuild. The baselines are a handful of rul
 (`HeuristicModeSelector`, `RandomModeSelector`), so `scripts/battery.py` carries a direct
 twin of each — `fsm_decide` mirrors `HeuristicModeSelector.Decide` rule for rule, thresholds
 and all. Keep the twin in step if those rules change.
+
+## 10. The few-shot exemplar bank and the zero-shot ablation
+
+No weights move in the LLM tier, so the only thing there is to tune is what the model is
+shown. `Assets/Resources/Exemplars/bank-v1.txt` is that artifact: twelve curated
+state -> answer pairs, three per mode, each state a real snapshot harvested from match
+telemetry and written in the serialization the prompt's state slot carries. It is versioned
+like a prompt and **disjoint** from `battery/snapshots.json` — `scripts/battery.py` compares
+the two on the fields a decision turns on and refuses to run on an overlap.
+
+Prompt `v2` is `v1` with a `{{EXEMPLARS}}` slot added and nothing else changed; rendered with
+an empty bank it is `v1` byte for byte (`ModePromptTests.TheShippedV2_IsV1PlusTheExemplarSlot`
+holds it there), so the two arms of the ablation differ by the examples alone.
+
+```bash
+scripts/battery.py --selector llm --prompt v2 --exemplars none              --repeats 1 --temps 0.0
+scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1 --shots 4 --repeats 1 --temps 0.0
+scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1 --shots 8 --repeats 1 --temps 0.0
+scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1           --repeats 1 --temps 0.0   # all 12
+```
+
+`--shots N` takes the bank round-robin over the modes, so four shots is one of each rather
+than four Hunts. One repeat is enough at temperature 0: the decode is greedy and a fixed
+seed reproduces the answer, so repeats only buy something at 0.7, where they measure
+consistency. Live, the same knobs are `scripts/eval.sh --llm-prompt v2 --llm-exemplars
+bank-v1 --llm-shots N`, and every `mode_decision` line records the pair as
+`prompt: "v2+bank-v1x4"` — a few-shot run can't be read back as the zero-shot one.
+
+Retrieval (nearest exemplars by feature distance) is deliberately not implemented: it adds
+per-call latency and a second thing to tune, and the issue's own rule was to reach for it
+only if the fixed set underperforms.
