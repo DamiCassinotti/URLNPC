@@ -282,8 +282,9 @@ public class ModeSelectorDriverTests
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.HoldCover));
     }
 
-    // '-modeSelector llm' on a build where only the seam exists: say so once,
-    // keep the channel's mode.
+    // A kind this build can't construct: say so once, keep the channel's mode.
+    // Every declared kind builds since #130, so the case only reaches the
+    // guard through a value that is no kind at all.
     [Test]
     public void AKindWithNoSelectorInTheBuild_WarnsAndStaysInert()
     {
@@ -291,13 +292,73 @@ public class ModeSelectorDriverTests
         spawned.Add(go);
         ModeChannel channel = go.AddComponent<ModeChannel>();
         ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
-        driver.selectorKind = ModeSelectorKind.Llm;
+        driver.selectorKind = (ModeSelectorKind)99;
         ExpectWarning();
 
         driver.Tick(0f);
         driver.Tick(1f);
 
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Hunt));
+    }
+
+    // The LLM selector's knobs reach it off the driver's serialized fields, with
+    // the launch arguments on top (#130).
+    [Test]
+    public void TheLlmConfig_ComesOffTheSerializedFields()
+    {
+        var go = new GameObject("LlmConfigTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.llmEndpoint = "http://box:11434";
+        driver.llmModel = "qwen2.5:3b";
+        driver.llmTimeoutSeconds = 3f;
+        driver.llmRetries = 2;
+        driver.llmTemperature = 0.7f;
+        driver.llmSeed = 11;
+
+        LlmSelectorConfig config = driver.LlmConfig;
+
+        Assert.That(config.GenerateUrl, Is.EqualTo("http://box:11434/api/generate"));
+        Assert.That(config.Model, Is.EqualTo("qwen2.5:3b"));
+        Assert.That(config.TimeoutSeconds, Is.EqualTo(3f));
+        Assert.That(config.Retries, Is.EqualTo(2));
+        Assert.That(config.Temperature, Is.EqualTo(0.7f).Within(1e-4f));
+        Assert.That(config.Seed, Is.EqualTo(11));
+    }
+
+    // Without this the failover ladder had nothing to hand the channel to
+    // outside the tests, so an unreachable model left it on initialMode.
+    [Test]
+    public void TheLlmSelector_TakesTheFsmAsItsFallback()
+    {
+        var go = new GameObject("LlmFallbackTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Llm;
+        driver.fsmLowHealthPercent = 40;
+
+        Assert.That(driver.IsWriter, Is.True, "the LLM kind has to build a selector");
+
+        Assert.That(driver.Fallback, Is.InstanceOf<HeuristicModeSelector>());
+        Assert.That(((HeuristicModeSelector)driver.Fallback).LowHealthPercent, Is.EqualTo(40));
+    }
+
+    [Test]
+    public void AnAssignedFallback_IsNotReplacedByTheLlmDefault()
+    {
+        var go = new GameObject("LlmFallbackOverrideTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.selectorKind = ModeSelectorKind.Llm;
+        var mine = new FixedModeSelector(NpcMode.Patrol);
+        driver.Fallback = mine;
+
+        Assert.That(driver.IsWriter, Is.True);
+
+        Assert.That(driver.Fallback, Is.SameAs(mine));
     }
 
     [Test]

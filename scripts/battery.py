@@ -19,7 +19,7 @@ per state). Reports, per temperature:
 
 The FSM and random baselines run as Python twins of the C# selectors (see the
 runbook for why a twin rather than driving the Unity build); the `llm` selector
-is the seam #130 plugs its Ollama call into.
+is the seam the prompt (#131) plugs its Ollama call into.
 """
 
 import argparse
@@ -56,11 +56,12 @@ def random_decide(s, rng, temp):
 
 
 def llm_decide(s, rng, temp):
-    """The LLM selector plugs in here (issue #130): build the prompt from the
-    snapshot, call Ollama at the given temperature, parse a mode from the reply.
-    Not wired until the prompt lands."""
+    """The LLM selector plugs in here: build the prompt from the snapshot, call
+    Ollama at the given temperature, parse a mode from the reply. The in-game
+    side is LlmModeSelector (#130); this twin waits for the prompt it has to
+    share (#131) rather than drifting from it from the first run."""
     raise NotImplementedError(
-        "llm selector arrives with the Ollama prompt (#130); "
+        "llm selector arrives with the prompt (#131); "
         "run --selector fsm or random for now")
 
 

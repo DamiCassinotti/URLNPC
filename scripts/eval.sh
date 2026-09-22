@@ -4,7 +4,7 @@
 #   scripts/eval.sh <model.onnx> [--episodes N] [--seed S]
 #                   [--subject policy|heuristic|random|flee]
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
-#                   [--selector none|fixed:<Mode>|random|fsm]
+#                   [--selector none|fixed:<Mode>|random|fsm|llm]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
 #
@@ -26,15 +26,25 @@
 #   --modes               who commands the NPC's mode: the scripted director,
 #                         nobody, or one mode pinned for the whole run
 #   --selector            a mode selector commands the modes instead (#127):
-#                         the FSM, uniform random draws, or one pinned mode.
-#                         Exactly one writer: a selector forces --modes none,
-#                         and naming both is an error
+#                         the FSM, uniform random draws, one pinned mode, or the
+#                         LLM (#130 — the run ignores --time-scale: a model call
+#                         takes wall-clock seconds). Exactly one writer: a
+#                         selector forces --modes none, and naming both is an
+#                         error
+#   --llm-model           which model answers, plus --llm-endpoint,
+#                         --llm-temperature, --llm-timeout, --llm-retries and
+#                         --llm-seed: forwarded to the player as -llm*, so a
+#                         batch sweeps models or temperatures off one build.
+#                         Only with --selector llm
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
 #   --time-scale          game time per rendered frame, in physics steps; 1 is
 #                         the most faithful, higher is faster and coarser. The
-#                         run is never throttled to real time either way.
+#                         run is never throttled to real time either way —
+#                         except under --selector llm, which ignores this and
+#                         runs at wall clock, since a model call costs real
+#                         seconds
 #   --rebuild             rebuild the player even if it already has this model
 #
 # The model is baked into the player: Inference Engine only imports ONNX in the
@@ -73,6 +83,7 @@ OUT=""
 BUILD=1
 TIMEOUT=""
 REBUILD=0
+LLM_ARGS=()
 while [[ $# -ge 1 ]]; do
     case "$1" in
         --episodes) EPISODES="$2"; shift 2 ;;
@@ -81,6 +92,12 @@ while [[ $# -ge 1 ]]; do
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
         --selector) SELECTOR="$2"; shift 2 ;;
+        --llm-endpoint)    LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
+        --llm-model)       LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
+        --llm-timeout)     LLM_ARGS+=(-llmTimeout "$2"); shift 2 ;;
+        --llm-retries)     LLM_ARGS+=(-llmRetries "$2"); shift 2 ;;
+        --llm-temperature) LLM_ARGS+=(-llmTemperature "$2"); shift 2 ;;
+        --llm-seed)        LLM_ARGS+=(-llmSeed "$2"); shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;
@@ -100,7 +117,11 @@ case "$SUBJECT" in policy|heuristic|random|flee) ;; *) echo "error: --subject ta
 case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy|heuristic" >&2; exit 1 ;; esac
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
 SELECTOR="${SELECTOR,,}"
-case "$SELECTOR" in none|random|fsm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm" >&2; exit 1 ;; esac
+case "$SELECTOR" in none|random|fsm|llm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm|llm" >&2; exit 1 ;; esac
+if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
+    echo "error: the --llm-* knobs need --selector llm" >&2
+    exit 1
+fi
 # One writer on the mode channel: a selector run stands the scripted director
 # down. Naming both is a condition mix-up, not a run.
 if [[ "$SELECTOR" != "none" ]]; then
@@ -127,6 +148,7 @@ cat > "$OUT/config.json" <<JSON
   "opponent": "$OPPONENT",
   "modes": "$MODES",
   "selector": "$SELECTOR",
+  "llmArgs": "${LLM_ARGS[*]-}",
   "timeScale": $TIME_SCALE,
   "commit": "$(git -C "$PROJECT_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)",
   "startedUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -157,10 +179,15 @@ fi
 
 UNITY_LOG="$OUT/unity.log"
 # Rounds always end (the clock is a draw), so the only way the player runs
-# forever is a startup failure that never starts one. The run is not throttled
-# to real time, so this is a loose wall-clock bound, not the expected duration;
-# --timeout 0 disables the guard.
-TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
+# forever is a startup failure that never starts one. This is a loose wall-clock
+# bound, not the expected duration; --timeout 0 disables the guard. An LLM run
+# is the one that actually spends real time per episode — up to a full round
+# each — so it gets a budget built on the round length instead.
+if [[ "$SELECTOR" == "llm" ]]; then
+    TIMEOUT="${TIMEOUT:-$((EPISODES * 180 + 300))}"
+else
+    TIMEOUT="${TIMEOUT:-$((EPISODES * 60 + 300))}"
+fi
 echo "==> $EPISODES episodes, seed $SEED, subject $SUBJECT, opponent $OPPONENT, modes $MODES, selector $SELECTOR, timeScale $TIME_SCALE"
 echo "    log: $UNITY_LOG"
 set +e
@@ -173,7 +200,8 @@ timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
     -evalOpponent "$OPPONENT" \
     -evalModes "$MODES" \
     -modeSelector "$SELECTOR" \
-    -evalTimeScale "$TIME_SCALE"
+    -evalTimeScale "$TIME_SCALE" \
+    ${LLM_ARGS[@]+"${LLM_ARGS[@]}"}
 RC=$?
 set -e
 if [[ $RC -eq 124 ]]; then

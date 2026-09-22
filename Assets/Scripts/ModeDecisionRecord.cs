@@ -73,9 +73,16 @@ public class ModeDecisionRecord
     // own serialization; the prompt's JSON is the prompt issue's.
     public static string SnapshotJson(GameStateSnapshot s)
     {
-        if (s == null) return "\"snapshot\":null";
+        return s == null ? "\"snapshot\":null" : "\"snapshot\":" + SnapshotObject(s);
+    }
+
+    // The object on its own, for callers that aren't building a keyed line — the
+    // prompt embeds it as the state it decides on.
+    public static string SnapshotObject(GameStateSnapshot s)
+    {
+        if (s == null) return "null";
         var sb = new StringBuilder(256);
-        sb.Append("\"snapshot\":{")
+        sb.Append('{')
           .Append(JsonLine.Field("hpPercent", s.hpPercent)).Append(',')
           .Append(JsonLine.Field("targetVisible", s.targetVisible)).Append(',')
           .Append(JsonLine.Field("targetDistance", s.targetDistance.ToString())).Append(',')

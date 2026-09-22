@@ -266,7 +266,7 @@ and clock-about-to-run-out cases.
 ```bash
 scripts/battery.py --selector fsm         # the FSM baseline
 scripts/battery.py --selector random      # the sanity floor
-scripts/battery.py --selector llm --repeats 5 --temps 0.0,0.7   # once #130 lands
+scripts/battery.py --selector llm --repeats 5 --temps 0.0,0.7   # once #131 lands
 ```
 
 It reports, per temperature: accuracy over the non-ambiguous snapshots, self-consistency

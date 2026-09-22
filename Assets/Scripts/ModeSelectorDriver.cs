@@ -44,6 +44,25 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Seconds since the last sighting after which the FSM patrols instead of pursuing the memory.")]
     [SerializeField] internal int fsmUnseenSecondsForPatrol = 6;
 
+    [Header("LLM selector (#130)")]
+    [Tooltip("Ollama base URL. Overridable with '-llmEndpoint <url>'.")]
+    [SerializeField] internal string llmEndpoint = "http://localhost:11434";
+
+    [Tooltip("Ollama model tag, e.g. 'llama3.1:8b'. Overridable with '-llmModel <tag>'.")]
+    [SerializeField] internal string llmModel = "llama3.1:8b";
+
+    [Tooltip("Seconds one model call may take before it counts as a failure. Kept under decisionPeriodSeconds. Overridable with '-llmTimeout <seconds>'.")]
+    [SerializeField] internal float llmTimeoutSeconds = 4f;
+
+    [Tooltip("Extra attempts after output that names no mode. Overridable with '-llmRetries <n>'.")]
+    [SerializeField] internal int llmRetries = 1;
+
+    [Tooltip("Sampling temperature. 0 with a fixed seed makes a run repeatable; the consistency measurement needs 0.7. Overridable with '-llmTemperature <t>'.")]
+    [SerializeField] internal float llmTemperature = 0f;
+
+    [Tooltip("Decode seed. Overridable with '-llmSeed <n>'.")]
+    [SerializeField] internal int llmSeed = 1;
+
     [Tooltip("Log one line to the console per decision (transition plus the snapshot fields the FSM reads), for watching a match live. Only fires while a selector is running, so training and plain human play stay quiet. Telemetry records every decision regardless.")]
     [SerializeField] internal bool logDecisions = true;
 
@@ -142,7 +161,7 @@ public class ModeSelectorDriver : MonoBehaviour
         }
     }
 
-    // The baselines construct here (#125); the LLM lands with #130. A kind
+    // The baselines (#125) and the LLM selector (#130) construct here. A kind
     // this build can't construct resolves to nothing and the driver stays
     // inert unless a selector was assigned from code.
     IModeSelector BuildSelector(ModeSelectorKind kind)
@@ -156,15 +175,42 @@ public class ModeSelectorDriver : MonoBehaviour
             case ModeSelectorKind.Random:
                 return new RandomModeSelector();
             case ModeSelectorKind.Fsm:
-                return new HeuristicModeSelector
-                {
-                    LowHealthPercent = fsmLowHealthPercent,
-                    UnseenSecondsForPatrol = fsmUnseenSecondsForPatrol,
-                };
+                return Fsm();
+            case ModeSelectorKind.Llm:
+                // An unreachable model would otherwise leave the channel stuck
+                // on initialMode for the rest of the episode: the failover ladder
+                // exists but nothing outside the tests ever filled the slot.
+                if (Fallback == null) Fallback = Fsm();
+                LlmSelectorConfig config = LlmConfig;
+                Debug.Log($"[ModeSelector] LLM selector on {config.Model} at {config.Endpoint} " +
+                    $"(temp {config.Temperature}, seed {config.Seed}, timeout {config.TimeoutSeconds:0.##} s, " +
+                    $"{config.Retries} retries).", this);
+                return new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config);
             default:
                 return null;
         }
     }
+
+    HeuristicModeSelector Fsm()
+    {
+        return new HeuristicModeSelector
+        {
+            LowHealthPercent = fsmLowHealthPercent,
+            UnseenSecondsForPatrol = fsmUnseenSecondsForPatrol,
+        };
+    }
+
+    // Serialized defaults, then the launch arguments on top — the batch runs
+    // sweep models and temperatures without a rebuild.
+    internal LlmSelectorConfig LlmConfig => new LlmSelectorConfig
+    {
+        Endpoint = llmEndpoint,
+        Model = llmModel,
+        TimeoutSeconds = llmTimeoutSeconds,
+        Retries = llmRetries,
+        Temperature = llmTemperature,
+        Seed = llmSeed,
+    }.WithCommandLine(System.Environment.GetCommandLineArgs());
 
     void FixedUpdate()
     {
