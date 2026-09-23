@@ -316,9 +316,10 @@ scripts/battery.py --selector llm --prompt v2 --exemplars bank-v1           --re
 
 `battery.py` still defaults to the base prompt with no bank, so each arm names itself
 rather than inheriting whatever the game ships. `--shots N` takes the bank round-robin over
-the modes, so four shots is one of each rather than four Hunts. One repeat is enough at temperature 0: the decode is greedy and a fixed
-seed reproduces the answer, so repeats only buy something at 0.7, where they measure
-consistency. Live, the same knobs are `scripts/eval.sh --llm-prompt v2 --llm-exemplars
+the modes, so four shots is one of each rather than four Hunts. One repeat was assumed to be enough at temperature 0, on the
+grounds that a greedy decode with a fixed seed reproduces the answer. **It does not** —
+#133 measured 95.8% self-consistency at temp 0 (§11), so single-pass numbers carry a
+couple of points of resampling noise. Live, the same knobs are `scripts/eval.sh --llm-prompt v2 --llm-exemplars
 bank-v1 --llm-shots N`, and every `mode_decision` line records the pair as
 `prompt: "v2+bank-v1x4"` — a few-shot run can't be read back as the zero-shot one.
 
@@ -487,3 +488,48 @@ Lengthening the period does **not** require a retrain. `ModeDirector` may redraw
 the mode it is already on and simply extend the dwell, so mode intervals well
 past 5 s are already in the policy's training distribution; it is shortening the
 period that would be out of distribution.
+
+### Self-consistency, and what temperature 0 does not guarantee
+
+Three repeats per snapshot at each temperature, on the shipped cell
+(`results/battery/sweep-133-consistency/`):
+
+```bash
+scripts/battery_sweep.py --models llama3.2:3b --prompts v4 --shots 8 \
+  --exemplars bank-v1 --temps 0.0,0.7 --repeats 3 \
+  --timeout 600 --out results/battery/sweep-133-consistency
+```
+
+| temp | accuracy | consistency | ambig-acc | invalid | lat p95 |
+|---|---|---|---|---|---|
+| 0.0 | 57.9% | 95.8% | 61.9% | 0% | 14.3 s |
+| 0.7 | 47.2% | 93.5% | 66.7% | 0% | 14.3 s |
+
+Temperature 0.7 costs 10.7 points of accuracy for no gain anywhere, so the
+selector ships at temperature 0 (`llmTemperature`).
+
+**Temperature 0 is not deterministic here, and the repo used to assume it was.**
+At temp 0 with a fixed decode seed, **13 of 86 snapshots gave a non-unanimous
+answer over three repeats** — 95.8%, not 100%. Ollama's CPU backend does not
+guarantee a reproducible greedy decode; reduction order varies between runs and
+near-ties in the argmax break differently. Three consequences:
+
+- **Every single-pass number in §11 carries run-to-run noise.** The shipped cell
+  scored 59.7% in the grid (one repeat) and 57.9% here (three) — about two
+  points, from nothing but resampling. That *strengthens* the significance
+  reading: the 7-point model-size gap is barely over the noise floor, which is
+  what p=0.46 already said, while the 26-point exemplar effect is far outside it.
+- **A fixed seed does not make a battery run replay.** Treat these as averages
+  over repeats, the way `eval.sh` runs are (aim spread is deliberately unseeded
+  there for the same kind of reason).
+- **A plain retry at temp 0 is not necessarily wasted budget** — re-sending the
+  same prompt can produce different text. `LlmModeSelector` quotes the
+  unreadable answer back anyway, which is still the better retry.
+
+**Latency from a repeats > 1 run is not comparable to the grid's.** Mean 7.7 s
+and p50 4.4 s here are deflated: consecutive repeats send a byte-identical
+prompt, which hits Ollama's exact-prefix KV cache and costs ~0.2 s of prefill
+instead of ~10 s. A match never repeats a prompt. **p95 (14.3 s) is the honest
+figure**, and it agrees with the grid's 14.8 s because it lands on the first,
+uncached call of each triplet. The 126 s max at temp 0 is the cold-prefix first
+call of the run.

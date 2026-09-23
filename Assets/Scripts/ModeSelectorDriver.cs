@@ -68,7 +68,7 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Extra attempts after output that names no mode. Overridable with '-llmRetries <n>'.")]
     [SerializeField] internal int llmRetries = 1;
 
-    [Tooltip("Sampling temperature. 0 with a fixed seed makes a run repeatable; the consistency measurement needs 0.7. Overridable with '-llmTemperature <t>'.")]
+    [Tooltip("Sampling temperature. 0 is what ships — 0.7 cost 10.7 points of accuracy in the #133 sweep. It does not make a run replay: the decode measured only 95.8% self-consistent at 0. Overridable with '-llmTemperature <t>'.")]
     [SerializeField] internal float llmTemperature = 0f;
 
     [Tooltip("Decode seed. Overridable with '-llmSeed <n>'.")]
