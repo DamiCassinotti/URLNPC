@@ -19,9 +19,21 @@ public class ModePrompt
     public const string DefaultId = "v1";
 
     // v1 plus the {{EXEMPLARS}} slot and nothing else, so it renders as v1 with
-    // no bank behind it. What the selector ships on, the few-shot arm having
-    // won the battery ablation (#132).
+    // no bank behind it — the few-shot arm of the #132 ablation.
     public const string FewShotId = "v2";
+
+    // v2 with the round's payoffs stated and the mode catalog rewritten around
+    // them (#133). Every arm of the #132 ablation missed the same way —
+    // disengaging where the labels say press and pressing where they say break
+    // off — which is a wording problem and not a shot count, so the sweep's
+    // prompt axis is this against v2.
+    public const string RevisedId = "v3";
+
+    // v3 asking for a four-word reason instead of a sentence (#133). Generation
+    // is about a third of each call on CPU and the reason is nearly all of the
+    // tokens generated, so this is the latency arm of the sweep — the text is
+    // v3's but for the output contract.
+    public const string TerseId = "v4";
 
     public const string HistoryToken = "{{HISTORY}}";
     public const string StateToken = "{{STATE}}";

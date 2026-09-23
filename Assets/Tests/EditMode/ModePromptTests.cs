@@ -177,6 +177,41 @@ public class ModePromptTests
             Is.EqualTo(zeroShot.Render(Snapshot(), history.Turns)));
     }
 
+    // v3 and v4 are rewrites of the wording, not structural changes: the sweep
+    // (#133) compares them against v2 on the text alone, so each has to carry
+    // the same three slots and still describe every mode.
+    [TestCase("v3")]
+    [TestCase("v4")]
+    public void TheShippedVariant_CarriesEverySlotAndNamesEveryMode(string id)
+    {
+        ModePromptLibrary.ClearCache();
+
+        Assert.That(ModePromptLibrary.TryLoad(id, out ModePrompt prompt), Is.True,
+            $"Resources/{ModePromptLibrary.ResourceFolder}{id}.txt is missing");
+        Assert.That(prompt.IsUsable, Is.True);
+        Assert.That(prompt.ShowsExemplars, Is.True);
+        Assert.That(prompt.Template, Does.Contain(ModePrompt.HistoryToken));
+        foreach (NpcMode mode in NpcModes.All)
+        {
+            Assert.That(prompt.Template, Does.Contain(mode.ToString()), $"{mode} is not described");
+        }
+    }
+
+    // v4 is the latency arm and differs from v3 only in the output contract; if
+    // it drifted into a second catalog rewrite the sweep could not attribute a
+    // difference to either.
+    [Test]
+    public void TheShippedV4_IsV3WithADifferentOutputContractOnly()
+    {
+        ModePromptLibrary.ClearCache();
+        ModePromptLibrary.TryLoad(ModePrompt.RevisedId, out ModePrompt revised);
+        ModePromptLibrary.TryLoad(ModePrompt.TerseId, out ModePrompt terse);
+
+        string upTo(ModePrompt p) => p.Template.Substring(0, p.Template.IndexOf("Answer with JSON"));
+        Assert.That(upTo(terse), Is.EqualTo(upTo(revised)));
+        Assert.That(terse.Template, Does.Contain("four words"));
+    }
+
     [Test]
     public void AMissingVariant_FailsRatherThanFallingBackToAnotherPrompt()
     {

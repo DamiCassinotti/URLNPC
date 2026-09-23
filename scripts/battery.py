@@ -12,11 +12,17 @@ harvested from match telemetry and labelled by hand with the acceptable mode(s)
 per state). Reports, per temperature:
 
   accuracy         fraction of non-ambiguous snapshots answered with an
-                   acceptable mode (the ambiguous subset is excluded — it has
-                   more than one defensible answer, so it measures consistency)
+                   acceptable mode (the ambiguous subset is scored apart — it
+                   has more than one defensible answer, so its rate says
+                   whether the model picks one of them, not which)
   consistency      mean over snapshots of the modal answer's share of K repeats
   invalid          fraction of calls that named no mode
   latency          mean / p50 / p95 / max in ms
+  per-mode         the same accuracy restricted to the states each mode is an
+                   acceptable answer for, beside that mode's share of the
+                   answers given — a model that reads Hunt perfectly and never
+                   picks Patrol scores well overall and is unusable, and only
+                   these two columns show it (issue #133)
 
 The FSM and random baselines run as Python twins of the C# selectors (see the
 runbook for why a twin rather than driving the Unity build); the `llm` selector
@@ -309,9 +315,17 @@ def run_temp(decide, entries, repeats, temp, rng):
     invalid = 0
     calls = 0
     acc_hits = acc_total = 0          # non-ambiguous only
+    ambig_hits = ambig_total = 0
     consistencies = []               # per snapshot, over all snapshots
     ambig_consistencies = []
     per_id = []
+    # A mode's row covers the non-ambiguous states it is an acceptable answer
+    # for; a state with two acceptable modes lands in both rows, since it is a
+    # state either mode is a right answer to.
+    mode_hits = {m: 0 for m in MODES}
+    mode_total = {m: 0 for m in MODES}   # calls
+    mode_states = {m: 0 for m in MODES}  # snapshots behind them
+    chosen = {m: 0 for m in MODES}
 
     for entry in entries:
         snapshot = entry["snapshot"]
@@ -325,6 +339,8 @@ def run_temp(decide, entries, repeats, temp, rng):
             if answer not in MODES:
                 invalid += 1
                 answer = None
+            else:
+                chosen[answer] += 1
             answers.append(answer)
 
         valid = [a for a in answers if a is not None]
@@ -332,9 +348,17 @@ def run_temp(decide, entries, repeats, temp, rng):
         consistency = valid.count(modal) / len(answers) if valid else 0.0
         (ambig_consistencies if entry.get("ambiguous", False) else consistencies).append(consistency)
 
-        if not entry.get("ambiguous", False):
-            acc_hits += sum(1 for a in answers if a in acceptable)
+        hits = sum(1 for a in answers if a in acceptable)
+        if entry.get("ambiguous", False):
+            ambig_hits += hits
+            ambig_total += len(answers)
+        else:
+            acc_hits += hits
             acc_total += len(answers)
+            for mode in acceptable:
+                mode_hits[mode] += hits
+                mode_total[mode] += len(answers)
+                mode_states[mode] += 1
 
         per_id.append({
             "id": entry["id"],
@@ -343,16 +367,21 @@ def run_temp(decide, entries, repeats, temp, rng):
             "acceptable": sorted(acceptable),
             "modal": modal,
             "consistency": consistency,
-            "accuracy": (None if entry.get("ambiguous", False)
-                         else sum(1 for a in answers if a in acceptable) / len(answers)),
+            "accuracy": hits / len(answers),
         })
 
     return {
         "temp": temp,
         "accuracy": acc_hits / acc_total if acc_total else None,
         "consistency": statistics.fmean(consistencies) if consistencies else None,
+        "ambiguousAccuracy": ambig_hits / ambig_total if ambig_total else None,
         "ambiguousConsistency": (statistics.fmean(ambig_consistencies)
                                  if ambig_consistencies else None),
+        "byMode": {m: {"labeled": mode_states[m],
+                       "accuracy": (mode_hits[m] / mode_total[m]) if mode_total[m] else None,
+                       "chosen": chosen[m],
+                       "chosenShare": (chosen[m] / calls) if calls else None}
+                   for m in MODES},
         "invalidRate": invalid / calls if calls else 0.0,
         "latencyMsMean": statistics.fmean(latencies) if latencies else 0.0,
         "latencyMsP50": percentile(latencies, 0.5),
@@ -373,18 +402,30 @@ def render(selector, entries, results):
         f"snapshots     {len(entries)}  ({ambiguous} ambiguous, "
         f"{len(entries) - ambiguous} scored for accuracy)",
         "",
-        f"{'temp':>5}{'accuracy':>11}{'consistency':>13}{'ambig-consist':>15}"
-        f"{'invalid':>9}{'lat.mean':>10}{'lat.p95':>9}",
+        f"{'temp':>5}{'accuracy':>11}{'consistency':>13}{'ambig-acc':>11}"
+        f"{'ambig-consist':>15}{'invalid':>9}{'lat.mean':>10}{'lat.p95':>9}",
     ]
     for r in results:
         lines.append(
             f"{r['temp']:>5.1f}{rate(r['accuracy']):>11}{rate(r['consistency']):>13}"
-            f"{rate(r['ambiguousConsistency']):>15}{rate(r['invalidRate']):>9}"
+            f"{rate(r['ambiguousAccuracy']):>11}{rate(r['ambiguousConsistency']):>15}"
+            f"{rate(r['invalidRate']):>9}"
             f"{r['latencyMsMean']:>9.1f}m{r['latencyMsP95']:>8.1f}"
         )
+
+    first = results[0]
+    lines.append("")
+    lines.append(f"per mode at temp {first['temp']:.1f} "
+                 f"(labeled = scored states the mode is an acceptable answer for):")
+    lines.append(f"  {'mode':<12}{'labeled':>9}{'accuracy':>11}{'chosen':>9}")
+    for mode in MODES:
+        row = first["byMode"][mode]
+        lines.append(f"  {mode:<12}{row['labeled']:>9}{rate(row['accuracy']):>11}"
+                     f"{rate(row['chosenShare']):>9}")
+
     # Misses at the first temperature, so a wrong-looking selector is debuggable.
-    misses = [p for p in results[0]["perSnapshot"]
-              if p["accuracy"] is not None and p["accuracy"] < 1.0]
+    misses = [p for p in first["perSnapshot"]
+              if not p["ambiguous"] and p["accuracy"] < 1.0]
     if misses:
         lines.append("")
         lines.append(f"misses at temp {results[0]['temp']:.1f}:")
