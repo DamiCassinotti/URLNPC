@@ -6,6 +6,7 @@
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
 #                   [--selector none|fixed:<Mode>|random|fsm|llm]
 #                   [--llm-prompt ID] [--llm-exemplars BANK] [--llm-shots N]
+#                   [--decision-period SECONDS]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
 #
@@ -41,6 +42,12 @@
 #                         no bank is the zero-shot arm): forwarded as -llm*, so a
 #                         batch sweeps models or temperatures off one build.
 #                         Only with --selector llm
+#   --decision-period     seconds between periodic selector decisions. The
+#                         default (20 s) is set by the chosen model's latency
+#                         (#133); a call still unanswered when the next
+#                         decision comes due is cancelled, so this has to
+#                         exceed --llm-timeout. Pass 5 to score the FSM and
+#                         random baselines on the cadence #129 measured
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
@@ -106,6 +113,7 @@ while [[ $# -ge 1 ]]; do
         --llm-prompt)      LLM_ARGS+=(-llmPrompt "$2"); shift 2 ;;
         --llm-exemplars)   LLM_ARGS+=(-llmExemplars "$2"); shift 2 ;;
         --llm-shots)       LLM_ARGS+=(-llmShots "$2"); shift 2 ;;
+        --decision-period) LLM_ARGS+=(-decisionPeriod "$2"); shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;

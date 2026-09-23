@@ -46,6 +46,10 @@ public class ModeSelectorDriverTests
         spawned.Add(go);
         channel = go.AddComponent<ModeChannel>();
         ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        // Pinned rather than inherited: these tests tick at fixed times to
+        // exercise the cadence, so they must not move when the shipped default
+        // does (it went 5 s -> 20 s with the #133 model choice).
+        driver.decisionPeriodSeconds = 5f;
         selector = new ScriptedSelector();
         driver.Selector = selector;
         return driver;
@@ -146,7 +150,7 @@ public class ModeSelectorDriverTests
         ExpectWarning(); // the timeout
 
         driver.Tick(0f);
-        driver.Tick(5f); // default period
+        driver.Tick(5f); // one decision period
 
         Assert.That(selector.Calls, Is.EqualTo(2));
         Assert.That(selector.Tokens[0].IsCancellationRequested, Is.True, "the stale call was told to stop");

@@ -347,13 +347,143 @@ mode catalog's "Retreat will not win a fight" seems to read as advice against re
 That is a prompt problem, not an exemplar-count one.
 
 The latency column is the offline loop's, not the game's: this box runs the 8B on CPU at
-tens of seconds per call, far over the 5 s decision period. What it is good for is the
-relative cost, and that is the point of the sweep — 8 shots is about 25% slower per call
-than zero-shot, so on hardware where the budget is tight the arm to give up is the shots,
-not the state.
+tens of seconds per call, far over the 5 s decision period.
+
+**Read the relative cost here with care — §11 supersedes it.** These means are over one
+greedy pass each, so a single cold-prefix first call (up to 187 s on the 8B) dominates
+them, and the "8 shots is ~25% slower" gap is mostly that artifact. Measured at steady
+state with the prefix warm, prefill is about two thirds of every call and eight shots cost
+only ~2 s more than zero-shot. The expensive axes are prompt and output length; shots are
+cheap. The accuracy ordering below is also superseded — it was measured on 32 items, where
+adjacent cells are indistinguishable (#153), and the #133 grid over 86 finds the shot count
+to be the *only* axis with a significant effect.
 
 Retrieval (nearest exemplars by feature distance) is deliberately not implemented: it adds
 per-call latency and a second thing to tune, and the issue's own rule was to reach for it
 only if the fixed set underperforms.
 
 Raw results are in `results/battery/ablation-132/`.
+
+## 11. The model and prompt sweep (#133)
+
+The point where the selector's model, prompt and exemplar bank are chosen.
+`scripts/battery_sweep.py` runs the grid — one `battery.py` cell per combination,
+resumable, rendering `grid.md` from every cell on disk so it can be run in passes:
+
+```bash
+scripts/battery_sweep.py --models llama3.2:1b,llama3.2:3b --prompts v2,v3,v4 \
+  --shots 0,8 --exemplars bank-v1 --timeout 600 --out results/battery/sweep-133
+scripts/battery_sweep.py --models llama3.1:8b --prompts v2,v3 --shots 0,8 \
+  --exemplars bank-v1 --baselines --timeout 600 --out results/battery/sweep-133
+```
+
+Sixteen cells over the 86-snapshot battery, temperature 0, one greedy pass each.
+Full results in `results/battery/sweep-133/`.
+
+| model | prompt | shots | accuracy | invalid | lat p95 |
+|---|---|---|---|---|---|
+| *FSM baseline* | — | — | *95.8%* | *0%* | *~0 s* |
+| *random baseline* | — | — | *27.8%* | *0%* | *~0 s* |
+| llama3.1:8b | v3 | 8 | **66.7%** | 0% | 39.2 s |
+| llama3.1:8b | v2 | 8 | 58.3% | 0% | 40.5 s |
+| **llama3.2:3b** | **v4** | **8** | **59.7%** | 0% | **14.8 s** |
+| llama3.2:3b | v3 | 8 | 58.3% | 0% | 20.7 s |
+| llama3.2:3b | v2 | 0 | 54.2% | 0% | 11.1 s |
+| llama3.2:1b | v4 | 8 | 43.1% | 0% | 7.8 s |
+| llama3.1:8b | v3 | 0 | 40.3% | 0% | 30.8 s |
+
+### What the grid says
+
+**One of the three bars passes.** Valid JSON is 100% in all sixteen cells — the
+schema-constrained decode holds, and the defensive parsing in `LlmModeResponse`
+was never exercised. Accuracy tops out at 66.7% against the FSM's 95.8%, and the
+best p95 is 39.2 s against a 3 s bar. The contingency ladder is exhausted: the
+catalog was revised twice (v3, v4), exemplars are in, and the model was stepped
+1B → 3B → 8B. **The largest local model does not tie the FSM, so this is the
+reportable null result §4.5.3 allows, and the cloud arm is now warranted.**
+
+**Only one axis in the grid is statistically real.** McNemar, exact two-sided,
+over the 72 scored snapshots:
+
+| comparison | Δ | p |
+|---|---|---|
+| 8B v3: zero-shot → 8 shots | 40.3 → 66.7 | **0.002** |
+| 3B v4×8 → 8B v3×8 (model size) | 59.7 → 66.7 | 0.458 |
+| 8B ×8: v2 → v3 (catalog rewrite) | 58.3 → 66.7 | 0.180 |
+| 3B ×8: v3 → v4 (terse output) | 58.3 → 59.7 | 1.000 |
+
+Model size and prompt wording are both null at this sample size; exemplars are
+not. This supersedes §10's reading of the #132 ablation, which was measured on
+32 items and could not separate adjacent cells at all.
+
+**What the exemplars actually buy is mode coverage, not judgement.** Six of the
+sixteen cells answer one mode to nearly every state: 8B v3 zero-shot and 3B v4
+zero-shot are 100% Hunt across all 86 snapshots, and four 1B cells are 93–98%
+Patrol. Every collapsed cell is zero-shot or 1B. That is the failure shape #118
+named, and the per-mode accuracy and chosen-share columns are the only place it
+shows — a cell answering Hunt everywhere still scores 40.3%, comfortably above
+the random floor.
+
+**The misses have not moved since #132.** Of the 21 states the FSM gets right
+and the best cell misses, 15 are `just-lost-sight` (8) and `lowhp-contact` (7) —
+the press-versus-break-off calls. Two catalog rewrites and a 4× model-size
+increase left them where they were, which is evidence that they are not a
+wording problem.
+
+### The chosen configuration
+
+**Best in the grid: `llama3.1:8b` + `v3` + `bank-v1` ×8 (66.7%).** It also has by
+far the best mode balance — 35/23/21/21 across Hunt/HoldCover/Retreat/Patrol,
+the only cell that exercises all four.
+
+**What the selector ships on: `llama3.2:3b` + `v4` + `bank-v1` ×8 (59.7%)** —
+`ModeSelectorDriver`'s serialized defaults and `Enemy.prefab`. The split is
+deliberate. The 8B's extra accuracy is not significant (p=0.46) and costs 2.5×
+the latency; at a p95 of 39.2 s a 120 s round fits two or three decisions, with
+event triggers mostly cancelled, so the first decision would set the mode for a
+third of the round. That is not a mode selector. The 3B supports a 20 s period,
+i.e. about six decisions a round plus events.
+
+The cost is mode coverage: the 3B cell picks HoldCover on 4.7% of decisions, so
+one of the four modes is effectively never commanded. Record it as a limitation
+of the shipped tier — and note that the arm that fixes it (the 8B) is the one
+that cannot run in time, which is the clearest single argument for the cloud arm.
+
+### Latency is prefill, not model size
+
+Measured on the study machine (i7-7500U, 4 cores, **no GPU**), steady state with
+the prefix warm:
+
+| | per call | of which prefill | output tokens |
+|---|---|---|---|
+| 3B, v3, zero-shot | ~14.8 s | ~9.9 s | 22.7 |
+| 3B, v3, 8 shots | ~16.7 s | ~9.4 s | 25.5 |
+
+Prefill is about two thirds of every call and eight shots cost only ~2 s more
+than zero-shot, so **the expensive axis is prompt and output length, not shot
+count** — the opposite of what §10 concluded from wall-clock means that were
+dominated by one cold first call. Capping the `reason` field to four words (v4)
+cut generation from 5.5 s to 2.9 s, which is the whole reason v4 ships over v3.
+
+The first call against a cold prefix costs far more — up to 80 s on the 3B, 187 s
+on the 8B — because the whole prefix is prefilled once. In a match that is one
+timeout at session start, which the 3-consecutive-failure latch absorbs.
+Pre-warming the prefix before the round starts is an obvious follow-up.
+
+### Decision period
+
+`decisionPeriodSeconds` is raised from 5 s to 20 s, and `llmTimeoutSeconds` from
+4 s to 16 s. At the old values every LLM call was cancelled before it landed —
+a call unanswered when the next decision comes due is cancelled, and the chosen
+model's p95 is 14.8 s — so the run would have scored an uncommanded policy.
+
+The period is shared by every selector kind, so the FSM and random baselines now
+decide on the same cadence. `-decisionPeriod 5` (`scripts/eval.sh
+--decision-period 5`) puts them back on the one #129 measured them at. Both are
+worth reporting: matched cadence isolates decision quality, native cadence is
+the deployment comparison.
+
+Lengthening the period does **not** require a retrain. `ModeDirector` may redraw
+the mode it is already on and simply extend the dwell, so mode intervals well
+past 5 s are already in the policy's training distribution; it is shortening the
+period that would be out of distribution.

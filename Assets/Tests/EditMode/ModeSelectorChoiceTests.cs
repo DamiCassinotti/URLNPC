@@ -106,4 +106,31 @@ public class ModeSelectorChoiceTests
             Is.EqualTo(ModeSelectorKind.Random),
             "a half-valid value must fall through to the next source");
     }
+
+    // -decisionPeriod (#133): the LLM arm needs a period above its answer
+    // latency, while the FSM and random baselines have to be re-runnable on
+    // the 5 s cadence #129 measured them at.
+    [Test]
+    public void DecisionPeriod_TakesTheArgumentOverTheSerializedValue()
+    {
+        Assert.That(ModeSelectorDriver.ResolveDecisionPeriod(
+            new[] { "-decisionPeriod", "5" }, 20f), Is.EqualTo(5f));
+    }
+
+    [Test]
+    public void DecisionPeriod_FallsBackToSerializedWhenAbsent()
+    {
+        Assert.That(ModeSelectorDriver.ResolveDecisionPeriod(NoArgs, 20f), Is.EqualTo(20f));
+    }
+
+    // A zero or negative period would issue a decision every tick, so a bad
+    // value falls through rather than being taken literally.
+    [TestCase("0")]
+    [TestCase("-3")]
+    [TestCase("banana")]
+    public void DecisionPeriod_IgnoresAnUnusableValue(string value)
+    {
+        Assert.That(ModeSelectorDriver.ResolveDecisionPeriod(
+            new[] { "-decisionPeriod", value }, 20f), Is.EqualTo(20f));
+    }
 }

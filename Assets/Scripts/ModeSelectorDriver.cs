@@ -22,8 +22,14 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Which selector commands modes this run. Overridden by '-modeSelector <none|fixed[:<Mode>]|random|fsm|llm>' on the command line, or KindOverride from code.")]
     [SerializeField] internal ModeSelectorKind selectorKind = ModeSelectorKind.None;
 
-    [Tooltip("Seconds between periodic decisions. Kept at ModeDirector.minDwellSeconds — the switch rate the policy was trained on.")]
-    [SerializeField] internal float decisionPeriodSeconds = 5f;
+    // Raised from 5 s by the #133 sweep: the chosen model answers in 14.8 s at
+    // p95 on this hardware, and a call unanswered when the next decision comes
+    // due is cancelled, so at 5 s every LLM call died and the run scored an
+    // uncommanded policy. Shared by every selector kind, so the FSM and random
+    // baselines decide on this cadence too — '-decisionPeriod 5' puts them
+    // back on the one #129 measured them at.
+    [Tooltip("Seconds between periodic decisions. Must exceed the selector's answer latency: a call still unanswered when the next decision comes due is cancelled. Overridable with '-decisionPeriod <seconds>'.")]
+    [SerializeField] internal float decisionPeriodSeconds = 20f;
 
     [Tooltip("Shortest gap between decisions when an event (damage taken, sight gained or lost, low HP crossed) asks for one early, so a noisy fight can't thrash the mode.")]
     [SerializeField] internal float minEventDwellSeconds = 2f;
@@ -48,11 +54,16 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Ollama base URL. Overridable with '-llmEndpoint <url>'.")]
     [SerializeField] internal string llmEndpoint = "http://localhost:11434";
 
-    [Tooltip("Ollama model tag, e.g. 'llama3.1:8b'. Overridable with '-llmModel <tag>'.")]
-    [SerializeField] internal string llmModel = "llama3.1:8b";
+    // llama3.2:3b, not the 8B: over the #133 battery the 8B's extra accuracy
+    // was not significant (66.7% vs 59.7%, McNemar p=0.46) while costing 2.5x
+    // the latency, and at 39 s a round fits two decisions.
+    [Tooltip("Ollama model tag, e.g. 'llama3.2:3b'. Overridable with '-llmModel <tag>'.")]
+    [SerializeField] internal string llmModel = "llama3.2:3b";
 
+    // Above the chosen model's measured p95 (14.8 s) and under the decision
+    // period, which cancels anything still in flight.
     [Tooltip("Seconds one model call may take before it counts as a failure. Kept under decisionPeriodSeconds. Overridable with '-llmTimeout <seconds>'.")]
-    [SerializeField] internal float llmTimeoutSeconds = 4f;
+    [SerializeField] internal float llmTimeoutSeconds = 16f;
 
     [Tooltip("Extra attempts after output that names no mode. Overridable with '-llmRetries <n>'.")]
     [SerializeField] internal int llmRetries = 1;
@@ -64,13 +75,16 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal int llmSeed = 1;
 
     [Tooltip("Which prompt variant is sent — the id of a text asset under Resources/Prompts. Overridable with '-llmPrompt <id>'.")]
-    [SerializeField] internal string llmPromptId = ModePrompt.FewShotId;
+    [SerializeField] internal string llmPromptId = ModePrompt.TerseId;
 
     [Tooltip("Which exemplar bank fills the prompt's {{EXEMPLARS}} slot — the id of a text asset under Resources/Exemplars. Empty, or '-llmExemplars none', is the zero-shot arm.")]
     [SerializeField] internal string llmExemplarsId = ModeExemplars.DefaultId;
 
-    // Eight shots is what won the battery ablation (#132): 65.6% against
-    // zero-shot's 56.2%, and past it twelve gave the accuracy back.
+    // Eight shots, and this is the one setting the #133 sweep found a real
+    // effect for: on the 86-snapshot battery, zero-shot to eight shots is
+    // +26 points (McNemar p=0.002) where model size and prompt wording were
+    // both null. What the examples buy is mode coverage — every zero-shot
+    // cell that collapsed answered one mode to nearly every state.
     [Tooltip("How many of the bank's exemplars are shown; 0 is all of them. Overridable with '-llmShots <n>'.")]
     [SerializeField] internal int llmShots = ModeExemplars.DefaultShots;
 
@@ -256,6 +270,30 @@ public class ModeSelectorDriver : MonoBehaviour
         Shots = llmShots,
     }.WithCommandLine(System.Environment.GetCommandLineArgs());
 
+    public const string DecisionPeriodArg = "-decisionPeriod";
+
+    // The rule, so it is testable without a process: the argument wins when it
+    // parses to a positive number, otherwise the serialized value stands — a
+    // zero or negative period would issue a decision every tick.
+    internal static float ResolveDecisionPeriod(string[] args, float serialized)
+    {
+        return CommandLineArgs.TryRead(args, DecisionPeriodArg, TryReadPeriod, out float seconds)
+               && seconds > 0f
+            ? seconds
+            : serialized;
+    }
+
+    static bool TryReadPeriod(string raw, out float seconds) =>
+        float.TryParse(raw, System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture, out seconds);
+
+    // Resolved once rather than per tick: the scan allocates and this runs
+    // every FixedUpdate, and the argument can't change mid-process.
+    float? resolvedDecisionPeriod;
+    internal float ResolvedDecisionPeriod =>
+        resolvedDecisionPeriod ??= ResolveDecisionPeriod(
+            System.Environment.GetCommandLineArgs(), decisionPeriodSeconds);
+
     void FixedUpdate()
     {
         Tick(Time.fixedTime);
@@ -281,7 +319,7 @@ public class ModeSelectorDriver : MonoBehaviour
             return;
         }
 
-        schedule.DecisionPeriodSeconds = decisionPeriodSeconds;
+        schedule.DecisionPeriodSeconds = ResolvedDecisionPeriod;
         schedule.MinEventDwellSeconds = minEventDwellSeconds;
         schedule.LowHealthFraction = lowHealthFraction;
         schedule.FailuresBeforeFallback = failuresBeforeFallback;
