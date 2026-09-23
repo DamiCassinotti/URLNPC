@@ -226,9 +226,17 @@ def main():
     grid = render_grid(cells, entries)
     with open(os.path.join(args.out, "grid.md"), "w", encoding="utf-8") as handle:
         handle.write(grid)
+    # The aggregate numbers only: the per-snapshot detail already sits in the
+    # per-cell files beside this one, and repeating all of it here made the
+    # grid a verbatim copy of the directory it summarizes.
+    summary = []
+    for cell in cells:
+        rows = [{k: v for k, v in r.items() if k != "perSnapshot"} for r in cell["results"]]
+        summary.append({"label": label(cell), **{k: v for k, v in cell.items()
+                                                 if k != "results"}, "results": rows})
     with open(os.path.join(args.out, "grid.json"), "w", encoding="utf-8") as handle:
         json.dump({"snapshots": len(entries), "repeats": args.repeats,
-                   "cells": [{"label": label(c), **c} for c in cells]}, handle, indent=2)
+                   "cells": summary}, handle, indent=2)
     print(grid)
     return 0
 
