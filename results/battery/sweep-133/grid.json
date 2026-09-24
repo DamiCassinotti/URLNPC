@@ -1,0 +1,922 @@
+{
+  "snapshots": 86,
+  "repeats": 1,
+  "cells": [
+    {
+      "label": "fsm",
+      "selector": "fsm",
+      "model": "-",
+      "prompt": "-",
+      "exemplars": "none",
+      "shots": 0,
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.9583333333333334,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 1.0,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.8275862068965517,
+              "chosen": 33,
+              "chosenShare": 0.38372093023255816
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.5172413793103449,
+              "chosen": 19,
+              "chosenShare": 0.22093023255813954
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.8260869565217391,
+              "chosen": 22,
+              "chosenShare": 0.2558139534883721
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.6875,
+              "chosen": 12,
+              "chosenShare": 0.13953488372093023
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 0.0007223023330457075,
+          "latencyMsP50": 0.0006699992809444666,
+          "latencyMsP95": 0.0012590026017278433,
+          "latencyMsMax": 0.0021500018192455173
+        }
+      ]
+    },
+    {
+      "label": "random",
+      "selector": "random",
+      "model": "-",
+      "prompt": "-",
+      "exemplars": "none",
+      "shots": 0,
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.2777777777777778,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.6428571428571429,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.1724137931034483,
+              "chosen": 22,
+              "chosenShare": 0.2558139534883721
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.10344827586206896,
+              "chosen": 19,
+              "chosenShare": 0.22093023255813954
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.34782608695652173,
+              "chosen": 24,
+              "chosenShare": 0.27906976744186046
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.25,
+              "chosen": 21,
+              "chosenShare": 0.2441860465116279
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 0.0018384996300758144,
+          "latencyMsP50": 0.0015129990060813725,
+          "latencyMsP95": 0.00289699892164208,
+          "latencyMsMax": 0.012279000657144934
+        }
+      ]
+    },
+    {
+      "label": "llama3.1:8b, v2, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.1:8b",
+      "prompt": "v2",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5833333333333334,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.8571428571428571,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.3793103448275862,
+              "chosen": 20,
+              "chosenShare": 0.23255813953488372
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.3103448275862069,
+              "chosen": 23,
+              "chosenShare": 0.26744186046511625
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.43478260869565216,
+              "chosen": 22,
+              "chosenShare": 0.2558139534883721
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.75,
+              "chosen": 21,
+              "chosenShare": 0.2441860465116279
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 36902.34441440665,
+          "latencyMsP50": 33336.20329199766,
+          "latencyMsP95": 40482.492187999014,
+          "latencyMsMax": 242473.36194799936
+        }
+      ]
+    },
+    {
+      "label": "llama3.1:8b, v2, zero-shot",
+      "selector": "llm",
+      "model": "llama3.1:8b",
+      "prompt": "v2",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.4166666666666667,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5714285714285714,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.3793103448275862,
+              "chosen": 29,
+              "chosenShare": 0.3372093023255814
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.27586206896551724,
+              "chosen": 18,
+              "chosenShare": 0.20930232558139536
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.21739130434782608,
+              "chosen": 24,
+              "chosenShare": 0.27906976744186046
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.375,
+              "chosen": 15,
+              "chosenShare": 0.1744186046511628
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 26888.576812697316,
+          "latencyMsP50": 25813.52871400304,
+          "latencyMsP95": 29034.654707997106,
+          "latencyMsMax": 105555.74121999962
+        }
+      ]
+    },
+    {
+      "label": "llama3.1:8b, v3, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.1:8b",
+      "prompt": "v3",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.6666666666666666,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.9285714285714286,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.5862068965517241,
+              "chosen": 30,
+              "chosenShare": 0.3488372093023256
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.3448275862068966,
+              "chosen": 20,
+              "chosenShare": 0.23255813953488372
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.391304347826087,
+              "chosen": 18,
+              "chosenShare": 0.20930232558139536
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.75,
+              "chosen": 18,
+              "chosenShare": 0.20930232558139536
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 36501.15085654617,
+          "latencyMsP50": 34106.10820400325,
+          "latencyMsP95": 39199.66099999874,
+          "latencyMsMax": 186593.45846900396
+        }
+      ]
+    },
+    {
+      "label": "llama3.1:8b, v3, zero-shot",
+      "selector": "llm",
+      "model": "llama3.1:8b",
+      "prompt": "v3",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.4027777777777778,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.7142857142857143,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 1.0,
+              "chosen": 86,
+              "chosenShare": 1.0
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 28751.873767046225,
+          "latencyMsP50": 27907.699423005397,
+          "latencyMsP95": 30840.808494001976,
+          "latencyMsMax": 97544.33413600054
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:1b, v2, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:1b",
+      "prompt": "v2",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.2638888888888889,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.35714285714285715,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.13043478260869565,
+              "chosen": 3,
+              "chosenShare": 0.03488372093023256
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 1.0,
+              "chosen": 83,
+              "chosenShare": 0.9651162790697675
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 7622.7572163372815,
+          "latencyMsP50": 7174.738805999368,
+          "latencyMsP95": 8758.61275600073,
+          "latencyMsMax": 34156.354883998574
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:1b, v2, zero-shot",
+      "selector": "llm",
+      "model": "llama3.2:1b",
+      "prompt": "v2",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.25,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.35714285714285715,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.06896551724137931,
+              "chosen": 2,
+              "chosenShare": 0.023255813953488372
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 1.0,
+              "chosen": 84,
+              "chosenShare": 0.9767441860465116
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 5754.422512767443,
+          "latencyMsP50": 5279.247567999846,
+          "latencyMsP95": 7506.501517998913,
+          "latencyMsMax": 24107.635641999877
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:1b, v3, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:1b",
+      "prompt": "v3",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.2638888888888889,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.35714285714285715,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.06896551724137931,
+              "chosen": 3,
+              "chosenShare": 0.03488372093023256
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.043478260869565216,
+              "chosen": 1,
+              "chosenShare": 0.011627906976744186
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 1.0,
+              "chosen": 82,
+              "chosenShare": 0.9534883720930233
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 7743.0608516395,
+          "latencyMsP50": 7373.327080000308,
+          "latencyMsP95": 7901.547743000265,
+          "latencyMsMax": 36316.50411600094
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:1b, v3, zero-shot",
+      "selector": "llm",
+      "model": "llama3.2:1b",
+      "prompt": "v3",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.4166666666666667,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.41379310344827586,
+              "chosen": 26,
+              "chosenShare": 0.3023255813953488
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.3103448275862069,
+              "chosen": 11,
+              "chosenShare": 0.12790697674418605
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.5625,
+              "chosen": 49,
+              "chosenShare": 0.5697674418604651
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 6291.162591639561,
+          "latencyMsP50": 6192.49976699939,
+          "latencyMsP95": 7847.21260400147,
+          "latencyMsMax": 19864.566312000534
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:1b, v4, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:1b",
+      "prompt": "v4",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.4305555555555556,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5714285714285714,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.5172413793103449,
+              "chosen": 33,
+              "chosenShare": 0.38372093023255816
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.391304347826087,
+              "chosen": 11,
+              "chosenShare": 0.12790697674418605
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.4375,
+              "chosen": 42,
+              "chosenShare": 0.4883720930232558
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 7764.708350430167,
+          "latencyMsP50": 7450.323371000195,
+          "latencyMsP95": 7795.797335000316,
+          "latencyMsMax": 35134.218413999406
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:1b, v4, zero-shot",
+      "selector": "llm",
+      "model": "llama3.2:1b",
+      "prompt": "v4",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.25,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.42857142857142855,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.034482758620689655,
+              "chosen": 2,
+              "chosenShare": 0.023255813953488372
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.043478260869565216,
+              "chosen": 4,
+              "chosenShare": 0.046511627906976744
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 1.0,
+              "chosen": 80,
+              "chosenShare": 0.9302325581395349
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 5732.408307860317,
+          "latencyMsP50": 5742.568652000045,
+          "latencyMsP95": 6286.132617000476,
+          "latencyMsMax": 8066.861620998679
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:3b, v2, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v2",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5277777777777778,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.42857142857142855,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.10344827586206896,
+              "chosen": 4,
+              "chosenShare": 0.046511627906976744
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.10344827586206896,
+              "chosen": 15,
+              "chosenShare": 0.1744186046511628
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.9130434782608695,
+              "chosen": 39,
+              "chosenShare": 0.45348837209302323
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.6875,
+              "chosen": 28,
+              "chosenShare": 0.32558139534883723
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 15518.387572848738,
+          "latencyMsP50": 14781.987237998692,
+          "latencyMsP95": 16053.947554999468,
+          "latencyMsMax": 78032.06792499986
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:3b, v2, zero-shot",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v2",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5416666666666666,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5714285714285714,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.4827586206896552,
+              "chosen": 28,
+              "chosenShare": 0.32558139534883723
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.1724137931034483,
+              "chosen": 6,
+              "chosenShare": 0.06976744186046512
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.5217391304347826,
+              "chosen": 17,
+              "chosenShare": 0.19767441860465115
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.5,
+              "chosen": 35,
+              "chosenShare": 0.4069767441860465
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 10741.257756558192,
+          "latencyMsP50": 10345.002591000593,
+          "latencyMsP95": 11099.48213700045,
+          "latencyMsMax": 42103.96944400054
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:3b, v3, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v3",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5833333333333334,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5714285714285714,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.5172413793103449,
+              "chosen": 26,
+              "chosenShare": 0.3023255813953488
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.06896551724137931,
+              "chosen": 8,
+              "chosenShare": 0.09302325581395349
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.6521739130434783,
+              "chosen": 35,
+              "chosenShare": 0.4069767441860465
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.625,
+              "chosen": 17,
+              "chosenShare": 0.19767441860465115
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 17152.9631980233,
+          "latencyMsP50": 15926.311273000465,
+          "latencyMsP95": 20700.778080998134,
+          "latencyMsMax": 80548.73134900117
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:3b, v3, zero-shot",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v3",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5416666666666666,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5714285714285714,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.7586206896551724,
+              "chosen": 43,
+              "chosenShare": 0.5
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.10344827586206896,
+              "chosen": 4,
+              "chosenShare": 0.046511627906976744
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.34782608695652173,
+              "chosen": 18,
+              "chosenShare": 0.20930232558139536
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.375,
+              "chosen": 21,
+              "chosenShare": 0.2441860465116279
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 11507.522146523199,
+          "latencyMsP50": 11157.415254998341,
+          "latencyMsP95": 12345.049096998991,
+          "latencyMsMax": 39690.588548997766
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:3b, v4, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v4",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5972222222222222,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.5714285714285714,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.6896551724137931,
+              "chosen": 32,
+              "chosenShare": 0.37209302325581395
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.06896551724137931,
+              "chosen": 4,
+              "chosenShare": 0.046511627906976744
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.5217391304347826,
+              "chosen": 19,
+              "chosenShare": 0.22093023255813954
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.5625,
+              "chosen": 31,
+              "chosenShare": 0.36046511627906974
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 14788.45917711628,
+          "latencyMsP50": 14098.246621000726,
+          "latencyMsP95": 14769.922337000025,
+          "latencyMsMax": 80623.09336999897
+        }
+      ]
+    },
+    {
+      "label": "llama3.2:3b, v4, zero-shot",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v4",
+      "exemplars": "none",
+      "shots": 0,
+      "endpoint": "http://localhost:11434",
+      "repeats": 1,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.4027777777777778,
+          "consistency": 1.0,
+          "ambiguousAccuracy": 0.7142857142857143,
+          "ambiguousConsistency": 1.0,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 1.0,
+              "chosen": 86,
+              "chosenShare": 1.0
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.0,
+              "chosen": 0,
+              "chosenShare": 0.0
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 11430.690178256047,
+          "latencyMsP50": 11448.356528002478,
+          "latencyMsP95": 11900.841462000244,
+          "latencyMsMax": 12927.860584000882
+        }
+      ]
+    }
+  ]
+}

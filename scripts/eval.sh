@@ -6,6 +6,7 @@
 #                   [--opponent policy|heuristic] [--modes scripted|none|<Mode>]
 #                   [--selector none|fixed:<Mode>|random|fsm|llm]
 #                   [--llm-prompt ID] [--llm-exemplars BANK] [--llm-shots N]
+#                   [--decision-period SECONDS]
 #                   [--time-scale F] [--out DIR]
 #                   [--rebuild | --no-build] [--timeout SEC]
 #
@@ -41,6 +42,12 @@
 #                         no bank is the zero-shot arm): forwarded as -llm*, so a
 #                         batch sweeps models or temperatures off one build.
 #                         Only with --selector llm
+#   --decision-period     seconds between periodic selector decisions. The
+#                         default (20 s) is set by the chosen model's latency
+#                         (#133); a call still unanswered when the next
+#                         decision comes due is cancelled, so this has to
+#                         exceed --llm-timeout. Pass 5 to score the FSM and
+#                         random baselines on the cadence #129 measured
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
@@ -66,7 +73,10 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    sed -n '2,43p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    # End derived from where the header stops, not a literal line number: the
+    # previous fixed range silently dropped options as the block grew.
+    local last=$(( $(grep -n '^set -euo' "${BASH_SOURCE[0]}" | head -1 | cut -d: -f1) - 1 ))
+    sed -n "2,${last}p" "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -89,6 +99,9 @@ BUILD=1
 TIMEOUT=""
 REBUILD=0
 LLM_ARGS=()
+# Not an --llm-* knob: the period is shared by every selector kind, so it must
+# stay out of the gate below that rejects LLM knobs on a non-LLM run.
+DECISION_PERIOD=""
 while [[ $# -ge 1 ]]; do
     case "$1" in
         --episodes) EPISODES="$2"; shift 2 ;;
@@ -106,6 +119,7 @@ while [[ $# -ge 1 ]]; do
         --llm-prompt)      LLM_ARGS+=(-llmPrompt "$2"); shift 2 ;;
         --llm-exemplars)   LLM_ARGS+=(-llmExemplars "$2"); shift 2 ;;
         --llm-shots)       LLM_ARGS+=(-llmShots "$2"); shift 2 ;;
+        --decision-period) DECISION_PERIOD="$2"; shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;
@@ -129,6 +143,20 @@ case "$SELECTOR" in none|random|fsm|llm|fixed:hunt|fixed:holdcover|fixed:retreat
 if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
     echo "error: the --llm-* knobs need --selector llm" >&2
     exit 1
+fi
+PERIOD_ARGS=()
+if [[ -n "$DECISION_PERIOD" ]]; then
+    # A typo would otherwise fall through to the serialized default and score
+    # the run at a cadence its own config.json disagrees with.
+    # Numeric compare, not a string one: '0.0' matches the shape but resolves
+    # to zero, which the driver ignores — leaving config.json claiming a period
+    # the run never used.
+    if ! [[ "$DECISION_PERIOD" =~ ^[0-9]+(\.[0-9]+)?$ ]] \
+       || ! awk -v v="$DECISION_PERIOD" 'BEGIN { exit !(v + 0 > 0) }'; then
+        echo "error: --decision-period takes a positive number of seconds" >&2
+        exit 1
+    fi
+    PERIOD_ARGS=(-decisionPeriod "$DECISION_PERIOD")
 fi
 # One writer on the mode channel: a selector run stands the scripted director
 # down. Naming both is a condition mix-up, not a run.
@@ -157,6 +185,7 @@ cat > "$OUT/config.json" <<JSON
   "modes": "$MODES",
   "selector": "$SELECTOR",
   "llmArgs": "${LLM_ARGS[*]-}",
+  "decisionPeriod": "${DECISION_PERIOD:-default}",
   "timeScale": $TIME_SCALE,
   "commit": "$(git -C "$PROJECT_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)",
   "startedUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -209,7 +238,8 @@ timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
     -evalModes "$MODES" \
     -modeSelector "$SELECTOR" \
     -evalTimeScale "$TIME_SCALE" \
-    ${LLM_ARGS[@]+"${LLM_ARGS[@]}"}
+    ${LLM_ARGS[@]+"${LLM_ARGS[@]}"} \
+    ${PERIOD_ARGS[@]+"${PERIOD_ARGS[@]}"}
 RC=$?
 set -e
 if [[ $RC -eq 124 ]]; then

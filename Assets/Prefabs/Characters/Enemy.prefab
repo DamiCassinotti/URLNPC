@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   selectorKind: 0
-  decisionPeriodSeconds: 5
+  decisionPeriodSeconds: 20
   minEventDwellSeconds: 2
   lowHealthFraction: 0.35
   failuresBeforeFallback: 3
@@ -310,12 +310,12 @@ MonoBehaviour:
   fsmLowHealthPercent: 35
   fsmUnseenSecondsForPatrol: 6
   llmEndpoint: http://localhost:11434
-  llmModel: llama3.1:8b
-  llmTimeoutSeconds: 4
+  llmModel: llama3.2:3b
+  llmTimeoutSeconds: 16
   llmRetries: 1
   llmTemperature: 0
   llmSeed: 1
-  llmPromptId: v2
+  llmPromptId: v4
   llmExemplarsId: bank-v1
   llmShots: 8
   logDecisions: 1

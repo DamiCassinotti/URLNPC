@@ -55,7 +55,7 @@ public struct LlmSelectorConfig
     public static LlmSelectorConfig Defaults => new LlmSelectorConfig
     {
         Endpoint = "http://localhost:11434",
-        Model = "llama3.1:8b",
+        Model = "llama3.2:3b",
         PromptId = ModePrompt.DefaultId,
     };
 

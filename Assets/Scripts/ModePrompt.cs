@@ -19,9 +19,17 @@ public class ModePrompt
     public const string DefaultId = "v1";
 
     // v1 plus the {{EXEMPLARS}} slot and nothing else, so it renders as v1 with
-    // no bank behind it. What the selector ships on, the few-shot arm having
-    // won the battery ablation (#132).
+    // no bank behind it.
     public const string FewShotId = "v2";
+
+    // v2 with the round's payoffs stated and the catalog rewritten around them.
+    // Measured no better than v2 (p=0.18) — kept as an arm, not an improvement.
+    public const string RevisedId = "v3";
+
+    // v3 with a four-word reason instead of a sentence: ties v3 on accuracy and
+    // is ~2 s cheaper per call, generation being a third of each call on CPU.
+    // Both collapse to answering Hunt everywhere with no bank — few-shot only.
+    public const string TerseId = "v4";
 
     public const string HistoryToken = "{{HISTORY}}";
     public const string StateToken = "{{STATE}}";

@@ -1,0 +1,97 @@
+{
+  "snapshots": 86,
+  "repeats": 1,
+  "cells": [
+    {
+      "label": "llama3.2:3b, v4, bank-v1 x8",
+      "selector": "llm",
+      "model": "llama3.2:3b",
+      "prompt": "v4",
+      "exemplars": "bank-v1",
+      "shots": 8,
+      "endpoint": "http://localhost:11434",
+      "repeats": 3,
+      "snapshots": 86,
+      "results": [
+        {
+          "temp": 0.0,
+          "accuracy": 0.5787037037037037,
+          "consistency": 0.9583333333333334,
+          "ambiguousAccuracy": 0.6190476190476191,
+          "ambiguousConsistency": 0.9047619047619048,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.6206896551724138,
+              "chosen": 32,
+              "chosenShare": 0.37209302325581395
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.06896551724137931,
+              "chosen": 4,
+              "chosenShare": 0.046511627906976744
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.5217391304347826,
+              "chosen": 16,
+              "chosenShare": 0.18604651162790697
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.5625,
+              "chosen": 34,
+              "chosenShare": 0.3953488372093023
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 7679.180793864559,
+          "latencyMsP50": 4421.966914997029,
+          "latencyMsP95": 14265.094697999302,
+          "latencyMsMax": 126191.25889799761,
+          "byModeFrom": "modal"
+        },
+        {
+          "temp": 0.7,
+          "accuracy": 0.4722222222222222,
+          "consistency": 0.9351851851851851,
+          "ambiguousAccuracy": 0.6666666666666666,
+          "ambiguousConsistency": 0.8333333333333333,
+          "byMode": {
+            "Hunt": {
+              "labeled": 29,
+              "accuracy": 0.5172413793103449,
+              "chosen": 31,
+              "chosenShare": 0.36046511627906974
+            },
+            "HoldCover": {
+              "labeled": 29,
+              "accuracy": 0.10344827586206896,
+              "chosen": 8,
+              "chosenShare": 0.09302325581395349
+            },
+            "Retreat": {
+              "labeled": 23,
+              "accuracy": 0.21739130434782608,
+              "chosen": 9,
+              "chosenShare": 0.10465116279069768
+            },
+            "Patrol": {
+              "labeled": 16,
+              "accuracy": 0.5625,
+              "chosen": 38,
+              "chosenShare": 0.4418604651162791
+            }
+          },
+          "invalidRate": 0.0,
+          "latencyMsMean": 7352.715995837613,
+          "latencyMsP50": 4667.744513004436,
+          "latencyMsP95": 14260.099615996296,
+          "latencyMsMax": 14621.116946000257,
+          "byModeFrom": "modal"
+        }
+      ]
+    }
+  ]
+}
