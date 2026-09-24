@@ -223,21 +223,31 @@ JSON
 # ------------------------------------------------------------------- build
 
 MODEL_HASH="$(sha256sum "$MODEL" | cut -d' ' -f1)"
+# The stamp keys on the game code too, not just the model: the player bakes in
+# whatever EvalSession/selector code was compiled, so a build made before a code
+# change silently runs the old behavior. That is how an --selector llm run on a
+# pre-LLM build scored an uncommanded policy at full speed. Content hash, not
+# mtime, so a git checkout doesn't force a needless rebuild. Paths relative to
+# the root so the hash doesn't depend on the caller's CWD.
+CODE_HASH="$(cd "$PROJECT_ROOT" && find Assets/Scripts Assets/Resources/Prompts Assets/Resources/Exemplars \
+    -type f \( -name '*.cs' -o -name '*.asmdef' -o -name '*.txt' \) -print0 2>/dev/null \
+    | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+BUILD_KEY="$MODEL_HASH $CODE_HASH"
 if [[ $BUILD -eq 1 ]]; then
     mkdir -p "$MODEL_DIR"
     cp "$MODEL" "$MODEL_DEST"
-    if [[ $REBUILD -eq 0 && -x "$ENV_BIN" && -f "$STAMP_FILE" && "$(cat "$STAMP_FILE")" == "$MODEL_HASH" ]]; then
-        echo "==> Build already carries this model, skipping the rebuild."
+    if [[ $REBUILD -eq 0 && -x "$ENV_BIN" && -f "$STAMP_FILE" && "$(cat "$STAMP_FILE")" == "$BUILD_KEY" ]]; then
+        echo "==> Build already carries this model and code, skipping the rebuild."
     else
         rm -f "$STAMP_FILE"   # a failed build must not look like a good one
         bash "$PROJECT_ROOT/scripts/build-player.sh"
-        echo "$MODEL_HASH" > "$STAMP_FILE"
+        echo "$BUILD_KEY" > "$STAMP_FILE"
     fi
 elif [[ ! -x "$ENV_BIN" ]]; then
     echo "error: no build at $ENV_BIN — drop --no-build" >&2
     exit 1
-elif [[ ! -f "$STAMP_FILE" || "$(cat "$STAMP_FILE")" != "$MODEL_HASH" ]]; then
-    echo "warning: the existing build was made from a different model — results describe whatever it carries" >&2
+elif [[ ! -f "$STAMP_FILE" || "$(cat "$STAMP_FILE")" != "$BUILD_KEY" ]]; then
+    echo "warning: the existing build was made from a different model or older game code — results describe whatever it carries" >&2
 fi
 
 # --------------------------------------------------------------------- run
