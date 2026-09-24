@@ -13,4 +13,3 @@ How often each mode was answered on the scored states it is an acceptable answer
 
 | selector | prompt | shots | Hunt answered / chosen | HoldCover answered / chosen | Retreat answered / chosen | Patrol answered / chosen |
 |---|---|---|---|---|---|---|
-| llama3.2:3b | v4 | 8 | 62.1% / 37.2% | 6.9% / 4.7% | 52.2% / 18.6% | 56.2% / 39.5% |

@@ -146,6 +146,14 @@ def render_grid(cells, entries):
             print(f"note: {label(cell)} predates per-mode reporting — "
                   f"re-run it with --force for a row here", file=sys.stderr)
             continue
+        # A cell whose per-mode counts were reconstructed from stored modal
+        # answers rather than counted per call is a different statistic under
+        # the same header, so it is left out rather than published as measured.
+        if cell["results"][0].get("byModeFrom") == "modal":
+            print(f"note: {label(cell)} has per-mode counts reconstructed from "
+                  f"modal answers — omitted; re-run with --force to measure it",
+                  file=sys.stderr)
+            continue
         cols = " | ".join(
             f"{battery.rate(by_mode[m]['accuracy']).strip()} / "
             f"{battery.rate(by_mode[m]['chosenShare']).strip()}"
