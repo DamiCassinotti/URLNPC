@@ -436,9 +436,10 @@ wording problem.
 
 ### The chosen configuration
 
-**Best in the grid: `llama3.1:8b` + `v3` + `bank-v1` ×8 (66.7%).** It also has by
-far the best mode balance — 35/23/21/21 across Hunt/HoldCover/Retreat/Patrol,
-the only cell that exercises all four.
+**Best in the grid: `llama3.1:8b` + `v3` + `bank-v1` ×8 (66.7%).** It answers all
+four modes at usable rates (35/23/21/21 across Hunt/HoldCover/Retreat/Patrol).
+Nine of the sixteen cells answer all four; the most evenly spread is `8b` + `v2`
+×8 at 23/27/26/24, which scores 8 points lower.
 
 **What the selector ships on: `llama3.2:3b` + `v4` + `bank-v1` ×8 (59.7%)** —
 `ModeSelectorDriver`'s serialized defaults and `Enemy.prefab`. The split is
@@ -450,8 +451,11 @@ i.e. about six decisions a round plus events.
 
 The cost is mode coverage: the 3B cell picks HoldCover on 4.7% of decisions, so
 one of the four modes is effectively never commanded. Record it as a limitation
-of the shipped tier — and note that the arm that fixes it (the 8B) is the one
-that cannot run in time, which is the clearest single argument for the cloud arm.
+of the shipped tier. Among the cells fast enough to run it trades against
+accuracy rather than being fixable — `3b` + `v2` ×8 reaches 17.4% HoldCover but
+scores 52.8%, and no 3B cell manages both. The 8B cells cover HoldCover better
+(23–27%) and are too slow to use, and not being able to get accuracy and
+coverage together locally is the argument for the cloud arm.
 
 ### Latency is prefill, not model size
 
