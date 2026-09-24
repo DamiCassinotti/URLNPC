@@ -18,9 +18,11 @@ per state). Reports, per temperature:
   consistency      mean over snapshots of the modal answer's share of K repeats
   invalid          fraction of calls that named no mode
   latency          mean / p50 / p95 / max in ms
-  per-mode         the same accuracy restricted to the states each mode is an
-                   acceptable answer for, beside that mode's share of the
-                   answers given — a model that reads Hunt perfectly and never
+  per-mode         how often each mode was actually answered on the states
+                   it is an acceptable answer for (recall, not accuracy —
+                   answering Hunt to a Hunt-or-Patrol state is a hit for Hunt
+                   and a miss for Patrol), beside that mode's share of the
+                   answers given. A model that reads Hunt perfectly and never
                    picks Patrol scores well overall and is unusable, and only
                    these two columns show it (issue #133)
 
@@ -321,7 +323,11 @@ def run_temp(decide, entries, repeats, temp, rng):
     per_id = []
     # A mode's row covers the non-ambiguous states it is an acceptable answer
     # for; a state with two acceptable modes lands in both rows, since it is a
-    # state either mode is a right answer to.
+    # state either mode is a right answer to. The hit is whether the model
+    # actually answered *that* mode, not whether it answered acceptably —
+    # crediting any acceptable answer to every acceptable mode's row would
+    # score Patrol as perfect on a state a Hunt-only model answered Hunt for,
+    # which is the collapse these columns exist to expose.
     mode_hits = {m: 0 for m in MODES}
     mode_total = {m: 0 for m in MODES}   # calls
     mode_states = {m: 0 for m in MODES}  # snapshots behind them
@@ -356,7 +362,7 @@ def run_temp(decide, entries, repeats, temp, rng):
             acc_hits += hits
             acc_total += len(answers)
             for mode in acceptable:
-                mode_hits[mode] += hits
+                mode_hits[mode] += sum(1 for a in answers if a == mode)
                 mode_total[mode] += len(answers)
                 mode_states[mode] += 1
 
@@ -416,8 +422,9 @@ def render(selector, entries, results):
     first = results[0]
     lines.append("")
     lines.append(f"per mode at temp {first['temp']:.1f} "
-                 f"(labeled = scored states the mode is an acceptable answer for):")
-    lines.append(f"  {'mode':<12}{'labeled':>9}{'accuracy':>11}{'chosen':>9}")
+                 f"(labeled = scored states the mode is an acceptable answer for; "
+                 f"answered = how often it was the answer there):")
+    lines.append(f"  {'mode':<12}{'labeled':>9}{'answered':>11}{'chosen':>9}")
     for mode in MODES:
         row = first["byMode"][mode]
         lines.append(f"  {mode:<12}{row['labeled']:>9}{rate(row['accuracy']):>11}"

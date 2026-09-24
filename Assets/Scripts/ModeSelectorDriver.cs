@@ -207,6 +207,19 @@ public class ModeSelectorDriver : MonoBehaviour
                 // exists but nothing outside the tests ever filled the slot.
                 if (Fallback == null) Fallback = Fsm();
                 LlmSelectorConfig config = LlmConfig;
+                // Whichever is shorter is the real deadline, because a call
+                // unanswered when the next decision comes due is cancelled. A
+                // period under the timeout isn't wrong — a fast endpoint can
+                // still answer inside it — but it silently caps the budget,
+                // and at 5 s against this model it cancels every call and
+                // scores an uncommanded policy. Warn rather than refuse.
+                if (ResolvedDecisionPeriod <= config.TimeoutSeconds)
+                {
+                    Debug.LogWarning($"[ModeSelector] decision period " +
+                        $"{ResolvedDecisionPeriod:0.##}s is not above the LLM timeout " +
+                        $"{config.TimeoutSeconds:0.##}s, so the period is the effective " +
+                        "deadline and any slower answer is cancelled unanswered.", this);
+                }
                 if (!ModePromptLibrary.TryLoad(config.PromptId, out ModePrompt prompt))
                 {
                     // Inert rather than prompted with something else: a run

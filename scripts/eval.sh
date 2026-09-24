@@ -147,7 +147,11 @@ PERIOD_ARGS=()
 if [[ -n "$DECISION_PERIOD" ]]; then
     # A typo would otherwise fall through to the serialized default and score
     # the run at a cadence its own config.json disagrees with.
-    if ! [[ "$DECISION_PERIOD" =~ ^[0-9]+(\.[0-9]+)?$ ]] || [[ "$DECISION_PERIOD" == 0 ]]; then
+    # Numeric compare, not a string one: '0.0' matches the shape but resolves
+    # to zero, which the driver ignores — leaving config.json claiming a period
+    # the run never used.
+    if ! [[ "$DECISION_PERIOD" =~ ^[0-9]+(\.[0-9]+)?$ ]] \
+       || ! awk -v v="$DECISION_PERIOD" 'BEGIN { exit !(v + 0 > 0) }'; then
         echo "error: --decision-period takes a positive number of seconds" >&2
         exit 1
     fi

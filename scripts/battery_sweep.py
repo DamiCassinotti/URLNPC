@@ -121,21 +121,31 @@ def render_grid(cells, entries):
                 f"| {r['latencyMsMean'] / 1000:.1f} s "
                 f"| {r['latencyMsP95'] / 1000:.1f} s |")
 
+    # Named, not "lowest": --temps is taken in the order given, so results[0]
+    # is the first temperature asked for and need not be the smallest.
+    shown = cells[0]["results"][0]["temp"] if cells else 0.0
     lines += [
         "",
-        "## Per-mode, at the lowest temperature",
+        f"## Per-mode, at temperature {shown:.1f}",
         "",
-        "Accuracy over the scored states each mode is an acceptable answer for, "
-        "and that mode's share of the answers given.",
+        "How often each mode was answered on the scored states it is an acceptable "
+        "answer for, and that mode's share of the answers given. Answering Hunt to "
+        "a Hunt-or-Patrol state is a hit for Hunt and a miss for Patrol.",
         "",
         "| selector | prompt | shots | " +
-        " | ".join(f"{m} acc / chosen" for m in battery.MODES) + " |",
+        " | ".join(f"{m} answered / chosen" for m in battery.MODES) + " |",
         "|---|---|---|" + "---|" * len(battery.MODES),
     ]
     for cell in cells:
         name = cell["model"] if cell["selector"] == "llm" else cell["selector"]
         shots = str(cell["shots"]) if cell["selector"] == "llm" else "-"
-        by_mode = cell["results"][0]["byMode"]
+        # A cell written before per-mode reporting existed still resumes and
+        # still belongs in the table above; it just has no row here.
+        by_mode = cell["results"][0].get("byMode")
+        if by_mode is None:
+            print(f"note: {label(cell)} predates per-mode reporting — "
+                  f"re-run it with --force for a row here", file=sys.stderr)
+            continue
         cols = " | ".join(
             f"{battery.rate(by_mode[m]['accuracy']).strip()} / "
             f"{battery.rate(by_mode[m]['chosenShare']).strip()}"
@@ -159,8 +169,9 @@ def main():
     parser.add_argument("--temps", default="0.0",
                         help="comma-separated temperatures per cell (default 0.0)")
     parser.add_argument("--repeats", type=int, default=1,
-                        help="calls per snapshot per temperature; 1 is enough at "
-                             "temperature 0, where the decode is greedy")
+                        help="calls per snapshot per temperature. Temperature 0 is "
+                             "not reproducible here (#133 measured 95.8% "
+                             "self-consistency), so 1 carries resampling noise")
     parser.add_argument("--baselines", action="store_true",
                         help="also score the FSM and random twins into the grid")
     parser.add_argument("--endpoint", default="http://localhost:11434",

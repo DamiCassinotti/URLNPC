@@ -421,9 +421,12 @@ not. This supersedes §10's reading of the #132 ablation, which was measured on
 sixteen cells answer one mode to nearly every state: 8B v3 zero-shot and 3B v4
 zero-shot are 100% Hunt across all 86 snapshots, and four 1B cells are 93–98%
 Patrol. Every collapsed cell is zero-shot or 1B. That is the failure shape #118
-named, and the per-mode accuracy and chosen-share columns are the only place it
-shows — a cell answering Hunt everywhere still scores 40.3%, comfortably above
-the random floor.
+named, and the per-mode answer-rate and chosen-share columns are the only place
+it shows — a cell answering Hunt everywhere still scores 40.3%, comfortably
+above the random floor. The answer rate counts a mode only when it was actually
+chosen, so a collapsed cell reads 100% on the mode it answers and 0% on the
+other three; crediting any acceptable answer to every acceptable mode's row
+would have scored those cells as merely mediocre.
 
 **The misses have not moved since #132.** Of the 21 states the FSM gets right
 and the best cell misses, 15 are `just-lost-sight` (8) and `lowhp-contact` (7) —

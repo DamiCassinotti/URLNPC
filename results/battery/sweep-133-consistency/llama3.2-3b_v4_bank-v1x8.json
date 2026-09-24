@@ -17,27 +17,27 @@
       "byMode": {
         "Hunt": {
           "labeled": 29,
-          "accuracy": 0.7586206896551724,
-          "chosen": 96,
+          "accuracy": 0.6206896551724138,
+          "chosen": 32,
           "chosenShare": 0.37209302325581395
         },
         "HoldCover": {
           "labeled": 29,
-          "accuracy": 0.42528735632183906,
-          "chosen": 12,
+          "accuracy": 0.06896551724137931,
+          "chosen": 4,
           "chosenShare": 0.046511627906976744
         },
         "Retreat": {
           "labeled": 23,
-          "accuracy": 0.6376811594202898,
-          "chosen": 51,
-          "chosenShare": 0.19767441860465115
+          "accuracy": 0.5217391304347826,
+          "chosen": 16,
+          "chosenShare": 0.18604651162790697
         },
         "Patrol": {
           "labeled": 16,
-          "accuracy": 0.6875,
-          "chosen": 99,
-          "chosenShare": 0.38372093023255816
+          "accuracy": 0.5625,
+          "chosen": 34,
+          "chosenShare": 0.3953488372093023
         }
       },
       "invalidRate": 0.0,
@@ -1032,7 +1032,8 @@
           "consistency": 1.0,
           "accuracy": 1.0
         }
-      ]
+      ],
+      "byModeFrom": "modal"
     },
     {
       "temp": 0.7,
@@ -1043,27 +1044,27 @@
       "byMode": {
         "Hunt": {
           "labeled": 29,
-          "accuracy": 0.6666666666666666,
-          "chosen": 92,
-          "chosenShare": 0.35658914728682173
+          "accuracy": 0.5172413793103449,
+          "chosen": 31,
+          "chosenShare": 0.36046511627906974
         },
         "HoldCover": {
           "labeled": 29,
-          "accuracy": 0.39080459770114945,
-          "chosen": 23,
-          "chosenShare": 0.08914728682170543
+          "accuracy": 0.10344827586206896,
+          "chosen": 8,
+          "chosenShare": 0.09302325581395349
         },
         "Retreat": {
           "labeled": 23,
-          "accuracy": 0.37681159420289856,
-          "chosen": 32,
-          "chosenShare": 0.12403100775193798
+          "accuracy": 0.21739130434782608,
+          "chosen": 9,
+          "chosenShare": 0.10465116279069768
         },
         "Patrol": {
           "labeled": 16,
-          "accuracy": 0.6875,
-          "chosen": 111,
-          "chosenShare": 0.43023255813953487
+          "accuracy": 0.5625,
+          "chosen": 38,
+          "chosenShare": 0.4418604651162791
         }
       },
       "invalidRate": 0.0,
@@ -2058,7 +2059,8 @@
           "consistency": 1.0,
           "accuracy": 1.0
         }
-      ]
+      ],
+      "byModeFrom": "modal"
     }
   ]
 }
