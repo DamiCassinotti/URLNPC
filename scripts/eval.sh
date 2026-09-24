@@ -73,7 +73,9 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    sed -n '2,43p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    # Through the last option line, not a fixed 43: the range already cut
+    # --seed, --time-scale and --rebuild before #133 added a flag below them.
+    sed -n '2,60p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 
@@ -96,6 +98,9 @@ BUILD=1
 TIMEOUT=""
 REBUILD=0
 LLM_ARGS=()
+# Not an --llm-* knob: the period is shared by every selector kind, so it must
+# stay out of the gate below that rejects LLM knobs on a non-LLM run.
+DECISION_PERIOD=""
 while [[ $# -ge 1 ]]; do
     case "$1" in
         --episodes) EPISODES="$2"; shift 2 ;;
@@ -113,7 +118,7 @@ while [[ $# -ge 1 ]]; do
         --llm-prompt)      LLM_ARGS+=(-llmPrompt "$2"); shift 2 ;;
         --llm-exemplars)   LLM_ARGS+=(-llmExemplars "$2"); shift 2 ;;
         --llm-shots)       LLM_ARGS+=(-llmShots "$2"); shift 2 ;;
-        --decision-period) LLM_ARGS+=(-decisionPeriod "$2"); shift 2 ;;
+        --decision-period) DECISION_PERIOD="$2"; shift 2 ;;
         --time-scale) TIME_SCALE="$2"; shift 2 ;;
         --out) OUT="$2"; shift 2 ;;
         --no-build) BUILD=0; shift ;;
@@ -137,6 +142,16 @@ case "$SELECTOR" in none|random|fsm|llm|fixed:hunt|fixed:holdcover|fixed:retreat
 if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
     echo "error: the --llm-* knobs need --selector llm" >&2
     exit 1
+fi
+PERIOD_ARGS=()
+if [[ -n "$DECISION_PERIOD" ]]; then
+    # A typo would otherwise fall through to the serialized default and score
+    # the run at a cadence its own config.json disagrees with.
+    if ! [[ "$DECISION_PERIOD" =~ ^[0-9]+(\.[0-9]+)?$ ]] || [[ "$DECISION_PERIOD" == 0 ]]; then
+        echo "error: --decision-period takes a positive number of seconds" >&2
+        exit 1
+    fi
+    PERIOD_ARGS=(-decisionPeriod "$DECISION_PERIOD")
 fi
 # One writer on the mode channel: a selector run stands the scripted director
 # down. Naming both is a condition mix-up, not a run.
@@ -165,6 +180,7 @@ cat > "$OUT/config.json" <<JSON
   "modes": "$MODES",
   "selector": "$SELECTOR",
   "llmArgs": "${LLM_ARGS[*]-}",
+  "decisionPeriod": "${DECISION_PERIOD:-default}",
   "timeScale": $TIME_SCALE,
   "commit": "$(git -C "$PROJECT_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)",
   "startedUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -217,7 +233,8 @@ timeout "$TIMEOUT" "$ENV_BIN" -batchmode -nographics -logFile "$UNITY_LOG" \
     -evalModes "$MODES" \
     -modeSelector "$SELECTOR" \
     -evalTimeScale "$TIME_SCALE" \
-    ${LLM_ARGS[@]+"${LLM_ARGS[@]}"}
+    ${LLM_ARGS[@]+"${LLM_ARGS[@]}"} \
+    ${PERIOD_ARGS[@]+"${PERIOD_ARGS[@]}"}
 RC=$?
 set -e
 if [[ $RC -eq 124 ]]; then
