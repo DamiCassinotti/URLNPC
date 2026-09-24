@@ -19,25 +19,16 @@ public class ModePrompt
     public const string DefaultId = "v1";
 
     // v1 plus the {{EXEMPLARS}} slot and nothing else, so it renders as v1 with
-    // no bank behind it — the few-shot arm of the #132 ablation.
+    // no bank behind it.
     public const string FewShotId = "v2";
 
-    // v2 with the round's payoffs stated and the mode catalog rewritten around
-    // them (#133), on the theory that the #132 ablation's shared failure —
-    // disengaging where the labels say press and pressing where they say break
-    // off — was wording rather than shot count. The sweep says it was not: v3
-    // beat v2 by 8 points on the 8B at eight shots, McNemar p=0.18, and the
-    // same states still miss. Kept as the measured arm, not as an improvement.
+    // v2 with the round's payoffs stated and the catalog rewritten around them.
+    // Measured no better than v2 (p=0.18) — kept as an arm, not an improvement.
     public const string RevisedId = "v3";
 
-    // v3 asking for a four-word reason instead of a sentence (#133): generation
-    // is about a third of each call on CPU and the reason is nearly all of the
-    // tokens generated, so this is the sweep's latency arm. What the selector
-    // ships on — indistinguishable from v3 on accuracy (p=1.00) and about 2 s
-    // cheaper per call, which is the only axis left once accuracy ties.
-    //
-    // Both variants collapse to answering Hunt everywhere when rendered with
-    // no bank behind them; they are only usable few-shot.
+    // v3 with a four-word reason instead of a sentence: ties v3 on accuracy and
+    // is ~2 s cheaper per call, generation being a third of each call on CPU.
+    // Both collapse to answering Hunt everywhere with no bank — few-shot only.
     public const string TerseId = "v4";
 
     public const string HistoryToken = "{{HISTORY}}";

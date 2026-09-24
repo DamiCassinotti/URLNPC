@@ -177,9 +177,9 @@ public class ModePromptTests
             Is.EqualTo(zeroShot.Render(Snapshot(), history.Turns)));
     }
 
-    // v3 and v4 are rewrites of the wording, not structural changes: the sweep
-    // (#133) compares them against v2 on the text alone, so each has to carry
-    // the same three slots and still describe every mode.
+    // v3 and v4 are wording rewrites, not structural ones: the sweep compares
+    // them against v2 on the text alone, so each has to carry the same three
+    // slots and still describe every mode.
     [TestCase("v3")]
     [TestCase("v4")]
     public void TheShippedVariant_CarriesEverySlotAndNamesEveryMode(string id)
@@ -197,9 +197,8 @@ public class ModePromptTests
         }
     }
 
-    // v4 is the latency arm and differs from v3 only in the output contract; if
-    // it drifted into a second catalog rewrite the sweep could not attribute a
-    // difference to either.
+    // v4 differs from v3 only in the output contract; if it drifted into a
+    // second catalog rewrite, a difference could not be attributed to either.
     [Test]
     public void TheShippedV4_IsV3WithADifferentOutputContractOnly()
     {

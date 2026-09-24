@@ -48,7 +48,7 @@ public class ModeSelectorDriverTests
         ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
         // Pinned rather than inherited: these tests tick at fixed times to
         // exercise the cadence, so they must not move when the shipped default
-        // does (it went 5 s -> 20 s with the #133 model choice).
+        // does (it went 5 s -> 20 s with the model choice).
         driver.decisionPeriodSeconds = 5f;
         selector = new ScriptedSelector();
         driver.Selector = selector;

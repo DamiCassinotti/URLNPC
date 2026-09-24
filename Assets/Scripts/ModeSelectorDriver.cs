@@ -22,12 +22,9 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Which selector commands modes this run. Overridden by '-modeSelector <none|fixed[:<Mode>]|random|fsm|llm>' on the command line, or KindOverride from code.")]
     [SerializeField] internal ModeSelectorKind selectorKind = ModeSelectorKind.None;
 
-    // Raised from 5 s by the #133 sweep: the chosen model answers in 14.8 s at
-    // p95 on this hardware, and a call unanswered when the next decision comes
-    // due is cancelled, so at 5 s every LLM call died and the run scored an
-    // uncommanded policy. Shared by every selector kind, so the FSM and random
-    // baselines decide on this cadence too — '-decisionPeriod 5' puts them
-    // back on the one #129 measured them at.
+    // Must clear the model's answer latency: a call unanswered when the next
+    // decision comes due is cancelled, and at 5 s every call died and the run
+    // scored an uncommanded policy. Shared by every selector kind.
     [Tooltip("Seconds between periodic decisions. Must exceed the selector's answer latency: a call still unanswered when the next decision comes due is cancelled. Overridable with '-decisionPeriod <seconds>'.")]
     [SerializeField] internal float decisionPeriodSeconds = 20f;
 
@@ -54,9 +51,8 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Ollama base URL. Overridable with '-llmEndpoint <url>'.")]
     [SerializeField] internal string llmEndpoint = "http://localhost:11434";
 
-    // llama3.2:3b, not the 8B: over the #133 battery the 8B's extra accuracy
-    // was not significant (66.7% vs 59.7%, McNemar p=0.46) while costing 2.5x
-    // the latency, and at 39 s a round fits two decisions.
+    // Not the 8B: its extra accuracy was not significant (p=0.46) and cost 2.5x
+    // the latency, at which a round fits two decisions.
     [Tooltip("Ollama model tag, e.g. 'llama3.2:3b'. Overridable with '-llmModel <tag>'.")]
     [SerializeField] internal string llmModel = "llama3.2:3b";
 
@@ -68,7 +64,7 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Extra attempts after output that names no mode. Overridable with '-llmRetries <n>'.")]
     [SerializeField] internal int llmRetries = 1;
 
-    [Tooltip("Sampling temperature. 0 is what ships — 0.7 cost 10.7 points of accuracy in the #133 sweep. It does not make a run replay: the decode measured only 95.8% self-consistent at 0. Overridable with '-llmTemperature <t>'.")]
+    [Tooltip("Sampling temperature. 0 is what ships — 0.7 cost 10.7 points of accuracy. It does not make a run replay: the decode measured only 95.8% self-consistent at 0. Overridable with '-llmTemperature <t>'.")]
     [SerializeField] internal float llmTemperature = 0f;
 
     [Tooltip("Decode seed. Overridable with '-llmSeed <n>'.")]
@@ -80,11 +76,9 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Which exemplar bank fills the prompt's {{EXEMPLARS}} slot — the id of a text asset under Resources/Exemplars. Empty, or '-llmExemplars none', is the zero-shot arm.")]
     [SerializeField] internal string llmExemplarsId = ModeExemplars.DefaultId;
 
-    // Eight shots, and this is the one setting the #133 sweep found a real
-    // effect for: on the 86-snapshot battery, zero-shot to eight shots is
-    // +26 points (McNemar p=0.002) where model size and prompt wording were
-    // both null. What the examples buy is mode coverage — every zero-shot
-    // cell that collapsed answered one mode to nearly every state.
+    // The only knob measured to matter: zero-shot to eight is +26 points
+    // (p=0.002) where model size and prompt wording were both null. What the
+    // examples buy is mode coverage — zero-shot collapses to one mode.
     [Tooltip("How many of the bank's exemplars are shown; 0 is all of them. Overridable with '-llmShots <n>'.")]
     [SerializeField] internal int llmShots = ModeExemplars.DefaultShots;
 

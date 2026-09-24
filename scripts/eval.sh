@@ -73,9 +73,10 @@ MODEL_DEST="$MODEL_DIR/eval.onnx"
 STAMP_FILE="$PROJECT_ROOT/Builds/Linux/.eval-model.sha256"
 
 usage() {
-    # Through the last option line, not a fixed 43: the range already cut
-    # --seed, --time-scale and --rebuild before #133 added a flag below them.
-    sed -n '2,60p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    # End derived from where the header stops, not a literal line number: the
+    # previous fixed range silently dropped options as the block grew.
+    local last=$(( $(grep -n '^set -euo' "${BASH_SOURCE[0]}" | head -1 | cut -d: -f1) - 1 ))
+    sed -n "2,${last}p" "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit "${1:-1}"
 }
 

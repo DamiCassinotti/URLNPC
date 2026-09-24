@@ -139,9 +139,15 @@ def render_grid(cells, entries):
     for cell in cells:
         name = cell["model"] if cell["selector"] == "llm" else cell["selector"]
         shots = str(cell["shots"]) if cell["selector"] == "llm" else "-"
-        # A cell written before per-mode reporting existed still resumes and
-        # still belongs in the table above; it just has no row here.
-        by_mode = cell["results"][0].get("byMode")
+        # Matched by temperature, not positionally: a cell from an earlier pass
+        # with a different --temps order holds a different one first, and would
+        # be tabulated under this heading's temperature without it.
+        row = next((r for r in cell["results"] if r["temp"] == shown), None)
+        if row is None:
+            print(f"note: {label(cell)} has no result at temperature {shown:.1f} "
+                  f"— omitted", file=sys.stderr)
+            continue
+        by_mode = row.get("byMode")
         if by_mode is None:
             print(f"note: {label(cell)} predates per-mode reporting — "
                   f"re-run it with --force for a row here", file=sys.stderr)
@@ -149,7 +155,7 @@ def render_grid(cells, entries):
         # A cell whose per-mode counts were reconstructed from stored modal
         # answers rather than counted per call is a different statistic under
         # the same header, so it is left out rather than published as measured.
-        if cell["results"][0].get("byModeFrom") == "modal":
+        if row.get("byModeFrom") == "modal":
             print(f"note: {label(cell)} has per-mode counts reconstructed from "
                   f"modal answers — omitted; re-run with --force to measure it",
                   file=sys.stderr)

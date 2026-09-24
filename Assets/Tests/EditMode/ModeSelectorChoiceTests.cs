@@ -107,9 +107,8 @@ public class ModeSelectorChoiceTests
             "a half-valid value must fall through to the next source");
     }
 
-    // -decisionPeriod (#133): the LLM arm needs a period above its answer
-    // latency, while the FSM and random baselines have to be re-runnable on
-    // the 5 s cadence #129 measured them at.
+    // The LLM arm needs a period above its answer latency; the baselines have
+    // to stay re-runnable on the shorter cadence they were measured at.
     [Test]
     public void DecisionPeriod_TakesTheArgumentOverTheSerializedValue()
     {
