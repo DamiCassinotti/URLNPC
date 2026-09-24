@@ -332,7 +332,9 @@ public class ModeSelectorDriver : MonoBehaviour
         schedule.FailuresBeforeFallback = failuresBeforeFallback;
 
         ApplyCompletedAnswer();
-        if (!schedule.ShouldIssue(now, TargetVisible, RecentlyDamaged, HealthFraction)) return;
+        // pending != null after ApplyCompletedAnswer means a call is still in
+        // flight: an event must not cancel it, only the periodic deadline (#134).
+        if (!schedule.ShouldIssue(now, TargetVisible, RecentlyDamaged, HealthFraction, pending != null)) return;
 
         Issue(now, primary);
     }

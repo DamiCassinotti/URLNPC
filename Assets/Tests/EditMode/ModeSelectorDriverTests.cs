@@ -162,6 +162,40 @@ public class ModeSelectorDriverTests
         Assert.That(channel.CurrentMode, Is.EqualTo(NpcMode.Hunt));
     }
 
+    // An event must not cancel a call still being answered — only the periodic
+    // deadline does. Without this an active fight re-issued on every 2 s event
+    // and cancelled each LLM call before it landed, scoring on the fallback (#134).
+    [Test]
+    public void AnEventWhileACallIsInFlight_DoesNotCancelIt()
+    {
+        var go = new GameObject("EventInFlightTest");
+        spawned.Add(go);
+        go.AddComponent<ModeChannel>();
+        Health health = go.AddComponent<Health>();
+        ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
+        driver.decisionPeriodSeconds = 5f;
+        driver.minEventDwellSeconds = 2f;
+        driver.lowHealthFraction = 0.35f;
+        var selector = new ScriptedSelector();
+        driver.Selector = selector;
+
+        driver.Tick(0f); // first call, left pending
+        Assert.That(selector.Calls, Is.EqualTo(1));
+
+        // HP crosses the low-water mark past the event dwell, but the call is
+        // still in flight.
+        health.health = 20f;
+        driver.Tick(3f);
+        Assert.That(selector.Calls, Is.EqualTo(1), "the event must not issue over an in-flight call");
+        Assert.That(selector.Tokens[0].IsCancellationRequested, Is.False, "so the call is not cancelled");
+
+        // The periodic deadline still cancels it — that is the timeout.
+        ExpectWarning();
+        driver.Tick(5f);
+        Assert.That(selector.Calls, Is.EqualTo(2));
+        Assert.That(selector.Tokens[0].IsCancellationRequested, Is.True);
+    }
+
     [Test]
     public void RepeatedFailures_HandTheChannelToTheFallback()
     {
