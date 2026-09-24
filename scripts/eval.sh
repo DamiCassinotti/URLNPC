@@ -32,7 +32,9 @@
 #                         LLM (#130 — the run ignores --time-scale: a model call
 #                         takes wall-clock seconds). Exactly one writer: a
 #                         selector forces --modes none, and naming both is an
-#                         error
+#                         error. --selector llm first checks the Ollama endpoint
+#                         is up and carrying the model, rather than scoring a
+#                         whole match on the fallback selector
 #   --llm-model           which model answers, plus --llm-endpoint,
 #                         --llm-temperature, --llm-timeout, --llm-retries,
 #                         --llm-seed, --llm-prompt (the prompt variant, an
@@ -99,6 +101,11 @@ BUILD=1
 TIMEOUT=""
 REBUILD=0
 LLM_ARGS=()
+# Mirror ModeSelectorDriver's serialized defaults, so the reachability check
+# below knows what an --selector llm run will actually talk to when the knobs
+# are left at their defaults.
+LLM_ENDPOINT="http://localhost:11434"
+LLM_MODEL="llama3.2:3b"
 # Not an --llm-* knob: the period is shared by every selector kind, so it must
 # stay out of the gate below that rejects LLM knobs on a non-LLM run.
 DECISION_PERIOD=""
@@ -110,8 +117,8 @@ while [[ $# -ge 1 ]]; do
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
         --selector) SELECTOR="$2"; shift 2 ;;
-        --llm-endpoint)    LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
-        --llm-model)       LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
+        --llm-endpoint)    LLM_ENDPOINT="${2%/}"; LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
+        --llm-model)       LLM_MODEL="$2"; LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
         --llm-timeout)     LLM_ARGS+=(-llmTimeout "$2"); shift 2 ;;
         --llm-retries)     LLM_ARGS+=(-llmRetries "$2"); shift 2 ;;
         --llm-temperature) LLM_ARGS+=(-llmTemperature "$2"); shift 2 ;;
@@ -169,6 +176,27 @@ if [[ "$SELECTOR" != "none" ]]; then
 fi
 [[ "$EPISODES" =~ ^[1-9][0-9]*$ ]] || { echo "error: --episodes takes a positive integer" >&2; exit 1; }
 [[ "$SEED" =~ ^-?[0-9]+$ ]] || { echo "error: --seed takes an integer" >&2; exit 1; }
+
+# The LLM selector needs Ollama up and carrying the model. Checked here, before
+# the build: an unreachable server otherwise fails every decision and the whole
+# run scores on the fallback selector, which finishes and reads as a completed
+# match. A clear failure now beats a match's worth of silent fallbacks.
+if [[ "$SELECTOR" == "llm" ]]; then
+    command -v curl >/dev/null || { echo "error: curl is required to reach the Ollama endpoint" >&2; exit 1; }
+    if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" >/dev/null 2>&1; then
+        echo "error: no Ollama server answering at $LLM_ENDPOINT — start one before an --selector llm run (scripts/ollama-test.sh --probe-only)" >&2
+        exit 1
+    fi
+    if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" | grep -q "\"$LLM_MODEL\""; then
+        echo "error: Ollama at $LLM_ENDPOINT is not carrying '$LLM_MODEL' — pull it first (scripts/ollama-test.sh --model $LLM_MODEL --probe-only)" >&2
+        exit 1
+    fi
+    # The clock is forced to wall time for this selector (EvalSession), so a
+    # --time-scale would be silently dropped; say so rather than let it look applied.
+    if [[ "$TIME_SCALE" != "1" ]]; then
+        echo "warning: --selector llm runs at wall clock and ignores --time-scale ($TIME_SCALE) — a model call costs real seconds" >&2
+    fi
+fi
 
 OUT="${OUT:-$PROJECT_ROOT/results/eval/$(basename "${MODEL%.onnx}")_${SUBJECT}-vs-${OPPONENT}_$(date +%Y%m%d_%H%M%S)}"
 mkdir -p "$OUT"
