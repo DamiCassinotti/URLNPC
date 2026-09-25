@@ -151,6 +151,14 @@ if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
     echo "error: the --llm-* knobs need --selector llm" >&2
     exit 1
 fi
+# The LLM selector's config (#133) assumes a 20 s decision period; the binary
+# FPS scene serializes a stale 5 s on the Enemy (below the 16 s LLM timeout), so
+# left unset every call is cancelled at the period boundary and the run scores
+# on the fallback. Pin the intended default for llm unless the caller chose one;
+# the baselines keep the serialized 5 s that #129 measured them at.
+if [[ "$SELECTOR" == "llm" && -z "$DECISION_PERIOD" ]]; then
+    DECISION_PERIOD=20
+fi
 PERIOD_ARGS=()
 if [[ -n "$DECISION_PERIOD" ]]; then
     # A typo would otherwise fall through to the serialized default and score
