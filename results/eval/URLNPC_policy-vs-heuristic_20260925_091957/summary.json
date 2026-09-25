@@ -1,0 +1,43 @@
+{
+  "entity": "NPC",
+  "episodes": 10,
+  "wins": 6,
+  "losses": 4,
+  "draws": 0,
+  "winRate": 0.6,
+  "damageDealtPerEpisode": 63.0,
+  "damageTakenPerEpisode": 93.0,
+  "shots": 51,
+  "hits": 42,
+  "accuracy": 0.8235294117647058,
+  "timeToKillSeconds": 10.4646,
+  "survivalSeconds": 14.521,
+  "modes": {
+    "Patrol": {
+      "steps": 5230,
+      "eligible": 5230,
+      "compliance": 0.5219885277246654,
+      "visible": 0.18279158699808795,
+      "closing": -0.043590822179732314,
+      "closingVisible": -0.07340794979079497
+    }
+  },
+  "selector": {
+    "selector": "llm",
+    "model": "llama3.2:3b",
+    "prompts": [
+      "v4+bank-v1x8"
+    ],
+    "decisions": 2,
+    "decisionsPerEpisode": 0.2,
+    "modeDistribution": {},
+    "switchRate": null,
+    "latencyMsMean": 16051.0,
+    "latencyMsP95": 16089,
+    "invalidRate": 0.0,
+    "fallbackRate": 0.0,
+    "outcomes": {
+      "error": 2
+    }
+  }
+}
