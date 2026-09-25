@@ -7,6 +7,7 @@ using System.Globalization;
 // fields and hands it to the selector.
 public struct LlmSelectorConfig
 {
+    public const string BackendArg = "-llmBackend";
     public const string EndpointArg = "-llmEndpoint";
     public const string ModelArg = "-llmModel";
     public const string TimeoutArg = "-llmTimeout";
@@ -21,6 +22,12 @@ public struct LlmSelectorConfig
     // argument can't carry.
     public const string NoExemplars = "none";
 
+    // The two backends behind ILlmEndpoint: the local Ollama (default) and the
+    // cloud Anthropic API added in #156.
+    public const string OllamaBackend = "ollama";
+    public const string AnthropicBackend = "anthropic";
+
+    public string Backend;
     public string Endpoint;
     public string Model;
     // Which prompt variant is sent (issue #131): the id of a text asset under
@@ -54,6 +61,7 @@ public struct LlmSelectorConfig
     // from the Inspector without anything reading it.
     public static LlmSelectorConfig Defaults => new LlmSelectorConfig
     {
+        Backend = OllamaBackend,
         Endpoint = "http://localhost:11434",
         Model = "llama3.2:3b",
         PromptId = ModePrompt.DefaultId,
@@ -64,6 +72,7 @@ public struct LlmSelectorConfig
     public LlmSelectorConfig WithCommandLine(string[] args)
     {
         LlmSelectorConfig resolved = this;
+        if (CommandLineArgs.TryRead(args, BackendArg, TryReadText, out string backend)) resolved.Backend = backend;
         if (CommandLineArgs.TryRead(args, EndpointArg, TryReadText, out string endpoint)) resolved.Endpoint = endpoint;
         if (CommandLineArgs.TryRead(args, ModelArg, TryReadText, out string model)) resolved.Model = model;
         if (CommandLineArgs.TryRead(args, TimeoutArg, TryReadFloat, out float timeout)) resolved.TimeoutSeconds = timeout;
@@ -81,6 +90,8 @@ public struct LlmSelectorConfig
     public LlmSelectorConfig Sanitized()
     {
         LlmSelectorConfig clean = this;
+        if (string.IsNullOrWhiteSpace(clean.Backend)) clean.Backend = Defaults.Backend;
+        else clean.Backend = clean.Backend.Trim().ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(clean.Endpoint)) clean.Endpoint = Defaults.Endpoint;
         else clean.Endpoint = clean.Endpoint.Trim().TrimEnd('/');
         if (string.IsNullOrWhiteSpace(clean.Model)) clean.Model = Defaults.Model;

@@ -45,6 +45,7 @@ class CellArgs:
 
     def __init__(self, args, model, prompt, shots):
         self.selector = "llm"
+        self.backend = args.backend
         self.model = model
         self.prompt = prompt
         self.shots = shots
@@ -62,11 +63,13 @@ def run_cell(args, entries, model, prompt, shots, temps):
                for temp in temps]
     return {
         "selector": "llm",
+        "backend": args.backend,
         "model": model,
         "prompt": prompt,
         "exemplars": args.exemplars if used_shots else "none",
         "shots": used_shots,
-        "endpoint": args.endpoint,
+        "endpoint": (battery.ANTHROPIC_URL if args.backend == "anthropic"
+                     else args.endpoint),
         "repeats": args.repeats,
         "snapshots": len(entries),
         "results": results,
@@ -171,8 +174,12 @@ def render_grid(cells, entries):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--backend", default="ollama", choices=battery.BACKENDS,
+                        help="which LLM backend answers — 'ollama' (default) or "
+                             "'anthropic' (#156)")
     parser.add_argument("--models", default="llama3.2:3b,llama3.1:8b",
-                        help="comma-separated Ollama tags (default a 3B and an 8B)")
+                        help="comma-separated model tags — Ollama's for the "
+                             "local backend, Anthropic's for the cloud one")
     parser.add_argument("--prompts", default="v2,v3",
                         help="comma-separated prompt variants; each must carry the "
                              "{{EXEMPLARS}} slot if any shot count is non-zero")

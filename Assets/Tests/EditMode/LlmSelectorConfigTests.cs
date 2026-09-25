@@ -51,6 +51,7 @@ public class LlmSelectorConfigTests
     {
         LlmSelectorConfig config = Serialized().WithCommandLine(new[]
         {
+            LlmSelectorConfig.BackendArg, LlmSelectorConfig.AnthropicBackend,
             LlmSelectorConfig.EndpointArg, "http://other:11434",
             LlmSelectorConfig.ModelArg, "mistral",
             LlmSelectorConfig.TimeoutArg, "2.5",
@@ -62,6 +63,7 @@ public class LlmSelectorConfigTests
             LlmSelectorConfig.ShotsArg, "8",
         });
 
+        Assert.That(config.Backend, Is.EqualTo(LlmSelectorConfig.AnthropicBackend));
         Assert.That(config.Endpoint, Is.EqualTo("http://other:11434"));
         Assert.That(config.Model, Is.EqualTo("mistral"));
         Assert.That(config.TimeoutSeconds, Is.EqualTo(2.5f).Within(1e-4f));
@@ -71,6 +73,20 @@ public class LlmSelectorConfigTests
         Assert.That(config.PromptId, Is.EqualTo("v2"));
         Assert.That(config.ExemplarsId, Is.EqualTo("bank-v1"));
         Assert.That(config.Shots, Is.EqualTo(8));
+    }
+
+    [Test]
+    public void TheBackend_DefaultsToOllama_AndAcceptsAnthropicCaseInsensitively()
+    {
+        LlmSelectorConfig serialized = Serialized().Sanitized();
+        Assert.That(serialized.Backend, Is.EqualTo(LlmSelectorConfig.OllamaBackend),
+            "an unset backend has to be the local default");
+
+        LlmSelectorConfig cloud = Serialized().WithCommandLine(new[]
+        {
+            LlmSelectorConfig.BackendArg, "Anthropic",
+        });
+        Assert.That(cloud.Backend, Is.EqualTo(LlmSelectorConfig.AnthropicBackend));
     }
 
     // "" is what means zero-shot, and an argument can't carry it (#132).
