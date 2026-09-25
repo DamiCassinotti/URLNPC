@@ -115,6 +115,26 @@ public struct LlmSelectorConfig
     // launch argument name.
     public string GenerateUrl => Endpoint + "/api/generate";
 
+    // The URL a call actually reaches given the backend: the Ollama endpoint
+    // for the local arm, the Anthropic default for the cloud arm when nothing
+    // overrides it. The Ollama default is the serialized value on the driver,
+    // so an unmodified anthropic run has to swap it out for the cloud default
+    // rather than send to localhost. Logged at startup and reported in the
+    // battery output so an audit can be traced to the endpoint that answered.
+    public string ResolvedEndpoint
+    {
+        get
+        {
+            if (!string.Equals(Backend, AnthropicBackend, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return Endpoint;
+            }
+            return string.Equals(Endpoint, Defaults.Endpoint, System.StringComparison.OrdinalIgnoreCase)
+                ? AnthropicEndpoint.DefaultBaseUrl
+                : Endpoint;
+        }
+    }
+
     static bool TryReadText(string value, out string parsed)
     {
         parsed = value;

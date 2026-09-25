@@ -76,6 +76,31 @@ public class LlmSelectorConfigTests
     }
 
     [Test]
+    public void TheResolvedEndpoint_SwapsOllamasDefaultForAnthropicsOnTheCloudArm()
+    {
+        LlmSelectorConfig local = Serialized().Sanitized();
+        Assert.That(local.ResolvedEndpoint, Is.EqualTo("http://box:1234"),
+            "the Ollama arm answers on its own endpoint");
+
+        LlmSelectorConfig cloudDefault = new LlmSelectorConfig
+        {
+            Backend = LlmSelectorConfig.AnthropicBackend,
+            Endpoint = LlmSelectorConfig.Defaults.Endpoint,
+        }.Sanitized();
+        Assert.That(cloudDefault.ResolvedEndpoint, Is.EqualTo(AnthropicEndpoint.DefaultBaseUrl),
+            "an unchanged Ollama default under the cloud backend means Anthropic's URL, "
+            + "not localhost — otherwise the startup log names the wrong endpoint");
+
+        LlmSelectorConfig cloudOverride = new LlmSelectorConfig
+        {
+            Backend = LlmSelectorConfig.AnthropicBackend,
+            Endpoint = "https://proxy.example/",
+        }.Sanitized();
+        Assert.That(cloudOverride.ResolvedEndpoint, Is.EqualTo("https://proxy.example"),
+            "a real override on the cloud arm is honoured (trailing slash trimmed)");
+    }
+
+    [Test]
     public void TheBackend_DefaultsToOllama_AndAcceptsAnthropicCaseInsensitively()
     {
         LlmSelectorConfig serialized = Serialized().Sanitized();

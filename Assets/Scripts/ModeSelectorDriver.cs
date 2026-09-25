@@ -248,7 +248,7 @@ public class ModeSelectorDriver : MonoBehaviour
                 }
                 ILlmEndpoint endpoint = BuildEndpoint(config);
                 if (endpoint == null) return null;
-                Debug.Log($"[ModeSelector] LLM selector on {config.Model} via {config.Backend} at {config.Endpoint} " +
+                Debug.Log($"[ModeSelector] LLM selector on {config.Model} via {config.Backend} at {config.ResolvedEndpoint} " +
                     $"(prompt {prompt.Id}, {(bank == null ? "zero-shot" : bank.Id + " x" + bank.Take(config.Shots).Count)}, " +
                     $"temp {config.Temperature}, seed {config.Seed}, " +
                     $"timeout {config.TimeoutSeconds:0.##} s, {config.Retries} retries).", this);
@@ -276,9 +276,7 @@ public class ModeSelectorDriver : MonoBehaviour
                         "— the LLM selector stays inert.", this);
                     return null;
                 }
-                string baseUrl = string.Equals(config.Endpoint, LlmSelectorConfig.Defaults.Endpoint,
-                    System.StringComparison.OrdinalIgnoreCase) ? "" : config.Endpoint;
-                return new AnthropicEndpoint(baseUrl, apiKey);
+                return new AnthropicEndpoint(config.ResolvedEndpoint, apiKey);
             default:
                 Debug.LogError($"[ModeSelector] unknown backend '{config.Backend}' " +
                     "— the LLM selector stays inert.", this);

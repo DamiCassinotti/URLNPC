@@ -233,7 +233,9 @@ def main():
             # A bad pairing or a dead endpoint stops the sweep rather than
             # leaving a hole in the grid; the finished cells are already on disk.
             if isinstance(error, urllib.error.URLError):
-                print(f"error: {args.endpoint} unreachable: {error}", file=sys.stderr)
+                endpoint = (battery.ANTHROPIC_URL if args.backend == "anthropic"
+                            else args.endpoint)
+                print(f"error: {endpoint} unreachable: {error}", file=sys.stderr)
             else:
                 print(f"error: {error}", file=sys.stderr)
             return 1
