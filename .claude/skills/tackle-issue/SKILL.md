@@ -7,7 +7,7 @@ description: >-
   applies, then open the PR. Use whenever the user says "tackle issue N", "implement issue
   #N", "do issue N", "start on issue N", "pick up #N", or otherwise asks to take a GitHub
   issue from unstarted to an open pull request. Handles the whole branch → implement →
-  review → PR loop, not just the coding step.
+  review → PR loop, not just the coding step. Token-optimized to prevent context bloat.
 ---
 
 # Tackle a GitHub issue
@@ -20,8 +20,14 @@ nothing you didn't already consider.
 The issue number is the argument. If none was given, ask which issue before doing anything.
 
 Work through the steps in order. Don't batch them — each gate exists to catch a problem
-before it becomes expensive (a wrong-base branch, a diff that misses the issue, a PR that
-trips the review gate).
+before it becomes expensive.
+
+## STRICT TOKEN CONSTRAINTS (CRITICAL)
+To prevent context snowballing and limit costs during your agentic loop:
+1. **Never read full files:** Unless a file is under 50 lines, do not read it entirely into memory. Use `rg` or `grep -n` to find relevant lines, then read *only* the surrounding context using `sed -n 'X,Yp' filename` or `head`/`tail`.
+2. **Cap terminal output:** Whenever running test suites, shell scripts, or git commands that might produce massive output, pipe them through `head -n 50` or `tail -n 50`.
+3. **Anti-looping:** If you attempt the same fix or encounter the same error twice in a row, STOP immediately and ask the user. Do not autonomously retry endlessly.
+4. **Surgical edits:** Do not rewrite or output entire files to make a change. Use targeted line replacements.
 
 ## Step 1 — Sync main and branch off it
 
@@ -46,7 +52,7 @@ by `-` — CI extracts the issue from the branch with `grep -oE '(^|/)[0-9]+-'`,
 `rl/41-movement-primitives` links and `issue-41-foo` does not.
 
 - `<prefix>` is a short area code. Reuse the convention already in the repo's history —
-  `git log --oneline --all | head -40` or `git branch -a` shows it: `rl/` for the ML
+  `git log --oneline --all | head -40` shows it: `rl/` for the ML
   agent / rewards / movement / mode work, `ci/` for workflows and CI, `docs/` for docs.
   Pick the one that fits; if nothing fits, choose a short new prefix in the same spirit.
 - `<slug>` is 2–4 kebab-case words from the issue title.
@@ -71,15 +77,16 @@ style, they're what the review in Step 4 checks against:
 - **Tests.** New logic, bug fixes and edge cases come with tests in the existing structure —
   EditMode for POCOs, PlayMode for anything needing real geometry/NavMesh/Academy. If a
   change genuinely doesn't warrant a test (trivial glue), that's fine, but say so and why.
-  Run the relevant suite with `scripts/run-tests.sh [editmode|playmode|all]` **only if the
+  Run the relevant suite with `scripts/run-tests.sh [editmode|playmode|all] | tail -n 50` **only if the
   Unity editor is closed** (single instance per project); otherwise note that tests should
-  be run in-editor and don't fight the lock.
-- Match the surrounding file's conventions and comment density. Comment the non-obvious
-  "why", not what the code plainly does.
+  be run in-editor and don't fight the lock. (Notice the tail -n 50 pipe to limit token ingestion).
+- **Comments.** Comment only the non-obvious "why", not what the code plainly does. Don't write big blocks 
+  of comments. Don't add issue linkage in code comments. The code should be self-documentation.
 
+Do NOT read full files to understand the architecture. Search for the specific methods or classes the issue mentions using grep -n, and read only those specific 30-line chunks before planning your edit.
 Read the pieces of the codebase the issue touches before editing — the architecture
 section of `CLAUDE.md` maps the systems (`EnemyAgent` / `EnemyBehavior` / `PerceptionMemory`,
-`ArenaManager`, `ModeChannel` / `ModeDirector`, `TelemetryLogger`, `RunRng`) to their files.
+`ArenaManager`, `ModeChannel` / `ModeDirector`, `TelemetryLogger`, `RunRng`) to their files. Remember: use grep -n and sed to read chunks, not full files.
 
 When the work is done, commit it:
 
@@ -101,11 +108,11 @@ trimming it. The same budget applies to the PR body in Step 5.
 
 ## Step 3 — Sanity-check before self-review
 
-Confirm the diff is what you think it is and nothing stray got committed:
+Confirm the diff is what you think it is and nothing stray got committed. Pipe the diff stat to avoid massive token dumps:
 
 ```bash
-git log --oneline main..HEAD
-git diff main...HEAD --stat
+git log --oneline main..HEAD | head -n 20
+git diff main...HEAD --stat | head -n 30
 ```
 
 ## Step 4 — Self-review the diff the way CI will
@@ -125,15 +132,10 @@ angles:
 `code-review high` expands into a multi-subagent fan-out. That's worth it for a large or
 unfamiliar diff, but for a small, self-authored change it's overkill — and this session
 discourages spawning subagents unasked. In that case do the review inline: read every hunk
-and its enclosing function, then walk the same angles yourself — line-by-line correctness,
-what any deleted lines used to guarantee, whether changed signatures break their callers,
-reuse/simplification/efficiency, and the CLAUDE.md conventions below. Either way, the bar
-and the fixes are the same.
+and its enclosing function **(using targeted line-reads)**, then walk the same angles yourself.
 
 Apply `.github/review-rules.md` as you triage: the report bar is "a defect a reviewer would
-ask to be fixed before merge" — wrong logic, an unhandled case, a runtime break, a broken
-URLNPC invariant. Style/naming/"could be cleaner" and anything the compiler or test suites
-already catch are **not** findings here.
+ask to be fixed before merge".
 
 **4b — Check the diff against the issue.** Beyond code-review's normal checks, verify the
 implementation actually satisfies the issue. Re-read the issue body and flag:
@@ -143,17 +145,11 @@ implementation actually satisfies the issue. Re-read the issue body and flag:
 
 **Triage and fix.** For each finding, decide honestly:
 
-- **Fix it** if it's a real defect or a missed requirement that applies to this project.
-- **Skip it** if the edge case genuinely doesn't apply here (e.g. a guard against input
-  that this call site can't produce, or a concern about a code path the issue rules out).
-  Skipping is fine and expected — but note *which* findings you skipped and the one-line
-  reason, so the user can veto.
+- **Fix it** if it's a real defect or a missed requirement.
+- **Skip it** if the edge case genuinely doesn't apply here.
 
 Fixing findings means editing and committing again — then re-run 4a on the new diff if the
-fixes were substantial, so you're not opening a PR against un-reviewed code.
-
-If the review surfaces something that makes the issue's approach look wrong, or a finding
-you're genuinely unsure whether to fix, **stop and ask the user** rather than pushing on.
+fixes were substantial. If you encounter the same failing review or test twice, STOP and ask the user.
 
 ## Step 5 — Open the PR
 
@@ -165,22 +161,17 @@ git push -u origin <prefix>/<N>-<slug>
 gh pr create --title "<title>" --body "<body>"
 ```
 
-- **Title:** concise, matches the repo's PR style (see `gh pr list --state merged` —
-  e.g. `RL: seven movement primitives on EnemyBehavior`).
-- **Body:** open with `Closes #<N>.` (CI also reads the linkage from the body; the keyword
-  auto-closes the issue on merge). Then a short, plain paragraph or two: what the change
-  does and the concrete reason, plus a line on test coverage. Keep it to something the user
-  could have written themselves. **No** "Generated with Claude Code" footer, no Claude
-  attribution, no thesis framing.
+- **Title:** concise, matches the repo's PR style (see `gh pr list --state merged | head -n 10`).
+- **Body:** open with `Closes #<N>.` Then a short, plain paragraph or two: what the change
+does and the concrete reason, plus a line on test coverage. No "Generated with Claude Code" footer, no Claude attribution, no thesis framing.
+Report back the PR URL and a one-line summary of any review findings you skipped, so the
+user knows what to glance at.
 
 Report back the PR URL and a one-line summary of any review findings you skipped, so the
 user knows what to glance at.
 
 ## What this skill does not do
 
-- It doesn't merge the PR or touch branch protection — the user and CI's review gate own
-  that.
-- It doesn't force a `main` sync or discard local changes; if `main` won't fast-forward or
-  the tree is dirty, it stops and asks.
-- It leaves the automated Unity test suites alone while the editor is open (single-instance
-  lock); it says so rather than failing silently.
+- It doesn't merge the PR or touch branch protection.
+- It doesn't force a `main` sync or discard local changes.
+- It leaves the automated Unity test suites alone while the editor is open.

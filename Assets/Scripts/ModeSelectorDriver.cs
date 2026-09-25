@@ -48,7 +48,10 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal int fsmUnseenSecondsForPatrol = 6;
 
     [Header("LLM selector (#130)")]
-    [Tooltip("Ollama base URL. Overridable with '-llmEndpoint <url>'.")]
+    [Tooltip("Which LLM backend answers — 'ollama' (local, default) or 'anthropic' (cloud). Overridable with '-llmBackend <name>'.")]
+    [SerializeField] internal string llmBackend = LlmSelectorConfig.OllamaBackend;
+
+    [Tooltip("Base URL for the selected backend — Ollama's default is 'http://localhost:11434'; Anthropic's is 'https://api.anthropic.com'. Overridable with '-llmEndpoint <url>'.")]
     [SerializeField] internal string llmEndpoint = "http://localhost:11434";
 
     // Not the 8B: its extra accuracy was not significant (p=0.46) and cost 2.5x
@@ -243,12 +246,40 @@ public class ModeSelectorDriver : MonoBehaviour
                         return null;
                     }
                 }
-                Debug.Log($"[ModeSelector] LLM selector on {config.Model} at {config.Endpoint} " +
+                ILlmEndpoint endpoint = BuildEndpoint(config);
+                if (endpoint == null) return null;
+                Debug.Log($"[ModeSelector] LLM selector on {config.Model} via {config.Backend} at {config.ResolvedEndpoint} " +
                     $"(prompt {prompt.Id}, {(bank == null ? "zero-shot" : bank.Id + " x" + bank.Take(config.Shots).Count)}, " +
                     $"temp {config.Temperature}, seed {config.Seed}, " +
                     $"timeout {config.TimeoutSeconds:0.##} s, {config.Retries} retries).", this);
-                return new LlmModeSelector(new OllamaEndpoint(config.GenerateUrl), config, prompt, bank);
+                return new LlmModeSelector(endpoint, config, prompt, bank);
             default:
+                return null;
+        }
+    }
+
+    // The backend switch (#156): Ollama's generate URL for the local arm, the
+    // Anthropic Messages API for the cloud one. Anything else is refused
+    // rather than silently falling back — a run against a backend the build
+    // does not know would be scored against a model nobody can name.
+    ILlmEndpoint BuildEndpoint(LlmSelectorConfig config)
+    {
+        switch (config.Backend)
+        {
+            case LlmSelectorConfig.OllamaBackend:
+                return new OllamaEndpoint(config.GenerateUrl);
+            case LlmSelectorConfig.AnthropicBackend:
+                string apiKey = System.Environment.GetEnvironmentVariable(AnthropicEndpoint.ApiKeyEnvVar);
+                if (string.IsNullOrEmpty(apiKey))
+                {
+                    Debug.LogError($"[ModeSelector] {AnthropicEndpoint.ApiKeyEnvVar} is not set " +
+                        "— the LLM selector stays inert.", this);
+                    return null;
+                }
+                return new AnthropicEndpoint(config.ResolvedEndpoint, apiKey);
+            default:
+                Debug.LogError($"[ModeSelector] unknown backend '{config.Backend}' " +
+                    "— the LLM selector stays inert.", this);
                 return null;
         }
     }
@@ -266,6 +297,7 @@ public class ModeSelectorDriver : MonoBehaviour
     // sweep models and temperatures without a rebuild.
     internal LlmSelectorConfig LlmConfig => new LlmSelectorConfig
     {
+        Backend = llmBackend,
         Endpoint = llmEndpoint,
         Model = llmModel,
         TimeoutSeconds = llmTimeoutSeconds,

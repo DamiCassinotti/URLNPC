@@ -1,0 +1,14 @@
+{
+  "model": "results/masked-02/URLNPC.onnx",
+  "episodes": 10,
+  "seed": 1001,
+  "subject": "policy",
+  "opponent": "heuristic",
+  "modes": "none",
+  "selector": "llm",
+  "llmArgs": "",
+  "decisionPeriod": "20",
+  "timeScale": 1,
+  "commit": "7594bcc",
+  "startedUtc": "2026-09-25T07:19:57Z"
+}
