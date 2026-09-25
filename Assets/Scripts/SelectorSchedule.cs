@@ -7,6 +7,12 @@
 // low-water mark — gated by MinEventDwellSeconds so a noisy fight can't
 // thrash the mode. An event landing inside that dwell is dropped, not
 // deferred: the next periodic call reads the same state soon enough.
+//
+// An event also can't preempt a call already in flight (#134): a real selector
+// needs wall-clock seconds to answer, and re-issuing on every event would
+// cancel it before it lands, scoring the run on the fallback. Only the periodic
+// deadline cancels an in-flight call — that cancellation is the selector's
+// timeout.
 public class SelectorSchedule
 {
     public float DecisionPeriodSeconds = 5f;
@@ -34,7 +40,7 @@ public class SelectorSchedule
     // should not wait a full period for its first decision. The first call
     // also seeds the edge state without triggering, so starting an episode in
     // sight or already hurt is a starting condition, not an event.
-    public bool ShouldIssue(float now, bool targetVisible, bool recentlyDamaged, float healthFraction)
+    public bool ShouldIssue(float now, bool targetVisible, bool recentlyDamaged, float healthFraction, bool callInFlight = false)
     {
         bool low = healthFraction <= LowHealthFraction;
         bool edge = seeded && (targetVisible != wasVisible
@@ -48,7 +54,11 @@ public class SelectorSchedule
 
         if (!issuedAny) return true;
         float sinceIssue = now - lastIssueTime;
+        // The periodic deadline fires regardless — cancelling any in-flight call
+        // is the timeout.
         if (sinceIssue >= DecisionPeriodSeconds) return true;
+        // An event can't cut in front of a call still being answered.
+        if (callInFlight) return false;
         return edge && sinceIssue >= MinEventDwellSeconds;
     }
 

@@ -540,3 +540,33 @@ instead of ~10 s. A match never repeats a prompt. **p95 (14.3 s) is the honest
 figure**, and it agrees with the grid's 14.8 s because it lands on the first,
 uncached call of each triplet. The 126 s max at temp 0 is the cold-prefix first
 call of the run.
+
+## 12. Running the selector in-game (#134)
+
+```bash
+scripts/ollama-test.sh --probe-only
+scripts/eval.sh results/masked-02/URLNPC.onnx --selector llm --episodes 10 --opponent heuristic
+```
+
+`eval.sh` checks the endpoint before the build, rebuilds whenever the game
+code changes (not just the model), pins the 20 s decision period regardless
+of what the binary scene serializes, disables the opponent's selector driver
+so it isn't a second stream of calls contending for the same Ollama process,
+and an event can no longer cancel a call already in flight — only the 20 s
+deadline does.
+
+**Against `masked-02`, the selector rarely gets a decision in at all.** That
+model fights fast and decisively (time to kill 10.5 s, survival 14.5 s), and
+most rounds end before a single LLM call resolves — 0.2 decisions per episode
+over a 10-match run, most calls abandoned mid-flight with no verdict when the
+round ended first (an abandoned call emits no `mode_decision` line, so this
+doesn't show up as a fallback or a timeout; it shows up as a low
+decisions-per-episode count). The fallback rate genuinely being low or zero on
+a run like this says the connection is healthy, not that the selector is
+steering the fight — check decisions-per-episode alongside it.
+
+This is a property of the matchup, not the harness: a decisive policy leaves
+too little real time per round for a model in the 2-16 s range to matter. A
+run intended to show the selector actually commanding modes needs a slower,
+less decisive matchup (self-play, or a weaker subject) rather than the
+combat-strongest checkpoint.

@@ -153,7 +153,18 @@ public class EvalSession : MonoBehaviour
             agent.control = isSubject ? ControlFor(settings.Subject) : EnemyAgent.ControlPolicy.Heuristic;
             ConfigurePolicy(agent, runsModel);
             ConfigureModeSource(agent);
+            ConfigureSelectorDriver(agent, isSubject);
         }
+    }
+
+    // Only the scored side is selector-driven. Left on, the opponent's driver
+    // commands modes its heuristic ignores while issuing its own selector calls;
+    // for the LLM that is a second stream of Ollama requests contending with the
+    // subject's on a CPU-bound server, slowing every call into a cancel (#134).
+    static void ConfigureSelectorDriver(EnemyAgent agent, bool isSubject)
+    {
+        ModeSelectorDriver driver = agent.GetComponent<ModeSelectorDriver>();
+        if (driver != null) driver.enabled = isSubject;
     }
 
     // Policy runs the model, so what Heuristic would play never comes up.

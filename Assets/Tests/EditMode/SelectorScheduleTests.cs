@@ -79,6 +79,23 @@ public class SelectorScheduleTests
     }
 
     [Test]
+    public void AnEvent_CannotPreemptACallInFlight()
+    {
+        SelectorSchedule schedule = NewSchedule();
+        Quiet(schedule, 0f);
+        schedule.MarkIssued(0f);
+
+        // Sight gained past the event dwell, but a call is still being answered:
+        // dropped, so a real selector isn't cancelled before it lands (#134).
+        Assert.That(schedule.ShouldIssue(3f, true, false, 1f, callInFlight: true), Is.False,
+            "an event must not cut in front of a call in flight");
+        // The periodic deadline still fires with a call in flight — that
+        // cancellation is the timeout.
+        Assert.That(schedule.ShouldIssue(5f, true, false, 1f, callInFlight: true), Is.True,
+            "the period cancels a stuck call regardless");
+    }
+
+    [Test]
     public void Damage_TriggersOnTheRisingEdgeOnly()
     {
         SelectorSchedule schedule = NewSchedule();

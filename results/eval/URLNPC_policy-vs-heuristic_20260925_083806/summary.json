@@ -1,0 +1,73 @@
+{
+  "entity": "NPC",
+  "episodes": 10,
+  "wins": 2,
+  "losses": 8,
+  "draws": 0,
+  "winRate": 0.2,
+  "damageDealtPerEpisode": 54.0,
+  "damageTakenPerEpisode": 96.0,
+  "shots": 47,
+  "hits": 36,
+  "accuracy": 0.7659574468085106,
+  "timeToKillSeconds": 13.4673,
+  "survivalSeconds": 14.54825,
+  "modes": {
+    "Hunt": {
+      "steps": 251,
+      "eligible": 0,
+      "compliance": null,
+      "visible": 0.0,
+      "closing": 0.009346613545816734,
+      "closingVisible": null
+    },
+    "HoldCover": {
+      "steps": 299,
+      "eligible": 0,
+      "compliance": null,
+      "visible": 0.0,
+      "closing": -0.04490301003344481,
+      "closingVisible": null
+    },
+    "Retreat": {
+      "steps": 255,
+      "eligible": 0,
+      "compliance": null,
+      "visible": 0.0,
+      "closing": -0.028949019607843136,
+      "closingVisible": null
+    },
+    "Patrol": {
+      "steps": 5929,
+      "eligible": 5929,
+      "compliance": 0.5044695564176084,
+      "visible": 0.1598920559959521,
+      "closing": -0.036017540900657785,
+      "closingVisible": -0.06078059071729958
+    }
+  },
+  "selector": {
+    "selector": "llm",
+    "model": "llama3.2:3b",
+    "prompts": [
+      "v4+bank-v1x8"
+    ],
+    "decisions": 27,
+    "decisionsPerEpisode": 2.7,
+    "modeDistribution": {
+      "Retreat": 3,
+      "Patrol": 6,
+      "HoldCover": 3,
+      "Hunt": 1
+    },
+    "switchRate": 0.6153846153846154,
+    "latencyMsMean": 2606.3703703703704,
+    "latencyMsP95": 5019,
+    "invalidRate": 0.0,
+    "fallbackRate": 0.48148148148148145,
+    "outcomes": {
+      "timeout": 14,
+      "applied": 13
+    }
+  }
+}

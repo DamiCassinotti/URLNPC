@@ -32,7 +32,9 @@
 #                         LLM (#130 — the run ignores --time-scale: a model call
 #                         takes wall-clock seconds). Exactly one writer: a
 #                         selector forces --modes none, and naming both is an
-#                         error
+#                         error. --selector llm first checks the Ollama endpoint
+#                         is up and carrying the model, rather than scoring a
+#                         whole match on the fallback selector
 #   --llm-model           which model answers, plus --llm-endpoint,
 #                         --llm-temperature, --llm-timeout, --llm-retries,
 #                         --llm-seed, --llm-prompt (the prompt variant, an
@@ -99,6 +101,11 @@ BUILD=1
 TIMEOUT=""
 REBUILD=0
 LLM_ARGS=()
+# Mirror ModeSelectorDriver's serialized defaults, so the reachability check
+# below knows what an --selector llm run will actually talk to when the knobs
+# are left at their defaults.
+LLM_ENDPOINT="http://localhost:11434"
+LLM_MODEL="llama3.2:3b"
 # Not an --llm-* knob: the period is shared by every selector kind, so it must
 # stay out of the gate below that rejects LLM knobs on a non-LLM run.
 DECISION_PERIOD=""
@@ -110,8 +117,8 @@ while [[ $# -ge 1 ]]; do
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
         --selector) SELECTOR="$2"; shift 2 ;;
-        --llm-endpoint)    LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
-        --llm-model)       LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
+        --llm-endpoint)    LLM_ENDPOINT="${2%/}"; LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
+        --llm-model)       LLM_MODEL="$2"; LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
         --llm-timeout)     LLM_ARGS+=(-llmTimeout "$2"); shift 2 ;;
         --llm-retries)     LLM_ARGS+=(-llmRetries "$2"); shift 2 ;;
         --llm-temperature) LLM_ARGS+=(-llmTemperature "$2"); shift 2 ;;
@@ -144,6 +151,14 @@ if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
     echo "error: the --llm-* knobs need --selector llm" >&2
     exit 1
 fi
+# The LLM selector's config (#133) assumes a 20 s decision period; the binary
+# FPS scene serializes a stale 5 s on the Enemy (below the 16 s LLM timeout), so
+# left unset every call is cancelled at the period boundary and the run scores
+# on the fallback. Pin the intended default for llm unless the caller chose one;
+# the baselines keep the serialized 5 s that #129 measured them at.
+if [[ "$SELECTOR" == "llm" && -z "$DECISION_PERIOD" ]]; then
+    DECISION_PERIOD=20
+fi
 PERIOD_ARGS=()
 if [[ -n "$DECISION_PERIOD" ]]; then
     # A typo would otherwise fall through to the serialized default and score
@@ -170,6 +185,27 @@ fi
 [[ "$EPISODES" =~ ^[1-9][0-9]*$ ]] || { echo "error: --episodes takes a positive integer" >&2; exit 1; }
 [[ "$SEED" =~ ^-?[0-9]+$ ]] || { echo "error: --seed takes an integer" >&2; exit 1; }
 
+# The LLM selector needs Ollama up and carrying the model. Checked here, before
+# the build: an unreachable server otherwise fails every decision and the whole
+# run scores on the fallback selector, which finishes and reads as a completed
+# match. A clear failure now beats a match's worth of silent fallbacks.
+if [[ "$SELECTOR" == "llm" ]]; then
+    command -v curl >/dev/null || { echo "error: curl is required to reach the Ollama endpoint" >&2; exit 1; }
+    if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" >/dev/null 2>&1; then
+        echo "error: no Ollama server answering at $LLM_ENDPOINT — start one before an --selector llm run (scripts/ollama-test.sh --probe-only)" >&2
+        exit 1
+    fi
+    if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" | grep -q "\"$LLM_MODEL\""; then
+        echo "error: Ollama at $LLM_ENDPOINT is not carrying '$LLM_MODEL' — pull it first (scripts/ollama-test.sh --model $LLM_MODEL --probe-only)" >&2
+        exit 1
+    fi
+    # The clock is forced to wall time for this selector (EvalSession), so a
+    # --time-scale would be silently dropped; say so rather than let it look applied.
+    if [[ "$TIME_SCALE" != "1" ]]; then
+        echo "warning: --selector llm runs at wall clock and ignores --time-scale ($TIME_SCALE) — a model call costs real seconds" >&2
+    fi
+fi
+
 OUT="${OUT:-$PROJECT_ROOT/results/eval/$(basename "${MODEL%.onnx}")_${SUBJECT}-vs-${OPPONENT}_$(date +%Y%m%d_%H%M%S)}"
 mkdir -p "$OUT"
 
@@ -195,21 +231,31 @@ JSON
 # ------------------------------------------------------------------- build
 
 MODEL_HASH="$(sha256sum "$MODEL" | cut -d' ' -f1)"
+# The stamp keys on the game code too, not just the model: the player bakes in
+# whatever EvalSession/selector code was compiled, so a build made before a code
+# change silently runs the old behavior. That is how an --selector llm run on a
+# pre-LLM build scored an uncommanded policy at full speed. Content hash, not
+# mtime, so a git checkout doesn't force a needless rebuild. Paths relative to
+# the root so the hash doesn't depend on the caller's CWD.
+CODE_HASH="$(cd "$PROJECT_ROOT" && find Assets/Scripts Assets/Resources/Prompts Assets/Resources/Exemplars \
+    -type f \( -name '*.cs' -o -name '*.asmdef' -o -name '*.txt' \) -print0 2>/dev/null \
+    | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+BUILD_KEY="$MODEL_HASH $CODE_HASH"
 if [[ $BUILD -eq 1 ]]; then
     mkdir -p "$MODEL_DIR"
     cp "$MODEL" "$MODEL_DEST"
-    if [[ $REBUILD -eq 0 && -x "$ENV_BIN" && -f "$STAMP_FILE" && "$(cat "$STAMP_FILE")" == "$MODEL_HASH" ]]; then
-        echo "==> Build already carries this model, skipping the rebuild."
+    if [[ $REBUILD -eq 0 && -x "$ENV_BIN" && -f "$STAMP_FILE" && "$(cat "$STAMP_FILE")" == "$BUILD_KEY" ]]; then
+        echo "==> Build already carries this model and code, skipping the rebuild."
     else
         rm -f "$STAMP_FILE"   # a failed build must not look like a good one
         bash "$PROJECT_ROOT/scripts/build-player.sh"
-        echo "$MODEL_HASH" > "$STAMP_FILE"
+        echo "$BUILD_KEY" > "$STAMP_FILE"
     fi
 elif [[ ! -x "$ENV_BIN" ]]; then
     echo "error: no build at $ENV_BIN — drop --no-build" >&2
     exit 1
-elif [[ ! -f "$STAMP_FILE" || "$(cat "$STAMP_FILE")" != "$MODEL_HASH" ]]; then
-    echo "warning: the existing build was made from a different model — results describe whatever it carries" >&2
+elif [[ ! -f "$STAMP_FILE" || "$(cat "$STAMP_FILE")" != "$BUILD_KEY" ]]; then
+    echo "warning: the existing build was made from a different model or older game code — results describe whatever it carries" >&2
 fi
 
 # --------------------------------------------------------------------- run
