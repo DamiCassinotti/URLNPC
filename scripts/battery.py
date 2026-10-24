@@ -267,12 +267,28 @@ def make_llm_decide(endpoint, model, prompt_id, seed, timeout, exemplars=""):
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 ANTHROPIC_MAX_TOKENS = 256
+ANTHROPIC_RETRY_STATUSES = frozenset({408, 409, 429, 500, 502, 503, 504, 529})
+ANTHROPIC_MAX_RETRIES = 5
+ANTHROPIC_BACKOFF_BASE = 1.0
+ANTHROPIC_BACKOFF_CAP = 30.0
+
+
+def anthropic_retry_delay(attempt, retry_after):
+    if retry_after is not None:
+        try:
+            return max(0.0, float(retry_after))
+        except ValueError:
+            pass
+    return min(ANTHROPIC_BACKOFF_CAP, ANTHROPIC_BACKOFF_BASE * (2 ** attempt))
 
 
 def make_anthropic_decide(model, api_key, prompt_id, timeout, exemplars=""):
     """The cloud arm (#156): same prompt as make_llm_decide, sent to Anthropic's
     Messages API. No seed (the API has none) and no schema-constrained decode
-    (relying on the prompt's "JSON only" and parse_mode's defensive scan)."""
+    (relying on the prompt's "JSON only" and parse_mode's defensive scan).
+    Transient 429/5xx get a bounded retry with exponential backoff, honouring
+    retry-after when present — otherwise one rate-limit mid-grid aborts the
+    whole paid run."""
     template = fill_exemplars(load_prompt(prompt_id), exemplars)
 
     def decide(s, rng, temp):
@@ -285,14 +301,26 @@ def make_anthropic_decide(model, api_key, prompt_id, timeout, exemplars=""):
             "temperature": temp,
             "messages": [{"role": "user", "content": prompt}],
         }).encode("utf-8")
-        request = urllib.request.Request(
-            ANTHROPIC_URL, data=body, headers={
-                "Content-Type": "application/json",
-                "x-api-key": api_key,
-                "anthropic-version": ANTHROPIC_VERSION,
-            })
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            payload = json.load(response)
+        for attempt in range(ANTHROPIC_MAX_RETRIES + 1):
+            request = urllib.request.Request(
+                ANTHROPIC_URL, data=body, headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": api_key,
+                    "anthropic-version": ANTHROPIC_VERSION,
+                })
+            try:
+                with urllib.request.urlopen(request, timeout=timeout) as response:
+                    payload = json.load(response)
+                break
+            except urllib.error.HTTPError as error:
+                if (error.code not in ANTHROPIC_RETRY_STATUSES
+                        or attempt == ANTHROPIC_MAX_RETRIES):
+                    raise
+                delay = anthropic_retry_delay(attempt, error.headers.get("retry-after"))
+                print(f"anthropic {error.code}, retrying in {delay:.1f}s "
+                      f"(attempt {attempt + 1}/{ANTHROPIC_MAX_RETRIES})",
+                      file=sys.stderr)
+                time.sleep(delay)
         text = "".join(block.get("text", "") for block in payload.get("content") or []
                        if block.get("type") == "text")
         return parse_mode(text)
@@ -539,6 +567,11 @@ def main():
 
     try:
         results = [run_temp(decide, entries, args.repeats, temp, rng) for temp in temps]
+    except urllib.error.HTTPError as error:
+        endpoint = ANTHROPIC_URL if args.backend == "anthropic" else args.endpoint
+        print(f"error: {endpoint} returned HTTP {error.code}: {error.reason}",
+              file=sys.stderr)
+        return 1
     except (urllib.error.URLError, OSError) as error:
         endpoint = ANTHROPIC_URL if args.backend == "anthropic" else args.endpoint
         print(f"error: {endpoint} unreachable: {error}", file=sys.stderr)
