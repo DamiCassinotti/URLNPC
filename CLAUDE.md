@@ -42,7 +42,7 @@ Full detail per system is in [docs/architecture.md](docs/architecture.md). The m
 - Combat — `Weapon.cs`/`PlayerWeapon.cs`/`EnemyWeapon.cs`, `CombatBalance.cs` (per-shot damage/cooldown/spread/range, forced in code), `BodyMetrics` (the two body origins), `Health.cs`.
 - `ArenaManager.cs` — procedural arena + runtime NavMesh bake; `RunRng.cs` — process-wide seedable RNG for reproducibility.
 - `CombatantRig.cs` — swappable Human/Agent player driver (self-play).
-- **LLM selector tier** — `GameStateSnapshot` (bucketed input, same sensory contract), `IModeSelector`/`ModeSelectorDriver` (the seam + cadence/failover), baseline selectors (`Fixed`/`Random`/`Heuristic`-FSM), `LlmModeSelector` (+`OllamaEndpoint`), prompt assets (`ModePrompt`, `Assets/Resources/Prompts/`) and few-shot exemplars (`ModeExemplars`, `Assets/Resources/Exemplars/`). Shipped config chosen in #133 (see runbook §11).
+- **LLM selector tier** — `GameStateSnapshot` (bucketed input, same sensory contract), `IModeSelector`/`ModeSelectorDriver` (the seam + cadence/failover), baseline selectors (`Fixed`/`Random`/`Heuristic`-FSM), `LlmModeSelector` (+`OllamaEndpoint`/`AnthropicEndpoint`), prompt assets (`ModePrompt`, `Assets/Resources/Prompts/`) and few-shot exemplars (`ModeExemplars`, `Assets/Resources/Exemplars/`). Shipped config chosen in #133 (see runbook §11).
 - Telemetry — `TelemetryLogger.cs` (one JSON line per event; `mode_decision`/`mode_change`/`mode_compliance`), `ModeComplianceTracker` (per-mode compliance/visibility/range-delta).
 - `EvalSession.cs` — headless eval harness behind `eval.sh`.
 
