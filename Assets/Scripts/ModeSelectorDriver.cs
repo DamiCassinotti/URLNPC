@@ -248,7 +248,7 @@ public class ModeSelectorDriver : MonoBehaviour
                 }
                 ILlmEndpoint endpoint = BuildEndpoint(config);
                 if (endpoint == null) return null;
-                Debug.Log($"[ModeSelector] LLM selector on {config.Model} via {config.Backend} at {config.ResolvedEndpoint} " +
+                Debug.Log($"[ModeSelector] LLM selector on {config.ResolvedModel} via {config.Backend} at {config.ResolvedEndpoint} " +
                     $"(prompt {prompt.Id}, {(bank == null ? "zero-shot" : bank.Id + " x" + bank.Take(config.Shots).Count)}, " +
                     $"temp {config.Temperature}, seed {config.Seed}, " +
                     $"timeout {config.TimeoutSeconds:0.##} s, {config.Retries} retries).", this);

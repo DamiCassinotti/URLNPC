@@ -135,6 +135,23 @@ public struct LlmSelectorConfig
         }
     }
 
+    // Same shape for the model: the serialized default is an Ollama tag, so an
+    // unmodified -llmBackend anthropic run would otherwise send "llama3.2:3b"
+    // to /v1/messages and 404 every call into the fallback.
+    public string ResolvedModel
+    {
+        get
+        {
+            if (!string.Equals(Backend, AnthropicBackend, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return Model;
+            }
+            return string.Equals(Model, Defaults.Model, System.StringComparison.OrdinalIgnoreCase)
+                ? AnthropicEndpoint.DefaultModel
+                : Model;
+        }
+    }
+
     static bool TryReadText(string value, out string parsed)
     {
         parsed = value;

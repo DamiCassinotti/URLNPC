@@ -17,6 +17,7 @@ using UnityEngine.Networking;
 public class AnthropicEndpoint : ILlmEndpoint
 {
     public const string DefaultBaseUrl = "https://api.anthropic.com";
+    public const string DefaultModel = "claude-haiku-4-5-20251001";
     public const string ApiVersion = "2023-06-01";
     public const string ApiKeyEnvVar = "ANTHROPIC_API_KEY";
     // Enough for the mode plus a short reason; longer answers wander and cost.

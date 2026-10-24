@@ -62,7 +62,7 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
     public async Task<NpcMode> SelectModeAsync(
         GameStateSnapshot snapshot, ModeDecisionReport report, CancellationToken cancellation)
     {
-        report.ModelName = Config.Model;
+        report.ModelName = Config.ResolvedModel;
         report.PromptId = promptLabel;
         if (snapshot == null)
         {
@@ -123,7 +123,7 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
     {
         var request = new LlmRequest
         {
-            Model = Config.Model,
+            Model = Config.ResolvedModel,
             Prompt = prompt,
             Temperature = Config.Temperature,
             // Moves with the attempt so a sampling backend doesn't repeat
@@ -147,7 +147,7 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
                 linked.Cancel();
                 Observe(call);
                 throw new System.TimeoutException(
-                    $"{Config.Model} did not answer within {timeoutSeconds:0.##} s " +
+                    $"{Config.ResolvedModel} did not answer within {timeoutSeconds:0.##} s " +
                     $"of the call's {Config.TimeoutSeconds:0.##} s budget");
             }
 
@@ -155,7 +155,7 @@ public class LlmModeSelector : IReportingModeSelector, IStatefulModeSelector
             if (!completion.Ok)
             {
                 throw new System.InvalidOperationException(
-                    $"{Config.Model} call failed: {completion.Error}");
+                    $"{Config.ResolvedModel} call failed: {completion.Error}");
             }
             return completion.Text ?? "";
         }
