@@ -375,6 +375,7 @@ public class ModeSelectorDriverTests
         go.AddComponent<ModeChannel>();
         ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
         driver.selectorKind = ModeSelectorKind.Llm;
+        driver.llmBackend = LlmSelectorConfig.OllamaBackend;
         driver.fsmLowHealthPercent = 40;
 
         Assert.That(driver.IsWriter, Is.True, "the LLM kind has to build a selector");
@@ -423,6 +424,7 @@ public class ModeSelectorDriverTests
         go.AddComponent<ModeChannel>();
         ModeSelectorDriver driver = go.AddComponent<ModeSelectorDriver>();
         driver.selectorKind = ModeSelectorKind.Llm;
+        driver.llmBackend = LlmSelectorConfig.OllamaBackend;
         var mine = new FixedModeSelector(NpcMode.Patrol);
         driver.Fallback = mine;
 
