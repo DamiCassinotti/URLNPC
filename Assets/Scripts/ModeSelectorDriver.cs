@@ -268,12 +268,16 @@ public class ModeSelectorDriver : MonoBehaviour
             case LlmSelectorConfig.OllamaBackend:
                 return new OllamaEndpoint(config.GenerateUrl);
             case LlmSelectorConfig.AnthropicBackend:
-                string apiKey = System.Environment.GetEnvironmentVariable(AnthropicEndpoint.ApiKeyEnvVar);
-                if (string.IsNullOrEmpty(apiKey))
+                // A missing key isn't a construction failure: the endpoint
+                // returns a completion failure per call and the driver counts
+                // it as a normal selector miss, so the FSM fallback takes the
+                // channel after failuresBeforeFallback. Refusing to build here
+                // would also block EditMode tests that exercise the ladder.
+                string apiKey = System.Environment.GetEnvironmentVariable(AnthropicEndpoint.ApiKeyEnvVar) ?? "";
+                if (apiKey.Length == 0)
                 {
-                    Debug.LogError($"[ModeSelector] {AnthropicEndpoint.ApiKeyEnvVar} is not set " +
-                        "— the LLM selector stays inert.", this);
-                    return null;
+                    Debug.LogWarning($"[ModeSelector] {AnthropicEndpoint.ApiKeyEnvVar} is not set " +
+                        "— every call will fail until it is, and the fallback selector will take over.", this);
                 }
                 return new AnthropicEndpoint(config.ResolvedEndpoint, apiKey);
             default:
