@@ -177,9 +177,13 @@ def main():
     parser.add_argument("--backend", default="ollama", choices=battery.BACKENDS,
                         help="which LLM backend answers — 'ollama' (default) or "
                              "'anthropic' (#156)")
-    parser.add_argument("--models", default="llama3.2:3b,llama3.1:8b",
+    parser.add_argument("--models", default=None,
                         help="comma-separated model tags — Ollama's for the "
-                             "local backend, Anthropic's for the cloud one")
+                             "local backend, Anthropic's for the cloud one. "
+                             "Defaults to 'llama3.2:3b,llama3.1:8b' on --backend "
+                             f"ollama, '{battery.ANTHROPIC_DEFAULT_MODEL}' on "
+                             "--backend anthropic (an Ollama tag sent to the "
+                             "Messages API 404s every cell)")
     parser.add_argument("--prompts", default="v2,v3",
                         help="comma-separated prompt variants; each must carry the "
                              "{{EXEMPLARS}} slot if any shot count is non-zero")
@@ -212,6 +216,9 @@ def main():
 
     entries = battery.load_battery(args.snapshots)
     temps = [float(t) for t in args.temps.split(",") if t.strip() != ""]
+    if args.models is None:
+        args.models = (battery.ANTHROPIC_DEFAULT_MODEL if args.backend == "anthropic"
+                       else "llama3.2:3b,llama3.1:8b")
     models = [m.strip() for m in args.models.split(",") if m.strip()]
     prompts = [p.strip() for p in args.prompts.split(",") if p.strip()]
     shot_counts = [int(s) for s in args.shots.split(",") if s.strip() != ""]
