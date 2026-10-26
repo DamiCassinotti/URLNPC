@@ -1,0 +1,29 @@
+selector      llm (anthropic claude-haiku-4-5-20251001, prompt v4, bank-v1 x8)
+snapshots     86  (14 ambiguous, 72 scored for accuracy)
+
+ temp   accuracy  consistency  ambig-acc  ambig-consist  invalid  lat.mean  lat.p95
+  0.0      80.6%       100.0%      92.9%          97.1%     0.0%   1004.3m  1284.1
+  0.7      81.4%        98.6%      97.1%          97.1%     0.0%    969.9m  1229.0
+
+per mode at temp 0.0 (labeled = scored states the mode is an acceptable answer for; answered = how often it was the answer there):
+  mode          labeled   answered   chosen
+  Hunt               29      48.3%    18.6%
+  HoldCover          29      48.3%    36.5%
+  Retreat            23      87.0%    32.1%
+  Patrol             16      62.5%    12.8%
+
+misses at temp 0.0:
+  hunt-visible-mid-midhp           chose HoldCover, acceptable ['Hunt']
+  hunt-lostsight-mid-instant       chose HoldCover, acceptable ['Hunt']
+  hunt-visible-far-damaged         chose HoldCover, acceptable ['Hunt', 'Patrol']
+  contested-memory-stale-under-fire chose Retreat, acceptable ['HoldCover']
+  contested-memory-far-stale-hit   chose Retreat, acceptable ['HoldCover']
+  contested-neverseen-hit-behind   chose Retreat, acceptable ['HoldCover']
+  healthy-visible-near-under-fire  chose Retreat, acceptable ['HoldCover', 'Hunt']
+  healthy-memory-fresh-clean       chose HoldCover, acceptable ['Hunt']
+  healthy-memory-mid-fresh         chose HoldCover, acceptable ['Hunt']
+  healthy-memory-mid-stale         chose HoldCover, acceptable ['Patrol']
+  healthy-memory-near-fresh-hit    chose HoldCover, acceptable ['Hunt']
+  high-visible-mid-under-fire      chose HoldCover, acceptable ['Hunt']
+  high-memory-far-fresh            chose HoldCover, acceptable ['Hunt']
+  high-memory-mid-fresh            chose HoldCover, acceptable ['Hunt']
