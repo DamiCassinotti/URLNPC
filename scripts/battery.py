@@ -2,7 +2,8 @@
 """Run a mode selector over the labeled snapshot battery (issue #128).
 
     scripts/battery.py [--selector fsm|random|llm] [--snapshots battery/snapshots.json]
-                       [--prompt v1] [--exemplars none|<bank>] [--shots N]
+                       [--backend ollama|anthropic] [--prompt v1]
+                       [--exemplars none|<bank>] [--shots N]
                        [--repeats K] [--temps 0.0,0.7] [--seed S] [--json out.json]
 
 The offline inner loop for prompt iteration: a real-time match costs a minute
@@ -263,7 +264,73 @@ def make_llm_decide(endpoint, model, prompt_id, seed, timeout, exemplars=""):
     return decide
 
 
+ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
+ANTHROPIC_VERSION = "2023-06-01"
+ANTHROPIC_MAX_TOKENS = 256
+ANTHROPIC_RETRY_STATUSES = frozenset({408, 409, 429, 500, 502, 503, 504, 529})
+ANTHROPIC_MAX_RETRIES = 5
+ANTHROPIC_BACKOFF_BASE = 1.0
+ANTHROPIC_BACKOFF_CAP = 30.0
+
+
+def anthropic_retry_delay(attempt, retry_after):
+    if retry_after is not None:
+        try:
+            return max(0.0, float(retry_after))
+        except ValueError:
+            pass
+    return min(ANTHROPIC_BACKOFF_CAP, ANTHROPIC_BACKOFF_BASE * (2 ** attempt))
+
+
+def make_anthropic_decide(model, api_key, prompt_id, timeout, exemplars=""):
+    """The cloud arm (#156): same prompt as make_llm_decide, sent to Anthropic's
+    Messages API. No seed (the API has none) and no schema-constrained decode
+    (relying on the prompt's "JSON only" and parse_mode's defensive scan).
+    Transient 429/5xx get a bounded retry with exponential backoff, honouring
+    retry-after when present — otherwise one rate-limit mid-grid aborts the
+    whole paid run."""
+    template = fill_exemplars(load_prompt(prompt_id), exemplars)
+
+    def decide(s, rng, temp):
+        prompt = template.replace("{{STATE}}", snapshot_json(s))
+        prompt = prompt.replace(
+            "{{HISTORY}}", "(none — this is the first decision of the round)")
+        body = json.dumps({
+            "model": model,
+            "max_tokens": ANTHROPIC_MAX_TOKENS,
+            "temperature": temp,
+            "messages": [{"role": "user", "content": prompt}],
+        }).encode("utf-8")
+        for attempt in range(ANTHROPIC_MAX_RETRIES + 1):
+            request = urllib.request.Request(
+                ANTHROPIC_URL, data=body, headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": api_key,
+                    "anthropic-version": ANTHROPIC_VERSION,
+                })
+            try:
+                with urllib.request.urlopen(request, timeout=timeout) as response:
+                    payload = json.load(response)
+                break
+            except urllib.error.HTTPError as error:
+                if (error.code not in ANTHROPIC_RETRY_STATUSES
+                        or attempt == ANTHROPIC_MAX_RETRIES):
+                    raise
+                delay = anthropic_retry_delay(attempt, error.headers.get("retry-after"))
+                print(f"anthropic {error.code}, retrying in {delay:.1f}s "
+                      f"(attempt {attempt + 1}/{ANTHROPIC_MAX_RETRIES})",
+                      file=sys.stderr)
+                time.sleep(delay)
+        text = "".join(block.get("text", "") for block in payload.get("content") or []
+                       if block.get("type") == "text")
+        return parse_mode(text)
+
+    return decide
+
+
 SELECTORS = ("fsm", "random", "llm")
+BACKENDS = ("ollama", "anthropic")
+ANTHROPIC_DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
 
 def build_selector(name, args, battery):
@@ -286,6 +353,14 @@ def build_selector(name, args, battery):
         picked = take_exemplars(entries, args.shots)
         shots = len(picked)
         block = render_exemplars(entries, args.shots)
+    backend = getattr(args, "backend", "ollama")
+    if backend == "anthropic":
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY is not set — the cloud arm "
+                             "needs an API key")
+        return make_anthropic_decide(args.model, api_key, args.prompt,
+                                     args.timeout, block), shots
     return make_llm_decide(args.endpoint, args.model, args.prompt,
                            args.decode_seed, args.timeout, block), shots
 
@@ -447,6 +522,9 @@ def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--selector", default="fsm", choices=sorted(SELECTORS),
                         help="which selector to score (default fsm)")
+    parser.add_argument("--backend", default="ollama", choices=BACKENDS,
+                        help="which LLM backend answers when --selector llm — "
+                             "'ollama' (local) or 'anthropic' (cloud, #156)")
     parser.add_argument("--prompt", default="v1",
                         help="prompt variant under Assets/Resources/Prompts (default v1)")
     parser.add_argument("--exemplars", default="none",
@@ -454,9 +532,12 @@ def main():
                              "or 'none' for the zero-shot arm (default none)")
     parser.add_argument("--shots", type=int, default=0,
                         help="how many of the bank's exemplars to show; 0 is all")
-    parser.add_argument("--model", default="llama3.1:8b", help="Ollama model tag")
+    parser.add_argument("--model", default=None,
+                        help="model tag — Ollama's for --backend ollama "
+                             "(default llama3.1:8b), Anthropic's for --backend "
+                             f"anthropic (default {ANTHROPIC_DEFAULT_MODEL})")
     parser.add_argument("--endpoint", default="http://localhost:11434",
-                        help="Ollama base URL")
+                        help="Ollama base URL (ignored for --backend anthropic)")
     parser.add_argument("--decode-seed", type=int, default=1,
                         help="decode seed sent to the model (LlmSelectorConfig.Seed)")
     parser.add_argument("--timeout", type=float, default=120.0,
@@ -473,6 +554,9 @@ def main():
     args = parser.parse_args()
 
     entries = load_battery(args.snapshots)
+    if args.model is None:
+        args.model = (ANTHROPIC_DEFAULT_MODEL if args.backend == "anthropic"
+                      else "llama3.1:8b")
     try:
         decide, shots = build_selector(args.selector, args, entries)
     except (OSError, ValueError) as error:
@@ -483,21 +567,29 @@ def main():
 
     try:
         results = [run_temp(decide, entries, args.repeats, temp, rng) for temp in temps]
+    except urllib.error.HTTPError as error:
+        endpoint = ANTHROPIC_URL if args.backend == "anthropic" else args.endpoint
+        print(f"error: {endpoint} returned HTTP {error.code}: {error.reason}",
+              file=sys.stderr)
+        return 1
     except (urllib.error.URLError, OSError) as error:
-        print(f"error: {args.endpoint} unreachable: {error}", file=sys.stderr)
+        endpoint = ANTHROPIC_URL if args.backend == "anthropic" else args.endpoint
+        print(f"error: {endpoint} unreachable: {error}", file=sys.stderr)
         return 1
     label = args.selector
     if args.selector == "llm":
         shown = f"{args.exemplars} x{shots}" if shots else "zero-shot"
-        label = f"{args.selector} ({args.model}, prompt {args.prompt}, {shown})"
+        label = f"{args.selector} ({args.backend} {args.model}, prompt {args.prompt}, {shown})"
     print(render(label, entries, results))
 
     if args.json:
         payload = {"selector": args.selector, "repeats": args.repeats,
                    "snapshots": len(entries), "results": results}
         if args.selector == "llm":
-            payload.update({"model": args.model, "prompt": args.prompt,
-                            "endpoint": args.endpoint,
+            payload.update({"backend": args.backend, "model": args.model,
+                            "prompt": args.prompt,
+                            "endpoint": (ANTHROPIC_URL if args.backend == "anthropic"
+                                         else args.endpoint),
                             "exemplars": args.exemplars if shots else "none",
                             "shots": shots})
         with open(args.json, "w", encoding="utf-8") as handle:

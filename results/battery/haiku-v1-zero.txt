@@ -1,0 +1,37 @@
+selector      llm (anthropic claude-haiku-4-5-20251001, prompt v1, zero-shot)
+snapshots     86  (14 ambiguous, 72 scored for accuracy)
+
+ temp   accuracy  consistency  ambig-acc  ambig-consist  invalid  lat.mean  lat.p95
+  0.0      69.4%       100.0%      78.6%         100.0%     0.0%   1226.3m  1475.2
+  0.7      69.2%        99.4%      78.6%         100.0%     0.0%   1246.0m  1528.5
+
+per mode at temp 0.0 (labeled = scored states the mode is an acceptable answer for; answered = how often it was the answer there):
+  mode          labeled   answered   chosen
+  Hunt               29      62.1%    26.7%
+  HoldCover          29       0.0%     1.2%
+  Retreat            23      82.6%    38.4%
+  Patrol             16      81.2%    33.7%
+
+misses at temp 0.0:
+  hunt-lostsight-near-fresh        chose Patrol, acceptable ['Hunt']
+  hunt-lostsight-mid-fresh         chose Patrol, acceptable ['Hunt']
+  holdcover-unseen-damaged         chose Patrol, acceptable ['HoldCover']
+  holdcover-lostsight-damaged      chose Retreat, acceptable ['HoldCover', 'Hunt']
+  lowhp-nocontact-10               chose Patrol, acceptable ['Retreat']
+  never-seen-damaged-mid-hp        chose Retreat, acceptable ['HoldCover', 'Patrol']
+  crit-visible-near-clean          chose Hunt, acceptable ['Retreat']
+  crit-neverseen-hit-behind        chose Patrol, acceptable ['HoldCover', 'Retreat']
+  contested-memory-under-fire      chose Retreat, acceptable ['HoldCover']
+  contested-memory-stale-under-fire chose Retreat, acceptable ['HoldCover']
+  contested-memory-far-stale-hit   chose Retreat, acceptable ['HoldCover']
+  contested-neverseen-hit-behind   chose Retreat, acceptable ['HoldCover']
+  healthy-visible-near-under-fire  chose Retreat, acceptable ['HoldCover', 'Hunt']
+  healthy-justlost-near-under-fire chose Retreat, acceptable ['HoldCover', 'Hunt']
+  healthy-memory-stale-hit-behind  chose Patrol, acceptable ['HoldCover']
+  healthy-memory-near-fresh-hit    chose Patrol, acceptable ['Hunt']
+  healthy-neverseen-hit-flank      chose Patrol, acceptable ['HoldCover']
+  healthy-neverseen-hit-behind     chose Patrol, acceptable ['HoldCover']
+  high-memory-far-fresh            chose Patrol, acceptable ['Hunt']
+  high-memory-mid-fresh            chose Patrol, acceptable ['Hunt']
+  high-memory-horizon-under-fire   chose Patrol, acceptable ['HoldCover']
+  high-neverseen-hit-flank         chose Patrol, acceptable ['HoldCover']

@@ -1,0 +1,18 @@
+entity            NPC
+episodes          10
+win / loss / draw 6 / 4 / 0   (win rate 60.0%)
+damage dealt      63.0 per episode
+damage taken      93.0 per episode
+accuracy          82.4%   (42/51 shots)
+time to kill      10.5 s (decided rounds)
+survival          14.5 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible    m/step  m/step seen
+Patrol         5230      5230       52.2%     18.3%   -0.0436      -0.0734
+
+selector          llm (llama3.2:3b) prompt v4+bank-v1x8
+decisions         2   (0.2 per episode)
+mode distribution -
+switch rate       - of applied decisions
+latency           mean 16051 ms, p95 16089 ms
+invalid output    0.0%   fallback 0.0%
