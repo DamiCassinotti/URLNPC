@@ -48,12 +48,15 @@
 #                         no bank is the zero-shot arm): forwarded as -llm*, so a
 #                         batch sweeps models or temperatures off one build.
 #                         Only with --selector llm
-#   --decision-period     seconds between periodic selector decisions. The
-#                         default (20 s) is set by the chosen model's latency
-#                         (#133); a call still unanswered when the next
-#                         decision comes due is cancelled, so this has to
-#                         exceed --llm-timeout. Pass 5 to score the FSM and
-#                         random baselines on the cadence #129 measured
+#   --decision-period     seconds between periodic selector decisions. For
+#                         --selector llm --llm-backend ollama the default
+#                         (20 s) is set by the local arm's latency (#133); a
+#                         call still unanswered when the next decision comes
+#                         due is cancelled, so this has to exceed
+#                         --llm-timeout. The anthropic backend keeps the
+#                         Enemy's serialized 5 s (#156) instead. Pass 5 to
+#                         score the FSM and random baselines on the cadence
+#                         #129 measured
 #   --seed                fixes arenas, spawns and the mode schedule; aim
 #                         spread stays unseeded by design, so rounds still
 #                         differ — run enough episodes for the average
@@ -105,10 +108,14 @@ BUILD=1
 TIMEOUT=""
 REBUILD=0
 LLM_ARGS=()
-# Mirror ModeSelectorDriver's serialized defaults, so the reachability check
-# below knows what an --selector llm run will actually talk to when the knobs
-# are left at their defaults.
+# Defaults to ollama regardless of what the Enemy prefab now serializes
+# (anthropic, since #156): an existing --selector llm caller that doesn't
+# pass --llm-backend keeps probing the local server it always has; opting
+# into the cloud arm's preflight needs --llm-backend anthropic explicitly.
 LLM_BACKEND="ollama"
+# Mirrors Ollama's own serialized defaults, so the reachability check below
+# knows what an ollama-backend run will actually talk to when the knobs are
+# left at their defaults.
 LLM_ENDPOINT="http://localhost:11434"
 LLM_MODEL="llama3.2:3b"
 # Not an --llm-* knob: the period is shared by every selector kind, so it must
