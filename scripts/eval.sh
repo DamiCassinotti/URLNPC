@@ -32,9 +32,13 @@
 #                         LLM (#130 — the run ignores --time-scale: a model call
 #                         takes wall-clock seconds). Exactly one writer: a
 #                         selector forces --modes none, and naming both is an
-#                         error. --selector llm first checks the Ollama endpoint
-#                         is up and carrying the model, rather than scoring a
+#                         error. --selector llm first checks the chosen backend
+#                         is reachable — Ollama's /api/tags carries the model,
+#                         or ANTHROPIC_API_KEY is set — rather than scoring a
 #                         whole match on the fallback selector
+#   --llm-backend         ollama (local, default here) or anthropic (cloud,
+#                         #156), forwarded as -llmBackend. Gates which
+#                         reachability check above runs
 #   --llm-model           which model answers, plus --llm-endpoint,
 #                         --llm-temperature, --llm-timeout, --llm-retries,
 #                         --llm-seed, --llm-prompt (the prompt variant, an
@@ -104,6 +108,7 @@ LLM_ARGS=()
 # Mirror ModeSelectorDriver's serialized defaults, so the reachability check
 # below knows what an --selector llm run will actually talk to when the knobs
 # are left at their defaults.
+LLM_BACKEND="ollama"
 LLM_ENDPOINT="http://localhost:11434"
 LLM_MODEL="llama3.2:3b"
 # Not an --llm-* knob: the period is shared by every selector kind, so it must
@@ -117,6 +122,7 @@ while [[ $# -ge 1 ]]; do
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
         --selector) SELECTOR="$2"; shift 2 ;;
+        --llm-backend)     LLM_BACKEND="$2"; LLM_ARGS+=(-llmBackend "$2"); shift 2 ;;
         --llm-endpoint)    LLM_ENDPOINT="${2%/}"; LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
         --llm-model)       LLM_MODEL="$2"; LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
         --llm-timeout)     LLM_ARGS+=(-llmTimeout "$2"); shift 2 ;;
@@ -147,16 +153,19 @@ case "$OPPONENT" in policy|heuristic) ;; *) echo "error: --opponent takes policy
 case "${MODES,,}" in scripted|none|hunt|holdcover|retreat|patrol) ;; *) echo "error: --modes takes scripted|none|Hunt|HoldCover|Retreat|Patrol" >&2; exit 1 ;; esac
 SELECTOR="${SELECTOR,,}"
 case "$SELECTOR" in none|random|fsm|llm|fixed:hunt|fixed:holdcover|fixed:retreat|fixed:patrol) ;; *) echo "error: --selector takes none|fixed:<Mode>|random|fsm|llm" >&2; exit 1 ;; esac
+LLM_BACKEND="${LLM_BACKEND,,}"
+case "$LLM_BACKEND" in ollama|anthropic) ;; *) echo "error: --llm-backend takes ollama|anthropic" >&2; exit 1 ;; esac
 if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
     echo "error: the --llm-* knobs need --selector llm" >&2
     exit 1
 fi
-# The LLM selector's config (#133) assumes a 20 s decision period; the binary
-# FPS scene serializes a stale 5 s on the Enemy (below the 16 s LLM timeout), so
-# left unset every call is cancelled at the period boundary and the run scores
-# on the fallback. Pin the intended default for llm unless the caller chose one;
-# the baselines keep the serialized 5 s that #129 measured them at.
-if [[ "$SELECTOR" == "llm" && -z "$DECISION_PERIOD" ]]; then
+# The retired local arm's config (#133) assumed a 20 s decision period; the
+# binary FPS scene serialized a stale 5 s on the Enemy (below the 16 s LLM
+# timeout) that scored every call on the fallback. Pin it for an ollama run
+# unless the caller chose one. The shipped cloud arm (#156) serializes the
+# correct 5 s/4 s on the Enemy itself, so an anthropic run is left alone;
+# the baselines also keep the serialized 5 s that #129 measured them at.
+if [[ "$SELECTOR" == "llm" && "$LLM_BACKEND" == "ollama" && -z "$DECISION_PERIOD" ]]; then
     DECISION_PERIOD=20
 fi
 PERIOD_ARGS=()
@@ -185,19 +194,28 @@ fi
 [[ "$EPISODES" =~ ^[1-9][0-9]*$ ]] || { echo "error: --episodes takes a positive integer" >&2; exit 1; }
 [[ "$SEED" =~ ^-?[0-9]+$ ]] || { echo "error: --seed takes an integer" >&2; exit 1; }
 
-# The LLM selector needs Ollama up and carrying the model. Checked here, before
-# the build: an unreachable server otherwise fails every decision and the whole
+# The LLM selector needs its backend reachable. Checked here, before the
+# build: an unreachable backend otherwise fails every decision and the whole
 # run scores on the fallback selector, which finishes and reads as a completed
 # match. A clear failure now beats a match's worth of silent fallbacks.
 if [[ "$SELECTOR" == "llm" ]]; then
-    command -v curl >/dev/null || { echo "error: curl is required to reach the Ollama endpoint" >&2; exit 1; }
-    if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" >/dev/null 2>&1; then
-        echo "error: no Ollama server answering at $LLM_ENDPOINT — start one before an --selector llm run (scripts/ollama-test.sh --probe-only)" >&2
-        exit 1
-    fi
-    if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" | grep -q "\"$LLM_MODEL\""; then
-        echo "error: Ollama at $LLM_ENDPOINT is not carrying '$LLM_MODEL' — pull it first (scripts/ollama-test.sh --model $LLM_MODEL --probe-only)" >&2
-        exit 1
+    if [[ "$LLM_BACKEND" == "anthropic" ]]; then
+        # No server to probe for the cloud arm — the key is the only thing
+        # that can be checked from here; a bad key still fails per call.
+        if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
+            echo "error: ANTHROPIC_API_KEY is not set — the cloud arm needs it before an --llm-backend anthropic run" >&2
+            exit 1
+        fi
+    else
+        command -v curl >/dev/null || { echo "error: curl is required to reach the Ollama endpoint" >&2; exit 1; }
+        if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" >/dev/null 2>&1; then
+            echo "error: no Ollama server answering at $LLM_ENDPOINT — start one before an --selector llm run (scripts/ollama-test.sh --probe-only)" >&2
+            exit 1
+        fi
+        if ! curl -fsS -m 5 "$LLM_ENDPOINT/api/tags" | grep -q "\"$LLM_MODEL\""; then
+            echo "error: Ollama at $LLM_ENDPOINT is not carrying '$LLM_MODEL' — pull it first (scripts/ollama-test.sh --model $LLM_MODEL --probe-only)" >&2
+            exit 1
+        fi
     fi
     # The clock is forced to wall time for this selector (EvalSession), so a
     # --time-scale would be silently dropped; say so rather than let it look applied.
