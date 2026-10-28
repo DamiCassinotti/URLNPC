@@ -556,20 +556,15 @@ and an event can no longer cancel a call already in flight — only the 20 s
 deadline does.
 
 **Scoring the shipped cloud arm instead (#156, #161)** needs `--llm-backend
-anthropic`, forwarded as `-llmBackend` so the build picks the Anthropic
-endpoint over Ollama's:
+anthropic`; the preflight checks `ANTHROPIC_API_KEY` instead of `/api/tags`,
+and the 20 s decision-period pin above doesn't apply — an anthropic run
+keeps the Enemy's shipped 5 s/4 s.
 
 ```bash
 export ANTHROPIC_API_KEY=...
 scripts/eval.sh results/masked-02/URLNPC.onnx --selector llm --llm-backend anthropic \
   --episodes 10 --opponent heuristic
 ```
-
-The preflight swaps accordingly — no server to probe, so it just checks
-`ANTHROPIC_API_KEY` is set before the build, rather than `/api/tags`. The
-20 s decision-period pin above is specific to the retired local arm's config
-(#133); an anthropic run is left on the Enemy's serialized 5 s/4 s (#156),
-the cadence the cloud arm actually shipped at.
 
 **Against `masked-02`, the selector rarely gets a decision in at all.** That
 model fights fast and decisively (time to kill 10.5 s, survival 14.5 s), and
