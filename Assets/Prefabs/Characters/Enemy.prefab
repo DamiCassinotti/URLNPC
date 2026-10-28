@@ -301,17 +301,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e7e89185a74d43b02e101fec3ad605, type: 3}
   m_Name:
   m_EditorClassIdentifier:
-  selectorKind: 0
-  decisionPeriodSeconds: 20
+  selectorKind: 4
+  decisionPeriodSeconds: 5
   minEventDwellSeconds: 2
   lowHealthFraction: 0.35
   failuresBeforeFallback: 3
   fixedSelectorMode: 0
   fsmLowHealthPercent: 35
   fsmUnseenSecondsForPatrol: 6
-  llmEndpoint: http://localhost:11434
-  llmModel: llama3.2:3b
-  llmTimeoutSeconds: 16
+  llmBackend: anthropic
+  llmEndpoint: https://api.anthropic.com
+  llmModel: claude-haiku-4-5-20251001
+  llmTimeoutSeconds: 4
   llmRetries: 1
   llmTemperature: 0
   llmSeed: 1

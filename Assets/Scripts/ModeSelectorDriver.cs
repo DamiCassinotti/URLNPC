@@ -23,10 +23,11 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal ModeSelectorKind selectorKind = ModeSelectorKind.None;
 
     // Must clear the model's answer latency: a call unanswered when the next
-    // decision comes due is cancelled, and at 5 s every call died and the run
-    // scored an uncommanded policy. Shared by every selector kind.
+    // decision comes due is cancelled. 5 s is the shipped cloud arm's budget
+    // (Haiku 4.5 answers in ~1.3 s p95); the retired local arm needed 20 s to
+    // avoid every call being cancelled uncommanded. Shared by every selector kind.
     [Tooltip("Seconds between periodic decisions. Must exceed the selector's answer latency: a call still unanswered when the next decision comes due is cancelled. Overridable with '-decisionPeriod <seconds>'.")]
-    [SerializeField] internal float decisionPeriodSeconds = 20f;
+    [SerializeField] internal float decisionPeriodSeconds = 5f;
 
     [Tooltip("Shortest gap between decisions when an event (damage taken, sight gained or lost, low HP crossed) asks for one early, so a noisy fight can't thrash the mode.")]
     [SerializeField] internal float minEventDwellSeconds = 2f;
@@ -48,21 +49,19 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal int fsmUnseenSecondsForPatrol = 6;
 
     [Header("LLM selector (#130)")]
-    [Tooltip("Which LLM backend answers — 'ollama' (local, default) or 'anthropic' (cloud). Overridable with '-llmBackend <name>'.")]
-    [SerializeField] internal string llmBackend = LlmSelectorConfig.OllamaBackend;
+    [Tooltip("Which LLM backend answers — 'anthropic' (cloud, default) or 'ollama' (local). Overridable with '-llmBackend <name>'.")]
+    [SerializeField] internal string llmBackend = LlmSelectorConfig.AnthropicBackend;
 
-    [Tooltip("Base URL for the selected backend — Ollama's default is 'http://localhost:11434'; Anthropic's is 'https://api.anthropic.com'. Overridable with '-llmEndpoint <url>'.")]
-    [SerializeField] internal string llmEndpoint = "http://localhost:11434";
+    [Tooltip("Base URL for the selected backend — Anthropic's default is 'https://api.anthropic.com'; Ollama's is 'http://localhost:11434'. Overridable with '-llmEndpoint <url>'.")]
+    [SerializeField] internal string llmEndpoint = AnthropicEndpoint.DefaultBaseUrl;
 
-    // Not the 8B: its extra accuracy was not significant (p=0.46) and cost 2.5x
-    // the latency, at which a round fits two decisions.
-    [Tooltip("Ollama model tag, e.g. 'llama3.2:3b'. Overridable with '-llmModel <tag>'.")]
-    [SerializeField] internal string llmModel = "llama3.2:3b";
+    [Tooltip("Backend model id — Anthropic model name (e.g. 'claude-haiku-4-5-20251001') or Ollama tag. Overridable with '-llmModel <id>'.")]
+    [SerializeField] internal string llmModel = AnthropicEndpoint.DefaultModel;
 
-    // Above the chosen model's measured p95 (14.8 s) and under the decision
-    // period, which cancels anything still in flight.
+    // Above the shipped model's measured p95 (1.3 s on Haiku 4.5) and under the
+    // 5 s decision period, which cancels anything still in flight.
     [Tooltip("Seconds one model call may take before it counts as a failure. Kept under decisionPeriodSeconds. Overridable with '-llmTimeout <seconds>'.")]
-    [SerializeField] internal float llmTimeoutSeconds = 16f;
+    [SerializeField] internal float llmTimeoutSeconds = 4f;
 
     [Tooltip("Extra attempts after output that names no mode. Overridable with '-llmRetries <n>'.")]
     [SerializeField] internal int llmRetries = 1;
@@ -269,12 +268,16 @@ public class ModeSelectorDriver : MonoBehaviour
             case LlmSelectorConfig.OllamaBackend:
                 return new OllamaEndpoint(config.GenerateUrl);
             case LlmSelectorConfig.AnthropicBackend:
-                string apiKey = System.Environment.GetEnvironmentVariable(AnthropicEndpoint.ApiKeyEnvVar);
-                if (string.IsNullOrEmpty(apiKey))
+                // A missing key isn't a construction failure: the endpoint
+                // returns a completion failure per call and the driver counts
+                // it as a normal selector miss, so the FSM fallback takes the
+                // channel after failuresBeforeFallback. Refusing to build here
+                // would also block EditMode tests that exercise the ladder.
+                string apiKey = System.Environment.GetEnvironmentVariable(AnthropicEndpoint.ApiKeyEnvVar) ?? "";
+                if (apiKey.Length == 0)
                 {
-                    Debug.LogError($"[ModeSelector] {AnthropicEndpoint.ApiKeyEnvVar} is not set " +
-                        "— the LLM selector stays inert.", this);
-                    return null;
+                    Debug.LogWarning($"[ModeSelector] {AnthropicEndpoint.ApiKeyEnvVar} is not set " +
+                        "— every call will fail until it is, and the fallback selector will take over.", this);
                 }
                 return new AnthropicEndpoint(config.ResolvedEndpoint, apiKey);
             default:
