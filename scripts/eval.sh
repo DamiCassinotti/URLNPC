@@ -37,8 +37,11 @@
 #                         or ANTHROPIC_API_KEY is set — rather than scoring a
 #                         whole match on the fallback selector
 #   --llm-backend         ollama (local, default here) or anthropic (cloud,
-#                         #156), forwarded as -llmBackend. Gates which
-#                         reachability check above runs
+#                         #156). Always forwarded as -llmBackend on an
+#                         --selector llm run, even left at the default, so
+#                         the build can't silently run the Enemy prefab's
+#                         own serialized backend instead of the one the
+#                         reachability check above just verified
 #   --llm-model           which model answers, plus --llm-endpoint,
 #                         --llm-temperature, --llm-timeout, --llm-retries,
 #                         --llm-seed, --llm-prompt (the prompt variant, an
@@ -108,11 +111,12 @@ BUILD=1
 TIMEOUT=""
 REBUILD=0
 LLM_ARGS=()
-# Defaults to ollama regardless of what the Enemy prefab now serializes
-# (anthropic, since #156): an existing --selector llm caller that doesn't
-# pass --llm-backend keeps probing the local server it always has; opting
-# into the cloud arm's preflight needs --llm-backend anthropic explicitly.
+# Not forwarded from the prefab's own serialized default (anthropic, since
+# #156): this is eval.sh's own default, forced onto the run below whenever
+# --llm-backend is left unset, so the preflight can never check one backend
+# while the build quietly runs another.
 LLM_BACKEND="ollama"
+LLM_BACKEND_SET=0
 # Mirrors Ollama's own serialized defaults, so the reachability check below
 # knows what an ollama-backend run will actually talk to when the knobs are
 # left at their defaults.
@@ -129,7 +133,7 @@ while [[ $# -ge 1 ]]; do
         --opponent) OPPONENT="$2"; shift 2 ;;
         --modes) MODES="$2"; MODES_SET=1; shift 2 ;;
         --selector) SELECTOR="$2"; shift 2 ;;
-        --llm-backend)     LLM_BACKEND="$2"; LLM_ARGS+=(-llmBackend "$2"); shift 2 ;;
+        --llm-backend)     LLM_BACKEND="$2"; LLM_BACKEND_SET=1; LLM_ARGS+=(-llmBackend "$2"); shift 2 ;;
         --llm-endpoint)    LLM_ENDPOINT="${2%/}"; LLM_ARGS+=(-llmEndpoint "$2"); shift 2 ;;
         --llm-model)       LLM_MODEL="$2"; LLM_ARGS+=(-llmModel "$2"); shift 2 ;;
         --llm-timeout)     LLM_ARGS+=(-llmTimeout "$2"); shift 2 ;;
@@ -165,6 +169,12 @@ case "$LLM_BACKEND" in ollama|anthropic) ;; *) echo "error: --llm-backend takes 
 if [[ ${#LLM_ARGS[@]} -gt 0 && "$SELECTOR" != "llm" ]]; then
     echo "error: the --llm-* knobs need --selector llm" >&2
     exit 1
+fi
+# Forced onto the run explicitly rather than left to the prefab's serialized
+# default, so the preflight below and the build always agree on which
+# backend is being checked.
+if [[ "$SELECTOR" == "llm" && $LLM_BACKEND_SET -eq 0 ]]; then
+    LLM_ARGS+=(-llmBackend "$LLM_BACKEND")
 fi
 # The retired local arm's config (#133) assumed a 20 s decision period; the
 # binary FPS scene serialized a stale 5 s on the Enemy (below the 16 s LLM
