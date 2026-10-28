@@ -31,12 +31,16 @@ plays, not the mode).
 **Resumable per match:** each match is its own `scripts/eval.sh --episodes
 1` run under `<out>/<condition>/match-NNNN/`, skipped if that directory
 already has a `summary.json` — a crash partway through the campaign loses
-nothing already written, and re-running this same command resumes it.
-Matches that fail outright are reported and left for the next run to
-retry rather than aborting the rest of the campaign.
+nothing already written, and re-running the identical command resumes it.
+Absent `--out`, the campaign directory is derived from the model, subject,
+opponent, seed, matches and conditions rather than a timestamp, precisely
+so the identical command resolves to the identical directory. Matches that
+fail outright are reported and left for the next run to retry rather than
+aborting the rest of the campaign.
 """
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -95,6 +99,25 @@ def load_conditions(path):
     return conditions
 
 
+def conditions_fingerprint(conditions):
+    """Short hash of the resolved condition list, so two different
+    --conditions files (or one edited between runs) can't collide into the
+    same default campaign directory and mix their matches together."""
+    encoded = json.dumps(conditions, sort_keys=True).encode("utf-8")
+    return hashlib.sha1(encoded).hexdigest()[:8]
+
+
+def default_campaign_dir(model, subject, opponent, seed, matches, conditions):
+    # No timestamp: the same invocation (same model/subject/opponent/seed/
+    # matches/conditions) must resolve to the same directory, or "re-run this
+    # same command to resume" starts a fresh campaign instead of resuming one.
+    stem = os.path.splitext(os.path.basename(model))[0]
+    fingerprint = conditions_fingerprint(conditions)
+    return os.path.join(
+        PROJECT_ROOT, "results", "ab",
+        f"{stem}_{subject}-vs-{opponent}_seed{seed}_n{matches}_{fingerprint}")
+
+
 def match_dir(out, condition_name, index):
     return os.path.join(out, condition_name, f"match-{index:04d}")
 
@@ -129,12 +152,17 @@ def run_campaign(args, conditions):
 
 
 def load_condition_events(out, condition_name, matches):
+    """Events from matches that actually finished. Keyed on summary.json, the
+    same marker run_match's resumability check uses — not telemetry.jsonl,
+    which a match that failed after the player run (e.g. a truncated episode
+    eval_summary.py refused to score) can leave behind without a completed
+    episode in it."""
     events = []
     completed = 0
     for index in range(1, matches + 1):
-        telemetry = os.path.join(match_dir(out, condition_name, index), "telemetry.jsonl")
-        if os.path.exists(telemetry):
-            events.extend(eval_summary.read_events(telemetry))
+        directory = match_dir(out, condition_name, index)
+        if os.path.exists(os.path.join(directory, "summary.json")):
+            events.extend(eval_summary.read_events(os.path.join(directory, "telemetry.jsonl")))
             completed += 1
     return events, completed
 
@@ -324,11 +352,10 @@ def main():
         print(f"error: {error}", file=sys.stderr)
         return 1
 
-    stem = os.path.splitext(os.path.basename(args.model))[0]
-    args.out = os.path.abspath(args.out) if args.out else os.path.join(
-        PROJECT_ROOT, "results", "ab",
-        f"{stem}_{args.subject}-vs-{args.opponent}_{time.strftime('%Y%m%d_%H%M%S')}")
+    args.out = os.path.abspath(args.out) if args.out else default_campaign_dir(
+        args.model, args.subject, args.opponent, args.seed, args.matches, conditions)
     os.makedirs(args.out, exist_ok=True)
+    print(f"==> campaign directory: {args.out}", file=sys.stderr)
 
     if args.force:
         for condition in conditions:
