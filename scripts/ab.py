@@ -67,14 +67,31 @@ DEFAULT_CONDITIONS = [
 ]
 
 
+# Injected into every match's eval.sh call (model, --episodes, seed, subject,
+# opponent, --out) — a condition that also names one would silently overrule
+# the pairwise seed matching or the per-match output layout instead of erroring.
+RESERVED_FLAGS = {"--episodes", "--seed", "--subject", "--opponent", "--out"}
+
+
 def load_conditions(path):
     if path is None:
         return DEFAULT_CONDITIONS
     with open(path, encoding="utf-8") as handle:
         conditions = json.load(handle)
-    names = [c["name"] for c in conditions]
+    names = []
+    for condition in conditions:
+        name, condition_args = condition.get("name"), condition.get("args")
+        if not isinstance(name, str) or not name:
+            raise ValueError(f"{path}: every condition needs a non-empty 'name'")
+        if not isinstance(condition_args, list):
+            raise ValueError(f"{path}: condition '{name}' needs an 'args' list")
+        reserved_hit = RESERVED_FLAGS.intersection(condition_args)
+        if reserved_hit:
+            raise ValueError(f"{path}: condition '{name}' sets {sorted(reserved_hit)}, "
+                              "which this harness already controls")
+        names.append(name)
     if len(names) != len(set(names)):
-        raise ValueError(f"duplicate condition name in {path}")
+        raise ValueError(f"{path}: duplicate condition name")
     return conditions
 
 
@@ -296,6 +313,10 @@ def main():
         return 1
     if args.matches <= 0:
         print("error: --matches takes a positive integer", file=sys.stderr)
+        return 1
+    if not 0 < args.confidence < 1:
+        print("error: --confidence takes a value between 0 and 1 (e.g. 0.95)",
+              file=sys.stderr)
         return 1
     try:
         conditions = load_conditions(args.conditions)
