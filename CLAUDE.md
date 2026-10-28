@@ -18,6 +18,7 @@ Guidance for Claude Code (claude.ai/code) in this repository. This file is the o
   ```
   `config` defaults to `config/URLNPC.yaml` (slice/full/self-play configs and the full walkthrough are in `docs/rl-runbook.md`). Trained models (`.onnx`) are saved to `results/<run-id>/`.
 - **Score a model:** `scripts/eval.sh results/<run-id>/URLNPC.onnx --episodes 100 --seed 1001 --opponent heuristic` — headless rounds, no trainer, summary in `results/eval/`. Full flag set and behavior: "Headless evaluation" in [docs/architecture.md](docs/architecture.md).
+- **A/B a selector:** `scripts/ab.sh results/<run-id>/URLNPC.onnx --matches 100` — N matched-seed `eval.sh` matches per selector condition (default: the shipped `llm`/`fsm`/`random` arms), comparison table with a pairwise win-rate CI in `results/ab/`. Resumable per match; behavior in "A/B batch harness" in [docs/architecture.md](docs/architecture.md).
 - **Run tests:** `scripts/run-tests.sh [editmode|playmode|all]` (editor must be closed; results in `results/tests/`).
 - **What of a run is version-controlled (#140):** a training run commits `configuration.yaml`, the final `URLNPC.onnx` and the TensorBoard `events.out.tfevents.*`; an eval run commits `config.json`, `summary.json`/`summary.txt` and `telemetry.jsonl`. Everything else (console `.log`, mlagents' `run_logs/`, PPO checkpoints `*.pt`, step-numbered ONNX snapshots) is gitignored — still written to disk for local debugging and `--resume`.
 
@@ -44,7 +45,7 @@ Full detail per system is in [docs/architecture.md](docs/architecture.md). The m
 - `CombatantRig.cs` — swappable Human/Agent player driver (self-play).
 - **LLM selector tier** — `GameStateSnapshot` (bucketed input, same sensory contract), `IModeSelector`/`ModeSelectorDriver` (the seam + cadence/failover), baseline selectors (`Fixed`/`Random`/`Heuristic`-FSM), `LlmModeSelector` (+`OllamaEndpoint`/`AnthropicEndpoint`), prompt assets (`ModePrompt`, `Assets/Resources/Prompts/`) and few-shot exemplars (`ModeExemplars`, `Assets/Resources/Exemplars/`). Shipped config: cloud arm promoted in #156 — `anthropic` backend, `claude-haiku-4-5-20251001`, prompt `v4`, `bank-v1` ×8, 5 s decision period, 4 s timeout (needs `ANTHROPIC_API_KEY`). #133 ran the local sweep behind that decision (runbook §11).
 - Telemetry — `TelemetryLogger.cs` (one JSON line per event; `mode_decision`/`mode_change`/`mode_compliance`), `ModeComplianceTracker` (per-mode compliance/visibility/range-delta).
-- `EvalSession.cs` — headless eval harness behind `eval.sh`.
+- `EvalSession.cs` — headless eval harness behind `eval.sh`; `ab.py`/`ab.sh` batches matched-seed `eval.sh` matches per selector condition into a comparison table (the real-time A/B, #136).
 
 ### Tags
 - `"Player"` — the first-person character (Starter Assets `PlayerCapsule`)

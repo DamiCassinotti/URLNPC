@@ -94,5 +94,11 @@ mono_crash.*.json
 /results/*/*/*.pt
 /results/*/*/*-[0-9]*.onnx
 
+# A/B batch campaign (#136): the aggregate report is the artifact worth
+# keeping, the same way one eval run's summary.json is; the per-match
+# eval.sh outputs behind it are reproducible from the campaign's config.json
+# and seed (the arena/spawn/mode-schedule half of it, see architecture.md).
+/results/ab/*/*/match-*/
+
 # Python bytecode from the eval/battery scripts
 __pycache__/
