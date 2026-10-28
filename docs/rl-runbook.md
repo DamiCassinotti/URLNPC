@@ -555,6 +555,17 @@ so it isn't a second stream of calls contending for the same Ollama process,
 and an event can no longer cancel a call already in flight — only the 20 s
 deadline does.
 
+**Scoring the shipped cloud arm instead (#156, #161)** needs `--llm-backend
+anthropic`; the preflight checks `ANTHROPIC_API_KEY` instead of `/api/tags`,
+and the 20 s decision-period pin above doesn't apply — an anthropic run
+keeps the Enemy's shipped 5 s/4 s.
+
+```bash
+export ANTHROPIC_API_KEY=...
+scripts/eval.sh results/masked-02/URLNPC.onnx --selector llm --llm-backend anthropic \
+  --episodes 10 --opponent heuristic
+```
+
 **Against `masked-02`, the selector rarely gets a decision in at all.** That
 model fights fast and decisively (time to kill 10.5 s, survival 14.5 s), and
 most rounds end before a single LLM call resolves — 0.2 decisions per episode
