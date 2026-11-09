@@ -4,7 +4,7 @@ First-person combat arena where an AI enemy NPC is trained with Unity ML-Agents 
 
 ## Requirements
 
-- **Unity 6000.0 LTS** (install via Unity Hub).
+- **Unity 6000.0 LTS**, 6000.0.85f2 or later (install via Unity Hub).
 - **Python 3.10.12** for ML training.
 
 ## Running the game

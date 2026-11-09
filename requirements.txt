@@ -7,3 +7,5 @@ mlagents==1.1.0
 torch==2.2.1
 protobuf==3.20.3
 numpy==1.23.5
+# CA bundle with the eMudhra intermediates distrusted.
+certifi>=2026.10.23
