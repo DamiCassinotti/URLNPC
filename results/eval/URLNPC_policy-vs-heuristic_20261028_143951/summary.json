@@ -1,0 +1,51 @@
+{
+  "entity": "NPC",
+  "episodes": 30,
+  "wins": 17,
+  "losses": 12,
+  "draws": 1,
+  "winRate": 0.5666666666666667,
+  "damageDealtPerEpisode": 65.5,
+  "damageTakenPerEpisode": 73.0,
+  "shots": 159,
+  "hits": 131,
+  "accuracy": 0.8238993710691824,
+  "timeToKillSeconds": 14.960689655172414,
+  "survivalSeconds": 15.045,
+  "modes": {
+    "Hunt": {
+      "steps": 27703,
+      "eligible": 3040,
+      "compliance": 0.9134868421052632,
+      "visible": 0.10973540771757571,
+      "closing": -0.02408659711944555,
+      "closingVisible": -0.04633552631578948
+    },
+    "Patrol": {
+      "steps": 31,
+      "eligible": 31,
+      "compliance": 0.0,
+      "visible": 0.0,
+      "closing": 0.0006129032258064516,
+      "closingVisible": null
+    }
+  },
+  "selector": {
+    "selector": "fixed",
+    "model": "",
+    "prompts": [],
+    "decisions": 148,
+    "decisionsPerEpisode": 4.933333333333334,
+    "modeDistribution": {
+      "Hunt": 148
+    },
+    "switchRate": 0.20270270270270271,
+    "latencyMsMean": 0.2702702702702703,
+    "latencyMsP95": 1,
+    "invalidRate": 0.0,
+    "fallbackRate": 0.0,
+    "outcomes": {
+      "applied": 148
+    }
+  }
+}

@@ -1,0 +1,21 @@
+entity            NPC
+episodes          30
+win / loss / draw 10 / 18 / 2   (win rate 33.3%)
+damage dealt      63.5 per episode
+damage taken      82.0 per episode
+accuracy          84.1%   (127/151 shots)
+time to kill      14.1 s (decided rounds)
+survival          14.4 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible    m/step  m/step seen
+Hunt           2658      1106       95.6%     41.6%   -0.0338      -0.0583
+HoldCover      1007       544       17.1%      7.1%   -0.0375      -0.0517
+Retreat        4545       408       22.1%      1.3%   +0.0045      -0.0819
+Patrol        23556     23556       29.7%      8.3%   -0.0228      -0.0516
+
+selector          llm (claude-haiku-4-5-20251001) prompt v4+bank-v1x8
+decisions         156   (5.2 per episode)
+mode distribution HoldCover 3.8%  Hunt 9.6%  Patrol 64.7%  Retreat 21.8%
+switch rate       37.2% of applied decisions
+latency           mean 851 ms, p95 1020 ms
+invalid output    0.0%   fallback 0.0%
