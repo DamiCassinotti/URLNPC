@@ -1,0 +1,46 @@
+{
+  "model": "/home/damian/repos/URLNPC/results/masked-02/URLNPC.onnx",
+  "matches": 30,
+  "seed": 1001,
+  "subject": "policy",
+  "opponent": "policy",
+  "confidence": 0.95,
+  "conditions": [
+    {
+      "name": "v4",
+      "args": [
+        "--selector",
+        "llm",
+        "--llm-backend",
+        "anthropic",
+        "--llm-model",
+        "claude-haiku-4-5-20251001",
+        "--llm-prompt",
+        "v4",
+        "--llm-exemplars",
+        "bank-v1",
+        "--llm-shots",
+        "8"
+      ]
+    },
+    {
+      "name": "v5",
+      "args": [
+        "--selector",
+        "llm",
+        "--llm-backend",
+        "anthropic",
+        "--llm-model",
+        "claude-haiku-4-5-20251001",
+        "--llm-prompt",
+        "v5",
+        "--llm-exemplars",
+        "bank-v1",
+        "--llm-shots",
+        "8"
+      ]
+    }
+  ],
+  "commit": "b4cb9f0",
+  "startedUtc": "2026-11-09T21:23:11Z"
+}

@@ -1,0 +1,21 @@
+entity            NPC
+episodes          30
+win / loss / draw 16 / 13 / 1   (win rate 53.3%)
+damage dealt      77.0 per episode
+damage taken      83.5 per episode
+accuracy          88.0%   (154/175 shots)
+time to kill      15.2 s (decided rounds)
+survival          19.0 s (rounds it died in)
+
+mode          steps  eligible  compliance   visible    m/step  m/step seen
+Hunt           3297      1925       88.0%     58.4%   -0.0460      -0.0607
+HoldCover       695        70        0.0%      0.0%   -0.0310            -
+Retreat        6509      1135       10.1%      8.2%   -0.0042      -0.0321
+Patrol        17534     17534       42.3%      6.3%   -0.0323      -0.0508
+
+selector          fsm
+decisions         149   (5.0 per episode)
+mode distribution HoldCover 4.0%  Hunt 14.8%  Patrol 52.3%  Retreat 28.9%
+switch rate       32.9% of applied decisions
+latency           mean 0 ms, p95 1 ms
+invalid output    0.0%   fallback 0.0%
