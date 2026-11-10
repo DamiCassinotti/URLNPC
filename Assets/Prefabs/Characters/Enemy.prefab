@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   selectorKind: 4
-  decisionPeriodSeconds: 5
+  decisionPeriodSeconds: 3
   minEventDwellSeconds: 2
   lowHealthFraction: 0.35
   failuresBeforeFallback: 3
@@ -312,7 +312,7 @@ MonoBehaviour:
   llmBackend: anthropic
   llmEndpoint: https://api.anthropic.com
   llmModel: claude-haiku-4-5-20251001
-  llmTimeoutSeconds: 4
+  llmTimeoutSeconds: 2
   llmRetries: 1
   llmTemperature: 0
   llmSeed: 1
