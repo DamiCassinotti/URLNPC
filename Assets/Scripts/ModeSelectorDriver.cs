@@ -23,11 +23,11 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal ModeSelectorKind selectorKind = ModeSelectorKind.None;
 
     // Must clear the model's answer latency: a call unanswered when the next
-    // decision comes due is cancelled. 5 s is the shipped cloud arm's budget
-    // (Haiku 4.5 answers in ~1.3 s p95); the retired local arm needed 20 s to
+    // decision comes due is cancelled. 3 s clears the shipped cloud arm's p95
+    // (Haiku 4.5 ~1.3 s) with margin; the retired local arm needed 20 s to
     // avoid every call being cancelled uncommanded. Shared by every selector kind.
     [Tooltip("Seconds between periodic decisions. Must exceed the selector's answer latency: a call still unanswered when the next decision comes due is cancelled. Overridable with '-decisionPeriod <seconds>'.")]
-    [SerializeField] internal float decisionPeriodSeconds = 5f;
+    [SerializeField] internal float decisionPeriodSeconds = 3f;
 
     [Tooltip("Shortest gap between decisions when an event (damage taken, sight gained or lost, low HP crossed) asks for one early, so a noisy fight can't thrash the mode.")]
     [SerializeField] internal float minEventDwellSeconds = 2f;
@@ -59,9 +59,9 @@ public class ModeSelectorDriver : MonoBehaviour
     [SerializeField] internal string llmModel = AnthropicEndpoint.DefaultModel;
 
     // Above the shipped model's measured p95 (1.3 s on Haiku 4.5) and under the
-    // 5 s decision period, which cancels anything still in flight.
+    // 3 s decision period, which cancels anything still in flight.
     [Tooltip("Seconds one model call may take before it counts as a failure. Kept under decisionPeriodSeconds. Overridable with '-llmTimeout <seconds>'.")]
-    [SerializeField] internal float llmTimeoutSeconds = 4f;
+    [SerializeField] internal float llmTimeoutSeconds = 2f;
 
     [Tooltip("Extra attempts after output that names no mode. Overridable with '-llmRetries <n>'.")]
     [SerializeField] internal int llmRetries = 1;
