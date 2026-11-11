@@ -18,7 +18,7 @@ run at).
 Conditions differ only in who writes the NPC's mode; everything else
 (model, subject, opponent) is shared. Default conditions, absent
 `--conditions`, are the three arms the thesis compares (§4.4): the shipped
-LLM selector (anthropic/Haiku/v4/bank-v1 x8, #156), the FSM and the random
+LLM selector (anthropic/Haiku/v6/bank-v2 x8, #168), the FSM and the random
 baseline. `--conditions` takes a JSON file of
 `[{"name": ..., "args": [eval.sh flags appended to every match]}, ...]`.
 
@@ -58,13 +58,13 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 EVAL_SH = os.path.join(SCRIPT_DIR, "eval.sh")
 
 # The thesis's own three-arm comparison (implementation-plan.md §4.4), on the
-# shipped cloud selector config (#156) — the defaults a caller gets without
+# shipped cloud selector config (#168) — the defaults a caller gets without
 # writing a conditions file for the common case.
 DEFAULT_CONDITIONS = [
     {"name": "llm", "args": [
         "--selector", "llm", "--llm-backend", "anthropic",
-        "--llm-model", "claude-haiku-4-5-20251001", "--llm-prompt", "v4",
-        "--llm-exemplars", "bank-v1", "--llm-shots", "8",
+        "--llm-model", "claude-haiku-4-5-20251001", "--llm-prompt", "v6",
+        "--llm-exemplars", "bank-v2", "--llm-shots", "8",
     ]},
     {"name": "fsm", "args": ["--selector", "fsm"]},
     {"name": "random", "args": ["--selector", "random"]},
