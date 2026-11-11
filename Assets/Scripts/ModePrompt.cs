@@ -31,6 +31,12 @@ public class ModePrompt
     // Both collapse to answering Hunt everywhere with no bank — few-shot only.
     public const string TerseId = "v4";
 
+    // The current shipped variant: v5 (HoldCover rewrite from #137) plus the
+    // secondsInMode stall-escalation cue from #168 — the v5-vs-v6 ablation on
+    // masked-02 cut the worst same-mode streak from 32 decisions (96 s) to 7
+    // (21 s) with win rate unchanged inside CI.
+    public const string ShippedId = "v6";
+
     public const string HistoryToken = "{{HISTORY}}";
     public const string StateToken = "{{STATE}}";
     // The few-shot slot (#132). With no examples to show it takes its own line

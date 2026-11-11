@@ -78,11 +78,11 @@ public class ModeSelectorDriver : MonoBehaviour
     [Tooltip("Decode seed. Overridable with '-llmSeed <n>'.")]
     [SerializeField] internal int llmSeed = 1;
 
-    [Tooltip("Which prompt variant is sent — the id of a text asset under Resources/Prompts. Overridable with '-llmPrompt <id>'.")]
-    [SerializeField] internal string llmPromptId = ModePrompt.TerseId;
+    [Tooltip("Ignored at runtime — ModePrompt.ShippedId is forced on in Awake. Overridable with '-llmPrompt <id>'.")]
+    [SerializeField] internal string llmPromptId = ModePrompt.ShippedId;
 
-    [Tooltip("Which exemplar bank fills the prompt's {{EXEMPLARS}} slot — the id of a text asset under Resources/Exemplars. Empty, or '-llmExemplars none', is the zero-shot arm.")]
-    [SerializeField] internal string llmExemplarsId = ModeExemplars.DefaultId;
+    [Tooltip("Ignored at runtime — ModeExemplars.ShippedId is forced on in Awake. Overridable with '-llmExemplars <id>'.")]
+    [SerializeField] internal string llmExemplarsId = ModeExemplars.ShippedId;
 
     // The only knob measured to matter: zero-shot to eight is +26 points
     // (p=0.002) where model size and prompt wording were both null. What the
@@ -351,6 +351,8 @@ public class ModeSelectorDriver : MonoBehaviour
     {
         decisionPeriodSeconds = ShippedDecisionPeriodSeconds;
         llmTimeoutSeconds = ShippedLlmTimeoutSeconds;
+        llmPromptId = ModePrompt.ShippedId;
+        llmExemplarsId = ModeExemplars.ShippedId;
     }
 
     void FixedUpdate()

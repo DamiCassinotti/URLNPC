@@ -14,8 +14,12 @@ using System.Text;
 // scripts/battery.py renders the same file the same way the game does.
 public class ModeExemplars
 {
-    // The bank shipped as Resources/Exemplars/bank-v1.txt.
+    // The original bank, Resources/Exemplars/bank-v1.txt.
     public const string DefaultId = "bank-v1";
+
+    // The current shipped bank: bank-v1 plus the hunt-stalled-patrol exemplar
+    // at Hunt position 1 (issue #168), so eight-shot prompts include it.
+    public const string ShippedId = "bank-v2";
 
     // How many of it the selector ships showing: the arm that won the battery
     // ablation (65.6% against zero-shot's 56.2%, twelve shots giving it back).

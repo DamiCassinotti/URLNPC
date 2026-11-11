@@ -1,0 +1,161 @@
+{
+  "conditions": {
+    "v4": {
+      "entity": "NPC",
+      "episodes": 100,
+      "wins": 51,
+      "losses": 44,
+      "draws": 5,
+      "winRate": 0.51,
+      "damageDealtPerEpisode": 71.85,
+      "damageTakenPerEpisode": 83.1,
+      "shots": 562,
+      "hits": 479,
+      "accuracy": 0.8523131672597865,
+      "timeToKillSeconds": 14.718315789473685,
+      "survivalSeconds": 16.98409090909091,
+      "modes": {
+        "Hunt": {
+          "steps": 10536,
+          "eligible": 4320,
+          "compliance": 0.9601851851851851,
+          "visible": 0.41002277904328016,
+          "closing": -0.044887243735763104,
+          "closingVisible": -0.06034004629629631
+        },
+        "HoldCover": {
+          "steps": 3597,
+          "eligible": 1518,
+          "compliance": 0.4209486166007905,
+          "visible": 0.20822907978871283,
+          "closing": -0.028199888796219066,
+          "closingVisible": -0.06393724966622162
+        },
+        "Retreat": {
+          "steps": 6520,
+          "eligible": 411,
+          "compliance": 0.0,
+          "visible": 0.050920245398773004,
+          "closing": 0.002438496932515335,
+          "closingVisible": -0.04836746987951807
+        },
+        "Patrol": {
+          "steps": 79277,
+          "eligible": 79277,
+          "compliance": 0.36542755149665096,
+          "visible": 0.07708414798743646,
+          "closing": -0.023767246490154777,
+          "closingVisible": -0.05897218131238752
+        }
+      },
+      "selector": {
+        "selector": "llm",
+        "model": "claude-haiku-4-5-20251001",
+        "prompts": [
+          "v4+bank-v1x8"
+        ],
+        "decisions": 720,
+        "decisionsPerEpisode": 7.2,
+        "modeDistribution": {
+          "Patrol": 510,
+          "HoldCover": 33,
+          "Retreat": 90,
+          "Hunt": 86
+        },
+        "switchRate": 0.3240611961057024,
+        "latencyMsMean": 835.6805555555555,
+        "latencyMsP95": 1039,
+        "invalidRate": 0.0,
+        "fallbackRate": 0.0,
+        "outcomes": {
+          "applied": 719,
+          "error": 1
+        }
+      }
+    },
+    "v6": {
+      "entity": "NPC",
+      "episodes": 100,
+      "wins": 47,
+      "losses": 48,
+      "draws": 5,
+      "winRate": 0.47,
+      "damageDealtPerEpisode": 69.9,
+      "damageTakenPerEpisode": 84.3,
+      "shots": 558,
+      "hits": 466,
+      "accuracy": 0.8351254480286738,
+      "timeToKillSeconds": 13.347157894736842,
+      "survivalSeconds": 15.572916666666666,
+      "modes": {
+        "Hunt": {
+          "steps": 19877,
+          "eligible": 4909,
+          "compliance": 0.919942961906702,
+          "visible": 0.24696885847964983,
+          "closing": -0.028864214921768886,
+          "closingVisible": -0.05991444286005295
+        },
+        "HoldCover": {
+          "steps": 3783,
+          "eligible": 1302,
+          "compliance": 0.006144393241167435,
+          "visible": 0.2780861749933915,
+          "closing": -0.03119984139571768,
+          "closingVisible": -0.058121673003802284
+        },
+        "Retreat": {
+          "steps": 3151,
+          "eligible": 527,
+          "compliance": 0.0,
+          "visible": 0.09076483655982227,
+          "closing": -0.007612186607426212,
+          "closingVisible": -0.05112937062937063
+        },
+        "Patrol": {
+          "steps": 66615,
+          "eligible": 66615,
+          "compliance": 0.3857689709524882,
+          "visible": 0.07585378668468062,
+          "closing": -0.026254897545597837,
+          "closingVisible": -0.06367563823471208
+        }
+      },
+      "selector": {
+        "selector": "llm",
+        "model": "claude-haiku-4-5-20251001",
+        "prompts": [
+          "v6+bank-v2x8"
+        ],
+        "decisions": 674,
+        "decisionsPerEpisode": 6.74,
+        "modeDistribution": {
+          "Patrol": 425,
+          "Retreat": 66,
+          "HoldCover": 37,
+          "Hunt": 146
+        },
+        "switchRate": 0.4258160237388724,
+        "latencyMsMean": 853.4124629080119,
+        "latencyMsP95": 1079,
+        "invalidRate": 0.0,
+        "fallbackRate": 0.0,
+        "outcomes": {
+          "applied": 674
+        }
+      }
+    }
+  },
+  "pairwise": [
+    {
+      "a": "v4",
+      "b": "v6",
+      "winRateA": 0.51,
+      "winRateB": 0.47,
+      "diff": 0.040000000000000036,
+      "ciLow": -0.09691865197001812,
+      "ciHigh": 0.1748268075307099
+    }
+  ],
+  "failures": []
+}
