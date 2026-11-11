@@ -1,0 +1,23 @@
+[
+  {
+    "name": "llm",
+    "args": [
+      "--selector", "llm",
+      "--llm-backend", "anthropic",
+      "--llm-model", "claude-haiku-4-5-20251001",
+      "--llm-prompt", "v6",
+      "--llm-exemplars", "bank-v2",
+      "--llm-shots", "8",
+      "--decision-period", "5",
+      "--llm-timeout", "4"
+    ]
+  },
+  {
+    "name": "fsm",
+    "args": ["--selector", "fsm", "--decision-period", "5"]
+  },
+  {
+    "name": "random",
+    "args": ["--selector", "random", "--decision-period", "5"]
+  }
+]
