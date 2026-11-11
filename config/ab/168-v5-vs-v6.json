@@ -1,0 +1,24 @@
+[
+  {
+    "name": "v5",
+    "args": [
+      "--selector", "llm",
+      "--llm-backend", "anthropic",
+      "--llm-model", "claude-haiku-4-5-20251001",
+      "--llm-prompt", "v5",
+      "--llm-exemplars", "bank-v1",
+      "--llm-shots", "8"
+    ]
+  },
+  {
+    "name": "v6",
+    "args": [
+      "--selector", "llm",
+      "--llm-backend", "anthropic",
+      "--llm-model", "claude-haiku-4-5-20251001",
+      "--llm-prompt", "v6",
+      "--llm-exemplars", "bank-v2",
+      "--llm-shots", "8"
+    ]
+  }
+]
