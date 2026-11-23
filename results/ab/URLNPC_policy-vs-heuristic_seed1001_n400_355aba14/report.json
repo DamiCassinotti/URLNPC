@@ -1,0 +1,282 @@
+{
+  "conditions": {
+    "llm8": {
+      "entity": "NPC",
+      "episodes": 400,
+      "wins": 189,
+      "losses": 201,
+      "draws": 10,
+      "winRate": 0.4725,
+      "damageDealtPerEpisode": 68.2875,
+      "damageTakenPerEpisode": 84.4875,
+      "shots": 2213,
+      "hits": 1821,
+      "accuracy": 0.8228648892905558,
+      "timeToKillSeconds": 13.943435897435897,
+      "survivalSeconds": 15.496019900497512,
+      "modes": {
+        "Hunt": {
+          "steps": 71966,
+          "eligible": 17820,
+          "compliance": 0.8895622895622896,
+          "visible": 0.24761693021704695,
+          "closing": -0.030188672428646868,
+          "closingVisible": -0.0542753647586981
+        },
+        "HoldCover": {
+          "steps": 16695,
+          "eligible": 6702,
+          "compliance": 0.0453595941509997,
+          "visible": 0.24977538185085355,
+          "closing": -0.041426355196166526,
+          "closingVisible": -0.06154820143884893
+        },
+        "Retreat": {
+          "steps": 9034,
+          "eligible": 2002,
+          "compliance": 0.06393606393606394,
+          "visible": 0.12386539738764667,
+          "closing": -0.007387093203453613,
+          "closingVisible": -0.05216175156389633
+        },
+        "Patrol": {
+          "steps": 234350,
+          "eligible": 234350,
+          "compliance": 0.3846981011307873,
+          "visible": 0.09229357798165137,
+          "closing": -0.028872417324514617,
+          "closingVisible": -0.061034583198483455
+        }
+      },
+      "selector": {
+        "selector": "llm",
+        "model": "claude-haiku-4-5-20251001",
+        "prompts": [
+          "v6+bank-v2x8"
+        ],
+        "decisions": 2403,
+        "decisionsPerEpisode": 6.0075,
+        "modeDistribution": {
+          "Patrol": 1476,
+          "Retreat": 207,
+          "HoldCover": 186,
+          "Hunt": 532
+        },
+        "switchRate": 0.42149104539775095,
+        "latencyMsMean": 884.8148148148148,
+        "latencyMsP95": 1094,
+        "invalidRate": 0.0,
+        "fallbackRate": 0.0,
+        "outcomes": {
+          "applied": 2401,
+          "error": 2
+        }
+      }
+    },
+    "llm13": {
+      "entity": "NPC",
+      "episodes": 400,
+      "wins": 195,
+      "losses": 194,
+      "draws": 11,
+      "winRate": 0.4875,
+      "damageDealtPerEpisode": 68.925,
+      "damageTakenPerEpisode": 83.4375,
+      "shots": 2245,
+      "hits": 1838,
+      "accuracy": 0.8187082405345212,
+      "timeToKillSeconds": 14.215938303341902,
+      "survivalSeconds": 15.945360824742268,
+      "modes": {
+        "Hunt": {
+          "steps": 70371,
+          "eligible": 16666,
+          "compliance": 0.8982959318372735,
+          "visible": 0.23683051256909807,
+          "closing": -0.03093106535362578,
+          "closingVisible": -0.05481513260530421
+        },
+        "HoldCover": {
+          "steps": 16959,
+          "eligible": 7016,
+          "compliance": 0.10276510832383125,
+          "visible": 0.26062857479804236,
+          "closing": -0.04133374609351965,
+          "closingVisible": -0.06122285067873301
+        },
+        "Retreat": {
+          "steps": 15666,
+          "eligible": 2161,
+          "compliance": 0.23044886626561778,
+          "visible": 0.07442869909357845,
+          "closing": -0.002738669730626835,
+          "closingVisible": -0.03191423670668954
+        },
+        "Patrol": {
+          "steps": 239629,
+          "eligible": 239629,
+          "compliance": 0.37462076793710275,
+          "visible": 0.0935738161908617,
+          "closing": -0.02816216317724481,
+          "closingVisible": -0.05915970209160237
+        }
+      },
+      "selector": {
+        "selector": "llm",
+        "model": "claude-haiku-4-5-20251001",
+        "prompts": [
+          "v6+bank-v2x13"
+        ],
+        "decisions": 2468,
+        "decisionsPerEpisode": 6.17,
+        "modeDistribution": {
+          "Patrol": 1502,
+          "Retreat": 243,
+          "HoldCover": 194,
+          "Hunt": 524
+        },
+        "switchRate": 0.43158749492488835,
+        "latencyMsMean": 897.5036466774717,
+        "latencyMsP95": 1100,
+        "invalidRate": 0.0,
+        "fallbackRate": 0.0,
+        "outcomes": {
+          "applied": 2463,
+          "error": 5
+        }
+      }
+    },
+    "fsm": {
+      "entity": "NPC",
+      "episodes": 400,
+      "wins": 204,
+      "losses": 183,
+      "draws": 13,
+      "winRate": 0.51,
+      "damageDealtPerEpisode": 69.45,
+      "damageTakenPerEpisode": 83.4375,
+      "shots": 2260,
+      "hits": 1852,
+      "accuracy": 0.8194690265486726,
+      "timeToKillSeconds": 13.841343669250646,
+      "survivalSeconds": 15.580327868852459,
+      "modes": {
+        "Hunt": {
+          "steps": 53309,
+          "eligible": 24276,
+          "compliance": 0.936562860438293,
+          "visible": 0.45538276838807706,
+          "closing": -0.05082102459247032,
+          "closingVisible": -0.06384643269072335
+        },
+        "HoldCover": {
+          "steps": 15618,
+          "eligible": 2536,
+          "compliance": 0.25985804416403785,
+          "visible": 0.06447688564476886,
+          "closing": -0.04371814572928673,
+          "closingVisible": -0.07197815292949354
+        },
+        "Retreat": {
+          "steps": 26178,
+          "eligible": 7764,
+          "compliance": 0.16447707367336425,
+          "visible": 0.2075406830162732,
+          "closing": -0.010687791275116515,
+          "closingVisible": -0.052600773053561575
+        },
+        "Patrol": {
+          "steps": 250921,
+          "eligible": 250921,
+          "compliance": 0.3154937211313521,
+          "visible": 0.05572670282678612,
+          "closing": -0.023921050848673485,
+          "closingVisible": -0.05695344346706716
+        }
+      },
+      "selector": {
+        "selector": "fsm",
+        "model": "",
+        "prompts": [],
+        "decisions": 2591,
+        "decisionsPerEpisode": 6.4775,
+        "modeDistribution": {
+          "Patrol": 1699,
+          "Retreat": 313,
+          "HoldCover": 131,
+          "Hunt": 448
+        },
+        "switchRate": 0.252412196063296,
+        "latencyMsMean": 1.9359320725588576,
+        "latencyMsP95": 12,
+        "invalidRate": 0.0,
+        "fallbackRate": 0.0,
+        "outcomes": {
+          "applied": 2591
+        }
+      }
+    }
+  },
+  "pairwise": [
+    {
+      "a": "llm8",
+      "b": "llm13",
+      "winRateA": 0.4725,
+      "winRateB": 0.4875,
+      "diff": -0.015000000000000013,
+      "ciLow": -0.08380225896559276,
+      "ciHigh": 0.054003723262094364
+    },
+    {
+      "a": "llm8",
+      "b": "fsm",
+      "winRateA": 0.4725,
+      "winRateB": 0.51,
+      "diff": -0.03750000000000003,
+      "ciLow": -0.10615425642498572,
+      "ciHigh": 0.03165856788426745
+    },
+    {
+      "a": "llm13",
+      "b": "fsm",
+      "winRateA": 0.4875,
+      "winRateB": 0.51,
+      "diff": -0.02250000000000002,
+      "ciLow": -0.09129598254264322,
+      "ciHigh": 0.04659866001073826
+    }
+  ],
+  "pairedDamage": [
+    {
+      "a": "llm8",
+      "b": "llm13",
+      "pairs": 400,
+      "meanDiffA": -16.2,
+      "meanDiffB": -14.5125,
+      "diff": -1.6875,
+      "ciLow": -4.285092581066428,
+      "ciHigh": 0.9100925810664284
+    },
+    {
+      "a": "llm8",
+      "b": "fsm",
+      "pairs": 400,
+      "meanDiffA": -16.2,
+      "meanDiffB": -13.9875,
+      "diff": -2.2125,
+      "ciLow": -5.640829388905448,
+      "ciHigh": 1.2158293889054486
+    },
+    {
+      "a": "llm13",
+      "b": "fsm",
+      "pairs": 400,
+      "meanDiffA": -14.5125,
+      "meanDiffB": -13.9875,
+      "diff": -0.525,
+      "ciLow": -4.361263961716282,
+      "ciHigh": 3.3112639617162816
+    }
+  ],
+  "failures": []
+}
