@@ -112,5 +112,33 @@ class LoadConditionEventsTests(unittest.TestCase):
             self.assertEqual(events[0]["type"], "episode_summary")
 
 
+class PairedDamageTests(unittest.TestCase):
+    def _write(self, out, name, index, dealt, taken):
+        directory = ab.match_dir(out, name, index)
+        os.makedirs(directory)
+        with open(os.path.join(directory, "summary.json"), "w", encoding="utf-8") as handle:
+            json.dump({"damageDealtPerEpisode": dealt, "damageTakenPerEpisode": taken}, handle)
+
+    def test_pairs_on_match_index_and_skips_unfinished(self):
+        with tempfile.TemporaryDirectory() as out:
+            for index, (a, b) in enumerate([(50, 20), (30, 30), (0, 10)], start=1):
+                self._write(out, "a", index, a, 0)
+                if index < 3:
+                    self._write(out, "b", index, b, 0)
+            rows = ab.paired_damage_rows(out, [{"name": "a"}, {"name": "b"}], 3, 0.95)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["pairs"], 2)
+            self.assertAlmostEqual(rows[0]["diff"], 15.0)
+
+    def test_interval_is_centred_on_the_mean_delta(self):
+        diff, lower, upper, n = ab.paired_diff_interval([10, 20, 30], [5, 10, 15], 1.96)
+        self.assertEqual(n, 3)
+        self.assertAlmostEqual(diff, 10.0)
+        self.assertAlmostEqual(diff - lower, upper - diff)
+
+    def test_too_few_pairs_gives_no_interval(self):
+        self.assertIsNone(ab.paired_diff_interval([1], [2], 1.96))
+
+
 if __name__ == "__main__":
     unittest.main()

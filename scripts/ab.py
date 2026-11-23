@@ -218,7 +218,51 @@ def pairwise_rows(conditions, summaries, confidence):
     return rows
 
 
-def render_report(args, conditions, summaries, completed, failures, pairwise):
+def load_match_differentials(out, condition_name, matches):
+    """Damage dealt − taken per finished match, keyed by match index."""
+    result = {}
+    for index in range(1, matches + 1):
+        path = os.path.join(match_dir(out, condition_name, index), "summary.json")
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as handle:
+                summary = json.load(handle)
+            result[index] = summary["damageDealtPerEpisode"] - summary["damageTakenPerEpisode"]
+    return result
+
+
+def paired_diff_interval(a_values, b_values, z):
+    """Mean of per-match (a − b) with a normal-approximation CI. None below 2 pairs."""
+    deltas = [a - b for a, b in zip(a_values, b_values)]
+    if len(deltas) < 2:
+        return None
+    mean = statistics.fmean(deltas)
+    half = z * statistics.stdev(deltas) / math.sqrt(len(deltas))
+    return mean, mean - half, mean + half, len(deltas)
+
+
+def paired_damage_rows(out, conditions, matches, confidence):
+    z = statistics.NormalDist().inv_cdf((1 + confidence) / 2)
+    differentials = {c["name"]: load_match_differentials(out, c["name"], matches)
+                     for c in conditions}
+    rows = []
+    for i, a in enumerate(conditions):
+        for b in conditions[i + 1:]:
+            da, db = differentials[a["name"]], differentials[b["name"]]
+            shared = sorted(set(da) & set(db))
+            interval = paired_diff_interval([da[k] for k in shared], [db[k] for k in shared], z)
+            if interval is None:
+                continue
+            diff, lower, upper, n = interval
+            rows.append({
+                "a": a["name"], "b": b["name"], "pairs": n,
+                "meanDiffA": statistics.fmean(da[k] for k in shared),
+                "meanDiffB": statistics.fmean(db[k] for k in shared),
+                "diff": diff, "ciLow": lower, "ciHigh": upper,
+            })
+    return rows
+
+
+def render_report(args, conditions, summaries, completed, failures, pairwise, paired_damage=()):
     lines = [
         f"# A/B batch — {os.path.basename(args.out)}",
         "",
@@ -305,6 +349,20 @@ def render_report(args, conditions, summaries, completed, failures, pairwise):
                 f"| {row['winRateB'] * 100:.1f}% | {row['diff'] * 100:+.1f} pp "
                 f"| [{row['ciLow'] * 100:+.1f}, {row['ciHigh'] * 100:+.1f}] pp |")
 
+    if paired_damage:
+        lines += [
+            "",
+            f"## Paired damage differential, dealt − taken per match ({int(args.confidence * 100)}% CI)",
+            "",
+            "| A | B | pairs | mean A | mean B | A − B | CI |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for row in paired_damage:
+            lines.append(
+                f"| {row['a']} | {row['b']} | {row['pairs']} | {row['meanDiffA']:+.1f} "
+                f"| {row['meanDiffB']:+.1f} | {row['diff']:+.1f} "
+                f"| [{row['ciLow']:+.1f}, {row['ciHigh']:+.1f}] |")
+
     return "\n".join(lines) + "\n"
 
 
@@ -378,11 +436,15 @@ def main():
     summaries, completed = summarize_conditions(args.out, conditions, args.matches)
     pairwise = pairwise_rows(conditions, summaries, args.confidence)
 
-    report = render_report(args, conditions, summaries, completed, failures, pairwise)
+    paired_damage = paired_damage_rows(args.out, conditions, args.matches, args.confidence)
+
+    report = render_report(args, conditions, summaries, completed, failures, pairwise,
+                           paired_damage)
     with open(os.path.join(args.out, "report.md"), "w", encoding="utf-8") as handle:
         handle.write(report)
     with open(os.path.join(args.out, "report.json"), "w", encoding="utf-8") as handle:
-        json.dump({"conditions": summaries, "pairwise": pairwise, "failures": failures},
+        json.dump({"conditions": summaries, "pairwise": pairwise,
+                    "pairedDamage": paired_damage, "failures": failures},
                    handle, indent=2)
     print(report)
     print(f"==> results in {args.out}", file=sys.stderr)
